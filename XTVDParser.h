@@ -9,12 +9,13 @@
 #import <Cocoa/Cocoa.h>
 
 @interface XTVDParser : NSObject {
-
+  id	mReportProgressTo;
+  NSManagedObjectContext *mManagedObjectContext;
 }
 
-+ (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument reportTo:(id)inProgressDisplay inManagedObjectContext:(NSManagedObjectContext *)inMOC lineupsOnly:(BOOL)inLineupsOnly;
-+ (void) parseXMLFile:(NSString *)filePath reportTo:(id)inProgressDisplay inManagedObjectContext:(NSManagedObjectContext*)inMOC lineupsOnly:(BOOL)inLineupsOnly;
-+ (void) handleError:(NSError*) error;
+- (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument lineupsOnly:(BOOL)inLineupsOnly;
+- (void) parseXMLFile:(NSString *)filePath lineupsOnly:(BOOL)inLineupsOnly;
+- (void) handleError:(NSError*) error;
 
 @end
 
