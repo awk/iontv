@@ -13,6 +13,7 @@
 
 const int kScheduleStationColumnViewDefaultNumberOfCells = 200;
 const int kScheduleStationColumnViewWidth = 95;
+const int kScheduleStationColumnViewCellHeight = 32;
 
 @implementation ScheduleStationColumnView
 

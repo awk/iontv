@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-const int kScheduleStationColumnViewCellHeight = 32;
+extern const int kScheduleStationColumnViewCellHeight;
 
 @class Z2ITLineup;
 
