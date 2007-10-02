@@ -18,6 +18,11 @@
     IBOutlet NSObjectController *mCurrentSchedule;
     IBOutlet NSObjectController *mCurrentStation;
     IBOutlet NSObjectController *mCurrentLineup;
+	
+	IBOutlet NSView *mScheduleDetailsContentView;
+	IBOutlet NSWindow *mScheduleDetailsParentWindow;
+	
+	NSWindow *mScheduleDetailsPopupWindow;
     CFAbsoluteTime mStartTime;
 }
 

@@ -65,6 +65,9 @@
 		EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3090C30C6AB59E0005E89B /* RSWishlistController.m */; };
+		EA3B40500C8C79470042C793 /* ScheduleDetailsPopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */; };
+		EA3B40570C8C7AEE0042C793 /* closebox.png in Resources */ = {isa = PBXBuildFile; fileRef = EA3B40550C8C7AEE0042C793 /* closebox.png */; };
+		EA3B40580C8C7AEE0042C793 /* closebox_pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */; };
 		EA4B9FC10C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */; };
 		EA4B9FC20C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */; };
 		EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */; };
@@ -220,6 +223,10 @@
 		EA308FB60C66A7470005E89B /* RSColorDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSColorDictionary.m; sourceTree = "<group>"; };
 		EA3090C20C6AB59E0005E89B /* RSWishlistController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSWishlistController.h; sourceTree = "<group>"; };
 		EA3090C30C6AB59E0005E89B /* RSWishlistController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSWishlistController.m; sourceTree = "<group>"; };
+		EA3B404E0C8C79470042C793 /* ScheduleDetailsPopupView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleDetailsPopupView.h; sourceTree = "<group>"; };
+		EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleDetailsPopupView.m; sourceTree = "<group>"; };
+		EA3B40550C8C7AEE0042C793 /* closebox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = closebox.png; path = Images/closebox.png; sourceTree = "<group>"; };
+		EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = closebox_pressed.png; path = Images/closebox_pressed.png; sourceTree = "<group>"; };
 		EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched.xcmappingmodel; sourceTree = "<group>"; };
 		EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSCommonAppDelegate.h; sourceTree = "<group>"; };
@@ -430,6 +437,8 @@
 		EA2939860C0CC89E0053E2B8 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EA3B40550C8C7AEE0042C793 /* closebox.png */,
+				EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */,
 				EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */,
 				EA0888150B86B16C00809664 /* CC.tif */,
 				EA0888160B86B16C00809664 /* HD.tif */,
@@ -560,6 +569,8 @@
 				EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */,
 				EA977F5B0C8992CF0043B79E /* RSOutlineView.h */,
 				EA977F5C0C8992CF0043B79E /* RSOutlineView.m */,
+				EA3B404E0C8C79470042C793 /* ScheduleDetailsPopupView.h */,
+				EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -675,6 +686,8 @@
 				EA20AE0E0C23589700A9BDBD /* recsched.syncschema in Resources */,
 				EA20AE290C23608C00A9BDBD /* ClientDescription_Server.plist in Resources */,
 				EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */,
+				EA3B40570C8C7AEE0042C793 /* closebox.png in Resources */,
+				EA3B40580C8C7AEE0042C793 /* closebox_pressed.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -730,6 +743,7 @@
 				EA4B9FC10C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */,
 				EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */,
 				EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */,
+				EA3B40500C8C79470042C793 /* ScheduleDetailsPopupView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

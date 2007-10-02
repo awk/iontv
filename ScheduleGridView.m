@@ -16,6 +16,8 @@
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 
+const float kScheduleDetailsPopUpTime = 10.0;
+
 @interface ScheduleGridLine : NSObject
 {
   NSMutableArray *mCellsInLineArray;
@@ -33,6 +35,7 @@
 - (void) drawCellsWithFrame:(NSRect) inFrame inView:(NSView *)inView;
 - (Z2ITSchedule*) scheduleAtLocation:(NSPoint)localPoint withFrame:(NSRect)inFrame;
 - (void) mouseDown:(NSEvent *)theEvent withFrame:(NSRect)inFrame;
+- (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute;
 - (NSCell*) cellForSchedule:(Z2ITSchedule*)inSchedule;
 - (NSImage*) cellImageAtLocation:(NSPoint)localPoint withFrame:(NSRect) inFrame  inView:(NSView*)inView;
 - (NSPoint) dragImageLocFor:(NSPoint)localPoint withFrame:(NSRect) inFrame;
@@ -97,6 +100,16 @@
 {
 	// We need to be flipped in order for the layout manager to draw text correctly
 	return YES;
+}
+
+- (void) restartPopupTimer
+{
+	if (mScheduleCellPopupTimer)
+	{
+		[mScheduleCellPopupTimer invalidate];
+		mScheduleCellPopupTimer  = nil;
+	}
+	mScheduleCellPopupTimer = [NSTimer scheduledTimerWithTimeInterval:kScheduleDetailsPopUpTime target:self selector:@selector(showScheduleDetails:) userInfo:nil repeats:NO];
 }
 
 - (void)drawRect:(NSRect)rect 
@@ -212,6 +225,21 @@
     return;
 }
 
+- (void) mouseEntered:(NSEvent*) theEvent
+{
+	[self restartPopupTimer];
+}
+
+- (void) mouseExited:(NSEvent*) theEvent
+{
+//	NSPoint localPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+	if (mScheduleCellPopupTimer)
+	{
+		[mScheduleCellPopupTimer invalidate];
+		mScheduleCellPopupTimer  = nil;
+	}
+}
+
 - (NSMenu*) menuForEvent:(NSEvent*) theEvent
 {
 	NSMenu *theMenu = [self menu];
@@ -254,6 +282,36 @@
     [self setNeedsDisplay:YES];
 }
 
+- (void) updateSelectedScheduleCellTrackingArea
+{
+	// Remove any current tracking area
+	if (mScheduleCellTrackingArea)
+	{
+		[self removeTrackingArea:mScheduleCellTrackingArea];
+		[mScheduleCellTrackingArea release];
+		mScheduleCellTrackingArea = nil;
+	}
+	
+	// start tracking the mouse in the cell area - we use this to popup the larger program details window
+	int gridLineIndex = 0;
+	for (ScheduleGridLine *aGridLine in mStationsInViewArray)
+	{
+		if ([aGridLine station] == [mSelectedSchedule station])
+		{
+			float pixelsPerMinute = [self frame].size.width / mVisibleTimeSpan ;
+			NSRect cellRect = [aGridLine cellFrameRectForSchedule:mSelectedSchedule withPixelsPerMinute:pixelsPerMinute];
+			cellRect.origin.y = gridLineIndex * kScheduleStationColumnViewCellHeight;
+			mScheduleCellTrackingArea = [[NSTrackingArea alloc] initWithRect:cellRect 
+				options:(NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow)
+				 owner:self userInfo:nil];
+			[self addTrackingArea:mScheduleCellTrackingArea];
+			[self restartPopupTimer];
+			break;
+		}
+		gridLineIndex++;
+	}
+}
+
 - (void) setSortedStationsArray:(NSArray*)inArray forLineup:(Z2ITLineup*)inLineup;
 {
   [mCurrentLineup autorelease];
@@ -269,12 +327,14 @@
   mStartStationIndex = inIndex;
   [self updateStationsInViewArray];
   [self updateForNewStartTime];
+  [self updateSelectedScheduleCellTrackingArea];
 }
 
 - (void) setStartTime:(CFAbsoluteTime)inStartTime
 {
   mStartTime = inStartTime;
   [self updateForNewStartTime];
+  [self updateSelectedScheduleCellTrackingArea];
 }
 
 - (void) setVisibleTimeSpan:(float)inTimeSpan
@@ -294,18 +354,18 @@
 
 - (void) setSelectedSchedule:(Z2ITSchedule*)inSchedule
 {
-  NSEnumerator *anEnumerator = [mStationsInViewArray objectEnumerator];
-  ScheduleGridLine *aGridLine;
-  while ((aGridLine = [anEnumerator nextObject]) != nil)
+  for (ScheduleGridLine *aGridLine in mStationsInViewArray)
   {
     if ([aGridLine station] == [inSchedule station])
     {
       NSCell *aCell = [aGridLine cellForSchedule:inSchedule];
       [self setSelectedCell:aCell];
+	  break;
     }
   }
   [mSelectedSchedule autorelease];
   mSelectedSchedule = [inSchedule retain];
+  [self updateSelectedScheduleCellTrackingArea];
 }
 
 - (Z2ITSchedule*) selectedSchedule
@@ -323,6 +383,26 @@
   {
 	[delegate setCurrentStation:[inSchedule station]];
   }
+}
+
+- (void)updateTrackingAreas
+{
+	[self updateSelectedScheduleCellTrackingArea];
+}
+
+- (void) showScheduleDetails:(NSTimer*) theTimer
+{
+	[mScheduleCellPopupTimer invalidate];
+	mScheduleCellPopupTimer = nil;
+	// Is the mouse inside the tracking area ? Only show the schedule details popup if it is
+	NSPoint mousePoint = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
+	if ([self mouse:mousePoint inRect:[mScheduleCellTrackingArea rect]])
+	{
+		if (delegate && ([delegate respondsToSelector:@selector(showScheduleDetails:)]))
+		{
+			[delegate showScheduleDetails:theTimer];
+		}
+	}
 }
 
 #pragma mark Drag and Drop

@@ -21,6 +21,8 @@
   NSCell *mSelectedCell;
   Z2ITSchedule *mSelectedSchedule;
   id  delegate;
+	NSTrackingArea *mScheduleCellTrackingArea;
+	NSTimer *mScheduleCellPopupTimer;
 }
 
 - (void) setSortedStationsArray:(NSArray*)inArray forLineup:(Z2ITLineup*)inLineup;

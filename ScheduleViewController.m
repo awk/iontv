@@ -8,6 +8,7 @@
 
 #import "ScheduleViewController.h"
 #import "ScheduleView.h"
+#import "ScheduleDetailsPopupView.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
 #import "Z2ITLineup.h"
@@ -39,6 +40,23 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
   [self updateSegmentDisplay];
   [self updateSegmentMenus];
   [mCurrentSchedule addObserver:self forKeyPath:@"content" options:NSKeyValueObservingOptionNew context:nil];
+  
+  // Set the popup window to be transparent
+  NSRect windowLocation = [mScheduleDetailsContentView frame];
+  windowLocation.origin.x = ([mScheduleDetailsParentWindow frame].size.width - windowLocation.size.width)/2 + [mScheduleDetailsParentWindow frame].origin.x;
+  windowLocation.origin.y = ([mScheduleDetailsParentWindow frame].size.height - windowLocation.size.height)/2 + [mScheduleDetailsParentWindow frame].origin.y;
+  windowLocation.size.width += kScheduleDetailsPopupWidthPadding;
+  windowLocation.size.height += kScheduleDetailsPopupHeightPadding;
+  mScheduleDetailsPopupWindow  = [[NSWindow alloc] initWithContentRect:windowLocation styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:YES];
+//  [mScheduleDetailsPopupWindow setMovableByWindowBackground:YES];
+  [mScheduleDetailsPopupWindow setOpaque:NO];
+  [mScheduleDetailsPopupWindow setBackgroundColor:[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:0.0]];
+  
+  // Reset the windowLocation origin to zero and increase the size of the view - this give us the space
+  // 'outside' in which we can draw the close icon.
+  windowLocation.origin.x = windowLocation.origin.y = 0;
+  [mScheduleDetailsContentView setFrame:windowLocation];
+  [[mScheduleDetailsPopupWindow contentView] addSubview:mScheduleDetailsContentView];
 }
 
 - (void) goBackwards
@@ -244,6 +262,13 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
     default:
       break;
   }
+}
+
+- (void) showScheduleDetails:(NSTimer*)theTimer
+{
+	[mScheduleDetailsParentWindow addChildWindow:mScheduleDetailsPopupWindow ordered:NSWindowAbove];
+	[mScheduleDetailsPopupWindow setIsVisible:YES];
+	[mScheduleDetailsPopupWindow makeKeyAndOrderFront:self];
 }
 
 @end
