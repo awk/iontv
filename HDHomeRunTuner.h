@@ -13,7 +13,9 @@
 
 @class HDHomeRun;
 @class HDHomeRunChannel;
+@class HDHomeRunStation;
 @class Z2ITLineup;
+@class Z2ITStation;
 
 @interface HDHomeRunTuner : NSManagedObject {
   struct hdhomerun_device_t *mHDHomeRunDevice;
@@ -42,7 +44,7 @@
   
 }
 
-+ createChannelWithType:(NSString*)inChannelType andNumber:(NSNumber*)inChannelNumber inManagedObjectContext:(NSManagedObjectContext*) inMOC;
++ (HDHomeRunChannel*) createChannelWithType:(NSString*)inChannelType andNumber:(NSNumber*)inChannelNumber inManagedObjectContext:(NSManagedObjectContext*) inMOC;
 
 - (NSString*) channelType;
 - (void) setChannelType:(NSString*)value;
@@ -57,5 +59,27 @@
 - (void)setTuner:(HDHomeRunTuner*)value;
 
 - (NSMutableSet *)stations;
+
+- (void) addStation:(HDHomeRunStation*)inStation;
+
+@end
+
+@interface HDHomeRunStation : NSManagedObject
+{
+}
+
++ (HDHomeRunStation*) createStationWithProgramNumber:(NSNumber*)inProgramNumber forChannel:(HDHomeRunChannel*)inChannel inManagedObjectContext:(NSManagedObjectContext*)inMOC;
+
+- (NSNumber*) programNumber;
+- (void) setProgramNumber:(NSNumber*)value;
+
+- (NSString*) callSign;
+- (void) setCallSign:(NSString*)value;
+
+- (HDHomeRunChannel*) channel;
+- (void) setChannel:(HDHomeRunChannel*) value;
+
+- (Z2ITStation*) Z2ITStation;
+- (void) setZ2ITStation:(Z2ITStation*) value;
 
 @end
