@@ -236,6 +236,7 @@
 		EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PolishedBackgroundView.m; sourceTree = "<group>"; };
 		EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RBSplitView.xcodeproj; path = RBSplitView/RBSplitView.xcodeproj; sourceTree = SOURCE_ROOT; };
 		EA293E870C10A8040053E2B8 /* ChannelScanProgressDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelScanProgressDisplayProtocol.h; sourceTree = "<group>"; };
+		EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLParsingProgressDisplayProtocol.h; sourceTree = "<group>"; };
 		EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_channelscan.c; path = ../libhdhomerun/hdhomerun_channelscan.c; sourceTree = SOURCE_ROOT; };
 		EA2EE02A0C07D2130002420F /* hdhomerun_channelscan.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_channelscan.h; path = ../libhdhomerun/hdhomerun_channelscan.h; sourceTree = SOURCE_ROOT; };
 		EA2EE02B0C07D2130002420F /* hdhomerun_config.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_config.c; path = ../libhdhomerun/hdhomerun_config.c; sourceTree = SOURCE_ROOT; };
@@ -558,6 +559,7 @@
 		EAF890120B66DC6400373CEF /* View & UI Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */,
 				EA2939B90C0CD63E0053E2B8 /* JKImageTextCell.h */,
 				EA2939BA0C0CD63E0053E2B8 /* JKImageTextCell.m */,
 				EA2939BB0C0CD63E0053E2B8 /* JKSeparatorCell.h */,

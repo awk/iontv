@@ -8,14 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class MainWindowController;
-
 @interface XTVDParser : NSObject {
 
 }
 
-+ (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument reportTo:(MainWindowController*)inMainWindowController inManagedObjectContext:(NSManagedObjectContext *)inMOC lineupsOnly:(BOOL)inLineupsOnly;
-+ (void) parseXMLFile:(NSString *)filePath reportTo:(MainWindowController*)inMainWindowController inManagedObjectContext:(NSManagedObjectContext*)inMOC lineupsOnly:(BOOL)inLineupsOnly;
++ (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument reportTo:(id)inProgressDisplay inManagedObjectContext:(NSManagedObjectContext *)inMOC lineupsOnly:(BOOL)inLineupsOnly;
++ (void) parseXMLFile:(NSString *)filePath reportTo:(id)inProgressDisplay inManagedObjectContext:(NSManagedObjectContext*)inMOC lineupsOnly:(BOOL)inLineupsOnly;
 + (void) handleError:(NSError*) error;
 
 @end

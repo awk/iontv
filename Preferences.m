@@ -564,6 +564,11 @@ static Preferences *sSharedInstance = nil;
 //  [mParsingProgressInfoField setHidden:NO];
 }
 
+- (void) cleanupComplete:(id)info
+{
+  // Cleanup never happens for lineup downloads in the Preferences dialog.
+}
+
 #pragma mark - Toolbar Delegates
 
 // This method is required of NSToolbar delegates.  It takes an identifier, and returns the matching NSToolbarItem.

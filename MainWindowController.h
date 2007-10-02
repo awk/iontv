@@ -7,12 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "XMLParsingProgressDisplayProtocol.h"
 
 @class Z2ITSchedule;
 @class ScheduleView;
 @class RBSplitView;
 
-@interface MainWindowController : NSWindowController {
+@interface MainWindowController : NSWindowController <XMLParsingProgressDisplay> {
   IBOutlet NSButton *mGetScheduleButton;
   IBOutlet NSProgressIndicator *mParsingProgressIndicator;
   IBOutlet NSTextField *mParsingProgressInfoField;
@@ -39,10 +40,6 @@
 - (IBAction) recordShow:(id)sender;
 - (IBAction) recordSeasonPass:(id)sender;
 - (IBAction) quitServer:(id)sender;
-
-- (void) setParsingInfoString:(NSString*)inInfoString;
-- (void) setParsingProgressMaxValue:(double)inTotal;
-- (void) setParsingProgressDoubleValue:(double)inValue;
 
 - (void) showViewForTableSelection:(int) selectedRow;
 

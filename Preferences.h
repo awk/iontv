@@ -8,13 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import "ChannelScanProgressDisplayProtocol.h"
+#import "XMLParsingProgressDisplayProtocol.h"
 
 extern NSString *kScheduleDownloadDurationPrefStr;
 extern NSString *kWebServicesZap2ItUsernamePrefStr;
 
 @class DiscreteDurationSlider;
 
-@interface Preferences : NSObject <ChannelScanProgressDisplay> {
+@interface Preferences : NSObject <XMLParsingProgressDisplay, ChannelScanProgressDisplay> {
 
     IBOutlet NSTextField *mDurationTextField;
     IBOutlet DiscreteDurationSlider *mDurationSlider;
