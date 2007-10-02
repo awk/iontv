@@ -11,7 +11,10 @@
             ACTIONS = {
                 cancelButtonAction = id; 
                 durationSliderChanged = id; 
+                getAccountButtonAction = id; 
                 okButtonAction = id; 
+                retrieveLineupsButtonAction = id; 
+                scanDevicesButtonAction = id; 
                 showPanel = id; 
             }; 
             CLASS = Preferences; 
@@ -21,9 +24,16 @@
                 mDurationSlider = DiscreteDurationSlider; 
                 mDurationTextField = NSTextField; 
                 mPanel = id; 
+                mParsingProgressIndicator = NSProgressIndicator; 
+                mParsingProgressInfoField = NSTextField; 
                 mPrefsContainerView = NSView; 
+                mRetrieveLineupsButton = NSButton; 
+                mScanTunersButton = NSButton; 
                 mTunerPrefsView = NSView; 
+                mTunerScanProgressIndicator = NSProgressIndicator; 
+                mZap2ItPasswordField = NSTextField; 
                 mZap2ItPrefsView = NSView; 
+                mZap2ItUsernameField = NSTextField; 
             }; 
             SUPERCLASS = NSObject; 
         }
