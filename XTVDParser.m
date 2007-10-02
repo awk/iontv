@@ -146,6 +146,7 @@
   [inMainWindowController setParsingInfoString:@"Updating Lineups"];
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -194,6 +195,7 @@
         [inMainWindowController setParsingProgressMaxValue:lineupChildCount];
         for (j=0; j < lineupChildCount; j++)
         {
+          NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
           NSNumber *stationIDNumber = nil;
           NSString *channelString = nil;
           NSNumber *channelMinorNumber = nil;
@@ -253,6 +255,7 @@
             aLineupMap = NULL;
           }
           
+        [subPool release];
         }
 
         [aLineup release];
@@ -260,6 +263,7 @@
         
       }
     }
+  [subPool release];
   }
 }
 
@@ -285,6 +289,7 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -297,6 +302,7 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
         [programIDArray addObject:programIDString];
       }
     }
+    [subPool release];
   }
   [programIDArray sortUsingSelector:@selector(compare:)];
   NSArray *existingProgramsArray;
@@ -308,6 +314,7 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
   int existingProgramCount = [existingProgramsArray count];
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -328,14 +335,15 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
         
         if (!aProgram)
         {
-          aProgram = [NSEntityDescription insertNewObjectForEntityForName:@"Program"
-                  inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+          aProgram = [[NSEntityDescription insertNewObjectForEntityForName:@"Program"
+                  inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]] autorelease];
         }
         
         [aProgram setProgramID:programIDString];
         [aProgram initializeWithXMLElement:childElement];
       }
     }
+  [subPool release];
   }
 }
 
@@ -360,6 +368,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -372,6 +381,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         [programIDArray addObject:programIDString];
       }
     }
+    [subPool release];
   }
   [programIDArray sortUsingSelector:@selector(compare:)];
   NSArray *existingProgramsArray;
@@ -382,6 +392,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -406,6 +417,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
           [aProgram addProductionCrewWithXMLElement:childElement];
       }
     }
+  [subPool release];
   }
 }
 
@@ -422,6 +434,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -434,6 +447,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         [programIDArray addObject:programIDString];
       }
     }
+    [subPool release];
   }
   [programIDArray sortUsingSelector:@selector(compare:)];
   NSArray *existingProgramsArray;
@@ -444,6 +458,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -468,6 +483,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
           [aProgram addGenreWithXMLElement:childElement];
       }
     }
+  [subPool release];
   }
 }
 
@@ -487,6 +503,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -499,6 +516,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         [programIDArray addObject:programIDString];
       }
     }
+    [subPool release];
   }
   [programIDArray sortUsingSelector:@selector(compare:)];
   NSArray *existingProgramsArray;
@@ -509,6 +527,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   
   for (i=0; i < count; i++)
   {
+    NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
     NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
@@ -547,12 +566,14 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         }
       }
     }
+  [subPool release];
   }
 }
 
 + (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument reportTo:(MainWindowController*)inMainWindowController;
 {
   NSError *err;
+  NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
   NSArray *nodes = [inXMLDocument nodesForXPath:@"//stations" error:&err];
   if ([nodes count] > 0 )
   {
@@ -560,7 +581,6 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         // Update the stations list
         [self updateStations:theStations reportTo:inMainWindowController];
   }
-
   nodes = [inXMLDocument nodesForXPath:@"//lineups" error:&err];
   if ([nodes count] > 0 )
   {
@@ -568,7 +588,9 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         // Update the stations list
         [self updateLineups:theLineups reportTo:inMainWindowController];
   }
+  [subPool release];
 
+  subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//programs" error:&err];
   if ([nodes count] > 0 )
   {
@@ -576,7 +598,9 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         // Update the stations list
         [self updatePrograms:thePrograms reportTo:inMainWindowController];
   }
-
+  [subPool release];
+  
+  subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//productionCrew" error:&err];
   if ([nodes count] > 0 )
   {
@@ -584,7 +608,9 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         // Update the stations list
         [self updateProductionCrew:theProductionCrew reportTo:inMainWindowController];
   }
-
+  [subPool release];
+  
+  subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//genres" error:&err];
   if ([nodes count] > 0 )
   {
@@ -592,7 +618,9 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         // Update the genres list
         [self updateGenres:theGenres reportTo:inMainWindowController];
   }
-
+  [subPool release];
+  
+  subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//schedules" error:&err];
   if ([nodes count] > 0 )
   {
@@ -600,6 +628,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         // Update the stations list
         [self updateSchedules:theSchedules reportTo:inMainWindowController];
   }
+  [subPool release];
 }
 
 @end
@@ -615,7 +644,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   [XTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] reportTo:[xtvdParserData valueForKey:@"reportProgressTo"]];
  
   [[NSFileManager defaultManager] removeFileAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] handler:nil];
-  [[xtvdParserData valueForKey:@"reportProgressTo"] performSelectorOnMainThread:@selector(parsingComplete:) withObject:nil waitUntilDone:YES];
+  [[xtvdParserData valueForKey:@"reportProgressTo"] performSelectorOnMainThread:@selector(parsingComplete:) withObject:nil waitUntilDone:NO];
   [pool release];
 }
 
@@ -685,7 +714,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   [self cleanupSchedulesIn:moc before:currentDate];
   
   [self cleanupUnscheduledProgramsIn:moc];
-  [[xtvdCleanupInfo valueForKey:@"reportProgressTo"] performSelectorOnMainThread:@selector(cleanupComplete:) withObject:nil waitUntilDone:YES];
+  [[xtvdCleanupInfo valueForKey:@"reportProgressTo"] performSelectorOnMainThread:@selector(cleanupComplete:) withObject:nil waitUntilDone:NO];
 
   [pool release];
 }

@@ -102,13 +102,15 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 {
   NSArray *nodes;
   NSError *err;
+  NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];    // A temporary pool 
+  
   nodes = [inXMLElement nodesForXPath:@"./series" error:&err];
   if ([nodes count] > 0 )
   {
         NSString *theSeriesString = [[nodes objectAtIndex:0] stringValue];
         [self setSeries:theSeriesString];
   }
-
+  
   nodes = [inXMLElement nodesForXPath:@"./title" error:&err];
   if ([nodes count] > 0 )
   {
@@ -218,6 +220,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
       [self addAdvisory:advStr];
     }
   }
+  [subPool release];
 }
 
 - (void) addProductionCrewWithXMLElement:(NSXMLElement *)inXMLElement
