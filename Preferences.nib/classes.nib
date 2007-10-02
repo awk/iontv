@@ -7,6 +7,7 @@
             SUPERCLASS = NSSlider; 
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = HexNumberFormatter; LANGUAGE = ObjC; SUPERCLASS = NSNumberFormatter; }, 
         {
             ACTIONS = {
                 cancelButtonAction = id; 

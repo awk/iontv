@@ -6,6 +6,8 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+#import "JKSeparatorCell.h"
+#import "JKImageTextCell.h"
 #import "MainWindowController.h"
 #import "ScheduleView.h"
 #import "tvDataDelivery.h"
@@ -27,6 +29,11 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   
   [mViewSelectionTableView selectRow:0 byExtendingSelection:NO];
   [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
+  mSeparatorCell = [[JKSeparatorCell alloc] init];
+  mDefaultCell = [[JKImageTextCell alloc] initTextCell:@"Default title"];
+  [mViewSelectionArrayController addObject:@"Schedule"];
+  [mViewSelectionArrayController addObject:@"Search"];
+  [mViewSelectionArrayController addObject:@""];    // Separator at row '2'
   
   mDetailViewMinHeight = [mDetailView frame].size.height;
   NSView *bottomContainerView = [[NSView alloc] initWithFrame:[mScheduleContainerView frame]];
@@ -123,6 +130,7 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 - (IBAction) recordShow:(id)sender
 {
   Z2ITSchedule *aSchedule = [mCurrentSchedule content];
+//  [aSchedule setToBeRecorded:YES];
   [mRecServer addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
 }
 
@@ -269,6 +277,32 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 }
 
 #pragma mark View Selection Table Delegate Methods
+
+- (float) heightFor:(NSTableView *)tableView row:(int)row {
+	if (row == 2) { // separator
+		return 4;
+	}
+	
+	return [tableView rowHeight];
+}
+
+- (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row {
+	return row != 2;
+}
+
+- (id) tableColumn:(NSTableColumn *)column inTableView:(NSTableView *)tableView dataCellForRow:(int)row {
+//	if (row == 0) {
+//		[defaultCell setImage:libraryImage];
+//	} else {
+//		[defaultCell setImage:playlistImage];
+//	}
+	
+	if (row == 2) { // separator
+		return mSeparatorCell;
+	}
+	
+	return mDefaultCell;
+}
 
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {

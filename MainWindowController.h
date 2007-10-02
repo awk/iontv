@@ -23,6 +23,12 @@
   IBOutlet NSView *mProgramSearchView;
   IBOutlet ScheduleView *mScheduleView;
   IBOutlet NSObjectController *mCurrentSchedule;
+  IBOutlet NSArrayController *mViewSelectionArrayController;
+  
+  // Cells used by the Source View selector 'table'
+  NSCell *mSeparatorCell;
+  NSCell *mDefaultCell;
+
   float mDetailViewMinHeight;
   id mRecServer;
 }
