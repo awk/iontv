@@ -31,10 +31,13 @@
 			<string>channelNumber</string>
 			<string>channelType</string>
 			<string>tuningType</string>
+<!--
 			<string>stations</string>
+-->
 			<string>tuner</string>
 		</array>
 
+<!--
 		<key>org.awkward.recsched.HDHomeRunStation</key>
 		<array>
 			<string>com.apple.syncservices.RecordEntityName</string>
@@ -43,6 +46,7 @@
 			<string>channel</string>
 			<string>z2itStation</string>
 		</array>
+-->
 
 		<key>org.awkward.recsched.Lineup</key>
 		<array>
@@ -77,7 +81,9 @@
 			<string>fccChannelNumber</string>
 			<string>name</string>
 			<string>stationID</string>
+<!--
 			<string>hdhrStations</string>
+-->
 			<string>lineupMaps</string>
 			<string>schedules</string>
 		</array>
