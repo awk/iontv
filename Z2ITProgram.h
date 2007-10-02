@@ -18,10 +18,10 @@
 }
 
 // Fetch the Program with the given ID from the Managed Object Context
-+ (Z2ITProgram *) fetchProgramWithID:(NSString*)inProgramID;
++ (Z2ITProgram *) fetchProgramWithID:(NSString*)inProgramID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
 // Fetch all the programs present with supplied IDs
-+ (NSArray *) fetchProgramsWithIDS:(NSArray*)inProgramIDS;
++ (NSArray *) fetchProgramsWithIDS:(NSArray*)inProgramIDS inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
 - (void) addToSchedule:(Z2ITSchedule *)inSchedule;
 

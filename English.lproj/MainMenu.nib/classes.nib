@@ -2,7 +2,13 @@
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {cleanupAction = id; getScheduleAction = id; }; 
+            ACTIONS = {
+                cleanupAction = id; 
+                getScheduleAction = id; 
+                quitServer = id; 
+                recordSeasonPass = id; 
+                recordShow = id; 
+            }; 
             CLASS = MainWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -12,6 +18,7 @@
                 mParsingProgressIndicator = NSProgressIndicator; 
                 mParsingProgressInfoField = NSTextField; 
                 mProgramSearchView = NSView; 
+                mRecServer = id; 
                 mScheduleContainerView = NSView; 
                 mScheduleSplitView = NSSplitView; 
                 mScheduleView = ScheduleView; 

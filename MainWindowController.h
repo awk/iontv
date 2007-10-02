@@ -24,10 +24,14 @@
   IBOutlet ScheduleView *mScheduleView;
   IBOutlet NSObjectController *mCurrentSchedule;
   float mDetailViewMinHeight;
+  id mRecServer;
 }
 
 - (IBAction) getScheduleAction:(id)sender;
 - (IBAction) cleanupAction:(id)sender;
+- (IBAction) recordShow:(id)sender;
+- (IBAction) recordSeasonPass:(id)sender;
+- (IBAction) quitServer:(id)sender;
 
 - (void) setParsingInfoString:(NSString*)inInfoString;
 - (void) setParsingProgressMaxValue:(double)inTotal;

@@ -1,24 +1,18 @@
 //
-//  recsched_AppDelegate.m
+//  RecSchedServer.m
 //  recsched
 //
-//  Created by Andrew Kimpton on 1/12/07.
-//  Copyright __MyCompanyName__ 2007 . All rights reserved.
+//  Created by Andrew Kimpton on 3/5/07.
+//  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import "recsched_AppDelegate.h"
-#import "Preferences.h"
+#import "RecSchedServer.h"
 
-@implementation recsched_AppDelegate
+#import "Z2ITProgram.h"
+#import "Z2ITSchedule.h"
+#import "XTVDParser.h"
 
-- (id) init {
-  self = [super init];
-  if (self != nil) {
-    [Preferences setupDefaults];
-	
-  }
-  return self;
-}
+@implementation RecSchedServer
 
 /**
     Returns the support folder for the application, used to store the Core Data
@@ -34,6 +28,15 @@
     return [basePath stringByAppendingPathComponent:@"recsched"];
 }
 
+- (id) init {
+  self = [super init];
+  if (self != nil) {
+    mExitServer = NO;
+  }
+  return self;
+}
+
+#pragma mark - CoreData Methods
 
 /**
     Creates, retains, and returns the managed object model for the application 
@@ -82,7 +85,7 @@
         [fileManager createDirectoryAtPath:applicationSupportFolder attributes:nil];
     }
     
-    url = [NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched.dat"]];
+    url = [NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched_bkgd.dat"]];
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
     if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error]){
         [[NSApplication sharedApplication] presentError:error];
@@ -136,12 +139,6 @@
         [[NSApplication sharedApplication] presentError:error];
     }
 }
-
-- (IBAction)showCoreDataProgramWindow:(id)sender
-{
-	[mCoreDataProgramWindow makeKeyAndOrderFront:sender];
-}
-
 
 /**
     Implementation of the applicationShouldTerminate: method, used here to
@@ -204,5 +201,56 @@
     [super dealloc];
 }
 
+#pragma mark - Server Methods
+
+- (bool) shouldExit
+{
+	return mExitServer;
+}
+
+- (BOOL) addRecordingOfProgram:(NSManagedObject*) aProgram
+            withSchedule:(NSManagedObject*)aSchedule
+{
+  NSLog(@"addRecordingOfProgram\n%@\n%@", aProgram, aSchedule);
+  return YES;
+}
+
+- (BOOL) addRecordingWithName:(NSString*) name
+{
+	NSLog(@"addRecordingWithName - name  = %@", name);
+	return YES;
+}
+
+- (void) performParse:(NSDictionary *)parseInfo
+{
+  NSDictionary *newParseInfo = [NSDictionary dictionaryWithObjectsAndKeys:[parseInfo objectForKey:@"xmlFilePath"], @"xmlFilePath", self, @"reportCompletionTo", [self persistentStoreCoordinator], @"persistentStoreCoordinator", NULL];
+  
+  NSLog(@"performParse - newParseInfo = %@", newParseInfo);
+  [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:newParseInfo];
+}
+
+- (void) quitServer:(id)sender
+{
+  NSLog(@"Server shutting down");
+  mExitServer = YES;
+}
+
+#pragma Callback Methods
+
+- (void) parsingComplete:(id)info
+{
+  NSLog(@"parsingComplete");
+  // Clear all old items from the store
+  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportCompletionTo", [self persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
+
+  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
+}
+
+- (void) cleanupComplete:(id)info
+{
+  NSLog(@"cleanupComplete");
+}
 
 @end

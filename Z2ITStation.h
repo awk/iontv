@@ -16,7 +16,7 @@
 }
 
 // Fetch the station with the given ID from the Managed Object Context
-+ (Z2ITStation *) fetchStationWithID:(NSNumber*)inStationID;
++ (Z2ITStation *) fetchStationWithID:(NSNumber*)inStationID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
 // Fetch the program object for the program on air at the specified time
 - (Z2ITProgram*)programAtTime:(CFAbsoluteTime) inAirTime;

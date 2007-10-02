@@ -15,7 +15,7 @@
 
 }
 
-+ (void) clearAllSchedules;
++ (void) clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
 - (void) setDurationHours:(int)inHours minutes:(int)inMinutes;
 
@@ -71,7 +71,6 @@
 - (NSString *)tvRating;
 - (void)setTvRating:(NSString *)value;
 - (NSString *) tvRatingImageName;
-- (NSImage *) tvRatingImage;
 
 - (NSString *) programDetailsStr;
 @end

@@ -16,7 +16,7 @@
 
 static NSMutableDictionary *sStationsDictionary = nil;
 
-+ (Z2ITStation *) fetchStationWithID:(NSNumber*)inStationID
++ (Z2ITStation *) fetchStationWithID:(NSNumber*)inStationID inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
   Z2ITStation *aStation;
   if (sStationsDictionary)
@@ -25,10 +25,7 @@ static NSMutableDictionary *sStationsDictionary = nil;
     if (aStation)
       return aStation;
   }
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:moc];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
@@ -40,7 +37,7 @@ static NSMutableDictionary *sStationsDictionary = nil;
   [sortDescriptor release];
    
   NSError *error = nil;
-  NSArray *array = [moc executeFetchRequest:request error:&error];
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
   if (array == nil)
   {
       NSLog(@"Error executing fetch request to find station with ID %@", inStationID);
@@ -210,9 +207,7 @@ static NSMutableDictionary *sStationsDictionary = nil;
 {
   NSDate *airDate = [NSDate dateWithTimeIntervalSinceReferenceDate:inAirTime];
 
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
+  NSManagedObjectContext *moc = [self managedObjectContext];
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:moc];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
@@ -247,9 +242,7 @@ static NSMutableDictionary *sStationsDictionary = nil;
   NSDate *startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:inStartTime];
   NSDate *endDate = [NSDate dateWithTimeIntervalSinceReferenceDate:inEndTime];
 
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
+  NSManagedObjectContext *moc = [self managedObjectContext];
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:moc];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];

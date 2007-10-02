@@ -14,12 +14,9 @@
 @implementation Z2ITLineup
 
 // Fetch the station with the given ID from the Managed Object Context
-+ (Z2ITLineup *) fetchLineupWithID:(NSString*)inLineupID
++ (Z2ITLineup *) fetchLineupWithID:(NSString*)inLineupID inManagedObjectContext:(NSManagedObjectContext*)inMOC
 {
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Lineup" inManagedObjectContext:moc];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Lineup" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
@@ -31,7 +28,7 @@
   [sortDescriptor release];
    
   NSError *error = nil;
-  NSArray *array = [moc executeFetchRequest:request error:&error];
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
   if (array == nil)
   {
       NSLog(@"Error executing fetch request to find lineup with ID %@", inLineupID);

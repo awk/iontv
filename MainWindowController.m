@@ -11,8 +11,12 @@
 #import "tvDataDelivery.h"
 #import "XTVDParser.h"
 #import "Preferences.h"
+#import "RecSchedProtocol.h"
+#import "Z2ITSchedule.h"
+#import "Z2ITProgram.h"
 
 const float kViewSelectionListMaxWidth = 200.0;
+NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 @implementation MainWindowController
 
@@ -42,6 +46,23 @@ const float kViewSelectionListMaxWidth = 200.0;
   [mScheduleSplitView adjustSubviews];
   
   [mCurrentSchedule setContent:nil];
+
+  // Connect to server
+  mRecServer = [[NSConnection rootProxyForConnectionWithRegisteredName:kRecServerConnectionName  host:nil] retain];
+   
+  // check if connection worked.
+  if (mRecServer == nil) 
+  {
+    NSLog(@"couldn't connect with server\n");
+  }
+  else
+  {
+    //
+    // set protocol for the remote object & then register ourselves with the 
+    // messaging server.
+    [mRecServer setProtocolForProxy:@protocol(RecSchedServerProto)];
+  }
+
 }
 
 #pragma mark Splitview delegate methods
@@ -57,7 +78,7 @@ const float kViewSelectionListMaxWidth = 200.0;
     
 }
 
-#pragma mark Action and Callback Methods
+#pragma mark Action Methods
 
 - (IBAction) getScheduleAction:(id)sender
 {
@@ -94,10 +115,30 @@ const float kViewSelectionListMaxWidth = 200.0;
 {
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", [[[NSApplication sharedApplication] delegate] managedObjectContext], @"managedObjectContext", nil];
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
   [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
   [callData release];
 }
+
+- (IBAction) recordShow:(id)sender
+{
+  Z2ITSchedule *aSchedule = [mCurrentSchedule content];
+  [mRecServer addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
+}
+
+- (IBAction) recordSeasonPass:(id)sender
+{
+	NSLog(@"Create a season pass");
+}
+
+- (IBAction) quitServer:(id)sender
+{
+  if (mRecServer)
+    [mRecServer quitServer:sender];
+  mRecServer = nil;
+}
+
+#pragma mark Callback Methods
 
 - (void) handleDownloadData:(id)inDownloadResult
 {
@@ -114,8 +155,14 @@ const float kViewSelectionListMaxWidth = 200.0;
   [mParsingProgressInfoField setHidden:YES];
   if (xtvd != nil)
   {
-    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath", self, @"reportProgressTo", nil];
+    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
+    
+    // Start our local parsing
     [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:callData];
+    
+    // And tell the bkgd server to parse the same data too
+    [mRecServer performParse:callData];
+    
     [callData release];
   }
   else
@@ -147,7 +194,7 @@ const float kViewSelectionListMaxWidth = 200.0;
   // Clear all old items from the store
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", nil];
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
 
   [mParsingProgressIndicator startAnimation:self];
   [mParsingProgressIndicator setHidden:NO];

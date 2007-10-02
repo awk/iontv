@@ -13,23 +13,20 @@
 
 @implementation Z2ITSchedule
 
-+ (void) clearAllSchedules
++ (void) clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
-
   NSFetchRequest *fetchRequest = [[[NSFetchRequest alloc] init] autorelease];
   [fetchRequest setEntity:
-          [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:moc]];
+          [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:inMOC]];
    
   // Execute the fetch
   NSError *error;
-  NSArray *allSchedules = [moc executeFetchRequest:fetchRequest error:&error];
+  NSArray *allSchedules = [inMOC executeFetchRequest:fetchRequest error:&error];
   Z2ITSchedule *aSchedule;
   NSEnumerator *aScheduleEnumerator = [allSchedules objectEnumerator];
   while (aSchedule = [aScheduleEnumerator nextObject])
   {
-    [moc deleteObject:aSchedule];
+    [inMOC deleteObject:aSchedule];
   }
 }
 
@@ -224,34 +221,6 @@ COREDATA_ACCESSOR(NSString*, @"tvRating")
 COREDATA_MUTATOR(NSString*, @"tvRating")
 }
 
-- (NSImage *) tvRatingImage
-{
-  NSImage *image = nil;
-  
-  [NSImage imageNamed:[self tvRatingImageName]];
-  if (image == nil)
-  {
-    NSLog(@"tvRatingImage no image for %@", [self tvRatingImageName]);
-  }
-  return image;
-}
-
-- (NSString *) tvRatingImageName
-{
-  if ([self tvRating] == nil)
-    return nil;
-  else
-    return [NSString stringWithFormat:@"%@.tif", [self tvRating]];
-}
-
-- (NSString *) tvRatingImagePath
-{
-  if ([self tvRatingImageName] == nil)
-    return nil;
-  NSString *imagePath = [[NSBundle mainBundle] pathForImageResource:[self tvRatingImageName]];
-  return imagePath;
-}
-
 - (NSString *) programDetailsStr
 {
   NSString *aString = nil;
@@ -274,6 +243,22 @@ COREDATA_MUTATOR(NSString*, @"tvRating")
     [detailsString release];
   }
   return aString;
+}
+
+- (NSString *) tvRatingImageName
+{
+  if ([self tvRating] == nil)
+    return nil;
+  else
+    return [NSString stringWithFormat:@"%@.tif", [self tvRating]];
+}
+
+- (NSString *) tvRatingImagePath
+{
+  if ([self tvRatingImageName] == nil)
+    return nil;
+  NSString *imagePath = [[NSBundle mainBundle] pathForImageResource:[self tvRatingImageName]];
+  return imagePath;
 }
 
 @end

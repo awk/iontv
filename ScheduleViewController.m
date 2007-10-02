@@ -121,7 +121,7 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
       aMenuItem = [daysMenu addItemWithTitle:menuItemString action:@selector(daysMenuItemAction:) keyEquivalent:@""];
     }
     [aMenuItem setTarget:self];
-    [aMenuItem setEnabled:YES];
+//    [aMenuItem setEnabled:YES];
     [aMenuItem setTag:i];
   }
   [mScheduleTimeSegmentedControl setMenu:daysMenu forSegment:kDaySegment];
@@ -131,7 +131,7 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
     NSString *menuString = [NSString stringWithFormat:@"%02d:00", (i / 60)];
     aMenuItem = [hoursMenu addItemWithTitle:menuString action:@selector(hoursMenuItemAction:) keyEquivalent:@""];
     [aMenuItem setTarget:self];
-    [aMenuItem setEnabled:YES];
+//    [aMenuItem setEnabled:YES];
     [aMenuItem setTag:i];
   }
   [mScheduleTimeSegmentedControl setMenu:hoursMenu forSegment:kHourSegment];

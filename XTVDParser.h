@@ -14,8 +14,8 @@
 
 }
 
-+ (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument reportTo:(MainWindowController*)inMainWindowController;
-+ (void) parseXMLFile:(NSString *)filePath reportTo:(MainWindowController*)inMainWindowController;
++ (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument reportTo:(MainWindowController*)inMainWindowController inManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (void) parseXMLFile:(NSString *)filePath reportTo:(MainWindowController*)inMainWindowController inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 + (void) handleError:(NSError*) error;
 
 @end

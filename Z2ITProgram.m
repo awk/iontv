@@ -31,12 +31,9 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 }
 
 // Fetch the Program with the given ID from the Managed Object Context
-+ (Z2ITProgram *) fetchProgramWithID:(NSString*)inProgramID
++ (Z2ITProgram *) fetchProgramWithID:(NSString*)inProgramID inManagedObjectContext:(NSManagedObjectContext*)inMOC
 {
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Program" inManagedObjectContext:moc];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Program" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
@@ -48,7 +45,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   [sortDescriptor release];
    
   NSError *error = nil;
-  NSArray *array = [moc executeFetchRequest:request error:&error];
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
   if (array == nil)
   {
       NSLog(@"Error executing fetch request to find program with ID %@", inProgramID);
@@ -71,14 +68,11 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   }
 }
 
-+ (NSArray *) fetchProgramsWithIDS:(NSArray*)inProgramIDS
++ (NSArray *) fetchProgramsWithIDS:(NSArray*)inProgramIDS inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
-
   NSFetchRequest *fetchRequest = [[[NSFetchRequest alloc] init] autorelease];
   [fetchRequest setEntity:
-          [NSEntityDescription entityForName:@"Program" inManagedObjectContext:moc]];
+          [NSEntityDescription entityForName:@"Program" inManagedObjectContext:inMOC]];
   [fetchRequest setPredicate: [NSPredicate predicateWithFormat: @"(programID IN %@)", inProgramIDS]];
    
   // make sure the results are sorted as well
@@ -87,7 +81,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
                   ascending:YES] autorelease]]];
   // Execute the fetch
   NSError *error;
-  NSArray *programsMatchingNames = [moc executeFetchRequest:fetchRequest error:&error];
+  NSArray *programsMatchingNames = [inMOC executeFetchRequest:fetchRequest error:&error];
   return programsMatchingNames;
 }
 
@@ -237,7 +231,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   {
       NSXMLElement *memberElement = [nodes objectAtIndex:i];
       Z2ITCrewMember *aCrewMember = [NSEntityDescription insertNewObjectForEntityForName:@"CrewMember"
-                  inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+                  inManagedObjectContext:[self managedObjectContext]];
 
       NSArray *memberNodes;
       memberNodes = [memberElement nodesForXPath:@"./role" error:&err];
@@ -273,7 +267,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   {
       NSXMLElement *memberElement = [nodes objectAtIndex:i];
       Z2ITGenre *aGenre = [NSEntityDescription insertNewObjectForEntityForName:@"Genre"
-                  inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+                  inManagedObjectContext:[self managedObjectContext]];
 
       NSArray *memberNodes;
       memberNodes = [memberElement nodesForXPath:@"./class" error:&err];
@@ -328,9 +322,9 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   }
 
   Z2ITSchedule *aSchedule = [NSEntityDescription insertNewObjectForEntityForName:@"Schedule"
-              inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+              inManagedObjectContext:[self managedObjectContext]];
   [aSchedule setProgram:self];
-  Z2ITStation *aStation = [Z2ITStation fetchStationWithID:stationID];
+  Z2ITStation *aStation = [Z2ITStation fetchStationWithID:stationID inManagedObjectContext:[self managedObjectContext]];
   if (aStation)
   {
     [aStation addSchedule:aSchedule];
@@ -535,7 +529,7 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 }
 
 // Fetch the Advisory Object with the given string from the Managed Object Context
-+ (NSManagedObject *) fetchAdvisoryWithName:(NSString*)inAdvisoryString
++ (NSManagedObject *) fetchAdvisoryWithName:(NSString*)inAdvisoryString inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
   NSManagedObject *anAdvisory = nil;
   
@@ -546,10 +540,7 @@ COREDATA_MUTATOR(NSNumber*,@"year")
       return anAdvisory;
   }
   
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Advisory" inManagedObjectContext:moc];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Advisory" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
@@ -561,7 +552,7 @@ COREDATA_MUTATOR(NSNumber*,@"year")
   [sortDescriptor release];
    
   NSError *error = nil;
-  NSArray *array = [moc executeFetchRequest:request error:&error];
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
   if (array == nil)
   {
       NSLog(@"Error executing fetch request to find advisory %@", inAdvisoryString);
@@ -587,12 +578,12 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 - (void)addAdvisory:(NSString *)value
 {
   NSMutableSet *advisories = [self mutableSetValueForKey:@"advisories"];
-  NSManagedObject *newAdvisory = [Z2ITProgram fetchAdvisoryWithName:value];
+  NSManagedObject *newAdvisory = [Z2ITProgram fetchAdvisoryWithName:value inManagedObjectContext:[self managedObjectContext]];
   if (!newAdvisory)
   {
     newAdvisory = [NSEntityDescription
         insertNewObjectForEntityForName:@"Advisory"
-        inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+        inManagedObjectContext:[self managedObjectContext]];
     [newAdvisory setValue:value forKey:@"name"];
   }
   [advisories addObject:newAdvisory];
@@ -659,7 +650,7 @@ static NSMutableDictionary *sCrewRoleDictionary = nil;
 @implementation Z2ITCrewMember
 
 // Fetch the CrewRole Object with the given string from the Managed Object Context
-+ (NSManagedObject *) fetchCrewRoleWithName:(NSString*)inCrewRoleNameString
++ (NSManagedObject *) fetchCrewRoleWithName:(NSString*)inCrewRoleNameString inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
   // Initialze the crew role dictionary we use to speed up queries.
   if (!sCrewRoleDictionary)
@@ -671,10 +662,7 @@ static NSMutableDictionary *sCrewRoleDictionary = nil;
     if (aCrewRole)
       return aCrewRole;
   }
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"CrewRole" inManagedObjectContext:moc];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"CrewRole" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
@@ -686,7 +674,7 @@ static NSMutableDictionary *sCrewRoleDictionary = nil;
   [sortDescriptor release];
    
   NSError *error = nil;
-  NSArray *array = [moc executeFetchRequest:request error:&error];
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
   if (array == nil)
   {
       NSLog(@"Error executing fetch request to find crew role name %@", inCrewRoleNameString);
@@ -726,12 +714,12 @@ static NSMutableDictionary *sCrewRoleDictionary = nil;
 
 - (void)setRoleName:(NSString *)value
 {
-  NSManagedObject* aCrewRole = [Z2ITCrewMember fetchCrewRoleWithName:value];
+  NSManagedObject* aCrewRole = [Z2ITCrewMember fetchCrewRoleWithName:value inManagedObjectContext:[self managedObjectContext]];
   if (!aCrewRole)
   {
     aCrewRole = [NSEntityDescription
         insertNewObjectForEntityForName:@"CrewRole"
-        inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+        inManagedObjectContext:[self managedObjectContext]];
     [aCrewRole retain];
     [aCrewRole setValue:value forKey:@"name"];
   }
@@ -769,7 +757,7 @@ COREDATA_MUTATOR(NSString*,@"givenname")
 @implementation Z2ITGenre
 
 // Fetch the GenreClass Object with the given string from the Managed Object Context
-+ (NSManagedObject *) fetchGenreClassWithName:(NSString*)inGenreClassNameString
++ (NSManagedObject *) fetchGenreClassWithName:(NSString*)inGenreClassNameString inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
   NSManagedObject *aGenreClass = nil;
   if (sGenreClassDictionary)
@@ -779,10 +767,7 @@ COREDATA_MUTATOR(NSString*,@"givenname")
       return aGenreClass;
   }
   
-  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
-
-  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"GenreClass" inManagedObjectContext:moc];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"GenreClass" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
@@ -794,7 +779,7 @@ COREDATA_MUTATOR(NSString*,@"givenname")
   [sortDescriptor release];
    
   NSError *error = nil;
-  NSArray *array = [moc executeFetchRequest:request error:&error];
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
   if (array == nil)
   {
       NSLog(@"Error executing fetch request to find genre class name %@", inGenreClassNameString);
@@ -824,12 +809,12 @@ COREDATA_MUTATOR(NSString*,@"givenname")
 
 - (void)setGenreClassName:(NSString *)value
 {
-  NSManagedObject* aGenreClass = [Z2ITGenre fetchGenreClassWithName:value];
+  NSManagedObject* aGenreClass = [Z2ITGenre fetchGenreClassWithName:value inManagedObjectContext:[self managedObjectContext]];
   if (!aGenreClass)
   {
     aGenreClass = [NSEntityDescription
         insertNewObjectForEntityForName:@"GenreClass"
-        inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+        inManagedObjectContext:[self managedObjectContext]];
     [aGenreClass setValue:value forKey:@"name"];
   }
 
