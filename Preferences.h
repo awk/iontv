@@ -16,6 +16,10 @@ extern NSString *kScheduleDownloadDurationPrefStr;
     IBOutlet NSTextField *mDurationTextField;
     IBOutlet DiscreteDurationSlider *mDurationSlider;
     IBOutlet id mPanel;
+	IBOutlet NSView* mPrefsContainerView;
+	IBOutlet NSView* mZap2ItPrefsView;
+	IBOutlet NSView* mTunerPrefsView;
+	IBOutlet NSView* mChannelPrefsView;
     NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
 }
 
@@ -33,5 +37,7 @@ extern NSString *kScheduleDownloadDurationPrefStr;
 - (void)updateUI;		/* Updates the displayed values in the UI */
 
 - (IBAction) durationSliderChanged:(NSSlider *)inSlider;
+- (IBAction) okButtonAction:(id)sender;
+- (IBAction) cancelButtonAction:(id)sender;
 
 @end

@@ -8,13 +8,22 @@
         }, 
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
-            ACTIONS = {durationSliderChanged = id; showPanel = id; }; 
+            ACTIONS = {
+                cancelButtonAction = id; 
+                durationSliderChanged = id; 
+                okButtonAction = id; 
+                showPanel = id; 
+            }; 
             CLASS = Preferences; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                mChannelPrefsView = NSView; 
                 mDurationSlider = DiscreteDurationSlider; 
                 mDurationTextField = NSTextField; 
                 mPanel = id; 
+                mPrefsContainerView = NSView; 
+                mTunerPrefsView = NSView; 
+                mZap2ItPrefsView = NSView; 
             }; 
             SUPERCLASS = NSObject; 
         }

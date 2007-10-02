@@ -8,6 +8,7 @@
 
 #import "Preferences.h"
 
+
 const float kDurationSliderMinValue = 1.0;
 const float kDurationSliderMaxValue = 772.0;
 const int k1HourTick = 0;   // Tick mark indices are zero based
@@ -128,6 +129,39 @@ static Preferences *sSharedInstance = nil;
       [super dealloc];	// Don't free the shared instance
 }
 
+- (void) showPrefsView:(NSView*)inViewToBeShown
+{
+	// Remove the current subivews of the container
+	NSArray *prefsSubviews = [mPrefsContainerView subviews];
+	int i=0;
+	for (i=0; i < [prefsSubviews count]; i++)
+	{
+		// If we're already showing the selected view we're done here
+		if ([prefsSubviews objectAtIndex:i] == inViewToBeShown)
+			return;
+		[[prefsSubviews objectAtIndex:i] removeFromSuperview];
+	}
+	
+	// Get the containers current size
+	NSSize sizeChange;
+	sizeChange.width = [inViewToBeShown frame].size.width - [mPrefsContainerView frame].size.width ;
+	sizeChange.height = [inViewToBeShown frame].size.height - [mPrefsContainerView frame].size.height;
+	
+	// Animate the window to the new size (and location - remember the co-ordinate system is zero,zero bottom left
+	// so we have to move the top of the window as well as changing it's size)
+	NSRect newFrame = [mPanel frame];
+	newFrame.size.height += sizeChange.height;
+	newFrame.size.width += sizeChange.width;
+	newFrame.origin.y -= sizeChange.height;
+	[mPanel setFrame:newFrame display:YES animate:YES];
+
+	[mPrefsContainerView addSubview:inViewToBeShown];
+	[inViewToBeShown setFrameOrigin:NSMakePoint(0,0)];
+	[inViewToBeShown setNeedsDisplay:YES];
+	[mPrefsContainerView setFrameSize:[inViewToBeShown frame].size];
+	[mPrefsContainerView setNeedsDisplay:YES];
+}
+
 // When we launch, we have to get our NSToolbar set up.  This involves creating a new one, adding the NSToolbarItems,
 // and installing the toolbar in our window.
 -(void)awakeFromNib
@@ -152,7 +186,7 @@ static Preferences *sSharedInstance = nil;
     // show this action (or the -toggleToolbarShown: action) for First Responder/NSWindow (this is a bug), so you 
     // have to manually add those methods to the First Responder in Interface Builder (by hitting return on the First Responder and 
     // adding the new actions in the usual way) if you want to wire up menus to them.
-    [toolbar setAllowsUserCustomization:YES];
+    [toolbar setAllowsUserCustomization:NO];
 
     // tell the toolbar that it should save any configuration changes to user defaults.  ie. mode changes, or reordering will persist. 
     // specifically they will be written in the app domain using the toolbar identifier as the key. 
@@ -160,6 +194,11 @@ static Preferences *sSharedInstance = nil;
     
     // tell the toolbar to show icons only by default
     [toolbar setDisplayMode: NSToolbarDisplayModeIconOnly];
+	
+	// Start with the Zap2It prefs
+	[toolbar setSelectedItemIdentifier:kZap2ItPreferencesToolbarIdentifier];
+	[self showZap2ItPrefs:self];
+	
     // install the toolbar.
     [mPanel setToolbar:toolbar];
 }
@@ -246,17 +285,27 @@ static Preferences *sSharedInstance = nil;
 
 - (void) showZap2ItPrefs:(id)sender
 {
-	NSLog(@"Show Zap2It Preferences");
+	[self showPrefsView:mZap2ItPrefsView];
 }
 
 - (void) showTunerPrefs:(id)sender
 {
-	NSLog(@"Show Tuner Preferences");
+	[self showPrefsView:mTunerPrefsView];
 }
 
 - (void) showChannelPrefs:(id)sender
 {
-	NSLog(@"Show Channel Preferences");
+	[self showPrefsView:mChannelPrefsView];
+}
+
+- (IBAction) okButtonAction:(id)sender
+{
+	NSLog(@"OK Button Clicked");
+}
+
+- (IBAction) cancelButtonAction:(id)sender
+{
+	NSLog(@"Cancel Button CLicked");
 }
 
 #pragma mark - Toolbar Delegates
