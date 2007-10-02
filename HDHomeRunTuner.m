@@ -790,6 +790,7 @@ COREDATA_ACCESSOR(Z2ITStation*, @"z2itStation");
 - (void) setZ2ITStation:(Z2ITStation*) value
 {
   COREDATA_MUTATOR(Z2ITLineupMap*, @"z2itStation");
+  [value addHDHRStation:self];
 }
 
 @end
