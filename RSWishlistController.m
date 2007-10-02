@@ -25,8 +25,6 @@
 
 - (NSPredicate *) currentPredicate
 {
-	if (!mCurrentPredicate)
-		mCurrentPredicate = [NSPredicate predicateWithFormat:@"name like 'Rick'"];
 	return mCurrentPredicate;
 }
 
