@@ -10,13 +10,17 @@
 
 @class Z2ITSchedule;
 @class Z2ITLineupMap;
-
+@class Z2ITProgram;
 @interface Z2ITStation : NSManagedObject {
 
 }
 
 // Fetch the station with the given ID from the Managed Object Context
 + (Z2ITStation *) fetchStationWithID:(NSNumber*)inStationID;
+
+// Fetch the program object for the program on air at the specified time
+- (Z2ITProgram*)programAtTime:(CFAbsoluteTime) inAirTime;
+- (Z2ITSchedule*)scheduleAtTime:(CFAbsoluteTime) inAirTime;
 
 // Accessor and mutator for the Station ID attribute
 - (NSNumber *)stationID;

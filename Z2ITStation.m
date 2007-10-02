@@ -205,4 +205,41 @@ static NSMutableDictionary *sStationsDictionary = nil;
   }
   return aLineupMap;
 }
+
+- (Z2ITSchedule*)scheduleAtTime:(CFAbsoluteTime) inAirTime
+{
+  NSDate *airDate = [NSDate dateWithTimeIntervalSinceReferenceDate:inAirTime];
+
+  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
+
+  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:moc];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+  
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(station == %@) AND (%@ >= time) AND (%@ < endTime)", self, airDate, airDate];
+  [request setPredicate:predicate];
+   
+//  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
+//  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+//  [sortDescriptor release];
+   
+  NSError *error = nil;
+  NSArray *array = [moc executeFetchRequest:request error:&error];
+
+  Z2ITSchedule *aSchedule =nil;
+  if ([array count] > 0)
+    aSchedule = [array objectAtIndex:0];
+  if ([array count] > 1)
+    NSLog(@"scheduleAtTime - %d schedules at time %@ for station %@", [array count], airDate, [self callSign]);
+  return aSchedule;
+}
+
+- (Z2ITProgram*)programAtTime:(CFAbsoluteTime) inAirTime
+{
+  Z2ITSchedule *aSchedule = [self scheduleAtTime:inAirTime];
+
+  return [aSchedule program];
+}
+
 @end
