@@ -11,14 +11,51 @@
 #import "Preferences.h"
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
+#import "RecSchedProtocol.h"
+
+NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 @implementation recsched_AppDelegate
+
+- (void) initializeServerConnection
+{
+  // Connect to server
+  mRecServer = [[NSConnection rootProxyForConnectionWithRegisteredName:kRecServerConnectionName  host:nil] retain];
+   
+  // check if connection worked.
+  if (mRecServer == nil) 
+  {
+    NSLog(@"couldn't connect with server\n");
+    [mServerMenuItem setTitle:@"Connect to Server"];
+  }
+  else
+  {
+    //
+    // set protocol for the remote object & then register ourselves with the 
+    // messaging server.
+    [mRecServer setProtocolForProxy:@protocol(RecSchedServerProto)];
+    [mServerMenuItem setTitle:@"Exit Server"];
+  }
+}
+
+- (void) awakeFromNib
+{
+  if (mRecServer)
+  {
+    [mServerMenuItem setTitle:@"Exit Server"];
+  }
+  else
+  {
+    [mServerMenuItem setTitle:@"Connect to Server"];
+  }
+  
+}
 
 - (id) init {
   self = [super init];
   if (self != nil) {
     [Preferences setupDefaults];
-	
+    [self initializeServerConnection];
   }
   return self;
 }
@@ -129,6 +166,73 @@
     return [[self managedObjectContext] undoManager];
 }
 
+- (void)applicationDidFinishLaunching:(NSNotification *)notification 
+{
+    [[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
+    [self syncAction:nil];
+}
+
+#pragma mark Sync
+
+- (ISyncClient *)syncClient
+{
+    NSString *clientIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+    NSString *reason = @"unknown error";
+    ISyncClient *client;
+
+    @try {
+        client = [[ISyncManager sharedManager] clientWithIdentifier:clientIdentifier];
+        if (nil == client) {
+            if (![[ISyncManager sharedManager] registerSchemaWithBundlePath:[[NSBundle mainBundle] pathForResource:@"recsched" ofType:@"syncschema"]]) {
+                reason = @"error registering the recsched sync schema";
+            } else {
+                client = [[ISyncManager sharedManager] registerClientWithIdentifier:clientIdentifier descriptionFilePath:[[NSBundle mainBundle] pathForResource:@"ClientDescription" ofType:@"plist"]];
+                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeApplication];
+                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeDevice];
+                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeServer];
+                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypePeer];
+            }
+        }
+    }
+    @catch (id exception) {
+        client = nil;
+        reason = [exception reason];
+    }
+
+    if (nil == client) {
+        NSRunAlertPanel(@"You can not sync your recsched data.", [NSString stringWithFormat:@"Failed to register the sync client: %@", reason], @"OK", nil, nil);
+    }
+    
+    return client;
+}
+
+- (void)client:(ISyncClient *)client mightWantToSyncEntityNames:(NSArray *)entityNames
+{
+    NSLog(@"Saving for alert to sync...");
+	[self saveAction:self];
+}
+
+- (NSArray *)managedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
+{
+    return [NSArray arrayWithObject:[self managedObjectContext]];
+}
+
+- (NSArray *)managedObjectContextsToReloadWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
+{
+    return [NSArray arrayWithObject:[self managedObjectContext]];
+}
+
+- (NSDictionary *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushRecord:(NSDictionary *)record forManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
+{
+    NSLog(@"push %@ = %@", [managedObject objectID], [record description]);
+    return record;
+}
+
+- (ISyncChange *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willApplyChange:(ISyncChange *)change toManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
+{
+    NSLog(@"pull %@", [change description]);
+    return change;
+}
 
 #pragma mark - Actions
 
@@ -142,6 +246,18 @@
 
     NSError *error = nil;
     if (![[self managedObjectContext] save:&error]) {
+        [[NSApplication sharedApplication] presentError:error];
+    }
+}
+
+- (void)syncAction:(id)sender
+{
+    NSError *error = nil;
+    ISyncClient *client = [self syncClient];
+    if (nil != client) {
+        [[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
+    }
+    if (nil != error) {
         [[NSApplication sharedApplication] presentError:error];
     }
 }
@@ -244,6 +360,19 @@
     [inStation startStreaming];
 }
 
+- (IBAction) quitServer:(id)sender
+{
+  if (mRecServer)
+  {
+    [mRecServer quitServer:sender];
+    mRecServer = nil;
+    [mServerMenuItem setTitle:@"Connect to Server"];
+  }
+  else
+  {
+    [self initializeServerConnection];
+  }
+}
 
 /**
     Implementation of the applicationShouldTerminate: method, used here to

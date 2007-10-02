@@ -7,29 +7,38 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <SyncServices/SyncServices.h>
 
 @class HDHomeRunStation;
 
-@interface recsched_AppDelegate : NSObject 
+@interface recsched_AppDelegate : NSObject <NSPersistentStoreCoordinatorSyncing>
 {
     IBOutlet NSWindow *window;
     IBOutlet NSWindow *mCoreDataProgramWindow;
-	
+    
+    IBOutlet NSMenuItem *mServerMenuItem;
+    
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
     NSManagedObjectContext *managedObjectContext;
     
     NSTask      *mVLCTask;
     NSTimer     *mVLCTerminateTimer;
+
+    id mRecServer;
 }
 
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
 - (NSManagedObjectModel *)managedObjectModel;
 - (NSManagedObjectContext *)managedObjectContext;
 
+- (ISyncClient *)syncClient;
+
 - (IBAction)saveAction:sender;
+- (void)syncAction:(id)sender;
 - (IBAction)showCoreDataProgramWindow:(id)sender;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
 
+- (IBAction) quitServer:(id)sender;
 @end
