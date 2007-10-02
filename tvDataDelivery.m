@@ -276,7 +276,8 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   
   NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:@"startDateStr"] in_endTime:[xtvdDownloadData valueForKey:@"endDateStr"]];
  
-  [[xtvdDownloadData valueForKey:@"dataRecipient"] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:downloadResult waitUntilDone:NO];
+  if ([[xtvdDownloadData valueForKey:@"dataRecipient"] respondsToSelector:@selector(handleDownloadData:)])
+    [[xtvdDownloadData valueForKey:@"dataRecipient"] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:downloadResult waitUntilDone:NO];
   [pool release];
 }
 
