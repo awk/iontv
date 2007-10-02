@@ -6,11 +6,13 @@
             CLASS = MainWindowController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                mCurrentSchedule = NSObjectController; 
                 mDetailView = NSView; 
                 mGetScheduleButton = NSButton; 
                 mParsingProgressIndicator = NSProgressIndicator; 
                 mParsingProgressInfoField = NSTextField; 
-                mScheduleView = NSView; 
+                mScheduleContainerView = NSView; 
+                mScheduleView = ScheduleView; 
                 mSplitView = NSSplitView; 
             }; 
             SUPERCLASS = NSWindowController; 
