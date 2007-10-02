@@ -15,27 +15,29 @@ extern const int kDefaultPortNumber;
 
 @class HDHomeRunTuner;
 
-@interface HDHomeRun : NSManagedObject {
+@interface HDHomeRun : NSManagedObject
+{
   struct hdhomerun_device_t *mHDHomeRunDevice;
 }
+
+@property (retain) NSNumber * deviceID;
+@property (retain) NSString * name;
+@property (retain) NSSet* tuners;
 
 // Fetch the HDHomeRun with the given ID from the Managed Object Context
 + (HDHomeRun *) fetchHDHomeRunWithID:(NSNumber*)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
 + (HDHomeRun *) createHDHomeRunWithID:(NSNumber*)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
-- (NSNumber *)deviceID;
-- (void)setDeviceID:(NSNumber *)value;
-- (NSString *)name;
-- (void)setName:(NSString*)value;
-
-- (void) addTuner:(HDHomeRunTuner *)aTuner;
-
-- (HDHomeRunTuner *)tunerWithIndex:(int) inIndex;
-
 - (HDHomeRunTuner*) tuner0;
-//- (void)setTuner0:(HDHomeRunTuner*) value;
-
 - (HDHomeRunTuner*) tuner1;
-//- (void)setTuner1:(HDHomeRunTuner*) value;
+@end
+
+// coalesce these into one @interface HDHomeRun (CoreDataGeneratedAccessors) section
+@interface HDHomeRun (CoreDataGeneratedAccessors)
+- (void)addTunersObject:(HDHomeRunTuner *)value;
+- (void)removeTunersObject:(HDHomeRunTuner *)value;
+- (void)addTuners:(NSSet *)value;
+- (void)removeTuners:(NSSet *)value;
+
 @end

@@ -15,27 +15,15 @@
 
 }
 
-// Accessor and mutator for the Station ID relationship
-- (Z2ITStation *)station;
-- (void)setStation:(Z2ITStation *)value;
+@property (retain) NSString * channel;
+@property (retain) NSNumber * channelMinor;
+@property (retain) NSDate * from;
+@property (retain) NSDate * to;
+@property (retain) Z2ITLineup * lineup;
+@property (retain) Z2ITStation * station;
 
-// Accessor and mutator for the Lineup relationship
-- (Z2ITLineup *)lineup;
-- (void)setLineup:(Z2ITLineup *)value;
+@end
 
-// Accessor and mutator for the channel attribute
-- (NSString *)channel;
-- (void)setChannel:(NSString *)value;
-
-// Accessor and mutator for the from attribute
-- (NSDate *)from;
-- (void)setFrom:(NSDate *)value;
-
-// Accessor and mutator for the to attribute
-- (NSDate *)to;
-- (void)setTo:(NSDate *)value;
-
-// Accessor and mutator for the channe minor attribute
-- (NSNumber *)channelMinor;
-- (void)setChannelMinor:(NSNumber *)value;
+// coalesce these into one @interface Z2ITLineupMap (CoreDataGeneratedAccessors) section
+@interface Z2ITLineupMap (CoreDataGeneratedAccessors)
 @end

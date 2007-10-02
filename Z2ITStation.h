@@ -30,37 +30,36 @@
 // Is there a valid tuner for this station and lineup ?
 - (BOOL) hasValidTunerForLineup:(Z2ITLineup*)aLineup;
 
-// Accessor and mutator for the Station ID attribute
-- (NSNumber *)stationID;
-- (void)setStationID:(NSNumber *)value;
+- (BOOL)addScheduleIfNew:(Z2ITSchedule*)value;
 
-// Accessor and mutator for the call sign attribute
-- (NSString *)callSign;
-- (void)setCallSign:(NSString *)value;
-
-// Accessor and mutator for the name attribute
-- (NSString *)name;
-- (void)setName:(NSString *)value;
-
-// Accessor and mutator for the affiliate attribute
-- (NSString *)affiliate;
-- (void)setAffiliate:(NSString *)value;
-
-// Accessor and mutator for the FCC Channel Number attribute
-- (NSNumber *)fccChannelNumber;
-- (void)setFccChannelNumber:(NSNumber *)value;
-
-// Accessor and mutator for the schedules relationship
-- (NSSet*)schedules;
-- (BOOL)addSchedule:(Z2ITSchedule*)value;
-
-// Accessor and mutator for the HDHomeRun Stations relationship
-- (NSSet*)hdhrStations;
-- (void)addHDHRStation:(HDHomeRunStation*)value;
-
-// Accessor and mutator for the lineupMap relationship
-- (NSSet*)lineupMaps;
-- (void)addLineupMap:(Z2ITLineupMap*)value;
-- (Z2ITLineupMap*)lineupMapAtIndex:(unsigned) index;
 - (Z2ITLineupMap*)lineupMapForLineupID:(NSString*) inLineupID;
+
+@property (retain) NSString * affiliate;
+@property (retain) NSString * callSign;
+@property (retain) NSNumber * fccChannelNumber;
+@property (retain) NSString * name;
+@property (retain) NSNumber * stationID;
+@property (retain) NSSet* hdhrStations;
+@property (retain) NSSet* lineupMaps;
+@property (retain) NSSet* schedules;
+
+@end
+
+// coalesce these into one @interface Z2ITStation (CoreDataGeneratedAccessors) section
+@interface Z2ITStation (CoreDataGeneratedAccessors)
+- (void)addHdhrStationsObject:(HDHomeRunStation *)value;
+- (void)removeHdhrStationsObject:(HDHomeRunStation *)value;
+- (void)addHdhrStations:(NSSet *)value;
+- (void)removeHdhrStations:(NSSet *)value;
+
+- (void)addLineupMapsObject:(Z2ITLineupMap *)value;
+- (void)removeLineupMapsObject:(Z2ITLineupMap *)value;
+- (void)addLineupMaps:(NSSet *)value;
+- (void)removeLineupMaps:(NSSet *)value;
+
+- (void)addSchedulesObject:(Z2ITSchedule *)value;
+- (void)removeSchedulesObject:(Z2ITSchedule *)value;
+- (void)addSchedules:(NSSet *)value;
+- (void)removeSchedules:(NSSet *)value;
+
 @end

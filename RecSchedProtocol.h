@@ -18,6 +18,4 @@ extern NSString *kRecServerConnectionName;
 
 - (oneway void) quitServer:(id)sender;
 
-- (oneway void) pushHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex;
-
 @end

@@ -11,7 +11,7 @@
 #import "XMLParsingProgressDisplayProtocol.h"
 
 extern NSString *kScheduleDownloadDurationPrefStr;
-extern NSString *kWebServicesZap2ItUsernamePrefStr;
+extern NSString *kWebServicesSDUsernamePrefStr;
 
 @class DiscreteDurationSlider;
 
@@ -21,12 +21,12 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
     IBOutlet DiscreteDurationSlider *mDurationSlider;
     IBOutlet id mPanel;
     IBOutlet NSView* mPrefsContainerView;
-    IBOutlet NSView* mZap2ItPrefsView;
+    IBOutlet NSView* mSDPrefsView;
     IBOutlet NSView* mTunerPrefsView;
     IBOutlet NSView* mChannelPrefsView;
 	IBOutlet NSView* mColorPrefsView;
-    IBOutlet NSTextField *mZap2ItUsernameField;
-    IBOutlet NSTextField *mZap2ItPasswordField;
+    IBOutlet NSTextField *mSDUsernameField;
+    IBOutlet NSTextField *mSDPasswordField;
     IBOutlet NSProgressIndicator *mParsingProgressIndicator;
     IBOutlet NSTextField *mParsingProgressInfoField;
     IBOutlet NSButton *mRetrieveLineupsButton;
@@ -43,7 +43,7 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
 	IBOutlet NSView *mExportChannelTunerSelectionView;
 	
     NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
-    SecKeychainItemRef mZap2ItKeychainItemRef;
+    SecKeychainItemRef mSDKeychainItemRef;
 
     BOOL mAbortChannelScan;
     BOOL mChannelScanInProgress;

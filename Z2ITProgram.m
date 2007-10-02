@@ -209,7 +209,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   {
 	maxNumAdvisories = [[advisoryRelationships objectAtIndex:0] maxCount];
   }
-  [self clearAdvisories];   // Clear the advisories - we're going to replace them with the contents of the XML
+  [self removeAdvisories:[self advisories]];   // Clear the advisories - we're going to replace them with the contents of the XML
   if ([nodes count] > 0 )
   {
     int i=0;
@@ -230,8 +230,8 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 	{
 		aGenre = [Z2ITGenre createGenreWithClassName:@"Movie" andRelevance:[NSNumber numberWithInt:0] inManagedObjectContext:[self managedObjectContext]];
 	}
-	[aGenre addProgram:self];
-	[self addGenre:aGenre];
+	[aGenre addProgramsObject:self];
+	[self addGenresObject:aGenre];
   }
 }
 
@@ -243,7 +243,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   int i=0;
   int crewMemberCount = [nodes count];
   
-  [self clearCrewMembers];    // Clear the current crew members - we're going to replace them with the contents of the XML
+  [self removeCrewMembers:[self crewMembers]];    // Clear the current crew members - we're going to replace them with the contents of the XML
   
   for (i=0; i < crewMemberCount; i++)
   {
@@ -255,7 +255,16 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
       memberNodes = [memberElement nodesForXPath:@"./role" error:&err];
       if ([memberNodes count] == 1)
       {
-        [aCrewMember setRoleName:[[memberNodes objectAtIndex:0] stringValue]];
+		  NSManagedObject* aCrewRole = [Z2ITCrewMember fetchCrewRoleWithName:[[memberNodes objectAtIndex:0] stringValue] inManagedObjectContext:[self managedObjectContext]];
+		  if (!aCrewRole)
+		  {
+			aCrewRole = [NSEntityDescription
+				insertNewObjectForEntityForName:@"CrewRole"
+				inManagedObjectContext:[self managedObjectContext]];
+			[aCrewRole retain];
+			[aCrewRole setValue:[[memberNodes objectAtIndex:0] stringValue] forKey:@"name"];
+		  }
+		[aCrewMember setRole:aCrewRole];
       }
       memberNodes = [memberElement nodesForXPath:@"./givenname" error:&err];
       if ([memberNodes count] == 1)
@@ -268,7 +277,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
         [aCrewMember setSurname:[[memberNodes objectAtIndex:0] stringValue]];
       }
       
-      [self addCrewMember:aCrewMember];
+      [self addCrewMembersObject:aCrewMember];
   }
 }
 
@@ -281,7 +290,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   int genreCount = [nodes count];
   NSDictionary *colorDictionary = [RSColorDictionary colorDictionaryNamed:@"Default"];
   
-  [self clearGenres];       // Clear the current genres - we're going to replace them with the contents of the XML
+  [self removeGenres:[self genres]];       // Clear the current genres - we're going to replace them with the contents of the XML
   
     // Update the genre if this is a Movie (program ID starts with 'MV')
   if ([self isMovie])
@@ -298,8 +307,8 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 		if (aColor)
 			[aGenre setValue:[NSArchiver archivedDataWithRootObject:aColor] forKeyPath:@"genreClass.color"];
 	}
-	[aGenre addProgram:self];
-	[self addGenre:aGenre];
+	[aGenre addProgramsObject:self];
+	[self addGenresObject:aGenre];
   }
 
   for (i=0; i < genreCount; i++)
@@ -347,8 +356,8 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 				[aGenre setValue:[NSArchiver archivedDataWithRootObject:aColor] forKeyPath:@"genreClass.color"];
 		}
 		// Add it to the program
-		[aGenre addProgram:self];
-		[self addGenre:aGenre];
+		[aGenre addProgramsObject:self];
+		[self addGenresObject:aGenre];
 	  }
   }
 }
@@ -369,11 +378,11 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSString *durationMinsString = [theDurationString substringWithRange:NSMakeRange(5, 2)];
   durationMins = [durationMinsString intValue];
 
-  BOOL repeat = boolValueForAttribute(inXMLElement, @"repeat");
-  BOOL stereo = boolValueForAttribute(inXMLElement, @"stereo");
-  BOOL subtitled = boolValueForAttribute(inXMLElement, @"subtitled");
-  BOOL hdtv = boolValueForAttribute(inXMLElement, @"hdtv");
-  BOOL closeCaptioned = boolValueForAttribute(inXMLElement, @"closeCaptioned");
+  NSNumber* newProgram = [NSNumber numberWithBool:boolValueForAttribute(inXMLElement, @"new")];
+  NSNumber* stereo = [NSNumber numberWithBool:boolValueForAttribute(inXMLElement, @"stereo")];
+  NSNumber* subtitled = [NSNumber numberWithBool:boolValueForAttribute(inXMLElement, @"subtitled")];
+  NSNumber* hdtv = [NSNumber numberWithBool:boolValueForAttribute(inXMLElement, @"hdtv")];
+  NSNumber* closeCaptioned = [NSNumber numberWithBool:boolValueForAttribute(inXMLElement, @"closeCaptioned")];
   
   NSString *tvRatingStr = [[inXMLElement attributeForName:@"tvRating"] stringValue];
   NSString *dolbyStr = [[inXMLElement attributeForName:@"dolby"] stringValue];
@@ -398,7 +407,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   {
     [aSchedule setTime:timeDate];
     [aSchedule setDurationHours:durationHours minutes:durationMins];
-    [aSchedule setRepeat:repeat];
+    [aSchedule setNew:newProgram];
     [aSchedule setStereo:stereo];
     [aSchedule setSubtitled:subtitled];
     [aSchedule setHdtv:hdtv];
@@ -414,7 +423,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 
 	// If this schedule already exists in matching form on the station (i.e. we're doing an update rather than just grabbing new data)
 	// addSchedule will return false and we should delete the schedule here.
-    if (![aStation addSchedule:aSchedule])
+    if (![aStation addScheduleIfNew:aSchedule])
 	{
 		[[self managedObjectContext] deleteObject:aSchedule];
 	}
@@ -432,178 +441,6 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 		return YES;
 	else
 		return NO;
-}
-
-#pragma mark
-#pragma mark Core Data accessors/mutators/validation methods
-#pragma mark
-
-
-// Accessor and mutator for the Lineup ID attribute
-- (NSString *)programID
-{
-COREDATA_ACCESSOR(NSString*, @"programID")
-}
-
-- (void)setProgramID:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*, @"programID")
-}
-
-// Accessor and mutator for the color code attribute
-- (NSString *)colorCode
-{
-COREDATA_ACCESSOR(NSString*, @"colorCode")
-}
-
-- (void)setColorCode:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"colorCode")
-}
-
-// Accessor and mutator for the description string attribute
-- (NSString *)descriptionStr
-{
-COREDATA_ACCESSOR(NSString*,@"descriptionStr")
-}
-
-- (void)setDescriptionStr:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"descriptionStr")
-}
-
-// Accessor and mutator for the MPAA Rating attribute
-- (NSString *)mpaaRating
-{
-COREDATA_ACCESSOR(NSString*,@"mpaaRating")
-}
-
-- (void)setMpaaRating:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"mpaaRating")
-}
-
-// Accessor and mutator for the original air date attribute
-- (NSDate *)originalAirDate
-{
-COREDATA_ACCESSOR(NSDate*,@"originalAirDate")
-}
-
-- (void)setOriginalAirDate:(NSDate *)value
-{
-COREDATA_MUTATOR(NSDate*,@"originalAirDate")
-}
-
-// Accessor and mutator for the type attribute
-- (NSNumber *)runTimeHours
-{
-COREDATA_ACCESSOR(NSNumber*,@"runTimeHours")
-}
-
-- (void)setRunTimeHours:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*,@"runTimeHours")
-}
-
-// Accessor and mutator for the user lineup name attribute
-- (NSNumber *)runTimeMinutes
-{
-COREDATA_ACCESSOR(NSNumber*,@"runTimeMinutes")
-}
-
-- (void)setRunTimeMinutes:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*,@"runTimeMinutes")
-}
-
-// Accessor and mutator for the series attribute
-- (NSString *)series
-{
-COREDATA_ACCESSOR(NSString*,@"series")
-}
-
-- (void)setSeries:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"series")
-}
-
-// Accessor and mutator for the show type attribute
-- (NSString *)showType
-{
-COREDATA_ACCESSOR(NSString*,@"showType")
-}
-
-- (void)setShowType:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"showType")
-}
-
-// Accessor and mutator for the star rating attribute
-- (NSNumber *)starRating
-{
-COREDATA_ACCESSOR(NSNumber*,@"starRating")
-}
-
-- (void)setStarRating:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*,@"starRating")
-}
-
-// Accessor and mutator for the sub-title attribute
-- (NSString *)subTitle
-{
-COREDATA_ACCESSOR(NSString*,@"subTitle")
-}
-
-- (void)setSubTitle:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"subTitle")
-}
-
-// Accessor and mutator for the syndicated episode number attribute
-- (NSString *)syndicatedEpisodeNumber
-{
-COREDATA_ACCESSOR(NSString*,@"syndicatedEpisodeNumber")
-}
-
-- (void)setSyndicatedEpisodeNumber:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"syndicatedEpisodeNumber")
-}
-
-// Accessor and mutator for the title attribute
-- (NSString *)title
-{
-COREDATA_ACCESSOR(NSString*,@"title")
-}
-
-- (void)setTitle:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"title")
-}
-
-// Accessor and mutator for the year attribute
-- (NSNumber *)year
-{
-COREDATA_ACCESSOR(NSNumber*,@"year")
-}
-
-- (void)setYear:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*,@"year")
-}
-
-// Accessor and mutator for the advisory attributes
-- (NSSet *)advisories
-{
-  NSMutableSet *advisories = [self mutableSetValueForKey:@"advisories"];
-  return [NSSet setWithSet:advisories];
-}
-
-- (void)clearAdvisories
-{
-  NSMutableSet *advisories = [self mutableSetValueForKey:@"advisories"];
-  [advisories removeAllObjects];
 }
 
 // Fetch the Advisory Object with the given string from the Managed Object Context
@@ -658,26 +495,6 @@ COREDATA_MUTATOR(NSNumber*,@"year")
   [[newAdvisory mutableSetValueForKey:@"programs"] addObject:self];
 }
 
-// Accessor and mutator for the genres relationships
-- (NSSet *)genres
-{
-  NSMutableSet *genresSet = [self mutableSetValueForKey:@"genres"];
-  return genresSet;
-}
-
-- (void)clearGenres
-{
-	// Clearing genres just removes them from our list
-  NSMutableSet *genresSet = [self mutableSetValueForKey:@"genres"];
-  [genresSet removeAllObjects];
-}
-
-- (void)addGenre:(Z2ITGenre *)value
-{
-  NSMutableSet *genresSet = [self mutableSetValueForKey:@"genres"];
-  [genresSet addObject:value];
-}
-
 - (Z2ITGenre*) genreWithRelevance:(int)inRelevance
 {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Genre" inManagedObjectContext:[self managedObjectContext]];
@@ -705,35 +522,26 @@ COREDATA_MUTATOR(NSNumber*,@"year")
   }
 }
 
-- (NSSet *)crewMembers
-{
-  NSMutableSet *crewMembersSet = [self mutableSetValueForKey:@"crewMembers"];
-  return crewMembersSet;
-}
 
-- (void)clearCrewMembers
-{
-  NSMutableSet *crewMembersSet = [self mutableSetValueForKey:@"crewMembers"];
-  NSEnumerator *crewEnumerator = [crewMembersSet objectEnumerator];
-  Z2ITCrewMember *aCrewMember;
-  while (aCrewMember = [crewEnumerator nextObject])
-  {
-    [[self managedObjectContext] deleteObject:aCrewMember];
-  }
-  [crewMembersSet removeAllObjects];
-}
+@dynamic colorCode;
+@dynamic descriptionStr;
+@dynamic mpaaRating;
+@dynamic originalAirDate;
+@dynamic programID;
+@dynamic runTimeHours;
+@dynamic runTimeMinutes;
+@dynamic series;
+@dynamic showType;
+@dynamic starRating;
+@dynamic subTitle;
+@dynamic syndicatedEpisodeNumber;
+@dynamic title;
+@dynamic year;
+@dynamic advisories;
+@dynamic crewMembers;
+@dynamic genres;
+@dynamic schedules;
 
-- (void)addCrewMember:(Z2ITCrewMember *)value
-{
-  NSMutableSet *crewMembersSet = [self mutableSetValueForKey:@"crewMembers"];
-  [crewMembersSet addObject:value];
-}
-
-- (NSSet *)schedules
-{
-  NSMutableSet *schedulesSet = [self mutableSetValueForKey:@"schedules"];
-  return schedulesSet;
-}
 @end
 
 @implementation Z2ITCrewMember
@@ -778,56 +586,11 @@ COREDATA_MUTATOR(NSNumber*,@"year")
   }
 }
 
-#pragma mark
-#pragma mark Core Data accessors/mutators/validation methods
-#pragma mark
 
-
-// Accessor and mutator for the Role attribute
-- (NSString *)roleName
-{
-  return [self valueForKeyPath:@"role.name"];
-}
-
-- (void)setRoleName:(NSString *)value
-{
-  NSManagedObject* aCrewRole = [Z2ITCrewMember fetchCrewRoleWithName:value inManagedObjectContext:[self managedObjectContext]];
-  if (!aCrewRole)
-  {
-    aCrewRole = [NSEntityDescription
-        insertNewObjectForEntityForName:@"CrewRole"
-        inManagedObjectContext:[self managedObjectContext]];
-    [aCrewRole retain];
-    [aCrewRole setValue:value forKey:@"name"];
-  }
-
-  [self willChangeValueForKey: @"role"]; 
-  [self setPrimitiveValue:aCrewRole forKey: @"role"]; 
-  [self didChangeValueForKey: @"role"]; 
-//  [aCrewRole release];
-}
-
-// Accessor and mutator for the surname attribute
-- (NSString *)surname
-{
-COREDATA_ACCESSOR(NSString*, @"surname")
-}
-
-- (void)setSurname:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*, @"surname")
-}
-
-// Accessor and mutator for the givenname attribute
-- (NSString *)givenname
-{
-COREDATA_ACCESSOR(NSString*, @"givenname")
-}
-
-- (void)setGivenname:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*,@"givenname")
-}
+@dynamic givenname;
+@dynamic surname;
+@dynamic program;
+@dynamic role;
 
 @end
 
@@ -911,38 +674,15 @@ COREDATA_MUTATOR(NSString*,@"givenname")
   }
 }
 
-// Accessor and mutator for the relevance attribute
-- (NSNumber *)relevance
-{
-  COREDATA_ACCESSOR(NSNumber*, @"relevance")
-}
-
-- (void)setRelevance:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*,@"relevance")
-}
-
-- (NSManagedObject *)genreClass
-{
-  COREDATA_ACCESSOR(NSManagedObject*, @"genreClass")
-}
-
-- (void)setGenreClass:(NSManagedObject *)value
-{
-COREDATA_MUTATOR(NSManagedObject*,@"genreClass")
-}
-
-- (void)addProgram:(Z2ITProgram *)value
-{
-  NSMutableSet *programsSet = [self mutableSetValueForKey:@"programs"];
-  [programsSet addObject:value];
-}
-
 - (NSNumber *) numberOfPrograms
 {
-	NSLog(@"numberOfPrograms %d for Genre %@", [[self mutableSetValueForKey:@"programs"] count], [self valueForKeyPath:@"genreClass.name"]);
+//	NSLog(@"numberOfPrograms %d for Genre %@", [[self mutableSetValueForKey:@"programs"] count], [self valueForKeyPath:@"genreClass.name"]);
 	return [NSNumber numberWithInt:[[self mutableSetValueForKey:@"programs"] count]];
 }
+
+@dynamic relevance;
+@dynamic genreClass;
+@dynamic programs;
 
 @end
 

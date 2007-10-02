@@ -29,55 +29,11 @@
       triggerChangeNotificationsForDependentKey:@"longName"];
 }
 
-- (NSNumber *) index;
-{
-COREDATA_ACCESSOR(NSNumber*, @"index")
-}
-
-- (void) setIndex:(NSNumber*)value;
-{
-COREDATA_MUTATOR(NSNumber*, @"index")
-}
-
-- (HDHomeRun*) device
-{
-COREDATA_ACCESSOR(HDHomeRun*, @"device")
-}
-
-- (void) setDevice:(HDHomeRun *)value
-{
-  if ([self device])
-  {
-    [[self device] removeObserver:self forKeyPath:@"name"];
-	[self releaseHDHRDevice];
-  } 
-  
-COREDATA_MUTATOR(HDHomeRun*, @"device")
-
-  // Register to be told when the device name changes
-  if (value)
-  {
-	[self createHDHRDevice];
-	[value addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
-  }
-}
-
-- (Z2ITLineup*)lineup
-{
-COREDATA_ACCESSOR(Z2ITLineup*, @"lineup");
-}
-
-- (void) setLineup:(Z2ITLineup*)value
-{
-COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
-}
-
-- (void) addChannel:(HDHomeRunChannel*)aChannel
-{
-  NSMutableSet *channels = [self mutableSetValueForKey:@"channels"];
-  [aChannel setTuner:self];
-  [channels addObject:aChannel];
-}
+@dynamic index;
+@dynamic channels;
+@dynamic device;
+@dynamic lineup;
+@dynamic longName;
 
 - (NSString*) longName
 {
@@ -263,7 +219,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 				HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:[channelInfoDictionary valueForKey:@"channelType"] andNumber:[channelInfoDictionary valueForKey:@"channelNumber"] inManagedObjectContext:[self managedObjectContext]];
 				[aChannel setTuningType:[channelInfoDictionary valueForKey:@"tuningType"]];
 				[aChannel importStationsFrom:[channelInfoDictionary valueForKey:@"stations"]];
-				[self addChannel:aChannel];
+				[self addChannelsObject:aChannel];
 			}
 		}
 		else
@@ -371,7 +327,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 		  // may be in a different managed object context. Instead we'll use objectForID to find the matching Tuner in
 		  // the inMoc context
 		  HDHomeRunTuner *tunerInThreadMOC = (HDHomeRunTuner*) [inMOC objectWithID:[self objectID]];
-		  [tunerInThreadMOC addChannel:mCurrentHDHomeRunChannel];
+		  [tunerInThreadMOC addChannelsObject:mCurrentHDHomeRunChannel];
         }
       }
       
@@ -406,7 +362,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
             channelNumberString = channelNumberAndCallsignString;
           }
           
-          // Zap2IT listings use a number for minor part of the channel details, and a string for the major part
+          // SchedulesDirect listings use a number for minor part of the channel details, and a string for the major part
           NSNumber *channelMinor;
           NSString *channelMajor;
           
@@ -423,7 +379,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 			Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[inMOC objectWithID:[[self lineup] objectID]];
             Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:callSignString inLineup:lineupInThreadMOC inManagedObjectContext:inMOC];
             if (aZ2ITStation)
-              [aStation setZ2ITStation:aZ2ITStation];
+              [aStation setZ2itStation:aZ2ITStation];
           }
         }
       }
@@ -570,71 +526,6 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   return anHDHomeRunChannel;
 }
 
-- (NSString*) channelType
-{
-  COREDATA_ACCESSOR(NSString*, @"channelType")
-}
-
-- (void) setChannelType:(NSString*)value
-{
-  COREDATA_MUTATOR(NSString*, @"channelType");
-}
-
-- (NSNumber*) channelNumber
-{
-  COREDATA_ACCESSOR(NSNumber*, @"channelNumber")
-}
-
-- (void) setChannelNumber:(NSNumber*)value
-{
-  COREDATA_MUTATOR(NSNumber*, @"channelNumber");
-}
-
-- (NSString*) tuningType;
-{
-  COREDATA_ACCESSOR(NSString*, @"tuningType")
-}
-
-- (void) setTuningType:(NSString*)value
-{
-  COREDATA_MUTATOR(NSString*, @"tuningType");
-}
-
-- (HDHomeRunTuner*)tuner
-{
-  COREDATA_ACCESSOR(HDHomeRunTuner*, @"tuner")
-}
-
-- (void)setTuner:(HDHomeRunTuner*)value
-{
-  COREDATA_MUTATOR(HDHomeRunTuner*, @"tuner");
-}
-
-
-- (NSMutableSet *)stations;
-{
-  NSMutableSet *stations = [self mutableSetValueForKey:@"stations"];
-  return stations;
-}
-
-- (void) clearAllStations
-{
-  NSMutableSet *stations = [self mutableSetValueForKey:@"stations"];
-  while ([stations count] > 0)
-  {
-	HDHomeRunStation *aStation = [stations anyObject];
-	[stations removeObject:aStation];
-	[[self managedObjectContext] deleteObject:aStation];
-  }
-}
-
-- (void) addStation:(HDHomeRunStation*)inStation
-{
-  NSMutableSet *stations = [self mutableSetValueForKey:@"stations"];
-  [stations addObject:inStation];
-  [inStation setChannel:self];
-}
-
 - (void) addChannelInfoDictionaryTo:(NSMutableArray *)inOutputArray
 {
 	// Create an array and use it to hold serialized info for each station on this channel
@@ -660,7 +551,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 		if ([stationInfo valueForKey:@"callSign"])
 			[aStation setCallSign:[stationInfo valueForKey:@"callSign"]];
 		
-		// If there's a Zap2IT station ID use that to find the matching Zap2It station
+		// If there's a SchedulesDirect station ID use that to find the matching SchedulesDirect station
 		if ([stationInfo valueForKey:@"Z2ITStationID"])
 		{
 			Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithID:[stationInfo valueForKey:@"Z2ITStationID"] inManagedObjectContext:[self managedObjectContext]];
@@ -671,11 +562,18 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 			}
 			if (aZ2ITStation)
 			{
-				[aStation setZ2ITStation:aZ2ITStation];
+				[aStation setZ2itStation:aZ2ITStation];
 			}
 		}
 	}
 }
+
+@dynamic channelNumber;
+@dynamic channelType;
+@dynamic tuningType;
+@dynamic stations;
+@dynamic tuner;
+
 @end
 
 @implementation HDHomeRunStation
@@ -684,7 +582,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 {
   HDHomeRunStation *anHDHomeRunStation = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunStation" inManagedObjectContext:inMOC];
   [anHDHomeRunStation setProgramNumber:inProgramNumber];
-  [inChannel addStation:anHDHomeRunStation];
+  [inChannel addStationsObject:anHDHomeRunStation];
   return anHDHomeRunStation;
 }
 
@@ -746,69 +644,25 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 	[infoDictionary setValue:[self programNumber] forKey:@"programNumber"];
 	if ([self callSign])
 		[infoDictionary setValue:[self callSign] forKey:@"callSign"];
-	if ([self Z2ITStation])
+	if ([self z2itStation])
 	{
-		[infoDictionary setValue:[[self Z2ITStation] stationID] forKey:@"Z2ITStationID"];
-		if ([[self Z2ITStation] callSign])
-			[infoDictionary setValue:[[self Z2ITStation] callSign] forKey:@"Z2ITCallSign"];
+		[infoDictionary setValue:[[self z2itStation] stationID] forKey:@"Z2ITStationID"];
+		if ([[self z2itStation] callSign])
+			[infoDictionary setValue:[[self z2itStation] callSign] forKey:@"Z2ITCallSign"];
 	}
 	
 	// and add it to the output array
 	[inOutputArray addObject:infoDictionary];
 }
 
-#pragma mark - CoreData Accessors and Mutators
-
-- (NSNumber*) programNumber
-{
-COREDATA_ACCESSOR(NSNumber*, @"programNumber");
-}
-
-- (void) setProgramNumber:(NSNumber*)value
-{
-  COREDATA_MUTATOR(NSNumber*, @"programNumber");
-}
+@dynamic callSign;
+@dynamic programNumber;
+@dynamic channel;
+@dynamic z2itStation;
 
 - (NSString*) channelAndProgramNumber
 {
   return [NSString stringWithFormat:@"%@:%@", [[self channel] channelNumber], [self programNumber]];
-}
-
-- (NSString*) callSign
-{
-COREDATA_ACCESSOR(NSString*, @"callSign");
-}
-
-- (void) setCallSign:(NSString*)value
-{
-  COREDATA_MUTATOR(NSString*, @"callSign");
-}
-
-- (HDHomeRunChannel*) channel
-{
-COREDATA_ACCESSOR(HDHomeRunChannel*, @"channel");
-}
-
-- (void) setChannel:(HDHomeRunChannel*) value
-{
-  if ([self channel])
-    [[self channel] removeObserver:self forKeyPath:@"channelNumber"];
-    
-  COREDATA_MUTATOR(HDHomeRunChannel*, @"channel");
-
-  // Register to be told when the device name changes
-  [value addObserver:self forKeyPath:@"channelNumber" options:NSKeyValueObservingOptionNew context:nil];
-}
-
-- (Z2ITStation*) Z2ITStation
-{
-COREDATA_ACCESSOR(Z2ITStation*, @"z2itStation");
-}
-
-- (void) setZ2ITStation:(Z2ITStation*) value
-{
-  COREDATA_MUTATOR(Z2ITLineupMap*, @"z2itStation");
-  [value addHDHRStation:self];
 }
 
 @end

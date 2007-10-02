@@ -11,9 +11,9 @@
 #import <Security/Security.h>
 
 // URL for SOAP services used to retrieve the listings
-// @"http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
-NSString *kWebServicesZap2ItHostname = @"datadirect.webservices.zap2it.com";
-NSString *kWebServicesZap2ItPath = @"/tvlistings/xtvdService";
+// @"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService
+NSString *kWebServicesSDHostname = @"webservices.schedulesdirect.tmsdatadirect.com";
+NSString *kWebServicesSDPath = @"/schedulesdirect/tvlistings/xtvdService";
 
 
 @implementation tvDataDelivery
@@ -119,7 +119,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                   CFRelease(theURL);
                   
                   // Fetch the account name from the prefs file, and the password from the keychain
-                  NSString *accountName = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesZap2ItUsernamePrefStr];
+                  NSString *accountName = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernamePrefStr];
 				  if (accountName == nil)
 				  {
 					NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
@@ -135,17 +135,17 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                                 mutabilityOption:NSPropertyListImmutable
                                 format:&format
                                 errorDescription:&error];
-					accountName = [plist valueForKey:kWebServicesZap2ItUsernamePrefStr];
+					accountName = [plist valueForKey:kWebServicesSDUsernamePrefStr];
 					if (accountName == nil)
 					{
-						NSLog(@"No Zap2It username in the application prefs !");
+						NSLog(@"No SchedulesDirect username in the application prefs !");
 						return nil;
 					}
 				  }
                   NSString *password;
-                  const char *serverNameUTF8 = [kWebServicesZap2ItHostname UTF8String];
+                  const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
                   const char *accountNameUTF8 = [accountName UTF8String];
-                  const char *pathUTF8 = [kWebServicesZap2ItPath UTF8String];
+                  const char *pathUTF8 = [kWebServicesSDPath UTF8String];
                   UInt32 passwordLength;
                   void *passwordData;
                   OSStatus status = SecKeychainFindInternetPassword(NULL,strlen(serverNameUTF8),serverNameUTF8, 0, NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, &passwordLength, &passwordData, NULL);
@@ -160,7 +160,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                     password = @"";
                   }
 
-                  CFHTTPMessageAddAuthentication(authInvocationMsgRef, responseMessage, (CFStringRef)accountName, CFSTR("zap2it"), NULL, false);
+                  CFHTTPMessageAddAuthentication(authInvocationMsgRef, responseMessage, (CFStringRef)accountName, (CFStringRef) password, NULL, false);
                   WSMethodInvocationSetProperty(authorizedInvocation,kWSHTTPMessage,authInvocationMsgRef);
                   [fResult autorelease];
                   fResult = NULL;
@@ -207,9 +207,9 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 
 - (WSMethodInvocationRef) genCreateInvocationRef
 {
-    NSString *endpointURL = [NSString stringWithFormat:@"http://%@%@", kWebServicesZap2ItHostname,kWebServicesZap2ItPath];
+    NSString *endpointURL = [NSString stringWithFormat:@"http://%@%@", kWebServicesSDHostname,kWebServicesSDPath];
     return [self createInvocationRef    
-               /*endpoint*/: endpointURL //@"http://datadirect.webservices.zap2it.com/tvlistings/xtvdService"            
+               /*endpoint*/: endpointURL //@"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService"            
                  methodName: @"acknowledge"            
                  protocol: (NSString*) kWSSOAP2001Protocol            
                       style: (NSString*) kWSSOAPStyleRPC            
@@ -246,9 +246,9 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 
 - (WSMethodInvocationRef) genCreateInvocationRef
 {
-    NSString *endpointURL = [NSString stringWithFormat:@"http://%@%@", kWebServicesZap2ItHostname,kWebServicesZap2ItPath];
+    NSString *endpointURL = [NSString stringWithFormat:@"http://%@%@", kWebServicesSDHostname,kWebServicesSDPath];
     WSMethodInvocationRef anInvocationRef = [self createInvocationRef    
-               /*endpoint*/: endpointURL //@"http://datadirect.webservices.zap2it.com/tvlistings/xtvdService"            
+               /*endpoint*/: endpointURL //@"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService"            
                  methodName: @"download"            
                  protocol: (NSString*) kWSSOAP2001Protocol            
                       style: (NSString*) kWSSOAPStyleRPC            

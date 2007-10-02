@@ -9,6 +9,7 @@
 #import <CoreData/CoreData.h>
 
 @class Z2ITLineupMap;
+@class HDHomeRunTuner;
 
 @interface Z2ITLineup : NSManagedObject {
 
@@ -20,37 +21,31 @@
 // Fetch the lineup map for the given station ID from the relationships in this Lineup
 - (Z2ITLineupMap *) fetchLineupMapWithStationID:(NSNumber*)inStationID;
 
-// Add the lineup map to this lineups relationships
-- (void) addLineupMap:(Z2ITLineupMap *)aLineupMap;
-
 // Return an array of all the stations in this lineup
 - (NSArray *)stations;
 
-// Accessor and mutator for the Lineup ID attribute
-- (NSString *)lineupID;
-- (void)setLineupID:(NSString *)value;
+@property (retain) NSString * device;
+@property (retain) NSString * lineupID;
+@property (retain) NSString * location;
+@property (retain) NSString * name;
+@property (retain) NSString * postalCode;
+@property (retain) NSString * type;
+@property (retain) NSString * userLineupName;
+@property (retain) NSSet* lineupMaps;
+@property (retain) NSSet* tuners;
 
-// Accessor and mutator for the device attribute
-- (NSString *)device;
-- (void)setDevice:(NSString *)value;
+@end
 
-// Accessor and mutator for the location attribute
-- (NSString *)location;
-- (void)setLocation:(NSString *)value;
+// coalesce these into one @interface Z2ITLineup (CoreDataGeneratedAccessors) section
+@interface Z2ITLineup (CoreDataGeneratedAccessors)
+- (void)addLineupMapsObject:(Z2ITLineupMap *)value;
+- (void)removeLineupMapsObject:(Z2ITLineupMap *)value;
+- (void)addLineupMaps:(NSSet *)value;
+- (void)removeLineupMaps:(NSSet *)value;
 
-// Accessor and mutator for the name attribute
-- (NSString *)name;
-- (void)setName:(NSString *)value;
+- (void)addTunersObject:(HDHomeRunTuner *)value;
+- (void)removeTunersObject:(HDHomeRunTuner *)value;
+- (void)addTuners:(NSSet *)value;
+- (void)removeTuners:(NSSet *)value;
 
-// Accessor and mutator for the postal code attribute
-- (NSString *)postalCode;
-- (void)setPostalCode:(NSString *)value;
-
-// Accessor and mutator for the type attribute
-- (NSString *)type;
-- (void)setType:(NSString *)value;
-
-// Accessor and mutator for the user lineup name attribute
-- (NSString *)userLineupName;
-- (void)setUserLineupName:(NSString *)value;
 @end

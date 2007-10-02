@@ -6,33 +6,22 @@
 //  Copyright __MyCompanyName__ 2007 . All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-#import <SyncServices/SyncServices.h>
+#import "RSCommonAppDelegate.h"
 
 @class HDHomeRunStation;
 
-@interface recsched_AppDelegate : NSObject <NSPersistentStoreCoordinatorSyncing>
+@interface recsched_AppDelegate : RSCommonAppDelegate
 {
     IBOutlet NSWindow *window;
     IBOutlet NSWindow *mCoreDataProgramWindow;
     
     IBOutlet NSMenuItem *mServerMenuItem;
     
-    NSPersistentStoreCoordinator *persistentStoreCoordinator;
-    NSManagedObjectModel *managedObjectModel;
-    NSManagedObjectContext *managedObjectContext;
-    NSPersistentStore *persistentStore;
-	
     NSTask      *mVLCTask;
     NSTimer     *mVLCTerminateTimer;
 
     id mRecServer;
 }
-
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
-- (NSPersistentStore *)persistentStore;
-- (NSManagedObjectModel *)managedObjectModel;
-- (NSManagedObjectContext *)managedObjectContext;
 
 - (ISyncClient *)syncClient;
 - (id) recServer;

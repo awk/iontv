@@ -12,6 +12,8 @@
 #import "Z2ITStation.h"
 #import "HDHomeRunTuner.h"
 
+#define RECORDING_DISABLED 1
+
 @implementation RecordingThreadController
 
 + (void) recordingThreadStarted:(id)aRecordingThreadController
@@ -43,6 +45,7 @@
   [NSThread detachNewThreadSelector:@selector(recordingThreadStarted:) toTarget:[RecordingThreadController class] withObject:self];
 }
 
+#if RECORDING_DISABLED
 - (void) beginRecording
 {
   NSLog(@"beginRecording - timer fired for schedule %@ program %@", mSchedule, mProgram);
@@ -56,7 +59,44 @@
   }
   
   HDHomeRunStation *anHDHRStation = [hdhrStations anyObject];
+
+  NSLog(@"Recording on HDHRStation %@", anHDHRStation);
+
+  mFinishRecording = NO;
   
+
+  uint64_t next_progress = getcurrenttime() + 1000;
+  while (!mFinishRecording)
+  {
+    usleep(64000);
+
+    uint64_t current_time = getcurrenttime();
+    if (current_time >= next_progress) {
+            next_progress = current_time + 1000;
+            printf(".");
+            fflush(stdout);
+    }
+
+    if ([[mSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
+      mFinishRecording = YES;
+  }
+}
+#else  
+- (void) beginRecording
+{
+  NSLog(@"beginRecording - timer fired for schedule %@ program %@", mSchedule, mProgram);
+  
+  Z2ITStation *aStation = [mSchedule station];
+  NSSet *hdhrStations = [aStation hdhrStations];
+  if ([hdhrStations count] == 0)
+  {
+	NSLog(@"beginRecording no mapped stations");
+	return;
+  }
+  
+  HDHomeRunStation *anHDHRStation = [hdhrStations anyObject];
+
+  NSLog(@"Recording on HDHRStation %@", anHDHRStation];
   [anHDHRStation startStreaming];
 
   mFinishRecording = NO;
@@ -93,6 +133,7 @@
   [anHDHRStation stopStreaming];
   fclose(fp);
 }
+#endif
 
 - (void) endRecording
 {

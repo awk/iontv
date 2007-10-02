@@ -102,112 +102,7 @@
 	return validTuner;
 }
 
-#pragma mark
-#pragma mark Core Data accessors/mutators/validation methods
-#pragma mark
-
-
-// Accessor and mutator for the Station ID attribute
-- (NSNumber *)stationID
-{
-    NSNumber * tmpValue;
-    
-    [self willAccessValueForKey: @"stationID"];
-    tmpValue = [self primitiveValueForKey: @"stationID"];
-    [self didAccessValueForKey: @"stationID"];
-    
-    return tmpValue;
-}
-
-- (void)setStationID:(NSNumber *)value
-{
-    [self willChangeValueForKey: @"stationID"];
-    [self setPrimitiveValue: value forKey: @"stationID"];
-    [self didChangeValueForKey: @"stationID"];
-}
-
-// Accessor and mutator for the call sign attribute
-- (NSString *)callSign
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"callSign"];
-    tmpValue = [self primitiveValueForKey: @"callSign"];
-    [self didAccessValueForKey: @"callSign"];
-    
-    return tmpValue;
-}
-
-- (void)setCallSign:(NSString *)value
-{
-    [self willChangeValueForKey: @"callSign"];
-    [self setPrimitiveValue: value forKey: @"callSign"];
-    [self didChangeValueForKey: @"callSign"];
-}
-
-// Accessor and mutator for the name attribute
-- (NSString *)name
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"name"];
-    tmpValue = [self primitiveValueForKey: @"name"];
-    [self didAccessValueForKey: @"name"];
-    
-    return tmpValue;
-}
-
-- (void)setName:(NSString *)value
-{
-    [self willChangeValueForKey: @"name"];
-    [self setPrimitiveValue: value forKey: @"name"];
-    [self didChangeValueForKey: @"name"];
-}
-
-// Accessor and mutator for the affiliate attribute
-- (NSString *)affiliate
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"affiliate"];
-    tmpValue = [self primitiveValueForKey: @"affiliate"];
-    [self didAccessValueForKey: @"affiliate"];
-    
-    return tmpValue;
-}
-
-- (void)setAffiliate:(NSString *)value
-{
-    [self willChangeValueForKey: @"affiliate"];
-    [self setPrimitiveValue: value forKey: @"affiliate"];
-    [self didChangeValueForKey: @"affiliate"];
-}
-
-// Accessor and mutator for the FCC Channel Number attribute
-- (NSNumber *)fccChannelNumber{
-    NSNumber * tmpValue;
-    
-    [self willAccessValueForKey: @"fccChannelNumber"];
-    tmpValue = [self primitiveValueForKey: @"fccChannelNumber"];
-    [self didAccessValueForKey: @"fccChannelNumber"];
-    
-    return tmpValue;
-}
-
-- (void)setFccChannelNumber:(NSNumber *)value
-{
-    [self willChangeValueForKey: @"fccChannelNumber"];
-    [self setPrimitiveValue: value forKey: @"fccChannelNumber"];
-    [self didChangeValueForKey: @"fccChannelNumber"];
-}
-
-- (NSSet*)schedules
-{
-  NSSet *schedules = [self mutableSetValueForKey:@"schedules"];
-  return schedules;
-}
-
-- (BOOL)addSchedule:(Z2ITSchedule*)value
+- (BOOL)addScheduleIfNew:(Z2ITSchedule*)value
 {
   // The station might already have something scheduled in the same time or this is a replacement for
   // an existing program on the station. We need to search through the schedules and remove any schedule
@@ -265,37 +160,6 @@
   return YES;
 }
 
-- (NSSet*)hdhrStations
-{
-  NSSet *hdhrStations = [self mutableSetValueForKey:@"hdhrStations"];
-  return hdhrStations;
-}
-
-- (void)addHDHRStation:(HDHomeRunStation*)value
-{
-  NSMutableSet *hdhrStations = [self mutableSetValueForKey:@"hdhrStations"];
-  [hdhrStations addObject:value];
-}
-
-- (NSSet*)lineupMaps
-{
-  NSSet *lineupMaps = [self mutableSetValueForKey:@"lineupMaps"];
-  return lineupMaps;
-}
-
-- (void)addLineupMap:(Z2ITLineupMap*)value
-{
-  NSMutableSet *lineupMaps = [self mutableSetValueForKey:@"lineupMaps"];
-  if (![lineupMaps containsObject:value])
-    [lineupMaps addObject:value];
-}
-
-- (Z2ITLineupMap*)lineupMapAtIndex:(unsigned) index
-{
-  NSArray *lineupMapArray = [[self lineupMaps] allObjects];
-  return [lineupMapArray objectAtIndex:index];
-}
-
 - (Z2ITLineupMap*)lineupMapForLineupID:(NSString*) inLineupID
 {
   NSSet *lineupMaps = [self lineupMaps];
@@ -308,6 +172,16 @@
   }
   return aLineupMap;
 }
+
+
+@dynamic affiliate;
+@dynamic callSign;
+@dynamic fccChannelNumber;
+@dynamic name;
+@dynamic stationID;
+@dynamic hdhrStations;
+@dynamic lineupMaps;
+@dynamic schedules;
 
 - (Z2ITSchedule*)scheduleAtTime:(CFAbsoluteTime) inAirTime
 {

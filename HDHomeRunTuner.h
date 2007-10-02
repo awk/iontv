@@ -23,28 +23,34 @@
   HDHomeRunChannel *mCurrentHDHomeRunChannel;
 }
 
-- (NSNumber *) index;
-- (void) setIndex:(NSNumber*)value;
-- (HDHomeRun*) device;
-- (void) setDevice:(HDHomeRun *)value;
-
-- (Z2ITLineup*)lineup;
-- (void) setLineup:(Z2ITLineup*)value;
-
-- (void) addChannel:(HDHomeRunChannel*)inChannel;
-
-- (NSString*) longName;
+@property (retain) NSNumber * index;
+@property (retain) NSSet* channels;
+@property (retain) HDHomeRun * device;
+@property (retain) Z2ITLineup * lineup;
+@property (retain) NSString * longName;
 
 - (void) scanActionReportingProgressTo:(id)progressDisplay;
+- (void) exportChannelMapTo:(NSURL *)inURL;
+- (void) importChannelMapFrom:(NSURL *)inURL;
+
+#if 0
 - (void) startStreaming;
 - (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber;
 - (void) tuneToChannel:(HDHomeRunChannel*)inChannel;
-- (void) exportChannelMapTo:(NSURL *)inURL;
-- (void) importChannelMapFrom:(NSURL *)inURL;
 - (UInt8*) receiveVideoData:(size_t*)outBytesReceived;
 
 - (void) releaseHDHRDevice;
 - (void) createHDHRDevice;
+#endif
+
+@end
+
+// coalesce these into one @interface HDHomeRunTuner (CoreDataGeneratedAccessors) section
+@interface HDHomeRunTuner (CoreDataGeneratedAccessors)
+- (void)addChannelsObject:(HDHomeRunChannel *)value;
+- (void)removeChannelsObject:(HDHomeRunChannel *)value;
+- (void)addChannels:(NSSet *)value;
+- (void)removeChannels:(NSSet *)value;
 
 @end
 
@@ -55,23 +61,22 @@
 
 + (HDHomeRunChannel*) createChannelWithType:(NSString*)inChannelType andNumber:(NSNumber*)inChannelNumber inManagedObjectContext:(NSManagedObjectContext*) inMOC;
 
-- (NSString*) channelType;
-- (void) setChannelType:(NSString*)value;
+@property (retain) NSNumber * channelNumber;
+@property (retain) NSString * channelType;
+@property (retain) NSString * tuningType;
+@property (retain) NSSet* stations;
+@property (retain) HDHomeRunTuner * tuner;
 
-- (NSNumber*) channelNumber;
-- (void) setChannelNumber:(NSNumber*)value;
-
-- (NSString*) tuningType;
-- (void) setTuningType:(NSString*)value;
-
-- (HDHomeRunTuner*)tuner;
-- (void)setTuner:(HDHomeRunTuner*)value;
-
-- (NSMutableSet *)stations;
-- (void) clearAllStations;
-
-- (void) addStation:(HDHomeRunStation*)inStation;
 - (void) importStationsFrom:(NSArray*)inArrayOfStationDictionaries;
+
+@end
+
+// coalesce these into one @interface HDHomeRunChannel (CoreDataGeneratedAccessors) section
+@interface HDHomeRunChannel (CoreDataGeneratedAccessors)
+- (void)addStationsObject:(HDHomeRunStation *)value;
+- (void)removeStationsObject:(HDHomeRunStation *)value;
+- (void)addStations:(NSSet *)value;
+- (void)removeStations:(NSSet *)value;
 
 @end
 
@@ -81,17 +86,12 @@
 
 + (HDHomeRunStation*) createStationWithProgramNumber:(NSNumber*)inProgramNumber forChannel:(HDHomeRunChannel*)inChannel inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
-- (NSNumber*) programNumber;
-- (void) setProgramNumber:(NSNumber*)value;
-
-- (NSString*) callSign;
-- (void) setCallSign:(NSString*)value;
-
-- (HDHomeRunChannel*) channel;
-- (void) setChannel:(HDHomeRunChannel*) value;
-
-- (Z2ITStation*) Z2ITStation;
-- (void) setZ2ITStation:(Z2ITStation*) value;
+// The capitlization on z2itStation is a little 'odd' - betware that the accessors will be
+// z2itStation and setZ2itStation
+@property (retain) NSString * callSign;
+@property (retain) NSNumber * programNumber;
+@property (retain) HDHomeRunChannel * channel;
+@property (retain) Z2ITStation * z2itStation;
 
 - (void) startStreaming;
 - (void) stopStreaming;
@@ -99,3 +99,8 @@
 - (UInt8*) receiveVideoData:(size_t*)outBytesReceived;
 
 @end
+
+// coalesce these into one @interface HDHomeRunStation (CoreDataGeneratedAccessors) section
+@interface HDHomeRunStation (CoreDataGeneratedAccessors)
+@end
+

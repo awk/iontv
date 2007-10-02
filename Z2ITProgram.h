@@ -33,98 +33,72 @@
 
 - (BOOL) isMovie;
 
-// Accessor and mutator for the Lineup ID attribute
-- (NSString *)programID;
-- (void)setProgramID:(NSString *)value;
-
-// Accessor and mutator for the color code attribute
-- (NSString *)colorCode;
-- (void)setColorCode:(NSString *)value;
-
-// Accessor and mutator for the description string attribute
-- (NSString *)descriptionStr;
-- (void)setDescriptionStr:(NSString *)value;
-
-// Accessor and mutator for the MPAA Rating attribute
-- (NSString *)mpaaRating;
-- (void)setMpaaRating:(NSString *)value;
-
-// Accessor and mutator for the original air date attribute
-- (NSDate *)originalAirDate;
-- (void)setOriginalAirDate:(NSDate *)value;
-
-// Accessor and mutator for the type attribute
-- (NSNumber *)runTimeHours;
-- (void)setRunTimeHours:(NSNumber *)value;
-
-// Accessor and mutator for the user lineup name attribute
-- (NSNumber *)runTimeMinutes;
-- (void)setRunTimeMinutes:(NSNumber *)value;
-
-// Accessor and mutator for the series attribute
-- (NSString *)series;
-- (void)setSeries:(NSString *)value;
-
-// Accessor and mutator for the show type attribute
-- (NSString *)showType;
-- (void)setShowType:(NSString *)value;
-
-// Accessor and mutator for the star rating attribute
-- (NSNumber *)starRating;
-- (void)setStarRating:(NSNumber *)value;
-
-// Accessor and mutator for the sub-title attribute
-- (NSString *)subTitle;
-- (void)setSubTitle:(NSString *)value;
-
-// Accessor and mutator for the syndicated episode number attribute
-- (NSString *)syndicatedEpisodeNumber;
-- (void)setSyndicatedEpisodeNumber:(NSString *)value;
-
-// Accessor and mutator for the title attribute
-- (NSString *)title;
-- (void)setTitle:(NSString *)value;
-
-// Accessor and mutator for the year attribute
-- (NSNumber *)year;
-- (void)setYear:(NSNumber *)value;
-
-// Accessor and mutator for the advisory attributes
-- (NSSet *)advisories;
-- (void)clearAdvisories;
 - (void)addAdvisory:(NSString *)value;
-
-// Accessor and mutator for the genres relationships
-- (NSSet *)genres;
-- (void)clearGenres;
-- (void)addGenre:(Z2ITGenre *)value;
 - (Z2ITGenre*) genreWithRelevance:(int)inRelevance;
 
-// Accessor and mutator for the crew member relationships
-- (NSSet *)crewMembers;
-- (void)clearCrewMembers;
-- (void)addCrewMember:(Z2ITCrewMember *)value;
+@property (retain) NSString * colorCode;
+@property (retain) NSString * descriptionStr;
+@property (retain) NSString * mpaaRating;
+@property (retain) NSDate * originalAirDate;
+@property (retain) NSString * programID;
+@property (retain) NSNumber * runTimeHours;
+@property (retain) NSNumber * runTimeMinutes;
+@property (retain) NSString * series;
+@property (retain) NSString * showType;
+@property (retain) NSNumber * starRating;
+@property (retain) NSString * subTitle;
+@property (retain) NSString * syndicatedEpisodeNumber;
+@property (retain) NSString * title;
+@property (retain) NSNumber * year;
+@property (retain) NSSet* advisories;
+@property (retain) NSSet* crewMembers;
+@property (retain) NSSet* genres;
+@property (retain) NSSet* schedules;
 
-// Accessor and mutator for the schedules relationship
-- (NSSet *)schedules;
+@end
+
+// coalesce these into one @interface Z2ITProgram (CoreDataGeneratedAccessors) section
+@interface Z2ITProgram (CoreDataGeneratedAccessors)
+- (void)addAdvisoriesObject:(NSManagedObject *)value;
+- (void)removeAdvisoriesObject:(NSManagedObject *)value;
+- (void)addAdvisories:(NSSet *)value;
+- (void)removeAdvisories:(NSSet *)value;
+
+- (void)addCrewMembersObject:(Z2ITCrewMember *)value;
+- (void)removeCrewMembersObject:(Z2ITCrewMember *)value;
+- (void)addCrewMembers:(NSSet *)value;
+- (void)removeCrewMembers:(NSSet *)value;
+
+- (void)addGenresObject:(Z2ITGenre *)value;
+- (void)removeGenresObject:(Z2ITGenre *)value;
+- (void)addGenres:(NSSet *)value;
+- (void)removeGenres:(NSSet *)value;
+
+- (void)addSchedulesObject:(Z2ITSchedule *)value;
+- (void)removeSchedulesObject:(Z2ITSchedule *)value;
+- (void)addSchedules:(NSSet *)value;
+- (void)removeSchedules:(NSSet *)value;
+
 @end
 
 @interface Z2ITCrewMember : NSManagedObject {
 };
 
-// Accessor and mutator for the Role attribute
-- (NSString *)roleName;
-- (void)setRoleName:(NSString *)value;
 
-// Accessor and mutator for the surname attribute
-- (NSString *)surname;
-- (void)setSurname:(NSString *)value;
+// Fetch the CrewRole Object with the given string from the Managed Object Context
++ (NSManagedObject *) fetchCrewRoleWithName:(NSString*)inCrewRoleNameString inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
-// Accessor and mutator for the givenname attribute
-- (NSString *)givenname;
-- (void)setGivenname:(NSString *)value;
+@property (retain) NSString * givenname;
+@property (retain) NSString * surname;
+@property (retain) Z2ITProgram * program;
+@property (retain) NSManagedObject * role;
 
 @end
+
+// coalesce these into one @interface Z2ITCrewMember (CoreDataGeneratedAccessors) section
+@interface Z2ITCrewMember (CoreDataGeneratedAccessors)
+@end
+
 
 @interface Z2ITGenre : NSManagedObject {
 };
@@ -132,13 +106,17 @@
 + (Z2ITGenre *) createGenreWithClassName:(NSString*)inGenreClassNameString andRelevance:(NSNumber*)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 + (Z2ITGenre *) fetchGenreWithClassName:(NSString*)inGenreClassNameString andRelevance:(NSNumber*)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
-// Accessor and mutator for the relevance attribute
-- (NSNumber *)relevance;
-- (void)setRelevance:(NSNumber *)value;
+@property (retain) NSNumber * relevance;
+@property (retain) NSManagedObject * genreClass;
+@property (retain) NSSet* programs;
 
-- (NSManagedObject*) genreClass;
-- (void) setGenreClass:(NSManagedObject*)value;
+@end
 
-- (void)addProgram:(Z2ITProgram*)value;
+// coalesce these into one @interface Z2ITGenre (CoreDataGeneratedAccessors) section
+@interface Z2ITGenre (CoreDataGeneratedAccessors)
+- (void)addProgramsObject:(Z2ITProgram *)value;
+- (void)removeProgramsObject:(Z2ITProgram *)value;
+- (void)addPrograms:(NSSet *)value;
+- (void)removePrograms:(NSSet *)value;
 
 @end

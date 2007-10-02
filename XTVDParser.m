@@ -259,7 +259,7 @@
               [aLineupMap setTo:toDate];
               
 			if (addLineup)
-				[aLineup addLineupMap:aLineupMap];
+				[aLineup addLineupMapsObject:aLineupMap];
 
             [aLineupMap release];
             aLineupMap = NULL;

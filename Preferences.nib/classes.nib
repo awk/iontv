@@ -87,6 +87,12 @@
 				<string>NSView</string>
 				<key>mRetrieveLineupsButton</key>
 				<string>NSButton</string>
+				<key>mSDPasswordField</key>
+				<string>NSTextField</string>
+				<key>mSDPrefsView</key>
+				<string>NSView</string>
+				<key>mSDUsernameField</key>
+				<string>NSTextField</string>
 				<key>mScanChannelsButton</key>
 				<string>NSButton</string>
 				<key>mScanTunersButton</key>

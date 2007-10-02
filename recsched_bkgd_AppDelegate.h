@@ -6,23 +6,14 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
-#import <SyncServices/SyncServices.h>
+#import "RSCommonAppDelegate.h"
 
 @class RecSchedServer;
 
-@interface recsched_bkgd_AppDelegate : NSObject<NSPersistentStoreCoordinatorSyncing> 
+@interface recsched_bkgd_AppDelegate : RSCommonAppDelegate
 {
-    NSPersistentStoreCoordinator *persistentStoreCoordinator;
-    NSManagedObjectModel *managedObjectModel;
-    NSManagedObjectContext *managedObjectContext;
-
 	RecSchedServer *mRecSchedServer;
 }
-
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
-- (NSManagedObjectModel *)managedObjectModel;
-- (NSManagedObjectContext *)managedObjectContext;
 
 - (ISyncClient *)syncClient;
 - (void)syncAction:(id)sender;

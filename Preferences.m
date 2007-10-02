@@ -17,6 +17,8 @@
 #import "RSColorDictionary.h"
 #import <Security/Security.h>
 
+#define SCAN_DISABLED 1
+
 const float kDurationSliderMinValue = 1.0;
 const float kDurationSliderMaxValue = 772.0;
 const int k1HourTick = 0;   // Tick mark indices are zero based
@@ -26,13 +28,13 @@ const int k24HoursTick   = 9;   // 1 day
 const int k168HoursTick = 15;   // 1 week
 const int k336HoursTick = 17;   // 2 weeks
 
-NSString *kZap2ItPreferencesToolbarIdentifier = @"Zap2It";
+NSString *kSDPreferencesToolbarIdentifier = @"SD";
 NSString *kTunersPreferencesToolbarIdentifier = @"Tuners";
 NSString *kChannelsPreferencesToolbarIdentifier = @"Channels";
 NSString *kColorsPreferencesToolbarIdentifier = @"Colors";
-NSString *kZap2ItLabsURL = @"http://labs.zap2it.com";
+NSString *kSchedulesDirectURL = @"http://schedulesdirect.org/signup";
 
-NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";
+NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";
 
 NSString *kScheduleDownloadDurationPrefStr = @"scheduleDownloadDuration";
 
@@ -114,7 +116,7 @@ static Preferences *sSharedInstance = nil;
     // if your application supports resetting a subset of the defaults to 
     // factory values, you should set those values 
     // in the shared user defaults controller
-    resettableUserDefaultsKeys=[NSArray arrayWithObjects:kScheduleDownloadDurationPrefStr, kWebServicesZap2ItUsernamePrefStr, nil];
+    resettableUserDefaultsKeys=[NSArray arrayWithObjects:kScheduleDownloadDurationPrefStr, kWebServicesSDUsernamePrefStr, nil];
     initialValuesDict=[userDefaultsValuesDict dictionaryWithValuesForKeys:resettableUserDefaultsKeys];
     
     // Set the initial values in the shared user defaults controller 
@@ -159,7 +161,8 @@ static Preferences *sSharedInstance = nil;
 		// If we're already showing the selected view we're done here
 		if ([prefsSubviews objectAtIndex:i] == inViewToBeShown)
 			return;
-		[[prefsSubviews objectAtIndex:i] removeFromSuperview];
+		NSView *viewToBeRemoved = [prefsSubviews objectAtIndex:i];
+		[viewToBeRemoved removeFromSuperview];
 	}
 	
 	// Get the containers current size
@@ -194,7 +197,7 @@ static Preferences *sSharedInstance = nil;
 
     // often using an image will be your standard case.  You'll notice that a selector is passed
     // for the action (blueText:), which will be called when the image-containing toolbar item is clicked.
-    addToolbarItem(mToolbarItems,kZap2ItPreferencesToolbarIdentifier,@"Zap2It",@"Zap2It",@"Zap2It User ID & Schedule",self,@selector(setImage:), nil /* image */,@selector(showZap2ItPrefs:),NULL);
+    addToolbarItem(mToolbarItems,kSDPreferencesToolbarIdentifier,@"SchedulesDirect",@"SchedulesDirect",@"SchedulesDirect User ID & Schedule",self,@selector(setImage:), nil /* image */,@selector(showSDPrefs:),NULL);
     addToolbarItem(mToolbarItems,kTunersPreferencesToolbarIdentifier,@"Tuner",@"Tuner",@"Tuner Selection",self,@selector(setImage:), nil /* image */,@selector(showTunerPrefs:),NULL);
     addToolbarItem(mToolbarItems,kChannelsPreferencesToolbarIdentifier,@"Channels",@"Channels",@"Customize Channels you recieve",self,@selector(setImage:), nil /* image */,@selector(showChannelPrefs:),NULL);
     addToolbarItem(mToolbarItems,kColorsPreferencesToolbarIdentifier,@"Colors",@"Colors",@"Colors for program genres",self,@selector(setImage:), nil /* image */,@selector(showColorPrefs:),NULL);
@@ -216,9 +219,9 @@ static Preferences *sSharedInstance = nil;
     // tell the toolbar to show icons only by default
     [toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
 	
-	// Start with the Zap2It prefs
-	[toolbar setSelectedItemIdentifier:kZap2ItPreferencesToolbarIdentifier];
-	[self showPrefsView:mZap2ItPrefsView];
+	// Start with the SchedulesDirect prefs
+	[toolbar setSelectedItemIdentifier:kSDPreferencesToolbarIdentifier];
+	[self showPrefsView:mSDPrefsView];
 	
     // install the toolbar.
     [mPanel setToolbar:toolbar];
@@ -277,23 +280,23 @@ static Preferences *sSharedInstance = nil;
           [mDurationSlider setDoubleValue:newSliderValue];
           
           
-    // Attempt to retrieve the Username and password fields for the Zap2It site
-    NSString* zap2ItUsernameString = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesZap2ItUsernamePrefStr];
-    if (zap2ItUsernameString)
+    // Attempt to retrieve the Username and password fields for the SchedulesDirect site
+    NSString* SDUsernameString = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernamePrefStr];
+    if (SDUsernameString)
     {
-      [mZap2ItUsernameField setStringValue:zap2ItUsernameString];
+      [mSDUsernameField setStringValue:SDUsernameString];
 
-      const char *serverNameUTF8 = [kWebServicesZap2ItHostname UTF8String];
-      const char *accountNameUTF8 = [zap2ItUsernameString UTF8String];
-      const char *pathUTF8 = [kWebServicesZap2ItPath UTF8String];
+      const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
+      const char *accountNameUTF8 = [SDUsernameString UTF8String];
+      const char *pathUTF8 = [kWebServicesSDPath UTF8String];
       UInt32 passwordLength;
       void *passwordData;
-      OSStatus status = SecKeychainFindInternetPassword(NULL,strlen(serverNameUTF8),serverNameUTF8, 0, NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, &passwordLength, &passwordData, &mZap2ItKeychainItemRef);
+      OSStatus status = SecKeychainFindInternetPassword(NULL,strlen(serverNameUTF8),serverNameUTF8, 0, NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, &passwordLength, &passwordData, &mSDKeychainItemRef);
       
       if (status == noErr)
       {
 		NSString *passwordString = [NSString stringWithCString:passwordData length:passwordLength];
-        [mZap2ItPasswordField setStringValue:passwordString];
+        [mSDPasswordField setStringValue:passwordString];
         SecKeychainItemFreeContent(NULL, passwordData);
       }
     }
@@ -341,42 +344,43 @@ static Preferences *sSharedInstance = nil;
 - (void) savePrefs:(id)sender
 {
   NSUserDefaultsController *theDefaultsController  = [NSUserDefaultsController sharedUserDefaultsController];
-  if ([mZap2ItUsernameField stringValue])
+  if ([mSDUsernameField stringValue])
   {
-    [[theDefaultsController values] setValue:[mZap2ItUsernameField stringValue] forKey:kWebServicesZap2ItUsernamePrefStr];
-    const char *serverNameUTF8 = [kWebServicesZap2ItHostname UTF8String];
-    const char *accountNameUTF8 = [[mZap2ItUsernameField stringValue] UTF8String];
-    const char *pathUTF8 = [kWebServicesZap2ItPath UTF8String];
+	NSUserDefaultsController *theDefaultsController  = [NSUserDefaultsController sharedUserDefaultsController];
+	[[theDefaultsController values] setValue:[mSDUsernameField stringValue] forKey:kWebServicesSDUsernamePrefStr];
+    const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
+    const char *accountNameUTF8 = [[mSDUsernameField stringValue] UTF8String];
+    const char *pathUTF8 = [kWebServicesSDPath UTF8String];
     UInt32 passwordLength;
     const void *passwordData;
 
-	NSString *passwordString = [mZap2ItPasswordField stringValue];
+	NSString *passwordString = [mSDPasswordField stringValue];
 	passwordData = [passwordString UTF8String];
 	passwordLength = strlen(passwordData);
     
     // Call AddInternetPassword - if it's already in the keychain then update it
     OSStatus status;
-    if (mZap2ItKeychainItemRef == nil)
+    if (mSDKeychainItemRef == nil)
     {
-      status = SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mZap2ItKeychainItemRef);
+      status = SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mSDKeychainItemRef);
     }
     else
     {
       // The item already exists - we just need to change the password.
       // And the Account name
-      void *accountNameAttributeData = malloc(strlen([[mZap2ItUsernameField stringValue] UTF8String]));
-      memcpy(accountNameAttributeData, [[mZap2ItUsernameField stringValue] UTF8String], strlen([[mZap2ItUsernameField stringValue] UTF8String]));
+      void *accountNameAttributeData = malloc(strlen([[mSDUsernameField stringValue] UTF8String]));
+      memcpy(accountNameAttributeData, [[mSDUsernameField stringValue] UTF8String], strlen([[mSDUsernameField stringValue] UTF8String]));
       
       SecKeychainAttribute accountNameAttribute;
       accountNameAttribute.tag = kSecAccountItemAttr;
       accountNameAttribute.data = accountNameAttributeData;
-      accountNameAttribute.length = strlen([[mZap2ItUsernameField stringValue] UTF8String]);
+      accountNameAttribute.length = strlen([[mSDUsernameField stringValue] UTF8String]);
       SecKeychainAttributeList attrList;
       attrList.count = 1;
       attrList.attr = &accountNameAttribute;
-      status = SecKeychainItemModifyAttributesAndData(mZap2ItKeychainItemRef, &attrList, passwordLength, passwordData);
+      status = SecKeychainItemModifyAttributesAndData(mSDKeychainItemRef, &attrList, passwordLength, passwordData);
       free(accountNameAttributeData);
-    }
+	}
   }
   [theDefaultsController save:sender];
 }
@@ -391,9 +395,9 @@ static Preferences *sSharedInstance = nil;
 
 #pragma mark Action Methods
 
-- (void) showZap2ItPrefs:(id)sender
+- (void) showSDPrefs:(id)sender
 {
-	[self showPrefsView:mZap2ItPrefsView];
+	[self showPrefsView:mSDPrefsView];
 }
 
 - (void) showTunerPrefs:(id)sender
@@ -435,11 +439,13 @@ static Preferences *sSharedInstance = nil;
 
 - (IBAction) getAccountButtonAction:(id)sender
 {
-  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:kZap2ItLabsURL]];
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:kSchedulesDirectURL]];
 }
 
 - (IBAction) retrieveLineupsButtonAction:(id)sender
 {
+  [self savePrefs:sender];
+  
   [mParsingProgressIndicator startAnimation:self];
   [mParsingProgressIndicator setHidden:NO];
   [mParsingProgressIndicator setIndeterminate:YES];
@@ -450,7 +456,7 @@ static Preferences *sSharedInstance = nil;
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   
   // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
-  // Zap2It expects
+  // SchedulesDirect expects
   CFGregorianDate startDate = CFAbsoluteTimeGetGregorianDate(currentTime,NULL);
   
   // Retrieve 'n' hours of data
@@ -476,8 +482,14 @@ static Preferences *sSharedInstance = nil;
 	[mTunerScanProgressIndicator setHidden:NO];
 	[mTunerScanProgressIndicator startAnimation:sender];
 	
+#if SCAN_DISABLED
+	int count = 1;
+	struct hdhomerun_discover_device_t result_list[1];
+	result_list[0].device_id = 0x01001B88;
+#else
 	struct hdhomerun_discover_device_t result_list[64];
 	int count = hdhomerun_discover_find_devices(HDHOMERUN_DEVICE_TYPE_TUNER, result_list, 64);
+#endif
 	
 	[mTunerScanProgressIndicator stopAnimation:sender];
 	[mTunerScanProgressIndicator setHidden:YES];
@@ -637,6 +649,13 @@ static Preferences *sSharedInstance = nil;
     
     [callData release];
   }
+  else
+  {
+	// Error occrred - renable the controls
+	[mParsingProgressIndicator setHidden:YES];
+	[mParsingProgressInfoField setHidden:YES];
+	[mRetrieveLineupsButton setEnabled:YES];
+  }
 }
 
 - (void) setParsingInfoString:(NSString*)inInfoString
@@ -753,19 +772,19 @@ static Preferences *sSharedInstance = nil;
 // set of toolbar items.  It can also be called by the customization palette to display the default toolbar.    
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
 }
 
 // This method is required of NSToolbar delegates.  It returns an array holding identifiers for all allowed
 // toolbar items in this toolbar.  Any not listed here will not be available in the customization palette.
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
 }
 
 @end

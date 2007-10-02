@@ -16,6 +16,9 @@ const int kDefaultPortNumber = 1234;
 
 @implementation HDHomeRun
 
+@dynamic deviceID;
+@dynamic name;
+@dynamic tuners;
 
 // Fetch the HDHomeRun with the given ID from the Managed Object Context
 + (HDHomeRun *) fetchHDHomeRunWithID:(NSNumber *)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC
@@ -80,45 +83,16 @@ const int kDefaultPortNumber = 1234;
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
 	[anHDHomeRunTuner setIndex:[NSNumber numberWithInt:0]];
 	[anHDHomeRunTuner setLineup:aLineup];
-	[anHDHomeRun addTuner:anHDHomeRunTuner];
+	[anHDHomeRun addTunersObject:anHDHomeRunTuner];
 	[anHDHomeRunTuner release];
 	
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
 	[anHDHomeRunTuner setIndex:[NSNumber numberWithInt:1]];
 	[anHDHomeRunTuner setLineup:aLineup];
-	[anHDHomeRun addTuner:anHDHomeRunTuner];
+	[anHDHomeRun addTunersObject:anHDHomeRunTuner];
 	[anHDHomeRunTuner release];
 	
 	return anHDHomeRun;
-}
-
-#pragma mark Property Accessors
-
-- (NSNumber *)deviceID
-{
-COREDATA_ACCESSOR(NSNumber*, @"deviceID")
-}
-
-- (void)setDeviceID:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*, @"deviceID")
-}
-
-- (NSString *)name
-{
-COREDATA_ACCESSOR(NSString*, @"name");
-}
-
-- (void) setName:(NSString*)value
-{
-COREDATA_MUTATOR(NSString*, @"name");
-}
-
-- (void) addTuner:(HDHomeRunTuner *)aTuner
-{
-  NSMutableSet *tuners = [self mutableSetValueForKey:@"tuners"];
-  [aTuner setDevice:self];
-  [tuners addObject:aTuner];
 }
 
 - (HDHomeRunTuner *)tunerWithIndex:(int) inIndex

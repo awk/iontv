@@ -12,8 +12,8 @@
 #import <Foundation/Foundation.h>
 #import "WSGeneratedObj.h"
 
-extern NSString *kWebServicesZap2ItHostname;
-extern NSString *kWebServicesZap2ItPath;
+extern NSString *kWebServicesSDHostname;
+extern NSString *kWebServicesSDPath;
 
 @interface tvDataDelivery : WSGeneratedObj
 

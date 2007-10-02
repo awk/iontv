@@ -69,13 +69,6 @@
   return foundLineupMap;
 }
 
-- (void) addLineupMap:(Z2ITLineupMap *)aLineupMap
-{
-  NSMutableSet *lineupMaps = [self mutableSetValueForKey:@"lineupMaps"];
-  [aLineupMap setLineup:self];
-  [lineupMaps addObject:aLineupMap];
-}
-
 - (NSArray *)stations
 {
   NSMutableSet *lineupMaps = [self mutableSetValueForKey:@"lineupMaps"];
@@ -89,143 +82,14 @@
   return stationsArray;
 }
 
-#pragma mark
-#pragma mark Core Data accessors/mutators/validation methods
-#pragma mark
-
-
-
-// Accessor and mutator for the Lineup ID attribute
-- (NSString *)lineupID
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"lineupID"];
-    tmpValue = [self primitiveValueForKey: @"lineupID"];
-    [self didAccessValueForKey: @"lineupID"];
-    
-    return tmpValue;
-}
-
-- (void)setLineupID:(NSString *)value
-{
-    [self willChangeValueForKey: @"lineupID"];
-    [self setPrimitiveValue: value forKey: @"lineupID"];
-    [self didChangeValueForKey: @"lineupID"];
-}
-
-// Accessor and mutator for the device attribute
-- (NSString *)device
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"device"];
-    tmpValue = [self primitiveValueForKey: @"device"];
-    [self didAccessValueForKey: @"device"];
-    
-    return tmpValue;
-}
-
-- (void)setDevice:(NSString *)value;
-{
-    [self willChangeValueForKey: @"device"];
-    [self setPrimitiveValue: value forKey: @"device"];
-    [self didChangeValueForKey: @"device"];
-}
-
-// Accessor and mutator for the location attribute
-- (NSString *)location
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"location"];
-    tmpValue = [self primitiveValueForKey: @"location"];
-    [self didAccessValueForKey: @"location"];
-    
-    return tmpValue;
-}
-
-- (void)setLocation:(NSString *)value;
-{
-    [self willChangeValueForKey: @"location"];
-    [self setPrimitiveValue: value forKey: @"location"];
-    [self didChangeValueForKey: @"location"];
-}
-
-// Accessor and mutator for the name attribute
-- (NSString *)name
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"name"];
-    tmpValue = [self primitiveValueForKey: @"name"];
-    [self didAccessValueForKey: @"name"];
-    
-    return tmpValue;
-}
-
-- (void)setName:(NSString *)value;
-{
-    [self willChangeValueForKey: @"name"];
-    [self setPrimitiveValue: value forKey: @"name"];
-    [self didChangeValueForKey: @"name"];
-}
-
-// Accessor and mutator for the postal code attribute
-- (NSString *)postalCode
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"postalCode"];
-    tmpValue = [self primitiveValueForKey: @"postalCode"];
-    [self didAccessValueForKey: @"postalCode"];
-    
-    return tmpValue;
-}
-
-- (void)setPostalCode:(NSString *)value
-{
-    [self willChangeValueForKey: @"postalCode"];
-    [self setPrimitiveValue: value forKey: @"postalCode"];
-    [self didChangeValueForKey: @"postalCode"];
-}
-
-// Accessor and mutator for the type attribute
-- (NSString *)type
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"type"];
-    tmpValue = [self primitiveValueForKey: @"type"];
-    [self didAccessValueForKey: @"type"];
-    
-    return tmpValue;
-}
-
-- (void)setType:(NSString *)value
-{
-    [self willChangeValueForKey: @"type"];
-    [self setPrimitiveValue: value forKey: @"type"];
-    [self didChangeValueForKey: @"type"];
-}
-
-// Accessor and mutator for the user lineup name attribute
-- (NSString *)userLineupName
-{
-    NSString * tmpValue;
-    
-    [self willAccessValueForKey: @"userLineupName"];
-    tmpValue = [self primitiveValueForKey: @"userLineupName"];
-    [self didAccessValueForKey: @"userLineupName"];
-    
-    return tmpValue;
-}
-
-- (void)setUserLineupName:(NSString *)value
-{
-    [self willChangeValueForKey: @"userLineupName"];
-    [self setPrimitiveValue: value forKey: @"userLineupName"];
-    [self didChangeValueForKey: @"userLineupName"];
-}
+@dynamic device;
+@dynamic lineupID;
+@dynamic location;
+@dynamic name;
+@dynamic postalCode;
+@dynamic type;
+@dynamic userLineupName;
+@dynamic lineupMaps;
+@dynamic tuners;
 
 @end

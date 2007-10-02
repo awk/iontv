@@ -19,62 +19,28 @@
 
 - (void) setDurationHours:(int)inHours minutes:(int)inMinutes;
 
-// Accessor and mutator for the Program relationship
-- (Z2ITProgram *)program;
-- (void)setProgram:(Z2ITProgram *)value;
-
-// Accessor and mutator for the station relationship
-- (Z2ITStation *)station;
-- (void)setStation:(Z2ITStation *)value;
-
-// Accessor and mutator for the close captioned attribute
-- (bool)closeCaptioned;
-- (void)setCloseCaptioned:(bool)value;
-
-// Accessor and mutator for the dolby attribute
-- (NSString *)dolby;
-- (void)setDolby:(NSString *)value;
-
-// Accessor and mutator for the close captioned attribute
-- (bool)hdtv;
-- (void)setHdtv:(bool)value;
-
-// Accessor and mutator for the user lineup name attribute
-- (NSNumber *)partNumber;
-- (void)setPartNumber:(NSNumber *)value;
-
-// Accessor and mutator for the user lineup name attribute
-- (NSNumber *)totalNumberParts;
-- (void)setTotalNumberParts:(NSNumber *)value;
-
-// Accessor and mutator for the close captioned attribute
-- (bool)repeat;
-- (void)setRepeat:(bool)value;
-
-// Accessor and mutator for the close captioned attribute
-- (bool)stereo;
-- (void)setStereo:(bool)value;
-
-// Accessor and mutator for the close captioned attribute
-- (bool)subtitled;
-- (void)setSubtitled:(bool)value;
-
-// Accessor and mutator for the (start) time attribute
-- (NSDate *)time;
-- (void)setTime:(NSDate*)value;
-
-// Accessor and mutator for the end time attribute
-- (NSDate *)endTime;
-- (void)setEndTime:(NSDate*)value;
-
-// Accessor and mutator for the to be recorded attribute
-- (bool)toBeRecorded;
-- (void)setToBeRecorded:(bool)value;
-
-// Accessor and mutator for the TV Rating attribute
-- (NSString *)tvRating;
-- (void)setTvRating:(NSString *)value;
-- (NSString *) tvRatingImageName;
+@property (retain) NSNumber * closeCaptioned;
+@property (retain) NSString * dolby;
+@property (retain) NSDate * endTime;
+@property (retain) NSNumber * hdtv;
+@property (retain) NSNumber * new;
+@property (retain) NSNumber * partNumber;
+@property (retain) NSString * recordedMediaPath;
+@property (retain) NSNumber * recordingStatus;
+@property (retain) NSNumber * stereo;
+@property (retain) NSNumber * subtitled;
+@property (retain) NSDate * time;
+@property (retain) NSNumber * toBeRecorded;
+@property (retain) NSNumber * totalNumberParts;
+@property (retain) NSString * tvRating;
+@property (retain) Z2ITProgram * program;
+@property (retain) Z2ITStation * station;
 
 - (NSString *) programDetailsStr;
+- (NSString *) tvRatingImageName;
+
+@end
+
+// coalesce these into one @interface Z2ITSchedule (CoreDataGeneratedAccessors) section
+@interface Z2ITSchedule (CoreDataGeneratedAccessors)
 @end

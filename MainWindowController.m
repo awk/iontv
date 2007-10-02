@@ -98,7 +98,7 @@ const CGFloat kSourceListMinWidth = 150;
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   
   // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
-  // Zap2It expects
+  // SchedulesDirect expects
   CFGregorianDate startDate = CFAbsoluteTimeGetGregorianDate(currentTime,NULL);
   
   // Retrieve 'n' hours of data
@@ -130,7 +130,7 @@ const CGFloat kSourceListMinWidth = 150;
 - (IBAction) recordShow:(id)sender
 {
   Z2ITSchedule *aSchedule = [mCurrentSchedule content];
-  [aSchedule setToBeRecorded:YES];
+  [aSchedule setToBeRecorded:[NSNumber numberWithBool:YES]];
   [[[[NSApplication sharedApplication] delegate] recServer] addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
 }
 
@@ -150,7 +150,7 @@ const CGFloat kSourceListMinWidth = 150;
 	HDHomeRunStation *aHDHRStation;
 	while ((aHDHRStation = [anEnumerator nextObject]) != nil)
 	{
-		if (([aHDHRStation Z2ITStation] == aStation) && ([[[aHDHRStation channel] tuner] lineup] == aLineup))
+		if (([aHDHRStation z2itStation] == aStation) && ([[[aHDHRStation channel] tuner] lineup] == aLineup))
 		{
 			[[[NSApplication sharedApplication] delegate] launchVLCAction:sender withParentWindow:[self window] startStreaming:aHDHRStation];
 			break;
@@ -307,17 +307,12 @@ const CGFloat kSourceListMinWidth = 150;
 {
 	BOOL enableItem = NO;
 	
-	if ([anItem action] == @selector(watchStation:))
+	if (([anItem action] == @selector(watchStation:)) || ([anItem action] == @selector(recordShow:)) || ([anItem action] == @selector(recordSeasonPass:)))
 	{
 		if ([mCurrentStation content] != nil)
 		{
 			enableItem = [[mCurrentStation content] hasValidTunerForLineup:[mCurrentLineup content]];
 		}
-	}
-	
-	if (([anItem action] == @selector(recordShow:)) || ([anItem action] == @selector(recordSeasonPass:)))
-	{
-		enableItem = ([mCurrentSchedule content] != nil);
 	}
 	
 	if ([anItem action] == @selector(createWishlist:))

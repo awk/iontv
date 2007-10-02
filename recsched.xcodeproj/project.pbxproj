@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 43;
+	objectVersion = 44;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -65,6 +65,10 @@
 		EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3090C30C6AB59E0005E89B /* RSWishlistController.m */; };
+		EA4B9FC10C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */; };
+		EA4B9FC20C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */; };
+		EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */; };
+		EA4BA1190C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
 		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
@@ -215,6 +219,10 @@
 		EA308FB60C66A7470005E89B /* RSColorDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSColorDictionary.m; sourceTree = "<group>"; };
 		EA3090C20C6AB59E0005E89B /* RSWishlistController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSWishlistController.h; sourceTree = "<group>"; };
 		EA3090C30C6AB59E0005E89B /* RSWishlistController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSWishlistController.m; sourceTree = "<group>"; };
+		EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 2.xcdatamodel"; sourceTree = "<group>"; };
+		EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched.xcmappingmodel; sourceTree = "<group>"; };
+		EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSCommonAppDelegate.h; sourceTree = "<group>"; };
+		EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSCommonAppDelegate.m; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
@@ -321,6 +329,8 @@
 				EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */,
 				EA3090C20C6AB59E0005E89B /* RSWishlistController.h */,
 				EA3090C30C6AB59E0005E89B /* RSWishlistController.m */,
+				EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */,
+				EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -409,6 +419,7 @@
 			isa = PBXGroup;
 			children = (
 				EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */,
+				EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -711,6 +722,8 @@
 				EAF4EACF0C5F90B1003EC697 /* AKColorExtensions.m in Sources */,
 				EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */,
 				EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */,
+				EA4B9FC10C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */,
+				EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -749,6 +762,8 @@
 				EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */,
 				EA289D160C720FCE00D2EE7B /* HDHomeRunTuner.m in Sources */,
 				EA289D170C720FCF00D2EE7B /* HDHomeRunMO.m in Sources */,
+				EA4B9FC20C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */,
+				EA4BA1190C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -860,7 +875,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOTS = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
 			name = Debug;
 		};
@@ -870,7 +885,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOTS = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
 			};
 			name = Release;
 		};
@@ -1038,8 +1053,9 @@
 			isa = XCVersionGroup;
 			children = (
 				770B37EC0679A11B001EADE2 /* recsched_DataModel.xcdatamodel */,
+				EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */,
 			);
-			currentVersion = 770B37EC0679A11B001EADE2 /* recsched_DataModel.xcdatamodel */;
+			currentVersion = EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */;
 			path = recsched_DataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

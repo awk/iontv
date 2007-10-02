@@ -68,179 +68,18 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   return self;
 }
 
-/**
-    Returns the support folder for the application, used to store the Core Data
-    store file.  This code uses a folder named "recsched" for
-    the content, either in the NSApplicationSupportDirectory location or (if the
-    former cannot be found), the system's temporary directory.
- */
-
-- (NSString *)applicationSupportFolder {
-
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
-    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
-    return [basePath stringByAppendingPathComponent:@"recsched"];
+- (NSURL *)urlForPersistentStore {
+	return [NSURL fileURLWithPath: [[self applicationSupportFolder] stringByAppendingPathComponent: @"recsched.dat"]];
 }
 
-
-/**
-    Creates, retains, and returns the managed object model for the application 
-    by merging all of the models found in the application bundle and all of the 
-    framework bundles.
- */
- 
-- (NSManagedObjectModel *)managedObjectModel {
-
-    if (managedObjectModel != nil) {
-        return managedObjectModel;
-    }
-	
-    NSMutableSet *allBundles = [[NSMutableSet alloc] init];
-    [allBundles addObject: [NSBundle mainBundle]];
-    [allBundles addObjectsFromArray: [NSBundle allFrameworks]];
-    
-    managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles: [allBundles allObjects]] retain];
-    [allBundles release];
-    
-    return managedObjectModel;
-}
-
-
-/**
-    Returns the persistent store coordinator for the application.  This 
-    implementation will create and return a coordinator, having added the 
-    store for the application to it.  (The folder for the store is created, 
-    if necessary.)
- */
-
-- (NSPersistentStoreCoordinator *) persistentStoreCoordinator {
-
-    if (persistentStoreCoordinator != nil) {
-        return persistentStoreCoordinator;
-    }
-
-    NSFileManager *fileManager;
-    NSString *applicationSupportFolder = nil;
-    NSURL *url;
-    NSError *error;
-    
-    fileManager = [NSFileManager defaultManager];
-    applicationSupportFolder = [self applicationSupportFolder];
-    if ( ![fileManager fileExistsAtPath:applicationSupportFolder isDirectory:NULL] ) {
-        [fileManager createDirectoryAtPath:applicationSupportFolder attributes:nil];
-    }
-    
-    url = [NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched.dat"]];
-    persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
-		
-	// Turn on Migration for the store
-	NSDictionary *optionsDictionary = nil; //[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
-
-	persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:optionsDictionary error:&error];
-    if (persistentStore != nil)
-	{
-		NSURL *fastSyncDetailURL;
-        fastSyncDetailURL = [NSURL fileURLWithPath:[applicationSupportFolder stringByAppendingPathComponent:@"org.awkward.recsched.fastsyncstore"]];
-        [persistentStoreCoordinator setStoresFastSyncDetailsAtURL:fastSyncDetailURL forPersistentStore:persistentStore];
-	}
-	else
-	{
-        [[NSApplication sharedApplication] presentError:error];
-    }    
-
-    return persistentStoreCoordinator;
-}
-
-- (NSPersistentStore*) persistentStore
-{
-	if (persistentStore != nil)
-	{
-		return persistentStore;
-	}
-	[self persistentStoreCoordinator];
-	if (persistentStore)
-		return persistentStore;
-	else
-		NSLog(@"ERROR - No Persistent Store after initializing coordinator !");
-	return nil;
-}
-
-/**
-    Returns the managed object context for the application (which is already
-    bound to the persistent store coordinator for the application.) 
- */
- 
-- (NSManagedObjectContext *) managedObjectContext {
-
-    if (managedObjectContext != nil) {
-        return managedObjectContext;
-    }
-
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
-    if (coordinator != nil) {
-        managedObjectContext = [[NSManagedObjectContext alloc] init];
-        [managedObjectContext setPersistentStoreCoordinator: coordinator];
-        
-        // We may change the store in a seperate thread (when fetching for instance) in which case
-        // the store should overwrite any changes made locally within the receivers context
-        [managedObjectContext setMergePolicy:NSMergeByPropertyStoreTrumpMergePolicy];
-    }
-    
-    return managedObjectContext;
-}
-
-
-/**
-    Returns the NSUndoManager for the application.  In this case, the manager
-    returned is that of the managed object context for the application.
- */
- 
-- (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window {
-    return [[self managedObjectContext] undoManager];
+- (NSURL*)urlForFastSyncStore {
+	return [NSURL fileURLWithPath:[[self applicationSupportFolder] stringByAppendingPathComponent:@"org.awkward.recsched.fastsyncstore"]];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
 {
     [[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
     [self syncAction:nil];
-}
-
-#pragma Leopard Bug Workarounds
-
-- (void) pushHDHomeRunStations
-{
-	if ([self recServer])
-	{
-		// Get all the tuners in the system
-		NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"HDHomeRunTuner" inManagedObjectContext:[self managedObjectContext]];
-		NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-		[request setEntity:entityDescription];
-
-		NSError *error = nil;
-		NSArray *array = [[self managedObjectContext] executeFetchRequest:request error:&error];
-		
-		// Iterate over each tuner
-		int tunerIndex = 0;
-		for ( ; tunerIndex < [array count]; tunerIndex++)
-		{
-			HDHomeRunTuner *aTuner = [array objectAtIndex:tunerIndex];
-			
-			// Start by adding all the channels on this tuner to an array
-			NSMutableSet *channelsSet = [aTuner mutableSetValueForKey:@"channels"];
-
-			// Create an array to hold the dictionaries of channel info
-			NSMutableArray *channelsOnTuner = [NSMutableArray arrayWithCapacity:[channelsSet count]];
-
-			// Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array
-			[channelsSet makeObjectsPerformSelector:@selector(addChannelInfoDictionaryTo:) withObject:channelsOnTuner];
-			
-			NSSortDescriptor *channelDescriptor =[[[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES] autorelease];
-			NSArray *sortDescriptors=[NSArray arrayWithObject:channelDescriptor];
-			NSArray *sortedArray=[channelsOnTuner sortedArrayUsingDescriptors:sortDescriptors];
-			
-			[[self recServer] pushHDHomeRunChannelsAndStations:sortedArray onDeviceID:[[[aTuner device] deviceID] intValue] forTunerIndex:[[aTuner index] intValue]];
-		}
-	}
 }
 
 - (void) addSourceListNodes
@@ -335,72 +174,6 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     }
     
     return client;
-}
-
-- (void)client:(ISyncClient *)client mightWantToSyncEntityNames:(NSArray *)entityNames
-{
-	// We don't need to save the store here - we save after each significant change so the on disk store is good enough to use as is...
-	NSLog(@"syncing with client %@", [client displayName]);
-	NSError *error;
-	[[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
-}
-
-- (NSArray *)managedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
-{
-	NSManagedObjectContext *aContext = [self managedObjectContext];
-    return [NSArray arrayWithObject:aContext];
-}
-
-- (NSArray *)managedObjectContextsToReloadAfterSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
-{
-	NSManagedObjectContext *aContext = [self managedObjectContext];
-    return [NSArray arrayWithObject:aContext];
-}
-
-- (NSDictionary *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushRecord:(NSDictionary *)record forManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
-{
-//    NSLog(@"push %@ = %@", [managedObject objectID], [record description]);
-    return record;
-}
-
-- (ISyncChange *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willApplyChange:(ISyncChange *)change toManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
-{
-//    NSLog(@"pull %@", [change description]);
-    return change;
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushChangesInSyncSession:(ISyncSession *)session
-{
-	NSLog(@"willPushChangesInSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didPushChangesInSyncSession:(ISyncSession *)session
-{
-	NSLog(@"didPushChangesInSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPullChangesInSyncSession:(ISyncSession *)session
-{
-	NSLog(@"willPullChangesInSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didPullChangesInSyncSession:(ISyncSession *)session
-{
-	NSLog(@"didPullChangesInSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didCancelSyncSession:(ISyncSession *)session error:(NSError *)error
-{
-	NSLog(@"didCancelSyncSession - error = %@", error);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didFinishSyncSession:(ISyncSession *)session
-{
-	NSLog(@"didFinishSyncSession");
-	
-	// Work around the issues with syncing HDHomeRunStations (missing channel relationship) in Leopard 9A499 by explicitly
-	// pushing the station details to the background app
-	[self pushHDHomeRunStations];
 }
 
 #pragma mark - Actions
@@ -597,13 +370,6 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     return reply;
 }
 
-- (void) updateForSavedContext:(NSNotification *)notification
-{
-	[[self managedObjectContext] mergeChangesFromContextDidSaveNotification:notification];
-	
-//	[self syncAction:self];
-}
-
 #pragma mark - Notifications
 
 - (void)vlcTerminationTimer:(NSTimer*)theTimer
@@ -644,9 +410,6 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
  
 - (void) dealloc {
 
-    [managedObjectContext release], managedObjectContext = nil;
-    [persistentStoreCoordinator release], persistentStoreCoordinator = nil;
-    [managedObjectModel release], managedObjectModel = nil;
     [super dealloc];
 }
 

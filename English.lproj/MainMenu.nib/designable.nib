@@ -1535,7 +1535,7 @@ AAABAAAAAQ</bytes>
 					<string>tvRating</string>
 					<string>closeCaptioned</string>
 					<string>hdtv</string>
-					<string>repeat</string>
+					<string>newProgram</string>
 					<string>stereo</string>
 					<string>subtitled</string>
 					<string>program</string>
@@ -10442,9 +10442,9 @@ AAABAAAAAQ</bytes>
 							<string>mTunerPrefsView</string>
 							<string>mTunerScanProgressIndicator</string>
 							<string>mVisibleStationsArrayController</string>
-							<string>mZap2ItPasswordField</string>
-							<string>mZap2ItPrefsView</string>
-							<string>mZap2ItUsernameField</string>
+							<string>mSDPasswordField</string>
+							<string>mSDPrefsView</string>
+							<string>mSDUsernameField</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>

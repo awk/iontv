@@ -43,109 +43,6 @@
   [self setEndTime:endDate];
 }
 
-// Accessor and mutator for the Program relationship
-- (Z2ITProgram*)program 
-{
-COREDATA_ACCESSOR(Z2ITProgram*, @"program")
-}
-
-- (void) setProgram:(Z2ITProgram*) value
-{
-COREDATA_MUTATOR(Z2ITProgram*, @"program")
-}
-
-// Accessor and mutator for the station relationship
-- (Z2ITStation *)station
-{
-COREDATA_ACCESSOR(Z2ITStation*, @"station");
-}
-
-- (void)setStation:(Z2ITStation *)value
-{
-COREDATA_MUTATOR(Z2ITStation*, @"station");
-}
-
-// Accessor and mutator for the close captioned attribute
-- (bool)closeCaptioned
-{
-COREDATA_BOOL_ACCESSOR(@"closeCaptioned")
-}
-
-- (void)setCloseCaptioned:(bool)value
-{
-COREDATA_BOOL_MUTATOR(@"closeCaptioned")
-}
-
-// Accessor and mutator for the dolby attribute
-- (NSString *)dolby
-{
-COREDATA_ACCESSOR(NSString*, @"dolby")
-}
-
-- (void)setDolby:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*, @"dolby")
-}
-
-// Accessor and mutator for the type attribute
-- (NSNumber *)durationHours
-{
-COREDATA_ACCESSOR(NSNumber*, @"durationHours")
-}
-
-- (void)setDurationHours:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*, @"durationHours")
-}
-
-
-// Accessor and mutator for the user lineup name attribute
-- (NSNumber *)durationMinutes
-{
-COREDATA_ACCESSOR(NSNumber*, @"durationMinutes")
-}
-
-- (void)setDurationMinutes:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*, @"durationMinutes")
-}
-
-
-
-// Accessor and mutator for the close captioned attribute
-- (bool)hdtv
-{
-COREDATA_BOOL_ACCESSOR(@"hdtv")
-}
-
-- (void)setHdtv:(bool)value
-{
-COREDATA_BOOL_MUTATOR(@"hdtv")
-}
-
-
-// Accessor and mutator for the user lineup name attribute
-- (NSNumber *)partNumber
-{
-COREDATA_ACCESSOR(NSNumber*, @"partNumber")
-}
-
-- (void)setPartNumber:(NSNumber *)value
-{
-COREDATA_MUTATOR(NSNumber*, @"partNumber")
-}
-
-// Accessor and mutator for the user lineup name attribute
-- (NSNumber *)totalNumberParts
-{
-COREDATA_ACCESSOR(NSNumber*, @"totalNumberParts")
-}
-
-- (void)setTotalNumberParts:(NSNumber *)value;
-{
-COREDATA_MUTATOR(NSNumber*, @"totalNumberParts")
-}
-
 - (NSString *) partNumberString
 {
   if (([self partNumber] == nil) || ([self totalNumberParts] == nil))
@@ -156,89 +53,13 @@ COREDATA_MUTATOR(NSNumber*, @"totalNumberParts")
   return [NSString stringWithFormat:@"Part %@ of %@", [self partNumber], [self totalNumberParts]];
 }
 
-// Accessor and mutator for the close captioned attribute
-- (bool)repeat
-{
-COREDATA_BOOL_ACCESSOR(@"repeat")
-}
-
-- (void)setRepeat:(bool)value
-{
-COREDATA_BOOL_MUTATOR(@"repeat")
-}
-
-// Accessor and mutator for the close captioned attribute
-- (bool)stereo
-{
-COREDATA_BOOL_ACCESSOR(@"stereo")
-}
-
-- (void)setStereo:(bool)value
-{
-COREDATA_BOOL_MUTATOR(@"stereo")
-}
-
-// Accessor and mutator for the close captioned attribute
-- (bool)subtitled
-{
-COREDATA_BOOL_ACCESSOR(@"subtitled")
-}
-
-- (void)setSubtitled:(bool)value
-{
-COREDATA_BOOL_MUTATOR(@"subtitled")
-}
-
-// Accessor and mutator for the close captioned attribute
-- (NSDate *)time
-{
-COREDATA_ACCESSOR(NSDate*, @"time")
-}
-
-- (void)setTime:(NSDate*)value
-{
-COREDATA_MUTATOR(NSDate*, @"time")
-}
-
-- (NSDate *)endTime
-{
-COREDATA_ACCESSOR(NSDate*, @"endTime");
-}
-
-- (void) setEndTime:(NSDate*)value
-{
-COREDATA_MUTATOR(NSDate*, @"endTime");
-}
-
-- (bool)toBeRecorded
-{
-COREDATA_BOOL_ACCESSOR(@"toBeRecorded");
-}
-
-- (void)setToBeRecorded:(bool)value
-{
-COREDATA_BOOL_MUTATOR(@"toBeRecorded");
-}
-
-
-// Accessor and mutator for the dolby attribute
-- (NSString *)tvRating
-{
-COREDATA_ACCESSOR(NSString*, @"tvRating")
-}
-
-- (void)setTvRating:(NSString *)value
-{
-COREDATA_MUTATOR(NSString*, @"tvRating")
-}
-
 - (NSString *) programDetailsStr
 {
   NSString *aString = nil;
   if ([[self program] descriptionStr] != nil)
   {
     NSMutableString *detailsString = [[NSMutableString alloc] initWithString:[[self program] descriptionStr]];
-    if ([self repeat])
+    if (![self new])
     {
       [detailsString appendString:@" Repeat."];
     }
@@ -255,6 +76,23 @@ COREDATA_MUTATOR(NSString*, @"tvRating")
   }
   return aString;
 }
+
+@dynamic closeCaptioned;
+@dynamic dolby;
+@dynamic endTime;
+@dynamic hdtv;
+@dynamic new;
+@dynamic partNumber;
+@dynamic recordedMediaPath;
+@dynamic recordingStatus;
+@dynamic stereo;
+@dynamic subtitled;
+@dynamic time;
+@dynamic toBeRecorded;
+@dynamic totalNumberParts;
+@dynamic tvRating;
+@dynamic program;
+@dynamic station;
 
 - (NSString *) tvRatingImageName
 {
