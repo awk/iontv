@@ -9,7 +9,8 @@
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
 #import "CoreData_Macros.h"
-
+#import "hdhomerun_os.h"
+#import "hdhomerun_device.h"
 
 @implementation HDHomeRun
 
@@ -66,13 +67,6 @@
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
-//  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"lineupID == %@", inLineupID];
-//  [request setPredicate:predicate];
-//   
-//  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"lineupID" ascending:YES];
-//  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-//  [sortDescriptor release];
-   
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
 	
@@ -83,21 +77,19 @@
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
 	[anHDHomeRunTuner setIndex:[NSNumber numberWithInt:0]];
 	[anHDHomeRunTuner setLineup:aLineup];
-//	[anHDHomeRun setTuner0:anHDHomeRunTuner];
-//	[anHDHomeRunTuner setDevice:self];
 	[anHDHomeRun addTuner:anHDHomeRunTuner];
 	[anHDHomeRunTuner release];
 	
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
 	[anHDHomeRunTuner setIndex:[NSNumber numberWithInt:1]];
 	[anHDHomeRunTuner setLineup:aLineup];
-//	[anHDHomeRun setTuner1:anHDHomeRunTuner];
-//	[anHDHomeRunTuner setDevice:self];
 	[anHDHomeRun addTuner:anHDHomeRunTuner];
 	[anHDHomeRunTuner release];
 	
 	return anHDHomeRun;
 }
+
+#pragma mark Property Accessors
 
 - (NSNumber *)deviceID
 {
@@ -107,6 +99,16 @@ COREDATA_ACCESSOR(NSNumber*, @"deviceID")
 - (void)setDeviceID:(NSNumber *)value
 {
 COREDATA_MUTATOR(NSNumber*, @"deviceID")
+}
+
+- (NSString *)name
+{
+COREDATA_ACCESSOR(NSString*, @"name");
+}
+
+- (void) setName:(NSString*)value
+{
+COREDATA_MUTATOR(NSString*, @"name");
 }
 
 - (void) addTuner:(HDHomeRunTuner *)aTuner
@@ -139,14 +141,44 @@ COREDATA_MUTATOR(NSNumber*, @"deviceID")
 	return [self tunerWithIndex:1];
 }
 
-- (NSString *)name
+#pragma Initialization
+
+- (void) createHDHRDevice
 {
-COREDATA_ACCESSOR(NSString*, @"name");
+  uint32_t deviceID = [[self deviceID] intValue];
+  if ((deviceID != 0) && (mHDHomeRunDevice == nil))
+  {
+    mHDHomeRunDevice = hdhomerun_device_create(deviceID, 0, 0);
+  }
 }
 
-- (void) setName:(NSString*)value
+- (void) awakeFromFetch
 {
-COREDATA_MUTATOR(NSString*, @"name");
+  [super awakeFromFetch];
+  [self createHDHRDevice];
+}
+
+- (void) awakeFromInsert
+{
+  [super awakeFromInsert];
+  [self createHDHRDevice];
+  NSLog(@"HDHomeRunMO - awakeFromInsert");
+}
+
+#pragma Uninitialization
+
+- (void) releaseHDHRDevice
+{
+  if (mHDHomeRunDevice)
+    hdhomerun_device_destroy(mHDHomeRunDevice);
+  mHDHomeRunDevice = nil;
+}
+
+- (void) didTurnIntoFault
+{
+  [self releaseHDHRDevice];
+  
+  [super didTurnIntoFault];
 }
 
 @end

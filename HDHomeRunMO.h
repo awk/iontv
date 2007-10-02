@@ -7,11 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "hdhomerun_os.h"
+#import "hdhomerun_debug.h"       // Fixes warning from undefined type in device header
+#import "hdhomerun_device.h"
 
 @class HDHomeRunTuner;
 
 @interface HDHomeRun : NSManagedObject {
-
+  struct hdhomerun_device_t *mHDHomeRunDevice;
 }
 
 // Fetch the HDHomeRun with the given ID from the Managed Object Context
