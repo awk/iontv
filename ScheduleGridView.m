@@ -284,6 +284,7 @@
   self = [super init];
   if (self != nil) {
     mGridView = inGridView;
+	mCellsInLineArray = nil;
   }
   return self;
 }
