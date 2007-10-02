@@ -124,7 +124,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 				  {
 					NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 					NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
-					NSString *path = [NSString stringWithFormat:@"%@/Preferences/org.awkward.recsched.plist", basePath];
+					NSString *path = [NSString stringWithFormat:@"%@/Preferences/org.awkward.iontv.plist", basePath];
 					NSData *plistData;
 					NSString *error;
 					NSPropertyListFormat format;
