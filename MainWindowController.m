@@ -153,6 +153,14 @@ const CGFloat kSourceListMinWidth = 150;
 	}
 }
 
+- (IBAction) createWishlist:(id)sender
+{
+	[NSApp beginSheet:mPredicatePanel modalForWindow:[self window] modalDelegate:mWishlistController didEndSelector:nil contextInfo:nil];
+	[NSApp runModalForWindow:[self window]];
+	[NSApp endSheet:mPredicatePanel];
+	[mPredicatePanel orderOut:self];
+}
+
 #pragma mark Callback Methods
 
 - (void) handleDownloadData:(id)inDownloadResult
@@ -282,10 +290,15 @@ const CGFloat kSourceListMinWidth = 150;
 			enableItem = [[mCurrentStation content] hasValidTunerForLineup:[mCurrentLineup content]];
 		}
 	}
+	
 	if (([anItem action] == @selector(recordShow:)) || ([anItem action] == @selector(recordSeasonPass:)))
 	{
 		enableItem = ([mCurrentSchedule content] != nil);
 	}
+	
+	if ([anItem action] == @selector(createWishlist:))
+		enableItem = YES;
+		
 	return enableItem;
 }
 

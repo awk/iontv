@@ -11,6 +11,7 @@
 
 @class Z2ITSchedule;
 @class ScheduleView;
+@class RSWishlistController;
 
 @interface MainWindowController : NSWindowController <XMLParsingProgressDisplay> {
   IBOutlet NSButton *mGetScheduleButton;
@@ -23,6 +24,8 @@
   IBOutlet NSView *mScheduleContainerView;
   IBOutlet NSView *mProgramSearchView;
   IBOutlet ScheduleView *mScheduleView;
+  IBOutlet NSPanel *mPredicatePanel;
+  IBOutlet RSWishlistController *mWishlistController;
   IBOutlet NSObjectController *mCurrentSchedule;
   IBOutlet NSObjectController *mCurrentStation;
   IBOutlet NSObjectController *mCurrentLineup;
@@ -40,6 +43,7 @@
 - (IBAction) recordShow:(id)sender;
 - (IBAction) recordSeasonPass:(id)sender;
 - (IBAction) watchStation:(id)sender;
+- (IBAction) createWishlist:(id)sender;
 
 - (void) showViewForTableSelection:(int) selectedRow;
 
