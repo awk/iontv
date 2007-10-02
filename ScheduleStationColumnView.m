@@ -6,7 +6,6 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import "CTGradient.h"
 #import "ScheduleStationColumnView.h"
 #import "ScheduleViewController.h"
 #import "Z2ITStation.h"
@@ -20,15 +19,28 @@ const int kScheduleStationColumnViewCellHeight = 40;
 @interface ScheduleStationColumnCell : NSTextFieldCell {
 }
 
++ (NSGradient*) sharedGradient;
+
 @end
 
 @implementation ScheduleStationColumnCell
 
+static NSGradient *sScheduleStationColumnCellSharedGradient = nil;
+
++ (NSGradient*) sharedGradient
+{
+	if (!sScheduleStationColumnCellSharedGradient)
+	{
+		sScheduleStationColumnCellSharedGradient = [NSGradient alloc];
+	}
+	return sScheduleStationColumnCellSharedGradient;
+}
+
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
 	// Fill with the dark gray gradient
-	CTGradient *aGradient = [CTGradient gradientWithBeginningColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.3922 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.4980 alpha:1.0]];
-	[aGradient fillRect:cellFrame angle:90.0];
+	NSGradient *aGradient = [[ScheduleStationColumnCell sharedGradient] initWithStartingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.3922 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.4980 alpha:1.0]];
+	[aGradient drawInRect:cellFrame angle:90.0];
 	
 	// Draw the frame
 	[[NSColor colorWithDeviceRed:0 green:0 blue:0 alpha:0.65] set];

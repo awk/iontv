@@ -6,7 +6,6 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import "CTGradient.h"
 #import "ScheduleHeaderView.h"
 #import "ScheduleView.h"
 #import "ScheduleStationColumnView.h"
@@ -16,9 +15,21 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
 @interface ScheduleHeaderCell : NSTextFieldCell {
 }
 
++ (NSGradient*) sharedGradient;
 @end
 
 @implementation ScheduleHeaderCell
+
+static NSGradient *sScheduleHeaderCellSharedGradient = nil;
+
++ (NSGradient*) sharedGradient
+{
+	if (!sScheduleHeaderCellSharedGradient)
+	{
+		sScheduleHeaderCellSharedGradient = [NSGradient alloc];
+	}
+	return sScheduleHeaderCellSharedGradient;
+}
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
@@ -26,8 +37,8 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
 	[NSBezierPath setDefaultLineWidth:0.0];
 
 	// Draw background
-	CTGradient *aGradient = [CTGradient gradientWithBeginningColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:187.0/255.0 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:219.0/255.0 alpha:1.0]];
-	[aGradient fillRect:cellFrame angle:90.0];
+	NSGradient *aGradient = [[ScheduleHeaderCell sharedGradient] initWithStartingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:187.0/255.0 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:219.0/255.0 alpha:1.0]];
+	[aGradient drawInRect:cellFrame angle:90.0];
 	
 	// Draw top/bottom lines
 	[[NSColor colorWithDeviceRed:85.0/255.0 green:85.0/255.0 blue:85.0/255.0 alpha:1.0] set];

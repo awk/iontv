@@ -7,10 +7,19 @@
 //
 
 #import "iTableColumnHeaderCell.h"
-#import "CTGradient.h"
 
 @implementation iTableColumnHeaderCell
 
+static NSGradient *siTableColumnHeaderCellSharedGradient = nil;
+
++ (NSGradient*) sharedGradient
+{
+	if (!siTableColumnHeaderCellSharedGradient)
+	{
+		siTableColumnHeaderCellSharedGradient = [NSGradient alloc];
+	}
+	return siTableColumnHeaderCellSharedGradient;
+}
 
 - (id)initTextCell:(NSString *)text
 {
@@ -35,13 +44,13 @@
 
 - (void)drawWithFrame:(NSRect)inFrame inView:(NSView*)inView
 {
-	CTGradient *headerGradient;
+	NSGradient *headerGradient;
 	if ([inView isFlipped])
-		headerGradient = [CTGradient gradientWithBeginningColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0]];
+		headerGradient = [[iTableColumnHeaderCell sharedGradient] initWithStartingColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0]];
 	else
-		headerGradient = [CTGradient gradientWithBeginningColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0]];
+		headerGradient = [[iTableColumnHeaderCell sharedGradient] initWithStartingColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0]];
 
-	[headerGradient fillRect:inFrame angle:90.0];
+	[headerGradient drawInRect:inFrame angle:90.0];
 
     /* Draw white text centered, but offset down-left. */
     float offset = 0.5;

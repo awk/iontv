@@ -7,7 +7,6 @@
 //
 
 #import "AKColorExtensions.h"
-#import "CTGradient.h"
 #import "MainWindowController.h"
 #import "ScheduleViewController.h"
 #import "ScheduleGridView.h"
@@ -39,6 +38,8 @@
 @interface ScheduleCell : NSTextFieldCell
 {
 }
+
++ (NSGradient *)sharedGradient;
 
 @end
 
@@ -423,6 +424,17 @@
 
 @implementation ScheduleCell
 
+static NSGradient *sScheduleCellSharedGradient = nil;
+
++ (NSGradient*) sharedGradient
+{
+	if (!sScheduleCellSharedGradient)
+	{
+		sScheduleCellSharedGradient = [NSGradient alloc];
+	}
+	return sScheduleCellSharedGradient;
+}
+
 - (void) drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
 	if (cellFrame.origin.x < 0)
@@ -520,16 +532,16 @@
 			[aShadow release];
 			[NSGraphicsContext restoreGraphicsState];
 
-  			CTGradient *aGradient = [CTGradient gradientWithBeginningColor:topColor endingColor:bottomColor];
-			[aGradient fillBezierPath:framePath angle:90.0];
+  			NSGradient *aGradient = [[ScheduleCell sharedGradient] initWithStartingColor:topColor endingColor:bottomColor];
+			[aGradient drawInBezierPath:framePath angle:90.0];
 			
 		}
 		else
 		{
 			NSColor *bottomColor = [genreColor darkerColorBy:0.15];
 			NSColor *topColor = [genreColor lighterColorBy:0.15];
-			CTGradient *aGradient = [CTGradient gradientWithBeginningColor:topColor endingColor:bottomColor];
-			[aGradient fillBezierPath:framePath angle:90.0];
+			NSGradient *aGradient = [[ScheduleCell sharedGradient] initWithStartingColor:topColor endingColor:bottomColor];
+			[aGradient drawInBezierPath:framePath angle:90.0];
 			
 			// Set the base genre color for the outline
 			[[genreColor darkerColorBy:0.40] set];
