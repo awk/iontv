@@ -29,9 +29,9 @@ const float kViewSelectionListMaxWidth = 200.0;
   [bottomContainerView setAutoresizesSubviews:YES];
   [bottomContainerView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
   [bottomContainerView addSubview:mScheduleContainerView];
-  [bottomContainerView addSubview:mScheduleSearchView];
+  [bottomContainerView addSubview:mProgramSearchView];
   [mScheduleContainerView setHidden:NO];
-  [mScheduleSearchView setHidden:YES];
+  [mProgramSearchView setHidden:YES];
   
   [mScheduleSplitView addSubview:mDetailView];
   [mScheduleSplitView addSubview:bottomContainerView];
@@ -186,11 +186,11 @@ const float kViewSelectionListMaxWidth = 200.0;
     {
       case 0:
         [mScheduleContainerView setHidden:NO];
-        [mScheduleSearchView setHidden:YES];
+        [mProgramSearchView setHidden:YES];
         break;
       case 1:
         [mScheduleContainerView setHidden:YES];
-        [mScheduleSearchView setHidden:NO];
+        [mProgramSearchView setHidden:NO];
         break;
       default:
         break;

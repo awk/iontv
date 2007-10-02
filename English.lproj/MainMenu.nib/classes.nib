@@ -11,8 +11,8 @@
                 mGetScheduleButton = NSButton; 
                 mParsingProgressIndicator = NSProgressIndicator; 
                 mParsingProgressInfoField = NSTextField; 
+                mProgramSearchView = NSView; 
                 mScheduleContainerView = NSView; 
-                mScheduleSearchView = NSView; 
                 mScheduleSplitView = NSSplitView; 
                 mScheduleView = ScheduleView; 
                 mTopLevelSplitView = NSSplitView; 
@@ -26,6 +26,15 @@
             CLASS = Preferences; 
             LANGUAGE = ObjC; 
             OUTLETS = {mPanel = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            CLASS = ProgramSearchViewController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                mCurrentSchedule = NSObjectController; 
+                mProgramsArrayController = NSArrayController; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
         {CLASS = ScheduleHeaderView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 

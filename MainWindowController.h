@@ -20,7 +20,7 @@
   IBOutlet NSTableView *mViewSelectionTableView;
   IBOutlet NSView *mDetailView;
   IBOutlet NSView *mScheduleContainerView;
-  IBOutlet NSView *mScheduleSearchView;
+  IBOutlet NSView *mProgramSearchView;
   IBOutlet ScheduleView *mScheduleView;
   IBOutlet NSObjectController *mCurrentSchedule;
   float mDetailViewMinHeight;

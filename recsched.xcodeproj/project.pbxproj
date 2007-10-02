@@ -25,6 +25,7 @@
 		EA0888240B86B16D00809664 /* TV-Y.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881B0B86B16C00809664 /* TV-Y.tif */; };
 		EA0888250B86B16D00809664 /* TV-Y7.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881C0B86B16C00809664 /* TV-Y7.tif */; };
 		EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881D0B86B16C00809664 /* TV-Y7FV.tif */; };
+		EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
 		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
@@ -78,6 +79,8 @@
 		EA08881B0B86B16C00809664 /* TV-Y.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y.tif"; path = "Images/TV-Y.tif"; sourceTree = "<group>"; };
 		EA08881C0B86B16C00809664 /* TV-Y7.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7.tif"; path = "Images/TV-Y7.tif"; sourceTree = "<group>"; };
 		EA08881D0B86B16C00809664 /* TV-Y7FV.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7FV.tif"; path = "Images/TV-Y7FV.tif"; sourceTree = "<group>"; };
+		EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramSearchViewController.h; sourceTree = "<group>"; };
+		EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgramSearchViewController.m; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
@@ -142,6 +145,8 @@
 				EA0674300B58084D009B0E27 /* MainWindowController.m */,
 				EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */,
 				EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */,
+				EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */,
+				EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -375,6 +380,7 @@
 				EA5FAFD80B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m in Sources */,
 				EA5FBEAF0B724DB400CCD5D5 /* ScheduleGridView.m in Sources */,
 				EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */,
+				EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
