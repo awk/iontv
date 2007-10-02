@@ -6,47 +6,59 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import "JKSeparatorCell.h"
-#import "JKImageTextCell.h"
+#import "AKSourceTableClasses.h"
 #import "MainWindowController.h"
 #import "ScheduleView.h"
 #import "tvDataDelivery.h"
 #import "XTVDParser.h"
 #import "Preferences.h"
-#import "RBSplitView.h"
-#import "RBSplitSubView.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
 #import "recsched_AppDelegate.h"
 
 @implementation MainWindowController
 
+const CGFloat kSourceListMaxWidth = 250;
+const CGFloat kSourceListMinWidth = 150;
+
 - (void) awakeFromNib
 {
   [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
-  mSeparatorCell = [[JKSeparatorCell alloc] init];
-  mDefaultCell = [[JKImageTextCell alloc] initTextCell:@"Default title"];
+  mSeparatorCell = [[AKSourceSeparatorCell alloc] init];
   [mViewSelectionArrayController addObject:@"Schedule"];
   [mViewSelectionArrayController addObject:@"Search"];
   [mViewSelectionArrayController addObject:@""];    // Separator at row '2'
-  [mViewSelectionTableView selectRow:0 byExtendingSelection:NO];    // Always start at Row 0 - the schedule selection
+  [mViewSelectionArrayController addObserver:self forKeyPath:@"selection" options:0 context:nil];		// Watch for changes to view selection
+  [mViewSelectionArrayController setSelectionIndex:0];
   
   mDetailViewMinHeight = [mDetailView frame].size.height;
-  NSView *bottomContainerView = [[NSView alloc] initWithFrame:[mScheduleContainerView frame]];
-  [bottomContainerView setAutoresizesSubviews:YES];
-  [bottomContainerView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+  NSView *bottomContainerView = [[mScheduleSplitView subviews] objectAtIndex:1];
   [bottomContainerView addSubview:mScheduleContainerView];
   [bottomContainerView addSubview:mProgramSearchView];
+  
+  NSSize scheduleSize = [bottomContainerView frame].size;
+  NSRect newFrame = [mScheduleContainerView frame];
+  newFrame.size = scheduleSize;
+  [mScheduleContainerView setFrame:newFrame];
   [mScheduleContainerView setHidden:NO];
+  newFrame = [mProgramSearchView frame];
+  newFrame.size = scheduleSize;
+  [mProgramSearchView setFrame:newFrame];
   [mProgramSearchView setHidden:YES];
   
-  [mScheduleSplitView addSubview:mDetailView];
-  RBSplitSubview *aSubView = [mScheduleSplitView subviewAtPosition:0];
-  [aSubView setMinDimension:0.0 andMaxDimension:mDetailViewMinHeight];
-  [aSubView setDimension:mDetailViewMinHeight];
-  [aSubView setCanCollapse:YES];
-  [mScheduleSplitView addSubview:bottomContainerView];
-  [bottomContainerView release];
+  [mTopLevelSplitView setDividerStyle:NSSplitViewDividerStyleThin];
+  [mTopLevelSplitView setPosition:kSourceListMinWidth + ((kSourceListMaxWidth - kSourceListMinWidth) / 2) ofDividerAtIndex:0];
+  
+  [[[mScheduleSplitView subviews] objectAtIndex:0] addSubview:mDetailView];
+  newFrame = [mDetailView frame];
+  newFrame.size = [[[mScheduleSplitView subviews] objectAtIndex:0] frame].size;
+  [mDetailView setFrame:newFrame];
+
+  [mScheduleSplitView setDividerStyle:NSSplitViewDividerStyleThin];
+  [mScheduleSplitView setPosition:mDetailViewMinHeight ofDividerAtIndex:0];
+
+  [mScheduleSplitView adjustSubviews];
+  [mTopLevelSplitView adjustSubviews];
   
   [mCurrentSchedule setContent:nil];
 
@@ -164,8 +176,8 @@
   [mParsingProgressInfoField setHidden:YES];
 
   // Clear all old items from the store
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
+//  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+//  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
 //  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
 
   [mParsingProgressIndicator startAnimation:self];
@@ -214,31 +226,54 @@
     }
 }
 
-#pragma mark Split View Delegate Methods
-
-// This makes it possible to drag the first divider around by the dragView.
-- (unsigned int)splitView:(RBSplitView*)sender dividerForPoint:(NSPoint)point inSubview:(RBSplitSubview*)subview 
+- (void)observeValueForKeyPath:(NSString *)keyPath
+			ofObject:(id)object 
+			change:(NSDictionary *)change
+			context:(void *)context
 {
-	if (sender==mTopLevelSplitView) 
-        {
-            // The drag thumb rect is the right most 16 pixels of header view
-            NSRect thumbRect = [[mViewSelectionTableView headerView] bounds];
-            thumbRect.origin.x  = thumbRect.origin.x + thumbRect.size.width - 15;
-            thumbRect.size.width = 15;
-            NSPoint ptInView = [[mViewSelectionTableView headerView] convertPoint:point fromView:sender];
-            
-            if ([[mViewSelectionTableView headerView] mouse:ptInView inRect:thumbRect])
-            {
-                    return 0;	// [firstSplit position], which we assume to be zero
-            }
-        }
-        return NSNotFound;
+    if ((object == mViewSelectionArrayController) && ([keyPath isEqual:@"selection"]))
+	{
+		[self showViewForTableSelection:[mViewSelectionArrayController selectionIndex]];
+    }
 }
 
+#pragma mark Split View Delegate Methods
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMaxCoordinate:(CGFloat)proposedMaximumPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+	if (splitView == mTopLevelSplitView)
+	{
+		if (proposedMaximumPosition > kSourceListMaxWidth)
+			return kSourceListMaxWidth;
+		else
+			return proposedMaximumPosition;
+	}
+	if (splitView == mScheduleSplitView)
+	{
+		if (proposedMaximumPosition > mDetailViewMinHeight)
+			return mDetailViewMinHeight;
+		else
+			return proposedMaximumPosition;
+	}
+	return proposedMaximumPosition;
+}
+
+- (CGFloat)splitView:(NSSplitView *)splitView constrainMinCoordinate:(CGFloat)proposedMinimumPosition ofSubviewAt:(NSInteger)dividerIndex
+{
+	if (splitView == mTopLevelSplitView)
+	{
+		if (proposedMinimumPosition < kSourceListMinWidth)
+			return kSourceListMinWidth;
+		else
+			return proposedMinimumPosition;
+	}
+	return proposedMinimumPosition;
+}
 
 #pragma mark View Selection Table Delegate Methods
 
-- (float) heightFor:(NSTableView *)tableView row:(int)row {
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
+{
 	if (row == 2) { // separator
 		return 4;
 	}
@@ -250,26 +285,14 @@
 	return row != 2;
 }
 
-- (id) tableColumn:(NSTableColumn *)column inTableView:(NSTableView *)tableView dataCellForRow:(int)row {
-//	if (row == 0) {
-//		[defaultCell setImage:libraryImage];
-//	} else {
-//		[defaultCell setImage:playlistImage];
-//	}
-	
-	if (row == 2) { // separator
+- (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+	if ((row == 2)  && (tableColumn == nil))
+	{ // separator
 		return mSeparatorCell;
 	}
 	
-	return mDefaultCell;
-}
-
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
-{
-  if ([aNotification object] == mViewSelectionTableView)
-  {
-    [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
-  }
+	return [tableColumn dataCellForRow:row];
 }
 
 @end

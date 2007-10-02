@@ -67,14 +67,8 @@
 		EA2939A00C0CC8D70053E2B8 /* top_left.png in Resources */ = {isa = PBXBuildFile; fileRef = EA2939920C0CC8D70053E2B8 /* top_left.png */; };
 		EA2939A10C0CC8D70053E2B8 /* top_middle.png in Resources */ = {isa = PBXBuildFile; fileRef = EA2939930C0CC8D70053E2B8 /* top_middle.png */; };
 		EA2939A20C0CC8D70053E2B8 /* top_right.png in Resources */ = {isa = PBXBuildFile; fileRef = EA2939940C0CC8D70053E2B8 /* top_right.png */; };
-		EA2939C20C0CD63E0053E2B8 /* JKImageTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2939BA0C0CD63E0053E2B8 /* JKImageTextCell.m */; };
-		EA2939C30C0CD63E0053E2B8 /* JKSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2939BC0C0CD63E0053E2B8 /* JKSeparatorCell.m */; };
-		EA2939C40C0CD63E0053E2B8 /* JKSourceTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2939BF0C0CD63E0053E2B8 /* JKSourceTableView.m */; };
-		EA2939C50C0CD63E0053E2B8 /* JKVariableCellColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2939C10C0CD63E0053E2B8 /* JKVariableCellColumn.m */; };
 		EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */; };
-		EA293B860C0E1A1E0053E2B8 /* libRBSplitView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA293B760C0E18BC0053E2B8 /* libRBSplitView.a */; };
 		EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = EA294B2E0C162D1D0053E2B8 /* RecSchedNotifications.m */; };
-		EA294E3C0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EA294E3B0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m */; };
 		EA2EE03F0C07D2300002420F /* hdhomerun_channelscan.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */; };
 		EA2EE0400C07D2320002420F /* hdhomerun_config.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02B0C07D2130002420F /* hdhomerun_config.c */; };
 		EA2EE0410C07D2340002420F /* hdhomerun_control.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02C0C07D2130002420F /* hdhomerun_control.c */; };
@@ -104,6 +98,7 @@
 		EA72A7D90C26A5E3009C63E5 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
 		EA72A7DB0C26A608009C63E5 /* WSGeneratedObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
+		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
 		EAE655480B9D0AA100CDB279 /* recsched_bkgd.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */; };
 		EAE655500B9D0B3300CDB279 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		EAE6555A0B9D1A8300CDB279 /* RecSchedServer.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE655590B9D1A8300CDB279 /* RecSchedServer.m */; };
@@ -153,41 +148,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = EA2EE03D0C07D2250002420F;
 			remoteInfo = libhdhomerun;
-		};
-		EA293B710C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 8D1AC9740486D14A00FE50C9;
-			remoteInfo = Palette;
-		};
-		EA293B730C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D5E002A107328E1100594182;
-			remoteInfo = Framework;
-		};
-		EA293B750C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D5E003B9073298FC00594182;
-			remoteInfo = Library;
-		};
-		EA293B770C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D5EA8A09074CF5AB00AE807E;
-			remoteInfo = SampleApp;
-		};
-		EA293B790C0E18CD0053E2B8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = D5E003B8073298FC00594182;
-			remoteInfo = Library;
 		};
 		EA2EE04E0C07D3130002420F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -273,7 +233,6 @@
 		EA2939C10C0CD63E0053E2B8 /* JKVariableCellColumn.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = JKVariableCellColumn.m; sourceTree = SOURCE_ROOT; };
 		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolishedBackgroundView.h; sourceTree = "<group>"; };
 		EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PolishedBackgroundView.m; sourceTree = "<group>"; };
-		EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RBSplitView.xcodeproj; path = RBSplitView/RBSplitView.xcodeproj; sourceTree = SOURCE_ROOT; };
 		EA293E870C10A8040053E2B8 /* ChannelScanProgressDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelScanProgressDisplayProtocol.h; sourceTree = "<group>"; };
 		EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLParsingProgressDisplayProtocol.h; sourceTree = "<group>"; };
 		EA294B2B0C162CFC0053E2B8 /* RecSchedNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecSchedNotifications.h; sourceTree = "<group>"; };
@@ -320,6 +279,8 @@
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
 		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
 		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = "<group>"; };
+		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSourceTableClasses.h; sourceTree = "<group>"; };
+		EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKSourceTableClasses.m; sourceTree = "<group>"; };
 		EAE655260B9D08CD00CDB279 /* recsched_bkgd_cl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = recsched_bkgd_cl; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd.m; sourceTree = "<group>"; };
 		EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_bkgd_prefix.pch; sourceTree = "<group>"; };
@@ -361,7 +322,6 @@
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				EA2EE0680C07D4890002420F /* libhdhomerun.a in Frameworks */,
-				EA293B860C0E1A1E0053E2B8 /* libRBSplitView.a in Frameworks */,
 				EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */,
 				EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */,
 				EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */,
@@ -450,7 +410,6 @@
 		29B97314FDCFA39411CA2CEA /* recsched */ = {
 			isa = PBXGroup;
 			children = (
-				EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */,
 				EA2EE0280C07D1EA0002420F /* libhdhomerun */,
 				EAE655370B9D0A3100CDB279 /* Background App */,
 				7756732906782D8800D1FEB8 /* Models */,
@@ -542,17 +501,6 @@
 				EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */,
 			);
 			name = Images;
-			sourceTree = "<group>";
-		};
-		EA293B6A0C0E18BC0053E2B8 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				EA293B720C0E18BC0053E2B8 /* RBSplitView.palette */,
-				EA293B740C0E18BC0053E2B8 /* RBSplitView.framework */,
-				EA293B760C0E18BC0053E2B8 /* libRBSplitView.a */,
-				EA293B780C0E18BC0053E2B8 /* SampleApp.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		EA2EE0280C07D1EA0002420F /* libhdhomerun */ = {
@@ -665,6 +613,8 @@
 				EA293E870C10A8040053E2B8 /* ChannelScanProgressDisplayProtocol.h */,
 				EA294E3A0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.h */,
 				EA294E3B0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m */,
+				EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */,
+				EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -694,7 +644,6 @@
 			);
 			dependencies = (
 				EA2EE04F0C07D3130002420F /* PBXTargetDependency */,
-				EA293B7A0C0E18CD0053E2B8 /* PBXTargetDependency */,
 			);
 			name = recsched;
 			productInstallPath = "$(HOME)/Applications";
@@ -763,12 +712,6 @@
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* recsched */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = EA293B6A0C0E18BC0053E2B8 /* Products */;
-					ProjectRef = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* recsched */,
@@ -779,37 +722,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		EA293B720C0E18BC0053E2B8 /* RBSplitView.palette */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = RBSplitView.palette;
-			remoteRef = EA293B710C0E18BC0053E2B8 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		EA293B740C0E18BC0053E2B8 /* RBSplitView.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = RBSplitView.framework;
-			remoteRef = EA293B730C0E18BC0053E2B8 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		EA293B760C0E18BC0053E2B8 /* libRBSplitView.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libRBSplitView.a;
-			remoteRef = EA293B750C0E18BC0053E2B8 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		EA293B780C0E18BC0053E2B8 /* SampleApp.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = SampleApp.app;
-			remoteRef = EA293B770C0E18BC0053E2B8 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D1107290486CEB800E47090 /* Resources */ = {
@@ -897,13 +809,9 @@
 				EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */,
 				EA29391E0C0CB2740053E2B8 /* HexNumberFormatter.m in Sources */,
 				EA2939800C0CC83F0053E2B8 /* PolishedWindow.m in Sources */,
-				EA2939C20C0CD63E0053E2B8 /* JKImageTextCell.m in Sources */,
-				EA2939C30C0CD63E0053E2B8 /* JKSeparatorCell.m in Sources */,
-				EA2939C40C0CD63E0053E2B8 /* JKSourceTableView.m in Sources */,
-				EA2939C50C0CD63E0053E2B8 /* JKVariableCellColumn.m in Sources */,
 				EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */,
 				EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */,
-				EA294E3C0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m in Sources */,
+				EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -969,11 +877,6 @@
 			isa = PBXTargetDependency;
 			target = EA2EE03D0C07D2250002420F /* libhdhomerun */;
 			targetProxy = EA20AEE60C25C99D00A9BDBD /* PBXContainerItemProxy */;
-		};
-		EA293B7A0C0E18CD0053E2B8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = Library;
-			targetProxy = EA293B790C0E18CD0053E2B8 /* PBXContainerItemProxy */;
 		};
 		EA2EE04F0C07D3130002420F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1058,7 +961,7 @@
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
 				PRODUCT_NAME = recsched;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1080,7 +983,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Release;
 		};
@@ -1109,6 +1012,7 @@
 		EA2EE04B0C07D26E0002420F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1125,13 +1029,17 @@
 		EA2EE04C0C07D26E0002420F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = (
+					ppc,
+					i386,
+				);
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
-				PRODUCT_NAME = libhdhomerun;
+				PRODUCT_NAME = hdhomerun;
 				ZERO_LINK = NO;
 			};
 			name = Release;

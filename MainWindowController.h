@@ -11,14 +11,13 @@
 
 @class Z2ITSchedule;
 @class ScheduleView;
-@class RBSplitView;
 
 @interface MainWindowController : NSWindowController <XMLParsingProgressDisplay> {
   IBOutlet NSButton *mGetScheduleButton;
   IBOutlet NSProgressIndicator *mParsingProgressIndicator;
   IBOutlet NSTextField *mParsingProgressInfoField;
-  IBOutlet RBSplitView *mScheduleSplitView;
-  IBOutlet RBSplitView *mTopLevelSplitView;
+  IBOutlet NSSplitView *mScheduleSplitView;
+  IBOutlet NSSplitView *mTopLevelSplitView;
   IBOutlet NSTableView *mViewSelectionTableView;
   IBOutlet NSView *mDetailView;
   IBOutlet NSView *mScheduleContainerView;
@@ -29,7 +28,6 @@
   
   // Cells used by the Source View selector 'table'
   NSCell *mSeparatorCell;
-  NSCell *mDefaultCell;
 
   float mDetailViewMinHeight;
 }
