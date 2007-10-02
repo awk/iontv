@@ -9,8 +9,54 @@
 #import "RSActivityViewController.h"
 #import "recsched_AppDelegate.h"
 #import "RecSchedProtocol.h"
+#import "RSActivityListView.h"
+
+@interface RSActivityUnitTestInfo : NSObject
+{
+	@public
+	size_t activityToken;
+	int maxProgress;
+	int currentProgress;
+}
+
+@end
+
+@implementation RSActivityUnitTestInfo
+@end
 
 @implementation RSActivityViewController
+
+- (void) unitTest
+{
+	const double kUnitTestProgressMaxValue = 15.0;
+	int i=0;
+	for (i = 1; i <= 4; i++)
+	{
+		// Create an activity
+		size_t testActivityToken = [self createActivity];
+		[self setActivity:testActivityToken infoString:[NSString stringWithFormat:@"Activity %d", i]];
+		[self setActivity:testActivityToken progressMaxValue:kUnitTestProgressMaxValue*i];
+		
+		RSActivityUnitTestInfo *testInfo = [[RSActivityUnitTestInfo alloc] init];
+		testInfo->activityToken = testActivityToken;
+		testInfo->maxProgress = kUnitTestProgressMaxValue*i;
+		testInfo->currentProgress = 0;
+		[NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(unitTestIncrementActivity:) userInfo:testInfo repeats:YES];
+	}
+}
+
+- (void) unitTestIncrementActivity:(NSTimer*) aTimer
+{
+	RSActivityUnitTestInfo *testInfo = [aTimer userInfo];
+	
+	[self setActivity:testInfo->activityToken incrementBy:1.0];
+	if ((testInfo->currentProgress++) > testInfo->maxProgress)
+	{
+		[aTimer invalidate];
+		[self endActivity:testInfo->activityToken];
+		[testInfo release];
+	}
+}
 
 - (void) awakeFromNib
 {
@@ -21,12 +67,18 @@
     [theConnection setRootObject:self];
     if ([theConnection registerName:kRecUIActivityConnectionName] == NO) 
     {
+		theConnection = [[NSConnection alloc] init];
+		[theConnection setRootObject:self];
+		if ([theConnection registerName:kRecUIActivityConnectionName] == NO) 
+		{
             /* Handle error. */
             NSLog(@"Error registering connection");
+		}
+		else
+			[[[NSApp delegate] recServer] activityDisplayAvailable];
     }
 	else
 		[[[NSApp delegate] recServer] activityDisplayAvailable];
-	
 }
 
 - (void) dealloc
@@ -36,46 +88,97 @@
 	[super dealloc];
 }
 
-- (void) beginActivity
+- (size_t) createActivity
 {
-  [mParsingProgressIndicator setHidden:NO];
-  [mParsingProgressIndicator setIndeterminate:NO];
-  [mParsingProgressInfoField setHidden:NO];
+	// Create the new Aggregate view controller
+	RSActivityAggregateViewController *anAggregateViewController = [[RSActivityAggregateViewController alloc] init];
+	if (![NSBundle loadNibNamed:@"ActivityAggregateView" owner:anAggregateViewController])
+	{
+		NSLog(@"Error loading aggregate activity view NIB");
+		return 0;
+	}
+	
+	// Add the aggregate view to the list view
+	[mListView addSubview:[anAggregateViewController aggregateView]];
+	
+	return (size_t)anAggregateViewController;
 }
 
-- (void) endActivity
+- (void) endActivity:(size_t)activityToken
 {
-  [mParsingProgressIndicator stopAnimation:self];
-  [mParsingProgressIndicator setHidden:YES];
-  [mParsingProgressIndicator setIndeterminate:NO];
-  [mParsingProgressInfoField setHidden:YES];
+	[(RSActivityAggregateViewController*) activityToken release];
 }
 
-- (void) setActivityInfoString:(NSString*)inInfoString
+- (void) setActivity:(size_t)activityToken infoString:(NSString*)inInfoString
 {
-  [mParsingProgressInfoField setStringValue:inInfoString];
-  [mParsingProgressInfoField setHidden:NO];
+	[(RSActivityAggregateViewController*) activityToken setInfoString:inInfoString];
 }
 
-- (void) setActivityProgressIndeterminate:(BOOL)isIndeterminate
+- (void) setActivity:(size_t)activityToken progressIndeterminate:(BOOL)isIndeterminate
 {
-  [mParsingProgressIndicator setHidden:NO];
-  [mParsingProgressIndicator setIndeterminate:isIndeterminate];
-	if (isIndeterminate == YES)
-		[mParsingProgressIndicator startAnimation:self];
+	[(RSActivityAggregateViewController*) activityToken setProgressIndeterminate:isIndeterminate];
+}
+
+- (void) setActivity:(size_t)activityToken progressMaxValue:(double)inTotal
+{
+	[(RSActivityAggregateViewController*) activityToken setProgressMaxValue:inTotal];
+}
+
+- (void) setActivity:(size_t)activityToken incrementBy:(double)delta
+{
+	[(RSActivityAggregateViewController*) activityToken incrementProgressBy:delta];
+}
+
+@end
+
+@implementation RSActivityAggregateViewController
+
+- (void) dealloc
+{
+	[mActivityAggregateView removeFromSuperview];
+	
+	[mActivityAggregateView release];
+	[super dealloc];
+}
+
+- (NSView*) aggregateView
+{
+	return mActivityAggregateView;
+}
+
+- (void) setInfoString:(NSString*)inInfoString
+{
+	[mInfoField setStringValue:inInfoString];
+}
+
+- (void) setProgressIndeterminate:(BOOL)isIndeterminate
+{
+	[mProgressIndicator setIndeterminate:isIndeterminate];
+	if (isIndeterminate)
+		[mProgressIndicator startAnimation:self];
 	else
-		[mParsingProgressIndicator stopAnimation:self];
+		[mProgressIndicator stopAnimation:self];
 }
 
-- (void) setActivityProgressMaxValue:(double)inTotal
+- (void) setProgressMaxValue:(double)inTotal
 {
-  [mParsingProgressIndicator setMaxValue:inTotal];
-  [mParsingProgressIndicator setHidden:NO];
+	[mProgressIndicator setMaxValue:inTotal];
+	[mProgressIndicator setDoubleValue:0.0];
 }
 
-- (void) setActivityProgressDoubleValue:(double)inValue
+- (void) setProgressDoubleValue:(double)inValue
 {
-  [mParsingProgressIndicator setDoubleValue:inValue];
+	[mProgressIndicator setDoubleValue:inValue];
+}
+
+- (void) incrementProgressBy:(double)delta
+{
+	[mProgressIndicator incrementBy:delta];
+}
+
+- (IBAction) cancelButtonAction:(id)sender
+{
+	NSLog(@"Cancel Button");
 }
 
 @end

@@ -9,12 +9,12 @@
 extern NSString *kRecUIActivityConnectionName;
 
 @protocol RSActivityDisplay
-- (void) beginActivity;
-- (void) endActivity;
+- (size_t) createActivity;
+- (void) endActivity:(size_t)activityToken;
 
-- (void) setActivityInfoString:(NSString*)inInfoString;
-- (void) setActivityProgressIndeterminate:(BOOL)isIndeterminate;
-- (void) setActivityProgressMaxValue:(double)inTotal;
-- (void) setActivityProgressDoubleValue:(double)inValue;
+- (void) setActivity:(size_t)activityToken infoString:(NSString*)inInfoString;
+- (void) setActivity:(size_t)activityToken progressIndeterminate:(BOOL)isIndeterminate;
+- (void) setActivity:(size_t)activityToken progressMaxValue:(double)inTotal;
+- (void) setActivity:(size_t)activityToken incrementBy:(double)delta;
 @end
 

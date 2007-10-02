@@ -140,28 +140,35 @@ const int kDefaultScheduleFetchDuration = 3;
   }
 }
 
-- (void) beginActivity
+- (size_t) createActivity
+{
+	NSDictionary *anActivity = [[NSMutableDictionary alloc] initWithCapacity:3]; 
+	return (size_t) anActivity;
+}
+
+- (void) endActivity:(size_t)activityToken
+{
+	[(NSDictionary *)activityToken release];
+}
+
+- (void) setActivity:(size_t)activityToken infoString:(NSString*)inInfoString
+{
+	NSLog(@"setActivityInfoString - %@", inInfoString);
+}
+
+- (void) setActivity:(size_t)activityToken progressIndeterminate:(BOOL) isIndeterminate
 {
 }
 
-- (void) endActivity
+- (void) setActivity:(size_t)activityToken progressMaxValue:(double)inTotal
 {
 }
 
-- (void) setActivityInfoString:(NSString*)inInfoString
-{
-	NSLog(@"Parsing - %@", inInfoString);
-}
-
-- (void) setActivityProgressIndeterminate:(BOOL) isIndeterminate
+- (void) setActivity:(size_t)activityToken progressDoubleValue:(double)inValue
 {
 }
 
-- (void) setActivityProgressMaxValue:(double)inTotal
-{
-}
-
-- (void) setActivityProgressDoubleValue:(double)inValue
+- (void) setActivity:(size_t)activityToken incrementBy:(double)delta
 {
 }
 

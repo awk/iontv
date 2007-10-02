@@ -66,6 +66,11 @@
 		EA3B40500C8C79470042C793 /* ScheduleDetailsPopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */; };
 		EA3B40570C8C7AEE0042C793 /* closebox.png in Resources */ = {isa = PBXBuildFile; fileRef = EA3B40550C8C7AEE0042C793 /* closebox.png */; };
 		EA3B40580C8C7AEE0042C793 /* closebox_pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */; };
+		EA4909E60CADD0EB00A1DE02 /* Activity.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA4909E50CADD0EB00A1DE02 /* Activity.xib */; };
+		EA490BB50CAEDB8100A1DE02 /* Activity_Stop.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA490BB30CAEDB8100A1DE02 /* Activity_Stop.tif */; };
+		EA490BB60CAEDB8100A1DE02 /* Activity_StopPressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA490BB40CAEDB8100A1DE02 /* Activity_StopPressed.tif */; };
+		EA490BD90CAEE61E00A1DE02 /* RSActivityListView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */; };
+		EA490DBA0CAF376E00A1DE02 /* ActivityAggregateView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA490DB80CAF376E00A1DE02 /* ActivityAggregateView.xib */; };
 		EA4B9FC10C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */; };
 		EA4B9FC20C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */; };
 		EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */; };
@@ -226,6 +231,12 @@
 		EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleDetailsPopupView.m; sourceTree = "<group>"; };
 		EA3B40550C8C7AEE0042C793 /* closebox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = closebox.png; path = Images/closebox.png; sourceTree = "<group>"; };
 		EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = closebox_pressed.png; path = Images/closebox_pressed.png; sourceTree = "<group>"; };
+		EA4909E30CADD0E600A1DE02 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/Activity.xib; sourceTree = "<group>"; };
+		EA490BB30CAEDB8100A1DE02 /* Activity_Stop.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Activity_Stop.tif; path = Images/Activity_Stop.tif; sourceTree = "<group>"; };
+		EA490BB40CAEDB8100A1DE02 /* Activity_StopPressed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Activity_StopPressed.tif; path = Images/Activity_StopPressed.tif; sourceTree = "<group>"; };
+		EA490BD70CAEE61E00A1DE02 /* RSActivityListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSActivityListView.h; sourceTree = "<group>"; };
+		EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSActivityListView.m; sourceTree = "<group>"; };
+		EA490DB90CAF376E00A1DE02 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ActivityAggregateView.xib; sourceTree = "<group>"; };
 		EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		EA4B9FC00C822BD500FBAF95 /* recsched.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched.xcmappingmodel; sourceTree = "<group>"; };
 		EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSCommonAppDelegate.h; sourceTree = "<group>"; };
@@ -410,6 +421,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EA490DB80CAF376E00A1DE02 /* ActivityAggregateView.xib */,
 				EA72A7A90C260D79009C63E5 /* ClientDescription.plist */,
 				EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */,
 				EA20AE010C23589700A9BDBD /* recsched.syncschema */,
@@ -419,6 +431,7 @@
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
+				EA4909E50CADD0EB00A1DE02 /* Activity.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -446,6 +459,8 @@
 		EA2939860C0CC89E0053E2B8 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EA490BB30CAEDB8100A1DE02 /* Activity_Stop.tif */,
+				EA490BB40CAEDB8100A1DE02 /* Activity_StopPressed.tif */,
 				EA93F3980C922E53004788CF /* iOnTV.icns */,
 				EA3B40550C8C7AEE0042C793 /* closebox.png */,
 				EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */,
@@ -585,6 +600,8 @@
 				EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */,
 				EA686CE80CA95F5600185188 /* RSActivityViewController.h */,
 				EA686CE90CA95F5600185188 /* RSActivityViewController.m */,
+				EA490BD70CAEE61E00A1DE02 /* RSActivityListView.h */,
+				EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -700,6 +717,10 @@
 				EA3B40570C8C7AEE0042C793 /* closebox.png in Resources */,
 				EA3B40580C8C7AEE0042C793 /* closebox_pressed.png in Resources */,
 				EA93F3990C922E53004788CF /* iOnTV.icns in Resources */,
+				EA4909E60CADD0EB00A1DE02 /* Activity.xib in Resources */,
+				EA490BB50CAEDB8100A1DE02 /* Activity_Stop.tif in Resources */,
+				EA490BB60CAEDB8100A1DE02 /* Activity_StopPressed.tif in Resources */,
+				EA490DBA0CAF376E00A1DE02 /* ActivityAggregateView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -756,6 +777,7 @@
 				EA3B40500C8C79470042C793 /* ScheduleDetailsPopupView.m in Sources */,
 				EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */,
 				EA686CEA0CA95F5600185188 /* RSActivityViewController.m in Sources */,
+				EA490BD90CAEE61E00A1DE02 /* RSActivityListView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -840,6 +862,22 @@
 				29B97319FDCFA39411CA2CEA /* English */,
 			);
 			name = MainMenu.nib;
+			sourceTree = "<group>";
+		};
+		EA4909E50CADD0EB00A1DE02 /* Activity.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA4909E30CADD0E600A1DE02 /* English */,
+			);
+			name = Activity.xib;
+			sourceTree = "<group>";
+		};
+		EA490DB80CAF376E00A1DE02 /* ActivityAggregateView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA490DB90CAF376E00A1DE02 /* English */,
+			);
+			name = ActivityAggregateView.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

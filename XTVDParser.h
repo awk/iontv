@@ -11,6 +11,7 @@
 @interface XTVDParser : NSObject {
   id	mReportProgressTo;
   NSManagedObjectContext *mManagedObjectContext;
+  size_t	mActivityToken;
 }
 
 - (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument lineupsOnly:(BOOL)inLineupsOnly;

@@ -304,6 +304,15 @@
   }
 }
 
+- (IBAction)showActivityWindow:(id)sender
+{
+	if (!mActivityWindowController)
+	{
+		mActivityWindowController = [[NSWindowController alloc] initWithWindowNibName:@"Activity"];
+	}
+	[mActivityWindowController showWindow:self];
+}
+
 #pragma mark - Delegate Messages
 
 /**

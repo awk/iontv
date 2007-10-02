@@ -22,6 +22,8 @@
     NSTimer     *mVLCTerminateTimer;
 
     id mRecServer;
+	
+	NSWindowController *mActivityWindowController;
 }
 
 #if USE_SYNCSERVICES
@@ -36,6 +38,7 @@
 - (IBAction)showCoreDataProgramWindow:(id)sender;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
+- (IBAction)showActivityWindow:(id)sender;
 
 - (IBAction) quitServer:(id)sender;
 

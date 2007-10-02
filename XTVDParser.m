@@ -55,7 +55,7 @@
         return;
     }
 
-	[mReportProgressTo beginActivity];
+	mActivityToken = [mReportProgressTo createActivity];
 	
     xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl
             options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA)
@@ -79,7 +79,7 @@
     // Now that we have a document we can traverse it to create the CoreData objects
     [self traverseXMLDocument:xmlDoc lineupsOnly:inLineupsOnly];
     [xmlDoc release];
-	[mReportProgressTo endActivity];
+	[mReportProgressTo endActivity:mActivityToken];
 }
 
 - (void) handleError:(NSError*) error
@@ -93,9 +93,8 @@
   int i, count = [childNodes count];
   if (mReportProgressTo)
   {
-    [mReportProgressTo setActivityInfoString:@"Updating Stations"];
-    [mReportProgressTo setActivityProgressMaxValue:count];
-    [mReportProgressTo setActivityProgressDoubleValue:0];
+    [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Stations"];
+    [mReportProgressTo setActivity:mActivityToken progressMaxValue:count];
   }
   else
     NSLog(@"Updating Stations");
@@ -112,7 +111,7 @@
       int stationID = -1;
       if (stationIDString)
       {
-          [mReportProgressTo setActivityProgressDoubleValue:i];
+          [mReportProgressTo setActivity:mActivityToken incrementBy:1.0];
           
         stationID = [stationIDString intValue];
       
@@ -178,7 +177,7 @@
   NSArray *childNodes = [inLineupsNode children];
   int i, count = [childNodes count];
   if (mReportProgressTo)
-    [mReportProgressTo setActivityInfoString:@"Updating Lineups"];
+    [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Lineups"];
   else
     NSLog(@"Updating Lineups");
     
@@ -227,7 +226,7 @@
         // Now for the map items in the lineup element node
         NSArray *lineupChildNodes = [childElement children];
         int j, lineupChildCount = [lineupChildNodes count];
-          [mReportProgressTo setActivityProgressMaxValue:lineupChildCount];
+          [mReportProgressTo setActivity:mActivityToken progressMaxValue:lineupChildCount];
         for (j=0; j < lineupChildCount; j++)
         {
           NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
@@ -240,7 +239,7 @@
           NSXMLElement *lineupMap = [lineupChildNodes objectAtIndex:j];
           NSString *tmpStr;
           
-		  [mReportProgressTo setActivityProgressDoubleValue:j];
+		  [mReportProgressTo setActivity:mActivityToken incrementBy:1];
 
           tmpStr = [[lineupMap attributeForName:@"station"] stringValue];
           if (tmpStr)
@@ -321,14 +320,13 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
   NSArray *childNodes = nil;
   int i, count = 0;
   if (mReportProgressTo)
-    [mReportProgressTo setActivityInfoString:@"Updating Programs"];
+    [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Programs"];
   else
     NSLog(@"Updating Programs");
     
   childNodes  = [[inProgramsNode children] sortedArrayUsingFunction:compareProgramsByIDAttribute context:nil];
   count = [childNodes count];
-  [mReportProgressTo setActivityProgressMaxValue:count];
-  [mReportProgressTo setActivityProgressDoubleValue:0];
+  [mReportProgressTo setActivity:mActivityToken progressMaxValue:count];
   
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
@@ -368,7 +366,7 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
       NSString *programIDString = [[childElement attributeForName:@"id"] stringValue];
       if (programIDString)
       {
-		[mReportProgressTo setActivityProgressDoubleValue:i];
+		[mReportProgressTo setActivity:mActivityToken incrementBy:1.0];
 
         Z2ITProgram *aProgram  = nil;
         
@@ -404,14 +402,13 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSArray *childNodes = nil;
   int i, count = 0;
   if (mReportProgressTo)
-    [mReportProgressTo setActivityInfoString:@"Updating Production Crew"];
+    [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Production Crew"];
   else
     NSLog(@"Updating Production Crew");
     
   childNodes  = [[inProductionCrewNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
   count = [childNodes count];
-  [mReportProgressTo setActivityProgressMaxValue:count];
-  [mReportProgressTo setActivityProgressDoubleValue:0];
+  [mReportProgressTo setActivity:mActivityToken progressMaxValue:count];
   
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
@@ -447,7 +444,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     if (nodeKind == NSXMLElementKind)
     {
       NSXMLElement *childElement = (NSXMLElement *)child;
-	  [mReportProgressTo setActivityProgressDoubleValue:i];
+	  [mReportProgressTo setActivity:mActivityToken incrementBy:1.0];
 
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
       if (programIDString)
@@ -475,14 +472,13 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSArray *childNodes = nil;
   int i, count = 0;
   if (mReportProgressTo)
-    [mReportProgressTo setActivityInfoString:@"Updating Genres"];
+    [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Genres"];
   else
     NSLog(@"Updating Genres");
     
   childNodes = [[inGenresNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
   count = [childNodes count];
-  [mReportProgressTo setActivityProgressMaxValue:count];
-  [mReportProgressTo setActivityProgressDoubleValue:0];
+  [mReportProgressTo setActivity:mActivityToken progressMaxValue:count];
   
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
@@ -517,7 +513,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     NSXMLNodeKind nodeKind = [child kind];
     if (nodeKind == NSXMLElementKind)
     {
-	  [mReportProgressTo setActivityProgressDoubleValue:i];
+	  [mReportProgressTo setActivity:mActivityToken incrementBy:1.0];
 
       NSXMLElement *childElement = (NSXMLElement *)child;
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
@@ -546,14 +542,13 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSArray *childNodes = nil;
   int i, count = [childNodes count];
   if (mReportProgressTo)
-    [mReportProgressTo setActivityInfoString:@"Updating Schedules"];
+    [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Schedules"];
   else
     NSLog(@"Updating Schedules");
 
   childNodes = [[inSchedulesNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
   count = [childNodes count];
-  [mReportProgressTo setActivityProgressMaxValue:count];
-  [mReportProgressTo setActivityProgressDoubleValue:0];
+  [mReportProgressTo setActivity:mActivityToken progressMaxValue:count];
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
   {
@@ -588,7 +583,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     if (nodeKind == NSXMLElementKind)
     {
       NSXMLElement *childElement = (NSXMLElement *)child;
-	  [mReportProgressTo setActivityProgressDoubleValue:i];
+	  [mReportProgressTo setActivity:mActivityToken incrementBy:1.0];
 
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
       if (programIDString)

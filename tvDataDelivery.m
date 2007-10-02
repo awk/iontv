@@ -294,6 +294,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 + (void) performDownload:(id)downloadInfo
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  size_t activityToken;
   
   NSDictionary *xtvdDownloadData = (NSDictionary*)downloadInfo;
   
@@ -302,17 +303,17 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   
   if (reportProgress)
   {
-	[reportProgressTo beginActivity];
-	[reportProgressTo setActivityInfoString:@"Downloading Schedule Data"];
-	[reportProgressTo setActivityProgressIndeterminate:YES];
+	activityToken = [reportProgressTo createActivity];
+	[reportProgressTo setActivity:activityToken infoString:@"Downloading Schedule Data"];
+	[reportProgressTo setActivity:activityToken progressIndeterminate:YES];
   }
 	
   NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:@"startDateStr"] in_endTime:[xtvdDownloadData valueForKey:@"endDateStr"]];
  
   if (reportProgress)
   {
-	[reportProgressTo setActivityProgressIndeterminate:NO];
-	[reportProgressTo endActivity];
+	[reportProgressTo setActivity:activityToken progressIndeterminate:NO];
+	[reportProgressTo endActivity:activityToken];
   }
   if ([[xtvdDownloadData valueForKey:@"dataRecipient"] respondsToSelector:@selector(handleDownloadData:)])
     [[xtvdDownloadData valueForKey:@"dataRecipient"] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:downloadResult waitUntilDone:NO];
