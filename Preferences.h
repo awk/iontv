@@ -38,8 +38,6 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
 	
     IBOutlet NSArrayController *mHDHomeRunTunersArrayController;
     IBOutlet NSArrayController *mGenreArrayController;
-    IBOutlet NSArrayController *mLineupArrayController;
-    IBOutlet NSArrayController *mStationsArrayController;           // This is all the station entitiies in the MOC
     IBOutlet NSArrayController *mVisibleStationsArrayController;    // This is the subset of station entities that correspond to the selected HDHR Device/Tuner combo.
     
 	IBOutlet NSView *mExportChannelTunerSelectionView;

@@ -30,7 +30,6 @@
   IBOutlet NSObjectController *mCurrentStation;
   IBOutlet NSObjectController *mCurrentLineup;
   IBOutlet NSArrayController *mViewSelectionArrayController;
-  IBOutlet NSArrayController *mLineupsArrayController;
   
   // Cells used by the Source View selector 'table'
   NSCell *mSeparatorCell;

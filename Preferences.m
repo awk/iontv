@@ -13,7 +13,6 @@
 #import "hdhomerun.h"
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
-#import "RecSchedNotifications.h"
 #import "recsched_AppDelegate.h"
 #import "RSColorDictionary.h"
 #import <Security/Security.h>
@@ -141,9 +140,6 @@ static Preferences *sSharedInstance = nil;
 {
     if (self != sSharedInstance)
     {
-      // Unregister for the update notifications
-      [[NSNotificationCenter defaultCenter] removeObserver:self name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-
       [super dealloc];	// Don't free the shared instance
     }
 }
@@ -227,11 +223,6 @@ static Preferences *sSharedInstance = nil;
     // install the toolbar.
     [mPanel setToolbar:toolbar];
     
-    // Register to receive Managed Object context update notifications - when adding objects in to the context from a seperate
-    // thread (during parsing) 'our' managed object context may not notify the NSObjectControllers that new data has been added
-    // This notification is sent during the end of saving to notify everyone of new content
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateControllers) name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-
 	// Set the sort order for the colors list
 	NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"numberOfPrograms" ascending:NO];
 	[mGenreArrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
@@ -720,16 +711,6 @@ static Preferences *sSharedInstance = nil;
 	}
 	[importURL release];	// Copied in the file open panel did end delegate
 }
-
-#pragma mark - Notification callbacks
-
-- (void) updateControllers
-{
-  [mLineupArrayController prepareContent];
-  [mStationsArrayController prepareContent];
-  [mGenreArrayController prepareContent];
-}
-
 
 #pragma mark - Toolbar Delegates
 

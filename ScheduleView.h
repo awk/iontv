@@ -33,7 +33,6 @@
 - (float) timePerLineIncrement;
 - (void) updateStationsScroller;
 - (void) sortStationsArray;
-- (void) updateControllers;
 - (id) delegate;
 - (void) setDelegate:(id)inDelegate;
 

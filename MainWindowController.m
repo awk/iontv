@@ -16,7 +16,6 @@
 #import "Z2ITProgram.h"
 #import "Z2ITStation.h"
 #import "recsched_AppDelegate.h"
-#import "RecSchedNotifications.h"
 #import "HDHomeRunTuner.h"
 #import "RecSchedProtocol.h"
 
@@ -66,18 +65,6 @@ const CGFloat kSourceListMinWidth = 150;
   
   [mCurrentSchedule setContent:nil];
 
-	// Register to receive Managed Object context update notifications - when adding objects in to the context from a seperate
-	// thread (during parsing) 'our' managed object context may not notify the NSObjectControllers that new data has been added
-	// This notification is sent during the end of saving to notify everyone of new content
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateControllers) name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-}
-
-- (void) dealloc
-{
-  // Unregister for the update notifications
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-
-	[super dealloc];
 }
 
 #pragma mark Action Methods
@@ -301,14 +288,6 @@ const CGFloat kSourceListMinWidth = 150;
 		
 	return enableItem;
 }
-
-#pragma mark Notifications
-
-- (void) updateControllers
-{
-  [mLineupsArrayController prepareContent];
-}
-
 
 #pragma mark Split View Delegate Methods
 

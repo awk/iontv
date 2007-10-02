@@ -318,38 +318,12 @@ NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";			// Here becau
 }
 
 #pragma mark Notifications
-- (void) updateForSavedContext:(NSSet *)updatedObjects
-{
-    // enumerate the list
-    NSEnumerator *enumerator = [updatedObjects objectEnumerator];
-    NSManagedObject *staleObject;
-	NSManagedObjectID *updatedObjectID;
-    while ((updatedObjectID = [enumerator nextObject]) != nil) {
 
-        // if the object that was updated (in the recipe context) also has been fetched into the app delegate 
-        // context, we want to refresh the object merging in the changes from the persistent store. Otherwise
-        // the information will look out of date.
-        staleObject = [[self managedObjectContext] objectRegisteredForID:updatedObjectID/*[updatedObject objectID]*/];
-        if (staleObject != nil) 
-        {
-            [[self managedObjectContext] refreshObject:staleObject mergeChanges:NO];   
-        }
-        else
-        {
-          staleObject = [[self managedObjectContext] objectWithID:updatedObjectID/*[updatedObject objectID]*/];
-        }
-//		NSLog(@"updateForSavedContext - staleObject = %@", staleObject);
-    }    
-    
-    // Lastly do a 'performPendingChanges' to make sure everything is picked up correctly - in particular that
-    // any new data added in the save (which doesn't appear in the updatedObjects set - it's NEW after all) is
-    // reflected in the UI.
-    [[self managedObjectContext] processPendingChanges];
-    
-    // And notifiy everyone else a save just occured - which probably means new objects were added to this context
-//    [[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationManagedObjectContextUpdated object:[self managedObjectContext]];
-	
-	[self syncAction:self];
+- (void) updateForSavedContext:(NSNotification *)notification
+{
+	[[self managedObjectContext] mergeChangesFromContextDidSaveNotification:notification];
+
+//	[self syncAction:self];
 }
 
 

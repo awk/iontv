@@ -742,21 +742,8 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
 - (void)threadContextDidSave:(NSNotification *)notification
 {
-    // get the context and the list of updated objects
-    NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
-
-    NSMutableSet *allObjectsSet = [NSMutableSet setWithSet:updatedObjects];
-    [allObjectsSet unionSet:[[notification userInfo] objectForKey:NSInsertedObjectsKey]];
-    
-	NSMutableSet *allObjectIDsSet = [[NSMutableSet alloc] initWithCapacity:[allObjectsSet count]];
-	NSEnumerator *anEnumerator = [allObjectsSet objectEnumerator];
-	NSManagedObject *aManagedObject;
-	while ((aManagedObject = [anEnumerator nextObject]) != nil)
-	{
-		[allObjectIDsSet addObject:[aManagedObject objectID]];
-	}
 	if ([[[NSApplication sharedApplication] delegate] respondsToSelector:@selector(updateForSavedContext:)])
-		[[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:allObjectIDsSet waitUntilDone:NO];
+		[[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:NO];
 }
 
 @end;
