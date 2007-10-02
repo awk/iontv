@@ -83,7 +83,7 @@
   {
     if (ret < 1)
     {
-      NSLog(@"startStreaming - communication error sending request to hdhomerun device - stream start");
+      NSLog(@"startStreaming - communication error sending request to hdhomerun device - stream start (error = %d)", ret);
       return;
     }
   }
@@ -132,7 +132,7 @@
     {
       if (ret < 1)
       {
-              NSLog(@"setFilterForProgramNumber - communication error sending request to hdhomerun device - set tuner program\n");
+              NSLog(@"setFilterForProgramNumber - communication error sending request to hdhomerun device - set tuner program (error = %d)\n", ret);
       }
     }
   }
@@ -162,7 +162,7 @@
     {
       if (ret < 1)
       {
-            NSLog(@"tuneTo - communication error sending request to hdhomerun device\n");
+            NSLog(@"tuneTo - communication error sending request to hdhomerun device (error = %d)\n", ret);
       }
     }
   }
@@ -630,7 +630,10 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 
 - (void) startStreaming
 {
-  // Set our tuner to the channel
+	// Make sure we have a HDHR Device for the Tuner
+  [[[self channel] tuner] createHDHRDevice];
+  
+	// Set our tuner to the channel
   [[[self channel] tuner] tuneToChannel:[self channel]];
   
   // Set our tuners filter for this program
