@@ -387,6 +387,7 @@
 		0259C573FE90428111CA0C5A /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = D50F206F08A01A630073A261 /* Build configuration list for PBXProject "RBSplitView" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 0259C574FE90428111CA0C5A /* RBSplitView */;
 			projectDirPath = "";
@@ -556,6 +557,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LIBRARY_STYLE = STATIC;
+				SDKROOT_ppc = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Debug;
 		};
@@ -563,6 +565,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				LIBRARY_STYLE = STATIC;
+				SDKROOT_ppc = /Developer/SDKs/MacOSX10.4u.sdk;
 			};
 			name = Release;
 		};
@@ -701,6 +704,7 @@
 				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
 				MACOSX_DEPLOYMENT_TARGET_ppc = 10.3;
 				PRODUCT_NAME = RBSplitView;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				SDKROOT_i386 = /Developer/SDKs/MacOSX10.4u.sdk;
 				SDKROOT_ppc = /Developer/SDKs/MacOSX10.3.9.sdk;
 			};
