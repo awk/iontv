@@ -13,12 +13,14 @@
 @class HDHomeRunDevice;
 
 @interface RecordingThreadController : NSObject {
-  Z2ITProgram *mProgram;
   Z2ITSchedule *mSchedule;
   bool mFinishRecording;
   HDHomeRunDevice *mHDHRDevice;
+
+  NSManagedObjectContext *mThreadManagedObjectContext;
+  Z2ITSchedule *mThreadSchedule;
 }
 
-- (id) initWithProgram:(Z2ITProgram *)inProgram andSchedule:(Z2ITSchedule*)inSchedule;
+- (id) initWithSchedule:(Z2ITSchedule*)inSchedule;
 - (void) beginRecording;
 @end

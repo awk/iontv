@@ -14,6 +14,7 @@
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
+#import "RSRecording.h"
 #import "XTVDParser.h"
 #import "RecordingThread.h"
 #import "HDHomeRunTuner.h"
@@ -184,29 +185,25 @@ const int kDefaultScheduleFetchDuration = 3;
 	[self fetchScheduleWithDuration:kDefaultScheduleFetchDuration];
 }
 
-- (BOOL) addRecordingOfProgram:(NSManagedObject*) aProgram
-            withSchedule:(NSManagedObject*)aSchedule
+- (BOOL) addRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID
 {
-  Z2ITStation *aStation = [(Z2ITSchedule *)aSchedule station];
-  Z2ITProgram *myProgram = [Z2ITProgram fetchProgramWithID:[(Z2ITProgram *)(aProgram) programID] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-  NSSet *mySchedules = [myProgram schedules];
-  NSEnumerator *anEnumerator = [mySchedules objectEnumerator];
   Z2ITSchedule *mySchedule = nil;
-  BOOL foundMatch = NO;
-  while (mySchedule = [anEnumerator nextObject])
+  mySchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
+  
+  if (mySchedule)
   {
-    // Compare with time intervals since that will take into account any timezone discrepancies
-    if (([[aStation stationID] intValue] == [[[mySchedule station] stationID] intValue]) && ([[mySchedule time] timeIntervalSinceDate:[(Z2ITSchedule*)aSchedule time]] == 0))
-    {
-      foundMatch = YES;
-      break;
-    }
-  }
-  if (foundMatch)
-  {
-	NSLog(@"My Program = %@, My Schedule = %@", myProgram, mySchedule);
-	[mySchedule setToBeRecorded:[NSNumber numberWithBool:YES]];
-    [[RecordingThreadController alloc]initWithProgram:myProgram andSchedule:mySchedule];
+	NSLog(@"My Program title = %@, My Schedule start time = %@ channel = %@, recording = %@", mySchedule.program.title, mySchedule.time, mySchedule.station.callSign, [mySchedule recording]);
+	if ([mySchedule recording] == nil)
+	{
+		RSRecording *aRecording = [NSEntityDescription insertNewObjectForEntityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+		[mySchedule setRecording:aRecording];
+		[aRecording setSchedule:mySchedule];
+		[aRecording setStatus:[NSNumber numberWithInt:RSRecordingNoStatus]];
+		
+		[[RecordingThreadController alloc]initWithSchedule:mySchedule];
+		
+		[[NSApp delegate] saveAction:self];
+	}
     return YES;
   }
   else

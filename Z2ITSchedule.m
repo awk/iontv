@@ -30,20 +30,6 @@
   }
 }
 
-+ (NSArray*) fetchSchedulesToBeRecordedInManagedObjectContext:(NSManagedObjectContext*)inMOC
-{
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:inMOC];
-  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-  [request setEntity:entityDescription];
-   
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"toBeRecorded == YES"];
-  [request setPredicate:predicate];
-   
-  NSError *error = nil;
-  NSArray *array = [inMOC executeFetchRequest:request error:&error];
-  return array;
-}
-
 - (void) setDurationHours:(int)inHours minutes:(int)inMinutes
 {
   NSDate *startDate = [self time];
@@ -102,11 +88,11 @@
 @dynamic stereo;
 @dynamic subtitled;
 @dynamic time;
-@dynamic toBeRecorded;
 @dynamic totalNumberParts;
 @dynamic tvRating;
 @dynamic program;
 @dynamic station;
+@dynamic recording;
 
 - (NSString *) tvRatingImageName
 {

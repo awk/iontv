@@ -8,6 +8,8 @@
 
 #import "recsched_bkgd_AppDelegate.h"
 #import "RecSchedServer.h"
+#import "RSRecording.h"
+#import "RecordingThread.h"
 
 NSString *kRecSchedUIAppBundleID = @"org.awkward.recsched";
 NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
@@ -17,6 +19,23 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 
 @implementation recsched_bkgd_AppDelegate
 
+- (void) startTimersForRecordings
+{
+	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+	[request setEntity:entityDescription];
+   
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.endTime > %@", [NSDate dateWithTimeIntervalSinceNow:0]];
+	[request setPredicate:predicate];
+
+	NSError *error = nil;
+	NSArray *futureRecordings = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
+	for (RSRecording *aRecording in futureRecordings)
+	{
+		[[RecordingThreadController alloc] initWithSchedule:aRecording.schedule];
+	}
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
 {
 	NSLog(@"recsched_bkgd_AppDelegate - applicationDidFinishLaunching");
@@ -25,6 +44,7 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 #endif // USE_SYNCSERVICES
 	
 	[mRecSchedServer updateSchedule];
+	[self startTimersForRecordings];
 }
 
 - (id) init {

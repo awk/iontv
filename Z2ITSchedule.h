@@ -10,13 +10,13 @@
 
 @class Z2ITProgram;
 @class Z2ITStation;
+@class RSRecording;
 
 @interface Z2ITSchedule : NSManagedObject {
 
 }
 
 + (void) clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC;
-+ (NSArray*) fetchSchedulesToBeRecordedInManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
 - (void) setDurationHours:(int)inHours minutes:(int)inMinutes;
 
@@ -31,11 +31,11 @@
 @property (retain) NSNumber * stereo;
 @property (retain) NSNumber * subtitled;
 @property (retain) NSDate * time;
-@property (retain) NSNumber * toBeRecorded;
 @property (retain) NSNumber * totalNumberParts;
 @property (retain) NSString * tvRating;
 @property (retain) Z2ITProgram * program;
 @property (retain) Z2ITStation * station;
+@property (retain) RSRecording * recording;
 
 - (NSString *) programDetailsStr;
 - (NSString *) tvRatingImageName;

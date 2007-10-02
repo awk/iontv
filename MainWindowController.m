@@ -11,6 +11,7 @@
 #import "tvDataDelivery.h"
 #import "XTVDParser.h"
 #import "Preferences.h"
+#import "RSRecording.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
 #import "Z2ITStation.h"
@@ -46,7 +47,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (void) updateSourceListForFutureRecordings
 {
-	NSMutableArray *schedulesToBeRecorded = [NSMutableArray arrayWithArray:[Z2ITSchedule fetchSchedulesToBeRecordedInManagedObjectContext:[[NSApp delegate]managedObjectContext]]];
+	NSMutableArray *schedulesToBeRecorded = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext]]];
 	
 	NSArray *treeNodes = [mViewSelectionTreeController content];
 	NSMutableDictionary *aSourceListNode = nil;
@@ -68,10 +69,10 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 		{
 			// Get the Object ID for the schedule
 			NSManagedObjectID *anObjectID = [aFutureRecordingNode valueForKey:RSSourceListObjectIDKey];
-			Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+			RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
 			
 			// If the schedule isn't in the list of items to be recorded we should drop it from the futureRecordingsArray
-			if (![schedulesToBeRecorded containsObject:aSchedule])
+			if (![schedulesToBeRecorded containsObject:aRecording])
 			{
 				// However we can't just remove it since we're in the middle of iterating over the futureRecordingsArray
 				// so instead we'll add it to an array of recordings to be dropped en masse at the end of iterations.
@@ -80,8 +81,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 			else
 			{
 				// Lastly we should remove it from the list of schedulesToBeRecorded array 
-				if (aSchedule)
-					[schedulesToBeRecorded removeObject:aSchedule];
+				if (aRecording)
+					[schedulesToBeRecorded removeObject:aRecording];
 			}
 		}
 		[futureRecordingsArray removeObjectsInArray:futureRecordingsToDrop];
@@ -92,16 +93,16 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 		futureRecordingsArray = [[NSMutableArray alloc] initWithCapacity:[schedulesToBeRecorded count]];
 	}	
 
-	for (Z2ITSchedule *aSchedule in schedulesToBeRecorded)
+	for (RSRecording *aRecording in schedulesToBeRecorded)
 	{
 		NSMutableDictionary *aFutureRecordingNode = [[NSMutableDictionary alloc] init];
 		NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
 		[dateFormatter setDateStyle:NSDateFormatterShortStyle];
 		[dateFormatter setTimeStyle:NSDateFormatterShortStyle];
-		NSString *timeStr = [dateFormatter stringFromDate:[aSchedule time]];
-		NSString *labelStr = [NSString stringWithFormat:@"%@ - %@", timeStr, [[aSchedule program] title]];
+		NSString *timeStr = [dateFormatter stringFromDate:aRecording.schedule.time];
+		NSString *labelStr = [NSString stringWithFormat:@"%@ - %@", timeStr, aRecording.schedule.program.title];
 		[aFutureRecordingNode setValue:labelStr forKey:RSSourceListLabelKey];
-		[aFutureRecordingNode setValue:[aSchedule objectID] forKey:RSSourceListObjectIDKey];
+		[aFutureRecordingNode setValue:[aRecording objectID] forKey:RSSourceListObjectIDKey];
 		[aFutureRecordingNode setValue:@"futureRecordingSelected:" forKey:RSSourceListActionMessageNameKey];
 		[aFutureRecordingNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListDeletableKey];
 		[aFutureRecordingNode setValue:@"deleteFutureRecording:" forKey:RSSourceListDeleteMessageNameKey];
@@ -279,9 +280,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (IBAction) recordShow:(id)sender
 {
-  Z2ITSchedule *aSchedule = [mCurrentSchedule content];
-  [aSchedule setToBeRecorded:[NSNumber numberWithBool:YES]];
-  [[[[NSApplication sharedApplication] delegate] recServer] addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
+  [RSRecording createRecordingOfSchedule:[mCurrentSchedule content] withServer:[[NSApp delegate] recServer]];
 }
 
 - (IBAction) recordSeasonPass:(id)sender
@@ -421,9 +420,9 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 - (void) futureRecordingSelected:(id)anArgument
 {
 	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
-	Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
-	if (aSchedule)
-		[self setCurrentSchedule:aSchedule];
+	RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+	if (aRecording)
+		[self setCurrentSchedule:aRecording.schedule];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -484,10 +483,12 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 {
 	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
 	Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
-	if (aSchedule)
-	{
-		[aSchedule setToBeRecorded:[NSNumber numberWithBool:NO]];
-	}
+	
+	NSLog(@"deleteFutureRecording - %@, %@", anArgument, aSchedule);
+//	if (aSchedule)
+//	{
+//		[aSchedule setToBeRecorded:[NSNumber numberWithBool:NO]];
+//	}
 }
 
 #pragma mark Window Delegate Methods
@@ -656,9 +657,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 				NSManagedObjectContext *MOC = [[NSApp delegate] managedObjectContext];
 				
 				Z2ITSchedule *aSchedule = (Z2ITSchedule*) [MOC objectWithID:[storeCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:[dragInfoDict valueForKey:@"scheduleObjectURI"]]]];
-				[aSchedule setToBeRecorded:[NSNumber numberWithBool:YES]];
-				[[[[NSApplication sharedApplication] delegate] recServer] addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
-				
+				[RSRecording createRecordingOfSchedule:aSchedule withServer:[[NSApp delegate] recServer]];
 				return YES;
 		}
 		else

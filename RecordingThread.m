@@ -12,26 +12,41 @@
 #import "Z2ITStation.h"
 #import "HDHomeRunTuner.h"
 
-#define RECORDING_DISABLED 1
+#define RECORDING_DISABLED 0
 
 @implementation RecordingThreadController
+
+- (void) initializeThreadData
+{
+	// We need to create a new the managedObjectContext for this thread, we can use the mSchedule (which was given to us
+	// in a seperate thread context to retrieve the store co-ordinator and then work from there.
+	NSPersistentStoreCoordinator *psc = [[mSchedule managedObjectContext] persistentStoreCoordinator];
+	if (psc != nil)
+	{
+		mThreadManagedObjectContext = [[NSManagedObjectContext alloc] init];
+		[mThreadManagedObjectContext setPersistentStoreCoordinator: psc];
+		
+		// We also need to create a thread local schedule object too.
+		mThreadSchedule = (Z2ITSchedule*) [mThreadManagedObjectContext objectWithID:[mSchedule objectID]];
+	}
+}
 
 + (void) recordingThreadStarted:(id)aRecordingThreadController
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
   RecordingThreadController *theController = (RecordingThreadController*)aRecordingThreadController;
+  [theController initializeThreadData];
   [theController beginRecording];
   
   NSLog(@"recordingThread - EXIT");
   [pool release];
 }
 
-- (id) initWithProgram:(Z2ITProgram *)inProgram andSchedule:(Z2ITSchedule*)inSchedule
+- (id) initWithSchedule:(Z2ITSchedule*)inSchedule
 {
   self = [super init];
   if (self != nil) {
-    mProgram = [inProgram retain];
     mSchedule = [inSchedule retain];
     
     NSTimer *recordingStartTimer = [[NSTimer alloc] initWithFireDate:[mSchedule time] interval:0 target:self selector:@selector(startRecordingTimerFired:) userInfo:self repeats:NO];
@@ -48,9 +63,9 @@
 #if RECORDING_DISABLED
 - (void) beginRecording
 {
-  NSLog(@"beginRecording - timer fired for schedule %@ program %@", mSchedule, mProgram);
+  NSLog(@"beginRecording - timer fired for schedule %@ program title %@", mThreadSchedule, mThreadSchedule.program.title);
   
-  Z2ITStation *aStation = [mSchedule station];
+  Z2ITStation *aStation = [mThreadSchedule station];
   NSSet *hdhrStations = [aStation hdhrStations];
   if ([hdhrStations count] == 0)
   {
@@ -77,16 +92,16 @@
             fflush(stdout);
     }
 
-    if ([[mSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
+    if ([[mThreadSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
       mFinishRecording = YES;
   }
 }
 #else  
 - (void) beginRecording
 {
-  NSLog(@"beginRecording - timer fired for schedule %@ program %@", mSchedule, mProgram);
+  NSLog(@"beginRecording - timer fired for schedule %@ program title %@", mThreadSchedule, mThreadSchedule.program.title);
   
-  Z2ITStation *aStation = [mSchedule station];
+  Z2ITStation *aStation = [mThreadSchedule station];
   NSSet *hdhrStations = [aStation hdhrStations];
   if ([hdhrStations count] == 0)
   {
@@ -96,7 +111,7 @@
   
   HDHomeRunStation *anHDHRStation = [hdhrStations anyObject];
 
-  NSLog(@"Recording on HDHRStation %@", anHDHRStation];
+  NSLog(@"Recording on HDHRStation %@", anHDHRStation);
   [anHDHRStation startStreaming];
 
   mFinishRecording = NO;
@@ -127,7 +142,7 @@
             fflush(stdout);
     }
 
-    if ([[mSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
+    if ([[mThreadSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
       mFinishRecording = YES;
   }
   [anHDHRStation stopStreaming];

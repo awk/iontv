@@ -42,8 +42,6 @@
 		EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881D0B86B16C00809664 /* TV-Y7FV.tif */; };
 		EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
 		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
-		EA20AE0E0C23589700A9BDBD /* recsched.syncschema in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE010C23589700A9BDBD /* recsched.syncschema */; };
-		EA20AE290C23608C00A9BDBD /* ClientDescription_Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */; };
 		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
 		EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */; };
 		EA289D160C720FCE00D2EE7B /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
@@ -82,8 +80,9 @@
 		EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */; };
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
-		EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA72A7A90C260D79009C63E5 /* ClientDescription.plist */; };
 		EA93F3990C922E53004788CF /* iOnTV.icns in Resources */ = {isa = PBXBuildFile; fileRef = EA93F3980C922E53004788CF /* iOnTV.icns */; };
+		EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
+		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
@@ -94,8 +93,6 @@
 		EAEC09630C27452600C40D5A /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
 		EAEC09640C27452C00C40D5A /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
 		EAEC09650C27453200C40D5A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
-		EAEC099D0C27496600C40D5A /* recsched.syncschema in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE010C23589700A9BDBD /* recsched.syncschema */; };
-		EAEC09BC0C274A7700C40D5A /* ClientDescription_Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */; };
 		EAEC09D00C275AA400C40D5A /* RecSchedServer.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE655590B9D1A8300CDB279 /* RecSchedServer.m */; };
 		EAEC09D40C275B6400C40D5A /* tvDataDelivery.m in Sources */ = {isa = PBXBuildFile; fileRef = EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */; };
 		EAEC09D50C275B6E00C40D5A /* Z2ITProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8863A0B61598700373CEF /* Z2ITProgram.m */; };
@@ -250,6 +247,9 @@
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
 		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
 		EA93F3980C922E53004788CF /* iOnTV.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = iOnTV.icns; path = Images/iOnTV.icns; sourceTree = SOURCE_ROOT; };
+		EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 3.xcdatamodel"; sourceTree = "<group>"; };
+		EA93F8170C9C4A6E004788CF /* RSRecording.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRecording.h; sourceTree = "<group>"; };
+		EA93F8180C9C4A6E004788CF /* RSRecording.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSRecording.m; sourceTree = "<group>"; };
 		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSOutlineView.h; sourceTree = "<group>"; };
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSOutlineView.m; sourceTree = "<group>"; };
 		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = "<group>"; };
@@ -533,6 +533,8 @@
 				EAF8863A0B61598700373CEF /* Z2ITProgram.m */,
 				EAF8867B0B61740300373CEF /* Z2ITSchedule.h */,
 				EAF8867C0B61740300373CEF /* Z2ITSchedule.m */,
+				EA93F8170C9C4A6E004788CF /* RSRecording.h */,
+				EA93F8180C9C4A6E004788CF /* RSRecording.m */,
 			);
 			name = "Data & XML Classes";
 			sourceTree = "<group>";
@@ -686,9 +688,6 @@
 				EA0888250B86B16D00809664 /* TV-Y7.tif in Resources */,
 				EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */,
 				EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */,
-				EA20AE0E0C23589700A9BDBD /* recsched.syncschema in Resources */,
-				EA20AE290C23608C00A9BDBD /* ClientDescription_Server.plist in Resources */,
-				EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */,
 				EA3B40570C8C7AEE0042C793 /* closebox.png in Resources */,
 				EA3B40580C8C7AEE0042C793 /* closebox_pressed.png in Resources */,
 				EA93F3990C922E53004788CF /* iOnTV.icns in Resources */,
@@ -699,8 +698,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				EAEC099D0C27496600C40D5A /* recsched.syncschema in Resources */,
-				EAEC09BC0C274A7700C40D5A /* ClientDescription_Server.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -748,6 +745,7 @@
 				EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */,
 				EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */,
 				EA3B40500C8C79470042C793 /* ScheduleDetailsPopupView.m in Sources */,
+				EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -788,6 +786,7 @@
 				EA289D170C720FCF00D2EE7B /* HDHomeRunMO.m in Sources */,
 				EA4B9FC20C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */,
 				EA4BA1190C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */,
+				EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1078,8 +1077,9 @@
 			children = (
 				770B37EC0679A11B001EADE2 /* recsched_DataModel.xcdatamodel */,
 				EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */,
+				EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */,
 			);
-			currentVersion = EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */;
+			currentVersion = EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */;
 			path = recsched_DataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
