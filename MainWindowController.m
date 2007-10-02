@@ -239,6 +239,28 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     }
 }
 
+#pragma mark Split View Delegate Methods
+
+// This makes it possible to drag the first divider around by the dragView.
+- (unsigned int)splitView:(RBSplitView*)sender dividerForPoint:(NSPoint)point inSubview:(RBSplitSubview*)subview 
+{
+	if (sender==mTopLevelSplitView) 
+        {
+            // The drag thumb rect is the right most 16 pixels of header view
+            NSRect thumbRect = [[mViewSelectionTableView headerView] bounds];
+            thumbRect.origin.x  = thumbRect.origin.x + thumbRect.size.width - 15;
+            thumbRect.size.width = 15;
+            NSPoint ptInView = [[mViewSelectionTableView headerView] convertPoint:point fromView:sender];
+            
+            if ([[mViewSelectionTableView headerView] mouse:ptInView inRect:thumbRect])
+            {
+                    return 0;	// [firstSplit position], which we assume to be zero
+            }
+        }
+        return NSNotFound;
+}
+
+
 #pragma mark View Selection Table Delegate Methods
 
 - (float) heightFor:(NSTableView *)tableView row:(int)row {
