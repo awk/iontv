@@ -207,11 +207,62 @@
   return schedules;
 }
 
-- (void)addSchedule:(Z2ITSchedule*)value
+- (BOOL)addSchedule:(Z2ITSchedule*)value
 {
+  // The station might already have something scheduled in the same time or this is a replacement for
+  // an existing program on the station. We need to search through the schedules and remove any schedule
+  // that conflicts with this one.
+  NSManagedObjectContext *moc = [self managedObjectContext];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:moc];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+  
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"station == %@ AND (((%@ >= time) AND (%@ < endTime)) OR ((%@ > time) AND (%@ <= endTime)))",
+	self, [value time], [value time], [value endTime], [value endTime]];
+  [request setPredicate:predicate];
+  
+  NSError *error = nil;
+  NSArray *array;
+  @try {
+	array = [moc executeFetchRequest:request error:&error];
+  }
+  @catch (NSException * e) {
+	  NSLog(@"addSchedule exception occurred finding overlapping schedules %@", e);
+  }
+  @finally {
+	  if (array == nil)
+	  {
+		NSLog(@"addSchedule - error executing request %@", request);
+	  }
+  }
+
+  if ([array count] > 0)
+  {
+	// There are duplicate schedules on this channel - drop them
+	int i = 0;
+	for (i=0; i < [array count]; i++)
+	{
+		Z2ITSchedule *aSchedule = [array objectAtIndex:i];
+		if ([aSchedule program] == [value program])
+		{
+			// Program's for both the new and existing schedule are the same - this might be a complete duplicate
+			if (([[aSchedule time] compare:[value time]] == NSOrderedSame) && ([[aSchedule endTime] compare:[value endTime]] == NSOrderedSame))
+			{
+				// Duplicate schedule - we might want to update the other schedule details (in case they've changed)
+				// but for now we'll just ignore the new one
+				return NO;
+			}
+		}
+
+		NSLog(@"Dropping overlapping schedule %@ overlaps with %@ on station %@", aSchedule, value, self);
+		[moc deleteObject:aSchedule];
+	}
+  }
+
   NSMutableSet *schedules = [self mutableSetValueForKey:@"schedules"];
   [value setStation:self];
   [schedules addObject:value];
+  return YES;
 }
 
 - (NSSet*)hdhrStations
