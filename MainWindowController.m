@@ -83,9 +83,14 @@
   [mParsingProgressIndicator setHidden:YES];
   [mParsingProgressIndicator setIndeterminate:NO];
   [mParsingProgressInfoField setHidden:YES];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath", self, @"reportProgressTo", nil];
-  [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:callData];
-  [callData release];
+  if (xtvd != nil)
+  {
+    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath", self, @"reportProgressTo", nil];
+    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:callData];
+    [callData release];
+  }
+  else
+    [mGetScheduleButton setEnabled:YES];
 }
 
 - (void) setParsingInfoString:(NSString*)inInfoString
