@@ -1,0 +1,23 @@
+{
+    IBClasses = (
+        {
+            CLASS = DiscreteDurationSlider; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mDurationField = NSTextField; }; 
+            SUPERCLASS = NSSlider; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {durationSliderChanged = id; showPanel = id; }; 
+            CLASS = Preferences; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                mDurationSlider = DiscreteDurationSlider; 
+                mDurationTextField = NSTextField; 
+                mPanel = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
