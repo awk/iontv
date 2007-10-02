@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class Z2ITSchedule;
+@class ScheduleView;
 
 @interface MainWindowController : NSWindowController {
   IBOutlet NSButton *mGetScheduleButton;
@@ -15,7 +17,10 @@
   IBOutlet NSTextField *mParsingProgressInfoField;
   IBOutlet NSSplitView *mSplitView;
   IBOutlet NSView *mDetailView;
-  IBOutlet NSView *mScheduleView;
+  IBOutlet NSView *mScheduleContainerView;
+  IBOutlet ScheduleView *mScheduleView;
+  IBOutlet NSObjectController *mCurrentSchedule;
+  float mDetailViewMinHeight;
 }
 
 - (IBAction) getScheduleAction:(id)sender;
@@ -24,4 +29,6 @@
 - (void) setParsingInfoString:(NSString*)inInfoString;
 - (void) setParsingProgressMaxValue:(double)inTotal;
 - (void) setParsingProgressDoubleValue:(double)inValue;
+
+- (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule;
 @end

@@ -10,7 +10,7 @@
 
 @class Z2ITLineup;
 
-@interface ScheduleGridView : NSView {
+@interface ScheduleGridView : NSControl {
   NSMutableArray *mStationsInViewArray;
 //  NSMutableArray *mCellsInViewArray;
   NSArray *mSortedStationsArray;

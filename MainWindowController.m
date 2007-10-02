@@ -7,6 +7,7 @@
 //
 
 #import "MainWindowController.h"
+#import "ScheduleView.h"
 #import "tvDataDelivery.h"
 #import "XTVDParser.h"
 #import "Preferences.h"
@@ -15,17 +16,20 @@
 
 - (void) awakeFromNib
 {
+  mDetailViewMinHeight = [mDetailView frame].size.height;
   [mSplitView addSubview:mDetailView];
-  [mSplitView addSubview:mScheduleView];
+  [mSplitView addSubview:mScheduleContainerView];
   [mSplitView setIsPaneSplitter:NO];
   [mSplitView setDelegate:self];
+  
+  [mCurrentSchedule setContent:nil];
 }
 
 #pragma mark Splitview delegate methods
 
 - (float)splitView:(NSSplitView *)sender constrainMaxCoordinate:(float)proposedMax ofSubviewAt:(int)offset
 {
-  return proposedMax < 100.0f ? proposedMax : 100.0f;
+  return proposedMax < mDetailViewMinHeight ? proposedMax : mDetailViewMinHeight;
 }
 
 #pragma mark Action and Callback Methods
@@ -135,5 +139,15 @@
   [mParsingProgressIndicator setHidden:YES];
   [mParsingProgressInfoField setHidden:YES];
   [mGetScheduleButton setEnabled:YES];
+
+  // Update the schedule grid
+  [mScheduleView sortStationsArray];
+  [mScheduleView updateStationsScroller];
 }
+
+- (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule
+{
+  [mCurrentSchedule setContent:inSchedule];
+}
+
 @end
