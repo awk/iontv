@@ -11,6 +11,7 @@
 #import "Z2ITStation.h"
 #import "recsched_AppDelegate.h"
 #import "CoreData_Macros.h"
+#import "RSColorDictionary.h"
 
 @implementation Z2ITProgram
 
@@ -219,6 +220,19 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
     }
   }
   [subPool release];
+  
+  // Update the genre if this is a Movie (program ID starts with 'MV')
+  if ([self isMovie])
+  {
+	// Program is a Movie - set the genre to have Movie, Relevance 0
+	Z2ITGenre *aGenre = [Z2ITGenre fetchGenreWithClassName:@"Movie" andRelevance:[NSNumber numberWithInt:0] inManagedObjectContext:[self managedObjectContext]];
+	if (!aGenre)
+	{
+		aGenre = [Z2ITGenre createGenreWithClassName:@"Movie" andRelevance:[NSNumber numberWithInt:0] inManagedObjectContext:[self managedObjectContext]];
+	}
+	[aGenre addProgram:self];
+	[self addGenre:aGenre];
+  }
 }
 
 - (void) addProductionCrewWithXMLElement:(NSXMLElement *)inXMLElement
@@ -265,26 +279,77 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   nodes = [inXMLElement nodesForXPath:@"./genre" error:&err];
   int i=0;
   int genreCount = [nodes count];
+  NSDictionary *colorDictionary = [RSColorDictionary colorDictionaryNamed:@"Default"];
   
   [self clearGenres];       // Clear the current genres - we're going to replace them with the contents of the XML
+  
+    // Update the genre if this is a Movie (program ID starts with 'MV')
+  if ([self isMovie])
+  {
+	// Program is a Movie - set the genre to have Movie, Relevance 0
+	Z2ITGenre *aGenre = [Z2ITGenre fetchGenreWithClassName:@"Movie" andRelevance:[NSNumber numberWithInt:0] inManagedObjectContext:[self managedObjectContext]];
+	if (!aGenre)
+	{
+		aGenre = [Z2ITGenre createGenreWithClassName:@"Movie" andRelevance:[NSNumber numberWithInt:0] inManagedObjectContext:[self managedObjectContext]];
+	}
+	if (![aGenre valueForKeyPath:@"genreClass.color"])
+	{
+		NSColor *aColor = [colorDictionary valueForKey:@"Movie"];
+		if (aColor)
+			[aGenre setValue:[NSArchiver archivedDataWithRootObject:aColor] forKeyPath:@"genreClass.color"];
+	}
+	[aGenre addProgram:self];
+	[self addGenre:aGenre];
+  }
+
   for (i=0; i < genreCount; i++)
   {
       NSXMLElement *memberElement = [nodes objectAtIndex:i];
-      Z2ITGenre *aGenre = [NSEntityDescription insertNewObjectForEntityForName:@"Genre"
-                  inManagedObjectContext:[self managedObjectContext]];
-
+	  NSNumber *relevanceNumber = nil;
+	  NSString *genreClassString = nil;
+	  
       NSArray *memberNodes;
       memberNodes = [memberElement nodesForXPath:@"./class" error:&err];
       if ([memberNodes count] == 1)
       {
-        [aGenre setGenreClassName:[[memberNodes objectAtIndex:0] stringValue]];
+		  genreClassString = [[memberNodes objectAtIndex:0] stringValue];
       }
       memberNodes = [memberElement nodesForXPath:@"./relevance" error:&err];
       if ([memberNodes count] == 1)
       {
-        [aGenre setRelevance:[NSNumber numberWithInt:[[[memberNodes objectAtIndex:0] stringValue] intValue]]];
+		relevanceNumber = [NSNumber numberWithInt:[[[memberNodes objectAtIndex:0] stringValue] intValue]];
       }
-      [self addGenre:aGenre];
+
+	  // If this program is a Movie then we've already added a Genre
+	  // of 'Movie' with a relevance of zero, so all the other genre relevance values need to be 'bumped' by one.
+	  if ([self isMovie])
+	  {
+		int newRelevance = [relevanceNumber intValue] + 1;
+		relevanceNumber = [NSNumber numberWithInt:newRelevance];
+	  }
+	  
+	  if ([relevanceNumber intValue] >= 6)
+	  {
+		NSLog(@"addGenreWithXMLElement - genre relevance too great (%@)", relevanceNumber);
+	  }
+	  if (genreClassString && relevanceNumber && ([relevanceNumber intValue] <= 6))
+	  {
+		// Look for a genre with this relevance number and genreClass
+		Z2ITGenre *aGenre = [Z2ITGenre fetchGenreWithClassName:genreClassString andRelevance:relevanceNumber inManagedObjectContext:[self managedObjectContext]];
+		if (!aGenre)
+		{
+			aGenre = [Z2ITGenre createGenreWithClassName:genreClassString andRelevance:relevanceNumber inManagedObjectContext:[self managedObjectContext]];
+		}
+		if (![aGenre valueForKeyPath:@"genreClass.color"])
+		{
+			NSColor *aColor = [colorDictionary valueForKey:genreClassString];
+			if (aColor)
+				[aGenre setValue:[NSArchiver archivedDataWithRootObject:aColor] forKeyPath:@"genreClass.color"];
+		}
+		// Add it to the program
+		[aGenre addProgram:self];
+		[self addGenre:aGenre];
+	  }
   }
 }
 
@@ -358,6 +423,15 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   {
     NSLog(@"addScheduleWithXMLElement - cannot find station with ID %@", stationID);
   }  
+}
+
+- (BOOL) isMovie
+{
+	NSRange mvRange = [[self programID] rangeOfString:@"MV"];
+	if ((mvRange.location == 0) && (mvRange.length == 2))
+		return YES;
+	else
+		return NO;
 }
 
 #pragma mark
@@ -593,13 +667,8 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 
 - (void)clearGenres
 {
+	// Clearing genres just removes them from our list
   NSMutableSet *genresSet = [self mutableSetValueForKey:@"genres"];
-  NSEnumerator *genreEnumerator = [genresSet objectEnumerator];
-  Z2ITGenre *aGenre;
-  while (aGenre = [genreEnumerator nextObject])
-  {
-    [[self managedObjectContext] deleteObject:aGenre];
-  }
   [genresSet removeAllObjects];
 }
 
@@ -607,6 +676,33 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 {
   NSMutableSet *genresSet = [self mutableSetValueForKey:@"genres"];
   [genresSet addObject:value];
+}
+
+- (Z2ITGenre*) genreWithRelevance:(int)inRelevance
+{
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Genre" inManagedObjectContext:[self managedObjectContext]];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+   
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(programs CONTAINS %@) AND (relevance == %@)", self, [NSNumber numberWithInt:inRelevance]];
+  [request setPredicate:predicate];
+   
+  NSError *error = nil;
+  NSArray *array = [[self managedObjectContext] executeFetchRequest:request error:&error];
+  if (array == nil)
+  {
+      NSLog(@"Error executing fetch request to find genre with relevance %d", inRelevance);
+      return nil;
+  }
+  
+  if ([array count] == 0)
+  {
+      return nil;
+  }
+  else
+  {
+      return [array objectAtIndex:0];
+  }
 }
 
 - (NSSet *)crewMembers
@@ -737,18 +833,61 @@ COREDATA_MUTATOR(NSString*,@"givenname")
 
 @implementation Z2ITGenre
 
-// Fetch the GenreClass Object with the given string from the Managed Object Context
-+ (NSManagedObject *) fetchGenreClassWithName:(NSString*)inGenreClassNameString inManagedObjectContext:(NSManagedObjectContext *)inMOC
++ (Z2ITGenre *) createGenreWithClassName:(NSString*)inGenreClassNameString andRelevance:(NSNumber*)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
-  NSManagedObject *aGenreClass = nil;
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"GenreClass" inManagedObjectContext:inMOC];
+	Z2ITGenre* aGenre;
+	
+	// See if we can find a genreClass
+	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"GenreClass" inManagedObjectContext:inMOC];
+	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+	[request setEntity:entityDescription];
+
+	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", inGenreClassNameString];
+	[request setPredicate:predicate];
+
+	NSError *error = nil;
+	NSArray *array = [inMOC executeFetchRequest:request error:&error];
+	if (array == nil)
+	{
+		NSLog(@"Error executing fetch request to find genreClass %@ error = %@", inGenreClassNameString, *error);
+		return nil;
+	}
+	NSManagedObject *aGenreClass = nil;
+	
+	if ([array count] == 0)
+	{
+		aGenreClass = [NSEntityDescription insertNewObjectForEntityForName:@"GenreClass" inManagedObjectContext:inMOC];
+		[aGenreClass setValue:inGenreClassNameString forKey:@"name"];
+	}
+	else if ([array count] == 1)
+	{
+		aGenreClass = [array objectAtIndex:0];
+	}
+	else
+	{
+		NSLog(@"Warning - fetching genreClass found %d entities with name %@", [array count], inGenreClassNameString);
+		aGenreClass = [array objectAtIndex:0];
+	}
+
+	// Create a genre with the appropriate relevance
+	aGenre = [NSEntityDescription insertNewObjectForEntityForName:@"Genre" inManagedObjectContext:inMOC];
+	[aGenre setValue:aGenreClass forKey:@"genreClass"];
+	[aGenre setRelevance:inRelevance];
+	return aGenre;
+}
+
+// Fetch the GenreClass Object with the given string from the Managed Object Context
++ (Z2ITGenre *) fetchGenreWithClassName:(NSString*)inGenreClassNameString andRelevance:(NSNumber*)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC
+{
+  Z2ITGenre *aGenre = nil;
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Genre" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", inGenreClassNameString];
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"genreClass.name == %@ AND relevance == %@", inGenreClassNameString, inRelevance];
   [request setPredicate:predicate];
    
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:YES];
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"genreClass.name" ascending:YES];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
   [sortDescriptor release];
    
@@ -756,7 +895,7 @@ COREDATA_MUTATOR(NSString*,@"givenname")
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
   if (array == nil)
   {
-      NSLog(@"Error executing fetch request to find genre class name %@", inGenreClassNameString);
+      NSLog(@"Error executing fetch request to find genre class name %@ with relevance %@", inGenreClassNameString, inRelevance);
       return nil;
   }
   if ([array count] == 0)
@@ -765,36 +904,14 @@ COREDATA_MUTATOR(NSString*,@"givenname")
   }
   else
   {
-    aGenreClass = [array objectAtIndex:0];
+    aGenre = [array objectAtIndex:0];
     if ([array count] > 1)
-      NSLog(@"fetchGenreClassWithName - multiple (%d) genre classes with name %@", [array count], inGenreClassNameString);
-    return aGenreClass;
+      NSLog(@"fetchGenreClassWithName - multiple (%d) genre classes with name %@ and relevance", [array count], inGenreClassNameString, inRelevance);
+    return aGenre;
   }
 }
 
-// Accessor and mutator for the Role attribute
-- (NSString *)genreClassName
-{
-  return [self valueForKeyPath:@"genreClass.name"];
-}
-
-- (void)setGenreClassName:(NSString *)value
-{
-  NSManagedObject* aGenreClass = [Z2ITGenre fetchGenreClassWithName:value inManagedObjectContext:[self managedObjectContext]];
-  if (!aGenreClass)
-  {
-    aGenreClass = [NSEntityDescription
-        insertNewObjectForEntityForName:@"GenreClass"
-        inManagedObjectContext:[self managedObjectContext]];
-    [aGenreClass setValue:value forKey:@"name"];
-  }
-
-  [self willChangeValueForKey: @"genreClass"]; 
-  [self setPrimitiveValue:aGenreClass forKey: @"genreClass"]; 
-  [self didChangeValueForKey: @"genreClass"]; 
-}
-
-// Accessor and mutator for the surname attribute
+// Accessor and mutator for the relevance attribute
 - (NSNumber *)relevance
 {
   COREDATA_ACCESSOR(NSNumber*, @"relevance")
@@ -803,6 +920,28 @@ COREDATA_MUTATOR(NSString*,@"givenname")
 - (void)setRelevance:(NSNumber *)value
 {
 COREDATA_MUTATOR(NSNumber*,@"relevance")
+}
+
+- (NSManagedObject *)genreClass
+{
+  COREDATA_ACCESSOR(NSManagedObject*, @"genreClass")
+}
+
+- (void)setGenreClass:(NSManagedObject *)value
+{
+COREDATA_MUTATOR(NSManagedObject*,@"genreClass")
+}
+
+- (void)addProgram:(Z2ITProgram *)value
+{
+  NSMutableSet *programsSet = [self mutableSetValueForKey:@"programs"];
+  [programsSet addObject:value];
+}
+
+- (NSNumber *) numberOfPrograms
+{
+	NSLog(@"numberOfPrograms %d for Genre %@", [[self mutableSetValueForKey:@"programs"] count], [self valueForKeyPath:@"genreClass.name"]);
+	return [NSNumber numberWithInt:[[self mutableSetValueForKey:@"programs"] count]];
 }
 
 @end

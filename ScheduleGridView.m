@@ -6,6 +6,8 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+#import "AKColorExtensions.h"
+#import "CTGradient.h"
 #import "MainWindowController.h"
 #import "ScheduleViewController.h"
 #import "ScheduleGridView.h"
@@ -14,11 +16,6 @@
 #import "Z2ITStation.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
-
-typedef int ScheduleTruncationFlags;
-const int ScheduleTruncationNone = 0;
-const int ScheduleTruncationBeginning = 1;
-const int ScheduleTruncationEnd = 1 << 1;
 
 @interface ScheduleGridLine : NSObject
 {
@@ -42,8 +39,6 @@ const int ScheduleTruncationEnd = 1 << 1;
 @interface ScheduleCell : NSTextFieldCell
 {
 }
-
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView truncateFlags:(ScheduleTruncationFlags)truncationFlags;
 
 @end
 
@@ -92,25 +87,52 @@ const int ScheduleTruncationEnd = 1 << 1;
   return YES;
 }
 
-- (void)drawRect:(NSRect)rect {
-    // Drawing code here.
+- (BOOL) isFlipped
+{
+	// We need to be flipped in order for the layout manager to draw text correctly
+	return YES;
+}
 
+- (void)drawRect:(NSRect)rect 
+{
     NSRect cellFrameRect;
     cellFrameRect.origin.x = 0;
-    cellFrameRect.origin.y = [self bounds].size.height;
+    cellFrameRect.origin.y = ([mStationsInViewArray count]-1) * kScheduleStationColumnViewCellHeight;
     cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
     cellFrameRect.size.width = [self bounds].size.width;
 
+	// We draw from the bottom up so that the shadow below the selected cell is not 'covered' by the 
+	// cell contents drawn beneath it.
     int i=0;
-    for (i=0; i < [mStationsInViewArray count]; i++)
+    for (i = [mStationsInViewArray count]-1; i >= 0; i--)
     {
       ScheduleGridLine *aGridLine = [mStationsInViewArray objectAtIndex:i];
       if (aGridLine)
       {
-        cellFrameRect.origin.y -= kScheduleStationColumnViewCellHeight;
+		[[NSColor colorWithDeviceRed:0.85 green:0.85 blue:0.85 alpha:1.0] setFill];
+		NSRectFill(cellFrameRect);
+
         [aGridLine drawCellsWithFrame:cellFrameRect inView:self];
+
+        cellFrameRect.origin.y -= kScheduleStationColumnViewCellHeight;
       }
     }
+	
+    // Draw a shadow down the left edge to look as though it was 'cast' by the station column
+	if ([mStationsInViewArray count] > 0)
+	{
+		[NSGraphicsContext saveGraphicsState];
+		NSShadow *aShadow = [[NSShadow alloc] init];
+		[aShadow setShadowOffset:NSMakeSize(0.0, 0.0)];
+		[aShadow setShadowBlurRadius:5.0f];
+		[aShadow setShadowColor:[NSColor blackColor]];
+		[aShadow set];
+
+		[[NSColor blackColor] set];
+		[NSBezierPath strokeLineFromPoint:NSMakePoint([self bounds].origin.x-0.5, [self bounds].origin.y) toPoint:NSMakePoint([self bounds].origin.x-0.5, [self bounds].origin.y + [self bounds].size.height)];
+		[aShadow release];
+		[NSGraphicsContext restoreGraphicsState];
+	}
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -119,15 +141,16 @@ const int ScheduleTruncationEnd = 1 << 1;
   NSPoint localPoint = [self convertPoint:eventLocation fromView:nil];
   NSRect cellFrameRect;
   cellFrameRect.origin.x = 0;
-  cellFrameRect.origin.y = [self bounds].size.height;
+  cellFrameRect.origin.y = 0;
   cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
   cellFrameRect.size.width = [self bounds].size.width;
   
   if ([self acceptsFirstResponder])
     [[self window] makeFirstResponder:self];
   
-  int scheduleGridLineIndex = ([self frame].size.height - localPoint.y) / kScheduleStationColumnViewCellHeight;
-  [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] mouseDown:theEvent withFrame:cellFrameRect];
+  int scheduleGridLineIndex = localPoint.y / kScheduleStationColumnViewCellHeight;
+  if (scheduleGridLineIndex < [mStationsInViewArray count])
+	[[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] mouseDown:theEvent withFrame:cellFrameRect];
 }
 
 - (NSMenu*) menuForEvent:(NSEvent*) theEvent
@@ -146,8 +169,10 @@ const int ScheduleTruncationEnd = 1 << 1;
   [mStationsInViewArray removeAllObjects];
   
   int maxStationIndex = [mSortedStationsArray count];
-  if (maxStationIndex > (mStartStationIndex + [self frame].size.height/kScheduleStationColumnViewCellHeight))
-    maxStationIndex = (mStartStationIndex + [self frame].size.height/kScheduleStationColumnViewCellHeight);
+  
+  // We add one here to accomodate the potentially 'partial' display of the station at the bottom of the scroll area
+  if (maxStationIndex > (mStartStationIndex + [self frame].size.height/kScheduleStationColumnViewCellHeight)+1)
+    maxStationIndex = (mStartStationIndex + [self frame].size.height/kScheduleStationColumnViewCellHeight)+1;
   for (i=mStartStationIndex; i < maxStationIndex; i++)
   {
     ScheduleGridLine *aGridLine = [[ScheduleGridLine alloc] initWithGridView:self];
@@ -319,25 +344,15 @@ const int ScheduleTruncationEnd = 1 << 1;
   return theCell;
 }
 
-- (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute truncateFlags:(ScheduleTruncationFlags*)outTruncationFlags
+- (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute
 {
   NSRect cellFrameRect;
   NSTimeInterval durationRemaining;
   NSTimeInterval offsetFromStart = [[inSchedule time] timeIntervalSinceDate:[NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime]];
-  if (outTruncationFlags)
-	*outTruncationFlags = ScheduleTruncationNone;
-  if (offsetFromStart > 0)
-  {
-    durationRemaining = [[inSchedule endTime] timeIntervalSinceDate:[inSchedule time]];
-    cellFrameRect.origin.x = (offsetFromStart / 60.0) * pixelsPerMinute;
-  }
-  else
-  {
-	if (outTruncationFlags)
-		*outTruncationFlags |= ScheduleTruncationBeginning;
-    durationRemaining = [[inSchedule endTime] timeIntervalSinceDate:[NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime]];
-    cellFrameRect.origin.x = 0;
-  }
+
+	durationRemaining = [[inSchedule endTime] timeIntervalSinceDate:[inSchedule time]];
+	cellFrameRect.origin.x = (offsetFromStart / 60.0) * pixelsPerMinute;
+
   float programRunTime = durationRemaining / 60.0;
   cellFrameRect.size.width = programRunTime * pixelsPerMinute;
   return cellFrameRect;
@@ -358,13 +373,12 @@ const int ScheduleTruncationEnd = 1 << 1;
       Z2ITSchedule *aSchedule = [mSchedulesInLineArray objectAtIndex:i];
       if (aSchedule)
       {
-		ScheduleTruncationFlags scheduleTruncation;
-        cellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute truncateFlags:&scheduleTruncation];
+        cellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
         cellFrameRect.origin.y = inFrame.origin.y;
         cellFrameRect.size.height = inFrame.size.height;
         
         // Draw the cell
-        [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView truncateFlags:scheduleTruncation];
+        [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView];
       }
     }
 }
@@ -386,7 +400,7 @@ const int ScheduleTruncationEnd = 1 << 1;
       aSchedule = [mSchedulesInLineArray objectAtIndex:i];
       if (aSchedule)
       {
-        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute truncateFlags:nil];
+        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
         aCellFrameRect.origin.y = 0;
         aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
         // We always make the click to be in the middle of the cell vertically
@@ -409,40 +423,129 @@ const int ScheduleTruncationEnd = 1 << 1;
 
 @implementation ScheduleCell
 
-- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView truncateFlags:(ScheduleTruncationFlags)truncationFlags
+- (void) drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
+	if (cellFrame.origin.x < 0)
+	{
+		// Make sure the frame for the text is visible (but that the right end stays put)
+		cellFrame.size.width += (cellFrame.origin.x-2.0);
+		cellFrame.origin.x = 2;
+	}
+	
+	if (cellFrame.size.width < 20)
+		return;		// No point trying to draw in something so small
+		
+	NSRect textRect = NSInsetRect(cellFrame, 4, 2);
+	
+	NSTextStorage *textStorage = [[[NSTextStorage alloc] initWithString:[self stringValue]] autorelease];
+	NSTextContainer *textContainer = [[[NSTextContainer alloc] initWithContainerSize: textRect.size] autorelease];
+	NSLayoutManager *layoutManager = [[[NSLayoutManager alloc] init] autorelease];
+
+	[layoutManager setTypesetterBehavior:NSTypesetterBehavior_10_2_WithCompatibility];
+	[layoutManager addTextContainer:textContainer];
+	[textStorage addLayoutManager:layoutManager];
+
+	[textStorage addAttribute:NSFontAttributeName value:[self font] range:NSMakeRange(0, [textStorage length])];
+	[textContainer setLineFragmentPadding:0.0];
+
+	NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
+	[controlView lockFocus];
+	if ([self isHighlighted])
+	{
+		[textStorage setForegroundColor:[NSColor whiteColor]];
+	}
+	else
+	{
+		[textStorage setForegroundColor:[NSColor blackColor]];
+	}
+	
+	[layoutManager drawGlyphsForGlyphRange: glyphRange atPoint: textRect.origin];
+	[controlView unlockFocus];
+}
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+	NSRect insetCellFrame = NSInsetRect(cellFrame, 2.0, 1.5);
+	
 	// Curved corners radius
-	float radius = 7.0;
+	float radius = 8.0;
 	NSBezierPath *framePath = nil;
 	
-	if (truncationFlags & ScheduleTruncationBeginning)
-	{
-	  framePath = [NSBezierPath bezierPath];      // Clamp radius to be no larger than half the rect's width or height.
-      float clampedRadius = MIN(radius, 0.5 * MIN(cellFrame.size.width, cellFrame.size.height));
-
-      NSPoint topLeft = NSMakePoint(NSMinX(cellFrame), NSMaxY(cellFrame));
-      NSPoint topRight = NSMakePoint(NSMaxX(cellFrame), NSMaxY(cellFrame));
-      NSPoint bottomRight = NSMakePoint(NSMaxX(cellFrame), NSMinY(cellFrame));
-
-      [framePath moveToPoint:cellFrame.origin];
-      [framePath appendBezierPathWithArcFromPoint:cellFrame.origin toPoint:bottomRight radius:clampedRadius];
-      [framePath appendBezierPathWithArcFromPoint:bottomRight toPoint:topRight    radius:clampedRadius];
-      [framePath appendBezierPathWithArcFromPoint:topRight    toPoint:topLeft     radius:clampedRadius];	
-	  [framePath lineToPoint:topLeft];	
-	}
-
-	if (truncationFlags == ScheduleTruncationNone)
-	{
-		framePath = [NSBezierPath bezierPathWithRoundedRect:cellFrame xRadius:radius yRadius:radius];
-	}
+	framePath = [NSBezierPath bezierPathWithRoundedRect:insetCellFrame xRadius:radius yRadius:radius];
 	
 	if (framePath)
 	{
-		[[NSColor blackColor] set];
-		[framePath stroke];
+		// Fill the frame with our genre color
+		NSColor *genreColor = nil;
+		if ([self representedObject])
+		{
+			NSData *genreColorData = [[[[self representedObject] program] genreWithRelevance:0] valueForKeyPath:@"genreClass.color"];
+			if (genreColorData)
+				genreColor = [NSUnarchiver unarchiveObjectWithData:genreColorData];
+			else
+			{
+				genreColor = [NSColor colorWithDeviceRed:0.95 green:0.95 blue:0.95 alpha:1.0];
+			}
+		}
+
+		if ([self isHighlighted])
+		{
+			NSColor *bottomColor;
+			NSColor *topColor;
+			if (![[controlView window] isKeyWindow])
+			{
+				bottomColor = [NSColor colorWithDeviceRed:138.0/255.0 green:138.0/255.0 blue:138.0/255.0 alpha:1.0];
+				topColor = [NSColor colorWithDeviceRed:180.0/255.0 green:180.0/255.0 blue:180.0/255.0 alpha:1.0];
+			}
+			else if ([[controlView window] firstResponder] == controlView)
+			{
+				bottomColor = [NSColor colorWithDeviceRed:22.0/255.0 green:83.0/255.0 blue:170.0/255.0 alpha:1.0];
+				topColor = [NSColor colorWithDeviceRed:92.0/255.0 green:147.0/255.0 blue:214.0/255.0 alpha:1.0];
+			}
+			else
+			{
+				bottomColor = [NSColor colorWithDeviceRed:111.0/255.0 green:130.0/255.0 blue:170.0/255.0 alpha:1.0];
+				topColor = [NSColor colorWithDeviceRed:162.0/255.0 green:177.0/255.0 blue:208.0/255.0 alpha:1.0];
+			}
+			
+	
+			[NSGraphicsContext saveGraphicsState];
+			NSShadow *aShadow = [[NSShadow alloc] init];
+			[aShadow setShadowOffset:NSMakeSize(2.0, -2.0)];
+			[aShadow setShadowBlurRadius:5.0f];
+			[aShadow setShadowColor:[NSColor blackColor]];
+			[aShadow set];
+			[bottomColor setFill];
+			[framePath fill];
+			[aShadow release];
+			[NSGraphicsContext restoreGraphicsState];
+
+  			CTGradient *aGradient = [CTGradient gradientWithBeginningColor:topColor endingColor:bottomColor];
+			[aGradient fillBezierPath:framePath angle:90.0];
+			
+		}
+		else
+		{
+			NSColor *bottomColor = [genreColor darkerColorBy:0.15];
+			NSColor *topColor = [genreColor lighterColorBy:0.15];
+			CTGradient *aGradient = [CTGradient gradientWithBeginningColor:topColor endingColor:bottomColor];
+			[aGradient fillBezierPath:framePath angle:90.0];
+			
+			// Set the base genre color for the outline
+			[[genreColor darkerColorBy:0.40] set];
+			[framePath stroke];
+		}
+
+//		if ([self isHighlighted])
+//		{
+//			[[self highlightColorWithFrame:cellFrame inView:controlView] set];
+//			[framePath setLineWidth:3];
+//  		[framePath stroke];
+//		}
+
 	}
 	
-	[super drawInteriorWithFrame:cellFrame inView:controlView];
+	[self drawInteriorWithFrame:insetCellFrame inView:controlView];
 }
 
 - (NSColor *)highlightColorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView

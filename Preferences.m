@@ -6,6 +6,7 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+#import "AKColorCell.h"
 #import "Preferences.h"
 #import "tvDataDelivery.h"
 #import "XTVDParser.h"
@@ -14,6 +15,7 @@
 #import "HDHomeRunTuner.h"
 #import "RecSchedNotifications.h"
 #import "recsched_AppDelegate.h"
+#import "RSColorDictionary.h"
 #import <Security/Security.h>
 
 const float kDurationSliderMinValue = 1.0;
@@ -28,6 +30,7 @@ const int k336HoursTick = 17;   // 2 weeks
 NSString *kZap2ItPreferencesToolbarIdentifier = @"Zap2It";
 NSString *kTunersPreferencesToolbarIdentifier = @"Tuners";
 NSString *kChannelsPreferencesToolbarIdentifier = @"Channels";
+NSString *kColorsPreferencesToolbarIdentifier = @"Colors";
 NSString *kZap2ItLabsURL = @"http://labs.zap2it.com";
 
 NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";
@@ -198,6 +201,7 @@ static Preferences *sSharedInstance = nil;
     addToolbarItem(mToolbarItems,kZap2ItPreferencesToolbarIdentifier,@"Zap2It",@"Zap2It",@"Zap2It User ID & Schedule",self,@selector(setImage:), nil /* image */,@selector(showZap2ItPrefs:),NULL);
     addToolbarItem(mToolbarItems,kTunersPreferencesToolbarIdentifier,@"Tuner",@"Tuner",@"Tuner Selection",self,@selector(setImage:), nil /* image */,@selector(showTunerPrefs:),NULL);
     addToolbarItem(mToolbarItems,kChannelsPreferencesToolbarIdentifier,@"Channels",@"Channels",@"Customize Channels you recieve",self,@selector(setImage:), nil /* image */,@selector(showChannelPrefs:),NULL);
+    addToolbarItem(mToolbarItems,kColorsPreferencesToolbarIdentifier,@"Colors",@"Colors",@"Colors for program genres",self,@selector(setImage:), nil /* image */,@selector(showColorPrefs:),NULL);
      
     // the toolbar wants to know who is going to handle processing of NSToolbarItems for it.  This controller will.
     [toolbar setDelegate:self];
@@ -227,6 +231,18 @@ static Preferences *sSharedInstance = nil;
     // thread (during parsing) 'our' managed object context may not notify the NSObjectControllers that new data has been added
     // This notification is sent during the end of saving to notify everyone of new content
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateControllers) name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+
+	// Set the sort order for the colors list
+	NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"numberOfPrograms" ascending:NO];
+	[mGenreArrayController setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+	[sortDescriptor release];
+	
+	// Set the custom cell for the colors table
+	AKColorCell *aColorCell = [[[AKColorCell alloc] init] autorelease];	// create the special color well cell
+    [aColorCell setEditable: YES];						// allow user to change the color
+	[aColorCell setTarget: self];						// set colorClick as the method to call
+	[aColorCell setAction: @selector (colorClickAction:)];		// when the color well is clicked on
+	[[[mColorsTable tableColumns] objectAtIndex:1] setDataCell: aColorCell];					// sets the columns cell to the color well cell
 }
 
 - (void)showPanel:(id)sender
@@ -399,6 +415,11 @@ static Preferences *sSharedInstance = nil;
 	[self showPrefsView:mChannelPrefsView];
 }
 
+- (void) showColorPrefs:(id)sender
+{
+	[self showPrefsView:mColorPrefsView];
+}
+
 - (IBAction) okButtonAction:(id)sender
 {
   if (mChannelScanInProgress)
@@ -562,6 +583,24 @@ static Preferences *sSharedInstance = nil;
 	[anOpenPanel beginSheetForDirectory:docPath file:nil types:[NSArray arrayWithObject:@"xml"] modalForWindow:mPanel modalDelegate:self didEndSelector:@selector(importChannelPanelDidEnd: returnCode: contextInfo:) contextInfo:nil];
 } 
 
+- (void) colorClickAction: (id) sender {	// sender is the table view
+	NSColorPanel* panel;				// shared color panel
+
+	panel = [NSColorPanel sharedColorPanel];
+	[panel setTarget: self];			// send the color changed messages to colorChanged
+	[panel setAction: @selector (colorChangedAction:)];
+//	[panel setShowsAlpha: YES];			// per ber to show the opacity slider
+	NSData *colorData = [[[mGenreArrayController selectedObjects] objectAtIndex: 0] valueForKeyPath:@"genreClass.color"];
+	if (colorData)
+		[panel setColor: [NSUnarchiver unarchiveObjectWithData:colorData]];	// set the starting color
+	[panel makeKeyAndOrderFront: self];	// show the panel
+}
+
+- (void) colorChangedAction: (id) sender {	// sender is the NSColorPanel
+
+	[[[mGenreArrayController selectedObjects] objectAtIndex: 0] setValue:[NSArchiver archivedDataWithRootObject:[sender color]] forKeyPath:@"genreClass.color"];
+}
+
 #pragma mark Channel Scan Progress Display Protocol
 
 - (void) incrementChannelScanProgress
@@ -688,6 +727,7 @@ static Preferences *sSharedInstance = nil;
 {
   [mLineupArrayController prepareContent];
   [mStationsArrayController prepareContent];
+  [mGenreArrayController prepareContent];
 }
 
 
@@ -732,19 +772,19 @@ static Preferences *sSharedInstance = nil;
 // set of toolbar items.  It can also be called by the customization palette to display the default toolbar.    
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
+    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
 }
 
 // This method is required of NSToolbar delegates.  It returns an array holding identifiers for all allowed
 // toolbar items in this toolbar.  Any not listed here will not be available in the customization palette.
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
+    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
+    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
 }
 
 @end

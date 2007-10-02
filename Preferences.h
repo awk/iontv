@@ -24,6 +24,7 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
     IBOutlet NSView* mZap2ItPrefsView;
     IBOutlet NSView* mTunerPrefsView;
     IBOutlet NSView* mChannelPrefsView;
+	IBOutlet NSView* mColorPrefsView;
     IBOutlet NSTextField *mZap2ItUsernameField;
     IBOutlet NSTextField *mZap2ItPasswordField;
     IBOutlet NSProgressIndicator *mParsingProgressIndicator;
@@ -33,8 +34,10 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
     IBOutlet NSButton *mScanTunersButton;
     IBOutlet NSProgressIndicator *mChannelScanProgressIndicator;
     IBOutlet NSButton *mScanChannelsButton;
-    
+    IBOutlet NSTableView *mColorsTable;
+	
     IBOutlet NSArrayController *mHDHomeRunTunersArrayController;
+    IBOutlet NSArrayController *mGenreArrayController;
     IBOutlet NSArrayController *mLineupArrayController;
     IBOutlet NSArrayController *mStationsArrayController;           // This is all the station entitiies in the MOC
     IBOutlet NSArrayController *mVisibleStationsArrayController;    // This is the subset of station entities that correspond to the selected HDHR Device/Tuner combo.

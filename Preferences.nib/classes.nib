@@ -61,12 +61,18 @@
 				<string>NSView</string>
 				<key>mChannelScanProgressIndicator</key>
 				<string>NSProgressIndicator</string>
+				<key>mColorPrefsView</key>
+				<string>NSView</string>
+				<key>mColorsTable</key>
+				<string>NSTableView</string>
 				<key>mDurationSlider</key>
 				<string>DiscreteDurationSlider</string>
 				<key>mDurationTextField</key>
 				<string>NSTextField</string>
 				<key>mExportChannelTunerSelectionView</key>
 				<string>NSView</string>
+				<key>mGenreArrayController</key>
+				<string>NSArrayController</string>
 				<key>mHDHomeRunTunersArrayController</key>
 				<string>NSArrayController</string>
 				<key>mLineupArrayController</key>

@@ -31,6 +31,8 @@
 
 - (void) initializeWithXMLElement:(NSXMLElement *)inXMLElement;
 
+- (BOOL) isMovie;
+
 // Accessor and mutator for the Lineup ID attribute
 - (NSString *)programID;
 - (void)setProgramID:(NSString *)value;
@@ -96,6 +98,7 @@
 - (NSSet *)genres;
 - (void)clearGenres;
 - (void)addGenre:(Z2ITGenre *)value;
+- (Z2ITGenre*) genreWithRelevance:(int)inRelevance;
 
 // Accessor and mutator for the crew member relationships
 - (NSSet *)crewMembers;
@@ -126,12 +129,16 @@
 @interface Z2ITGenre : NSManagedObject {
 };
 
-// Accessor and mutator for the Genre Class Name attribute
-- (NSString *)genreClassName;
-- (void)setGenreClassName:(NSString *)value;
++ (Z2ITGenre *) createGenreWithClassName:(NSString*)inGenreClassNameString andRelevance:(NSNumber*)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (Z2ITGenre *) fetchGenreWithClassName:(NSString*)inGenreClassNameString andRelevance:(NSNumber*)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
-// Accessor and mutator for the surname attribute
+// Accessor and mutator for the relevance attribute
 - (NSNumber *)relevance;
 - (void)setRelevance:(NSNumber *)value;
+
+- (NSManagedObject*) genreClass;
+- (void) setGenreClass:(NSManagedObject*)value;
+
+- (void)addProgram:(Z2ITProgram*)value;
 
 @end

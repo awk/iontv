@@ -658,6 +658,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         [self updateProductionCrew:theProductionCrew reportTo:inProgressDisplay inManagedObjectContext:inMOC];
   }
   [subPool release];
+#endif
   
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//genres" error:&err];
@@ -668,7 +669,6 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         [self updateGenres:theGenres reportTo:inProgressDisplay inManagedObjectContext:inMOC];
   }
   [subPool release];
-#endif
   
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//schedules" error:&err];
