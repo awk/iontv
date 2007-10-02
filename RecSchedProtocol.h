@@ -16,8 +16,6 @@ extern NSString *kRecServerConnectionName;
 - (BOOL) addRecordingOfProgram:(NSManagedObject*) aProgram
             withSchedule:(NSManagedObject*)aSchedule;
 
-- (oneway void) performParse:(NSDictionary *)parseInfo;
-
 - (oneway void) quitServer:(id)sender;
 
 @end
