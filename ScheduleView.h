@@ -23,8 +23,7 @@
   CFAbsoluteTime mStartTime;
 }
 
-- (void) goBackwards;
-- (void) goForward;
+- (void) setStartTime:(CFAbsoluteTime) inStartTime;
 - (float) visibleTimeSpan;
 - (float) timePerLineIncrement;
 - (void) updateStationsScroller;

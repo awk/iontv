@@ -15,9 +15,12 @@
   IBOutlet NSButton *mGetScheduleButton;
   IBOutlet NSProgressIndicator *mParsingProgressIndicator;
   IBOutlet NSTextField *mParsingProgressInfoField;
-  IBOutlet NSSplitView *mSplitView;
+  IBOutlet NSSplitView *mScheduleSplitView;
+  IBOutlet NSSplitView *mTopLevelSplitView;
+  IBOutlet NSTableView *mViewSelectionTableView;
   IBOutlet NSView *mDetailView;
   IBOutlet NSView *mScheduleContainerView;
+  IBOutlet NSView *mScheduleSearchView;
   IBOutlet ScheduleView *mScheduleView;
   IBOutlet NSObjectController *mCurrentSchedule;
   float mDetailViewMinHeight;
@@ -30,5 +33,8 @@
 - (void) setParsingProgressMaxValue:(double)inTotal;
 - (void) setParsingProgressDoubleValue:(double)inValue;
 
+- (void) showViewForTableSelection:(int) selectedRow;
+
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule;
+- (Z2ITSchedule*) currentSchedule;
 @end

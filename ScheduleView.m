@@ -180,26 +180,6 @@
       [self stationsScrollerChanged:inScroller];
 }
 
-- (void) goBackwards
-{
-  CFGregorianUnits timeChange;
-  memset(&timeChange, 0, sizeof(timeChange));
-  timeChange.minutes = -30;
-  mStartTime = CFAbsoluteTimeAddGregorianUnits(mStartTime,CFTimeZoneCopyDefault(),timeChange);
-  [mGridView setStartTime:mStartTime];
-  [mHeaderView setStartTime:mStartTime];
-}
-
-- (void) goForward
-{
-  CFGregorianUnits timeChange;
-  memset(&timeChange, 0, sizeof(timeChange));
-  timeChange.minutes = 30;
-  mStartTime = CFAbsoluteTimeAddGregorianUnits(mStartTime,CFTimeZoneCopyDefault(),timeChange);
-  [mGridView setStartTime:mStartTime];
-  [mHeaderView setStartTime:mStartTime];
-}
-
 #pragma mark Station list updating methods
 
 // Compare two stations according to their overall lineup channel numbers (major and minor)

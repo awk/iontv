@@ -12,15 +12,34 @@
 #import "XTVDParser.h"
 #import "Preferences.h"
 
+const float kViewSelectionListMaxWidth = 200.0;
+
 @implementation MainWindowController
 
 - (void) awakeFromNib
 {
+  [mTopLevelSplitView setVertical:YES];
+  [mTopLevelSplitView setDelegate:self];
+  
+  [mViewSelectionTableView selectRow:0 byExtendingSelection:NO];
+  [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
+  
   mDetailViewMinHeight = [mDetailView frame].size.height;
-  [mSplitView addSubview:mDetailView];
-  [mSplitView addSubview:mScheduleContainerView];
-  [mSplitView setIsPaneSplitter:NO];
-  [mSplitView setDelegate:self];
+  NSView *bottomContainerView = [[NSView alloc] initWithFrame:[mScheduleContainerView frame]];
+  [bottomContainerView setAutoresizesSubviews:YES];
+  [bottomContainerView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+  [bottomContainerView addSubview:mScheduleContainerView];
+  [bottomContainerView addSubview:mScheduleSearchView];
+  [mScheduleContainerView setHidden:NO];
+  [mScheduleSearchView setHidden:YES];
+  
+  [mScheduleSplitView addSubview:mDetailView];
+  [mScheduleSplitView addSubview:bottomContainerView];
+  [bottomContainerView release];
+  
+  [mScheduleSplitView setIsPaneSplitter:NO];
+  [mScheduleSplitView setDelegate:self];
+  [mScheduleSplitView adjustSubviews];
   
   [mCurrentSchedule setContent:nil];
 }
@@ -29,7 +48,13 @@
 
 - (float)splitView:(NSSplitView *)sender constrainMaxCoordinate:(float)proposedMax ofSubviewAt:(int)offset
 {
-  return proposedMax < mDetailViewMinHeight ? proposedMax : mDetailViewMinHeight;
+  if (sender == mScheduleSplitView)
+    return proposedMax < mDetailViewMinHeight ? proposedMax : mDetailViewMinHeight;
+  else if (sender == mTopLevelSplitView)
+    return proposedMax < kViewSelectionListMaxWidth ? proposedMax : kViewSelectionListMaxWidth;
+  else
+    return proposedMax;
+    
 }
 
 #pragma mark Action and Callback Methods
@@ -148,6 +173,62 @@
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule
 {
   [mCurrentSchedule setContent:inSchedule];
+}
+
+- (Z2ITSchedule *)currentSchedule
+{
+  return [mCurrentSchedule content];
+}
+
+- (void) showViewForTableSelection:(int)selectedRow
+{
+    switch (selectedRow)
+    {
+      case 0:
+        [mScheduleContainerView setHidden:NO];
+        [mScheduleSearchView setHidden:YES];
+        break;
+      case 1:
+        [mScheduleContainerView setHidden:YES];
+        [mScheduleSearchView setHidden:NO];
+        break;
+      default:
+        break;
+    }
+}
+
+#pragma mark View Selection Table DataSource Methods
+
+- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+{
+  return 2;
+}
+
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+  NSString *aString = nil;
+  
+  // The Table only has one column
+  switch (rowIndex)
+  {
+    case 0:
+      aString = [NSString stringWithString:@"Schedule"];
+      break;
+    case 1:
+      aString = [NSString stringWithString:@"Search"];
+      break;
+  }
+  return aString;
+}
+
+#pragma mark View Selection Table Delegate Methods
+
+- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+{
+  if ([aNotification object] == mViewSelectionTableView)
+  {
+    [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
+  }
 }
 
 @end

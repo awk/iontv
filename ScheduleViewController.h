@@ -12,7 +12,13 @@
 
 @interface ScheduleViewController : NSObject {
     IBOutlet ScheduleView *mScheduleView;
+    IBOutlet NSSegmentedControl *mScheduleTimeSegmentedControl;
+    CFAbsoluteTime mStartTime;
 }
 
+- (void) updateSegmentDisplay;
+- (void) updateSegmentMenus;
+- (CFAbsoluteTime) startTime;
+- (void) setStartTime:(CFAbsoluteTime)inStartTime;
 - (IBAction) scheduleControlClicked:(id)sender;
 @end
