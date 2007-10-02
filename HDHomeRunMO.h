@@ -11,7 +11,7 @@
 #import "hdhomerun_debug.h"       // Fixes warning from undefined type in device header
 #import "hdhomerun_device.h"
 
-const int kDefaultPortNumber = 1234;
+extern const int kDefaultPortNumber;
 
 @class HDHomeRunTuner;
 
@@ -36,5 +36,4 @@ const int kDefaultPortNumber = 1234;
 
 - (HDHomeRunTuner*) tuner1;
 //- (void)setTuner1:(HDHomeRunTuner*) value;
-
 @end

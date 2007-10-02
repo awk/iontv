@@ -12,6 +12,8 @@
 #import "hdhomerun_os.h"
 #import "hdhomerun_device.h"
 
+const int kDefaultPortNumber = 1234;
+
 @implementation HDHomeRun
 
 
@@ -142,7 +144,7 @@ COREDATA_MUTATOR(NSString*, @"name");
 	return [self tunerWithIndex:1];
 }
 
-#pragma Initialization
+#pragma mark - Initialization
 
 - (void) createHDHRDevice
 {
@@ -165,7 +167,7 @@ COREDATA_MUTATOR(NSString*, @"name");
   [self createHDHRDevice];
 }
 
-#pragma Uninitialization
+#pragma mark - Uninitialization
 
 - (void) releaseHDHRDevice
 {
