@@ -109,7 +109,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = EA2EE03D0C07D2250002420F /* libhdhomerun */;
+			remoteGlobalIDString = EA2EE03D0C07D2250002420F;
 			remoteInfo = libhdhomerun;
 		};
 /* End PBXContainerItemProxy section */
@@ -166,7 +166,7 @@
 		EA2EE0370C07D2130002420F /* hdhomerun_video.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_video.c; path = ../libhdhomerun/hdhomerun_video.c; sourceTree = SOURCE_ROOT; };
 		EA2EE0380C07D2130002420F /* hdhomerun_video.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_video.h; path = ../libhdhomerun/hdhomerun_video.h; sourceTree = SOURCE_ROOT; };
 		EA2EE0390C07D2130002420F /* hdhomerun.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun.h; path = ../libhdhomerun/hdhomerun.h; sourceTree = SOURCE_ROOT; };
-		EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = liblibhdhomerun.a; path = build/Debug/liblibhdhomerun.a; sourceTree = "<group>"; };
+		EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibhdhomerun.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA2EE0760C07D57A0002420F /* HDHomeRunMO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunMO.h; sourceTree = "<group>"; };
 		EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunMO.m; sourceTree = "<group>"; };
 		EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunTuner.h; sourceTree = "<group>"; };

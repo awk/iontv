@@ -30,4 +30,15 @@ COREDATA_ACCESSOR(HDHomeRun*, @"device")
 {
 COREDATA_MUTATOR(HDHomeRun*, @"device")
 }
+
+- (Z2ITLineup*)lineup
+{
+COREDATA_ACCESSOR(Z2ITLineup*, @"lineup");
+}
+
+- (void) setLineup:(Z2ITLineup*)value
+{
+COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
+}
+
 @end

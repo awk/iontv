@@ -36,6 +36,8 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
 + (Preferences *)sharedInstance;
 + (void)setupDefaults;
 
+- (NSManagedObjectContext *)managedObjectContext;
+
 //Required NSToolbar delegate methods
 - (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag;    
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar;

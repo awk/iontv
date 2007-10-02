@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class HDHomeRun;
+@class Z2ITLineup;
 
 @interface HDHomeRunTuner : NSManagedObject {
 
@@ -18,4 +19,7 @@
 - (void) setIndex:(NSNumber*)value;
 - (HDHomeRun*) device;
 - (void) setDevice:(HDHomeRun *)value;
+
+- (Z2ITLineup*)lineup;
+- (void) setLineup:(Z2ITLineup*)value;
 @end

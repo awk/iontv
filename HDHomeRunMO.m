@@ -60,25 +60,43 @@
 	anHDHomeRun = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRun" inManagedObjectContext:inMOC];
 	[anHDHomeRun setDeviceID:inDeviceID];
 	
+	// Find a lineup to initialize the tuners with.
+	Z2ITLineup *aLineup = nil;
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Lineup" inManagedObjectContext:inMOC];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+   
+//  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"lineupID == %@", inLineupID];
+//  [request setPredicate:predicate];
+//   
+//  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"lineupID" ascending:YES];
+//  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+//  [sortDescriptor release];
+   
+  NSError *error = nil;
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
+	
+	aLineup = [array objectAtIndex:0];		// Just take the first lineup we have.
+	
 	// Create the Tuner objects too
 	HDHomeRunTuner *anHDHomeRunTuner;
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
 	[anHDHomeRunTuner setIndex:[NSNumber numberWithInt:0]];
+	[anHDHomeRunTuner setLineup:aLineup];
+//	[anHDHomeRun setTuner0:anHDHomeRunTuner];
+//	[anHDHomeRunTuner setDevice:self];
 	[anHDHomeRun addTuner:anHDHomeRunTuner];
 	[anHDHomeRunTuner release];
 	
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
 	[anHDHomeRunTuner setIndex:[NSNumber numberWithInt:1]];
+	[anHDHomeRunTuner setLineup:aLineup];
+//	[anHDHomeRun setTuner1:anHDHomeRunTuner];
+//	[anHDHomeRunTuner setDevice:self];
 	[anHDHomeRun addTuner:anHDHomeRunTuner];
-
+	[anHDHomeRunTuner release];
+	
 	return anHDHomeRun;
-}
-
-- (void) addTuner:(HDHomeRunTuner *)aTuner
-{
-  NSMutableSet *tuners = [self mutableSetValueForKey:@"tuners"];
-  [aTuner setDevice:self];
-  [tuners addObject:aTuner];
 }
 
 - (NSNumber *)deviceID
@@ -91,4 +109,55 @@ COREDATA_ACCESSOR(NSNumber*, @"deviceID")
 COREDATA_MUTATOR(NSNumber*, @"deviceID")
 }
 
+- (void) addTuner:(HDHomeRunTuner *)aTuner
+{
+  NSMutableSet *tuners = [self mutableSetValueForKey:@"tuners"];
+  [aTuner setDevice:self];
+  [tuners addObject:aTuner];
+}
+
+- (HDHomeRunTuner *)tunerWithIndex:(int) inIndex
+{
+  NSMutableSet *tuners = [self mutableSetValueForKey:@"tuners"];
+  NSEnumerator *anEnumerator = [tuners objectEnumerator];
+  HDHomeRunTuner *aTuner = nil;
+  while ((aTuner = [anEnumerator nextObject]) != nil)
+  {
+	if ([aTuner index] == [NSNumber numberWithInt:inIndex])
+		break;
+  }
+  return aTuner;
+}
+
+- (HDHomeRunTuner *)tuner0
+{
+	return [self tunerWithIndex:0];
+}
+
+- (HDHomeRunTuner *)tuner1
+{
+	return [self tunerWithIndex:1];
+}
+
+
+//- (HDHomeRunTuner *)tuner0
+//{
+//COREDATA_ACCESSOR(HDHomeRunTuner*, @"tuner0")
+//}
+//
+//- (void)setTuner0:(HDHomeRunTuner *)value
+//{
+//COREDATA_MUTATOR(HDHomeRunTuner*, @"tuner0")
+//}
+//
+//- (HDHomeRunTuner *)tuner1
+//{
+//COREDATA_ACCESSOR(HDHomeRunTuner*, @"tuner1")
+//}
+//
+//- (void)setTuner1:(HDHomeRunTuner *)value
+//{
+//COREDATA_MUTATOR(HDHomeRunTuner*, @"tuner1")
+//}
+//
 @end

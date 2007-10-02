@@ -19,9 +19,15 @@
 
 + (HDHomeRun *) createHDHomeRunWithID:(NSNumber*)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
-- (void) addTuner:(HDHomeRunTuner *)aTuner;
-
 - (NSNumber *)deviceID;
 - (void)setDeviceID:(NSNumber *)value;
+
+- (void) addTuner:(HDHomeRunTuner *)aTuner;
+
+- (HDHomeRunTuner*) tuner0;
+//- (void)setTuner0:(HDHomeRunTuner*) value;
+
+- (HDHomeRunTuner*) tuner1;
+//- (void)setTuner1:(HDHomeRunTuner*) value;
 
 @end

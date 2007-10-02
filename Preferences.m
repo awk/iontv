@@ -137,6 +137,11 @@ static Preferences *sSharedInstance = nil;
       [super dealloc];	// Don't free the shared instance
 }
 
+- (NSManagedObjectContext *)managedObjectContext
+{
+	return [[[NSApplication sharedApplication] delegate] managedObjectContext];
+}
+
 - (void) showPrefsView:(NSView*)inViewToBeShown
 {
 	// Remove the current subivews of the container
@@ -324,14 +329,15 @@ static Preferences *sSharedInstance = nil;
     const char *pathUTF8 = [kWebServicesZap2ItPath UTF8String];
     UInt32 passwordLength;
     const void *passwordData;
+
+	NSString *passwordString = [mZap2ItPasswordField stringValue];
+	passwordData = [passwordString UTF8String];
+	passwordLength = strlen(passwordData);
     
     // Call AddInternetPassword - if it's already in the keychain then update it
     OSStatus status;
     if (mZap2ItKeychainItemRef == nil)
     {
-      NSString *passwordString = [mZap2ItPasswordField stringValue];
-      passwordData = [passwordString UTF8String];
-      passwordLength = strlen(passwordData);
       status = SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mZap2ItKeychainItemRef);
     }
     else
