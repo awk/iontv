@@ -18,4 +18,5 @@ extern NSString *kRecServerConnectionName;
 
 - (oneway void) quitServer:(id)sender;
 
+- (oneway void) performDownload:(NSDictionary*)callData;
 @end

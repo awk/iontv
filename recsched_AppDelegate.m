@@ -69,19 +69,48 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 }
 
 - (NSURL *)urlForPersistentStore {
+#if USE_SYNCSERVICES
 	return [NSURL fileURLWithPath: [[self applicationSupportFolder] stringByAppendingPathComponent: @"recsched.dat"]];
+#else
+	return [NSURL fileURLWithPath: [[self applicationSupportFolder] stringByAppendingPathComponent: @"recsched_bkgd.dat"]];
+#endif
 }
 
+#if USE_SYNCSERVICES
 - (NSURL*)urlForFastSyncStore {
 	return [NSURL fileURLWithPath:[[self applicationSupportFolder] stringByAppendingPathComponent:@"org.awkward.recsched.fastsyncstore"]];
+}
+#endif // USE_SYNCSERVICES
+
+- (NSPersistentStore*) persistentStore
+{
+	if (persistentStore != nil)
+	{
+		return persistentStore;
+	}
+	[self persistentStoreCoordinator];
+	if (persistentStore)
+	{
+#if !USE_SYNCSERVICES
+		if ([persistentStore isReadOnly] == NO)
+			[persistentStore setReadOnly:YES];
+#endif // USE_SYNCSERVICES
+		return persistentStore;
+	}
+	else
+		NSLog(@"ERROR - No Persistent Store after initializing coordinator !");
+	return nil;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
 {
+#if USE_SYNCSERVICES
     [[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
     [self syncAction:nil];
+#endif
 }
 
+#if USE_SYNCSERVICES
 #pragma mark Sync
 
 - (ISyncClient *)syncClient
@@ -147,6 +176,7 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
         [[NSApplication sharedApplication] presentError:error];
     }
 }
+#endif // USE_SYNCSERVICES
 
 - (IBAction)showCoreDataProgramWindow:(id)sender
 {

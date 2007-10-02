@@ -15,8 +15,10 @@
 	RecSchedServer *mRecSchedServer;
 }
 
+#if USE_SYNCSERVICES
 - (ISyncClient *)syncClient;
 - (void)syncAction:(id)sender;
+#endif // USE_SYNCSERVICES
 - (IBAction) saveAction:(id)sender;
 
 @end

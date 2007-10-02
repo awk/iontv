@@ -257,8 +257,14 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
   NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
   
+#if USE_SYNCSERVICES
   NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", self, @"dataRecipient", nil];
   [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
+#else
+	// Send the message to the background server
+	NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", nil /* really needs to be a DO port or similar */, @"dataRecipient", nil];
+	[[[NSApp delegate] recServer] performDownload:callData];
+#endif // USE_SYNCSERVICES
   [callData release];
 }
 

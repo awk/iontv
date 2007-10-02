@@ -90,9 +90,11 @@
 	persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:optionsDictionary error:&error];
     if (persistentStore != nil)
 	{
+#if USE_SYNCSERVICES
 		NSURL *fastSyncDetailURL;
         fastSyncDetailURL = [self urlForFastSyncStore]; //[NSURL fileURLWithPath:[applicationSupportFolder stringByAppendingPathComponent:@"org.awkward.recsched-server.fastsyncstore"]];
         [persistentStoreCoordinator setStoresFastSyncDetailsAtURL:fastSyncDetailURL forPersistentStore:persistentStore];
+#endif // USE_SYNCSERVICES
 	}
 	else
 	{
@@ -199,6 +201,8 @@
     [super dealloc];
 }
 
+#if USE_SYNCSERVICES
+
 #pragma mark Syncing
 
 - (void)client:(ISyncClient *)client mightWantToSyncEntityNames:(NSArray *)entityNames
@@ -281,5 +285,6 @@
 //	[self syncAction:self];
 }
 
+#endif
 
 @end

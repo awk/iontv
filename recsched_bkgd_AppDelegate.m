@@ -20,7 +20,9 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
 {
 	NSLog(@"recsched_bkgd_AppDelegate - applicationDidFinishLaunching");
+#if USE_SYNCSERVICES
 	[[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
+#endif // USE_SYNCSERVICES
 	
 	[mRecSchedServer updateSchedule];
 }
@@ -49,6 +51,7 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 	return [NSURL fileURLWithPath: [[self applicationSupportFolder] stringByAppendingPathComponent: @"recsched_bkgd.dat"]];
 }
 
+#if USE_SYNCSERVICES
 - (NSURL*)urlForFastSyncStore {
 	return [NSURL fileURLWithPath:[[self applicationSupportFolder] stringByAppendingPathComponent:@"org.awkward.recsched-server.fastsyncstore"]];
 }
@@ -88,6 +91,7 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
     
     return client;
 }
+#endif // USE_SYNCSERVICES
 
 #pragma mark Actions
 
@@ -99,6 +103,7 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
     }
 }
 
+#if USE_SYNCSERVICES
 - (void)syncAction:(id)sender
 {
     NSError *error = nil;
@@ -110,5 +115,6 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
         NSLog(@"syncAction - error occured - %@", error);
     }
 }
+#endif // USE_SYNCSERVICES
 
 @end

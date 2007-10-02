@@ -423,9 +423,11 @@ static Preferences *sSharedInstance = nil;
   [self savePrefs:sender];
   [mPanel orderOut:sender];
   
+#if USE_SYNCSERVICES
   // The CoreData store might have changes because of editting the tuner settings and channel map.
   if ([[[[NSApplication sharedApplication] delegate] managedObjectContext] hasChanges])
 	[[[NSApplication sharedApplication] delegate] saveAction:nil];
+#endif // USE_SYNCSERVICES
 }
 
 - (IBAction) cancelButtonAction:(id)sender

@@ -116,7 +116,9 @@ const int kDefaultScheduleFetchDuration = 3;
 {
 	NSLog(@"cleanupComplete");
 	
+#if USE_SYNCSERVICES
 	[[NSApp delegate] syncAction:nil];
+#endif // USE_SYNCSERVICES
 }
 
 #pragma mark - Server Methods
@@ -198,6 +200,11 @@ const int kDefaultScheduleFetchDuration = 3;
     NSLog(@"Could not find matching local schedule for the program");
     return NO;
   }
+}
+
+- (oneway void) performDownload:(NSDictionary*)callData
+{
+  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
 }
 
 - (void) quitServer:(id)sender
