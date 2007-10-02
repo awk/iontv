@@ -36,6 +36,9 @@
 - (NSString*) longName;
 
 - (void) scanActionReportingProgressTo:(id)progressDisplay;
+- (void) startStreaming;
+- (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber;
+- (void) tuneToChannel:(HDHomeRunChannel*)inChannel;
 
 @end
 
@@ -61,7 +64,6 @@
 - (NSMutableSet *)stations;
 
 - (void) addStation:(HDHomeRunStation*)inStation;
-
 @end
 
 @interface HDHomeRunStation : NSManagedObject
@@ -82,4 +84,5 @@
 - (Z2ITStation*) Z2ITStation;
 - (void) setZ2ITStation:(Z2ITStation*) value;
 
+- (void) startStreaming;
 @end

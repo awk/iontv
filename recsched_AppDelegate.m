@@ -9,6 +9,8 @@
 #import "recsched_AppDelegate.h"
 #import "RecSchedNotifications.h"
 #import "Preferences.h"
+#import "HDHomeRunMO.h"
+#import "HDHomeRunTuner.h"
 
 @implementation recsched_AppDelegate
 
@@ -128,6 +130,8 @@
 }
 
 
+#pragma mark - Actions
+
 /**
     Performs the save action for the application, which is to send the save:
     message to the application's managed object context.  Any encountered errors
@@ -145,6 +149,99 @@
 - (IBAction)showCoreDataProgramWindow:(id)sender
 {
 	[mCoreDataProgramWindow makeKeyAndOrderFront:sender];
+}
+
+- (IBAction) launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow
+{
+  if (mVLCTask && [mVLCTask isRunning])
+  {
+    // VLC Already seems to be running (from a prior launch) - we can ignore this request to launch.
+    // It would be nice if there was a way to just switch the data in the stream and have VLC resync etc.
+    // however that doesn't appear to be possible so instead we must quit and relaunch VLC :-(
+    [mVLCTask terminate];
+    return;
+  }
+  
+  @try
+  {
+    NSString *vlcPath = [[NSUserDefaults standardUserDefaults] stringForKey:@"VLCAppPath"];
+    if (!vlcPath)
+      vlcPath = [NSString stringWithString:@"/Applications/VLC.app/Contents/MacOS/VLC"];
+    mVLCTask = [[NSTask launchedTaskWithLaunchPath:vlcPath arguments:[NSArray arrayWithObjects:[NSString stringWithFormat:@"udp://@:%d", kDefaultPortNumber], nil]] retain];
+    if (mVLCTask)
+    {
+      // Launch successful - store the default path
+      [[NSUserDefaults standardUserDefaults] setObject:vlcPath forKey:@"VLCAppPath"];
+      [[NSUserDefaults standardUserDefaults] synchronize];
+
+      // Register to watch for the termination notice
+      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(vlcTaskDidTerminate:) name:NSTaskDidTerminateNotification object:mVLCTask];
+
+      sleep(2);   // Wait for things to settle
+    }
+  }
+  @catch (NSException *exception)
+  {
+    if ([exception name] == NSInvalidArgumentException)
+    {
+      NSArray *appPaths;
+      
+      appPaths = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory,NSSystemDomainMask,true);
+      
+      if ([appPaths count] > 0)
+      {
+        [[NSOpenPanel openPanel]  // Get the shared open panel
+          beginSheetForDirectory:[appPaths objectAtIndex:0]  // Point it at the apps directory
+          file:nil
+          types:[NSArray arrayWithObjects:@"app", nil]
+          modalForWindow:inParentWindow  // This makes it show up as a sheet, attached to window
+          modalDelegate:self    // Tell me when you're done.
+          didEndSelector:@selector(findVLCPanelDidEnd:returnCode:contextInfo:)  // Call this method when you're done..
+          contextInfo:sender];  
+      }
+    }
+  }
+}
+
+- (void)findVLCPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
+{
+  if (returnCode == NSOKButton)
+  {
+    NSString *vlcPath = [NSString stringWithFormat:@"%@/Contents/MacOS/VLC", [panel filename]];
+    mVLCTask = [[NSTask launchedTaskWithLaunchPath:vlcPath arguments:[NSArray arrayWithObjects:@"udp://@:1234", nil]] retain];
+    if (mVLCTask)
+    {
+      // Launch successful - store the default path
+      [[NSUserDefaults standardUserDefaults] setObject:vlcPath forKey:@"VLCAppPath"];
+      [[NSUserDefaults standardUserDefaults] synchronize];
+
+      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(vlcTaskDidTerminate:) name:NSTaskDidTerminateNotification object:mVLCTask];
+
+      sleep(2);   // Wait for things to settle
+    }
+  }
+}
+
+- (IBAction) launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation
+{
+  if (mVLCTask && [mVLCTask isRunning])
+  {    
+    // VLC Already seems to be running (from a prior launch) - we can ignore this request to launch.
+    // It would be nice if there was a way to just switch the data in the stream and have VLC resync etc.
+    // however that doesn't appear to be possible so instead we must quit and relaunch VLC :-(
+    [mVLCTask terminate];
+  
+    // Set up a timer to fire in 5 seconds (or sooner !) to either start streaming or to give up because
+    // VLC hasn't terminated
+    mVLCTerminateTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(vlcTerminationTimer:) userInfo:[inStation retain] repeats:NO];
+    return;
+  }
+
+  mVLCTerminateTimer = nil;
+  [self launchVLCAction:sender withParentWindow:inParentWindow];
+  
+  if (mVLCTask)
+    [inStation startStreaming];
 }
 
 
@@ -225,6 +322,40 @@
     // And notifiy everyone else a save just occured - which probably means new objects were added to this context
     [[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationManagedObjectContextUpdated object:[self managedObjectContext]];
 }
+
+#pragma mark - Notifications
+
+- (void)vlcTerminationTimer:(NSTimer*)theTimer
+{
+  HDHomeRunStation *theStation = [theTimer userInfo];
+  
+  if (mVLCTask == nil)
+  {
+    [self launchVLCAction:self withParentWindow:nil];
+    [theStation startStreaming];
+  }
+  
+  [theStation release];
+  mVLCTerminateTimer  = nil;
+}
+
+/**
+    Notification sent out when the VLC task terminates (either from quit being sent a terminate message).
+*/
+
+- (void)vlcTaskDidTerminate:(NSNotification *)notification
+{
+  // Remove ourselves - this only happens once
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSTaskDidTerminateNotification object:mVLCTask];
+  
+  mVLCTask = nil;
+  
+  if (mVLCTerminateTimer)
+  {
+    [mVLCTerminateTimer fire];    // fire the terminate timer earlier (since we know it's definately done)
+  }
+}
+
 
 /**
     Implementation of dealloc, to release the retained variables.

@@ -73,7 +73,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 
 - (NSString*) longName
 {
-  NSString *name = [NSString stringWithFormat:@"%@ - %d - %@", [[self device] name], [[self index] intValue]+1, [[self lineup] name]];
+  NSString *name = [NSString stringWithFormat:@"%@:%d %@", [[self device] name], [[self index] intValue]+1, [[self lineup] name]];
   return name;
 }
 
@@ -97,6 +97,97 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
       
   mCurrentProgressDisplay = [progressDisplay retain];
     [NSThread detachNewThreadSelector:@selector(performScan:) toTarget:[HDHomeRunTunerChannelScanThread class] withObject:self];
+}
+
+- (void) startStreaming
+{
+  char value[64];
+  int ret = 0;
+
+  @try
+  {
+    @synchronized(self)
+    {
+      uint32_t local_ip = hdhomerun_device_get_local_machine_addr(mHDHomeRunDevice);
+
+      sprintf(value, "%u.%u.%u.%u:%d",
+              (unsigned int)(local_ip >> 24) & 0xFF, (unsigned int)(local_ip >> 16) & 0xFF,
+              (unsigned int)(local_ip >> 8) & 0xFF, (unsigned int)(local_ip >> 0) & 0xFF,
+              kDefaultPortNumber);
+
+      ret = hdhomerun_device_set_tuner_target(mHDHomeRunDevice, value);
+    }
+  }
+  @catch (NSException *exception)
+  {
+    NSLog(@"startStreaming Exception name: name: %@ reason: %@", [exception name], [exception reason]);
+  }
+  @finally 
+  {
+    if (ret < 1)
+    {
+      NSLog(@"startStreaming - communication error sending request to hdhomerun device - set target\n");
+      return;
+    }
+  }
+}
+
+- (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber
+{
+  int ret = 0;
+
+  if (inProgramNumber && (inProgramNumber != NSNoSelectionMarker))
+  {
+    @try 
+    {
+      @synchronized(self)
+      {
+        const char *programNumString = [[inProgramNumber stringValue] cString];
+        ret = hdhomerun_device_set_tuner_program(mHDHomeRunDevice, programNumString);
+      }
+    }
+    @catch (NSException * e) 
+    {
+      NSLog(@"setFilterForProgramNumber: exception name: %@ reason: %@", [e name], [e reason]);
+    }
+    @finally 
+    {
+      if (ret < 1)
+      {
+              NSLog(@"setFilterForProgramNumber - communication error sending request to hdhomerun device - set tuner program\n");
+      }
+    }
+  }
+}
+
+- (void) tuneToChannel:(HDHomeRunChannel*)inChannel
+{
+  int ret = 0;
+
+  if (inChannel)
+  {
+    @try 
+    {
+      @synchronized(self)
+      {
+        char value[64];
+        sprintf(value, "%s:%d", [[inChannel tuningType] cString], [[inChannel channelNumber] intValue] );
+        
+        ret = hdhomerun_device_set_tuner_channel(mHDHomeRunDevice, value);
+      }
+    }
+    @catch (NSException * e) 
+    {
+      NSLog(@"tuneTo: exception name: %@ reason: %@", [e name], [e reason]);
+    }
+    @finally 
+    {
+      if (ret < 1)
+      {
+            NSLog(@"tuneTo - communication error sending request to hdhomerun device\n");
+      }
+    }
+  }
 }
 
 #pragma mark - Notifications
@@ -460,6 +551,43 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   return anHDHomeRunStation;
 }
 
++ (void)initialize {
+    [self setKeys:[NSArray arrayWithObjects:@"programNumber", nil]
+      triggerChangeNotificationsForDependentKey:@"channelAndProgramNumber"];
+}
+
+- (void) awakeFromFetch
+{
+  [super awakeFromFetch];
+
+  // Register to be told when the device name changes
+  if ([self channel])
+    [[self channel] addObserver:self forKeyPath:@"channelNumber" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+  if ((object == [self channel]) && ([keyPath compare:@"channelNumber"] == NSOrderedSame))
+  {
+    [self willChangeValueForKey:@"channelAndProgramNumber"];
+    [self didChangeValueForKey:@"channelAndProgramNumber"];
+  }
+}
+
+- (void) startStreaming
+{
+  // Set our tuner to the channel
+  [[[self channel] tuner] tuneToChannel:[self channel]];
+  
+  // Set our tuners filter for this program
+  [[[self channel] tuner] setFilterForProgramNumber:[self programNumber]];
+  
+  // Set our tuner to start streaming
+  [[[self channel] tuner] startStreaming];
+}
+
+#pragma mark - CoreData Accessors and Mutators
+
 - (NSNumber*) programNumber
 {
 COREDATA_ACCESSOR(NSNumber*, @"programNumber");
@@ -468,6 +596,11 @@ COREDATA_ACCESSOR(NSNumber*, @"programNumber");
 - (void) setProgramNumber:(NSNumber*)value
 {
   COREDATA_MUTATOR(NSNumber*, @"programNumber");
+}
+
+- (NSString*) channelAndProgramNumber
+{
+  return [NSString stringWithFormat:@"%@:%@", [[self channel] channelNumber], [self programNumber]];
 }
 
 - (NSString*) callSign
@@ -487,7 +620,13 @@ COREDATA_ACCESSOR(HDHomeRunChannel*, @"channel");
 
 - (void) setChannel:(HDHomeRunChannel*) value
 {
+  if ([self channel])
+    [[self channel] removeObserver:self forKeyPath:@"channe;"];
+    
   COREDATA_MUTATOR(HDHomeRunChannel*, @"channel");
+
+  // Register to be told when the device name changes
+  [value addObserver:self forKeyPath:@"channel" options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (Z2ITStation*) Z2ITStation

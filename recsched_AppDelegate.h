@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class HDHomeRunStation;
+
 @interface recsched_AppDelegate : NSObject 
 {
     IBOutlet NSWindow *window;
@@ -16,6 +18,9 @@
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
     NSManagedObjectContext *managedObjectContext;
+    
+    NSTask      *mVLCTask;
+    NSTimer     *mVLCTerminateTimer;
 }
 
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
@@ -24,5 +29,7 @@
 
 - (IBAction)saveAction:sender;
 - (IBAction)showCoreDataProgramWindow:(id)sender;
+- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
+- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
 
 @end

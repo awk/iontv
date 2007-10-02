@@ -18,6 +18,7 @@
                 scanChannelsButtonAction = id; 
                 scanDevicesButtonAction = id; 
                 showPanel = id; 
+                viewHDHRStation = id; 
             }; 
             CLASS = Preferences; 
             LANGUAGE = ObjC; 
@@ -38,6 +39,7 @@
                 mStationsArrayController = NSArrayController; 
                 mTunerPrefsView = NSView; 
                 mTunerScanProgressIndicator = NSProgressIndicator; 
+                mVisibleStationsArrayController = NSArrayController; 
                 mZap2ItPasswordField = NSTextField; 
                 mZap2ItPrefsView = NSView; 
                 mZap2ItUsernameField = NSTextField; 

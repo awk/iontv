@@ -13,6 +13,7 @@
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
 #import "RecSchedNotifications.h"
+#import "recsched_AppDelegate.h"
 #import <Security/Security.h>
 
 const float kDurationSliderMinValue = 1.0;
@@ -504,6 +505,13 @@ static Preferences *sSharedInstance = nil;
 	
       [aTuner scanActionReportingProgressTo:self];
   }
+}
+
+- (IBAction) viewHDHRStation:(id)sender
+{
+  HDHomeRunStation *selectedStation = [[mVisibleStationsArrayController selectedObjects] objectAtIndex:0];
+  NSLog(@"viewHDHRStation selection = %@", [selectedStation callSign]);
+  [[[NSApplication sharedApplication] delegate] launchVLCAction:sender withParentWindow:mPanel startStreaming:selectedStation];
 }
 
 #pragma mark Channel Scan Progress Display Protocol
