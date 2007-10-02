@@ -11,6 +11,7 @@
 #import "Z2ITSchedule.h"
 #import "Z2ITLineupMap.h"
 #import "Z2ITLineup.h"
+#import "HDHomeRunTuner.h"
 
 @implementation Z2ITStation
 
@@ -80,6 +81,25 @@
     aStation = [array objectAtIndex:0];
   }
   return aStation;
+}
+
+- (BOOL) hasValidTunerForLineup:(Z2ITLineup*)aLineup
+{
+	BOOL validTuner = NO;
+	
+	if ([[self hdhrStations] count] > 0)
+	{
+		NSEnumerator *anEnumerator = [[self hdhrStations] objectEnumerator];
+		HDHomeRunStation *aStation;
+		while (((aStation = [anEnumerator nextObject]) != nil) && (validTuner == NO))
+		{
+			if ([[[aStation channel] tuner] lineup] == aLineup)
+			{
+				validTuner = YES;
+			}
+		}
+	}
+	return validTuner;
 }
 
 #pragma mark
@@ -192,6 +212,18 @@
   NSMutableSet *schedules = [self mutableSetValueForKey:@"schedules"];
   [value setStation:self];
   [schedules addObject:value];
+}
+
+- (NSSet*)hdhrStations
+{
+  NSSet *hdhrStations = [self mutableSetValueForKey:@"hdhrStations"];
+  return hdhrStations;
+}
+
+- (void)addHDHRStation:(HDHomeRunStation*)value
+{
+  NSMutableSet *hdhrStations = [self mutableSetValueForKey:@"hdhrStations"];
+  [hdhrStations addObject:value];
 }
 
 - (NSSet*)lineupMaps

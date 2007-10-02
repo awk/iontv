@@ -12,6 +12,7 @@
 @class Z2ITLineupMap;
 @class Z2ITProgram;
 @class Z2ITLineup;
+@class HDHomeRunStation;
 
 @interface Z2ITStation : NSManagedObject {
 
@@ -25,6 +26,9 @@
 - (Z2ITProgram*)programAtTime:(CFAbsoluteTime) inAirTime;
 - (Z2ITSchedule*)scheduleAtTime:(CFAbsoluteTime) inAirTime;
 - (NSArray *)schedulesBetweenStartTime:(CFAbsoluteTime) inStartTime andEndTime:(CFAbsoluteTime) inEndTime;
+
+// Is there a valid tuner for this station and lineup ?
+- (BOOL) hasValidTunerForLineup:(Z2ITLineup*)aLineup;
 
 // Accessor and mutator for the Station ID attribute
 - (NSNumber *)stationID;
@@ -49,6 +53,10 @@
 // Accessor and mutator for the schedules relationship
 - (NSSet*)schedules;
 - (void)addSchedule:(Z2ITSchedule*)value;
+
+// Accessor and mutator for the HDHomeRun Stations relationship
+- (NSSet*)hdhrStations;
+- (void)addHDHRStation:(HDHomeRunStation*)value;
 
 // Accessor and mutator for the lineupMap relationship
 - (NSSet*)lineupMaps;
