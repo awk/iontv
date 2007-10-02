@@ -46,10 +46,14 @@ COREDATA_ACCESSOR(HDHomeRun*, @"device")
 - (void) setDevice:(HDHomeRun *)value
 {
   if ([self device])
+  {
     [[self device] removeObserver:self forKeyPath:@"name"];
-    
+	[self releaseHDHRDevice];
+  } 
+  
 COREDATA_MUTATOR(HDHomeRun*, @"device")
 
+  [self createHDHRDevice];
   // Register to be told when the device name changes
   [value addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
 }
@@ -216,7 +220,14 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
     NSMutableSet *allObjectsSet = [NSMutableSet setWithSet:updatedObjects];
     [allObjectsSet unionSet:[[notification userInfo] objectForKey:NSInsertedObjectsKey]];
     
-    [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:allObjectsSet waitUntilDone:NO];
+	NSMutableSet *allObjectIDsSet = [[NSMutableSet alloc] initWithCapacity:[allObjectsSet count]];
+	NSEnumerator *anEnumerator = [allObjectsSet objectEnumerator];
+	NSManagedObject *aManagedObject;
+	while ((aManagedObject = [anEnumerator nextObject]) != nil)
+	{
+		[allObjectIDsSet addObject:[aManagedObject objectID]];
+	}
+    [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:allObjectIDsSet waitUntilDone:NO];
 }
 
 #pragma mark - Thread Functions
@@ -289,8 +300,11 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
           // Set the tuningType on the current Channel object
           [mCurrentHDHomeRunChannel setTuningType:tuningTypeStr];
           
-          // And add it to this tuners list of channels
-          [self addChannel:mCurrentHDHomeRunChannel];
+          // And add it to this tuners list of channels - however we can't just use 'self' here since that object
+		  // may be in a different managed object context. Instead we'll use objectForID to find the matching Tuner in
+		  // the inMoc context
+		  HDHomeRunTuner *tunerInThreadMOC = (HDHomeRunTuner*) [inMOC objectWithID:[self objectID]];
+		  [tunerInThreadMOC addChannel:mCurrentHDHomeRunChannel];
         }
       }
       
@@ -299,6 +313,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
         // We have a program - is it encrypted ?
         if (([data rangeOfString:@"(encrypted)"].location == NSNotFound)
               && ([data rangeOfString:@"(no data)"].location == NSNotFound)
+              && ([data rangeOfString:@"internet"].location == NSNotFound)
               && ([data rangeOfString:@"none"].location == NSNotFound))
         {
           // The data line will look like :
@@ -338,7 +353,8 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
           if (callSignString)
           {
             [aStation setCallSign:callSignString];
-            Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:callSignString inLineup:[self lineup] inManagedObjectContext:inMOC];
+			Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[inMOC objectWithID:[[self lineup] objectID]];
+            Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:callSignString inLineup:lineupInThreadMOC inManagedObjectContext:inMOC];
             if (aZ2ITStation)
               [aStation setZ2ITStation:aZ2ITStation];
           }
@@ -621,7 +637,7 @@ COREDATA_ACCESSOR(HDHomeRunChannel*, @"channel");
 - (void) setChannel:(HDHomeRunChannel*) value
 {
   if ([self channel])
-    [[self channel] removeObserver:self forKeyPath:@"channe;"];
+    [[self channel] removeObserver:self forKeyPath:@"channel"];
     
   COREDATA_MUTATOR(HDHomeRunChannel*, @"channel");
 

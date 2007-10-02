@@ -40,6 +40,9 @@
 - (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber;
 - (void) tuneToChannel:(HDHomeRunChannel*)inChannel;
 
+- (void) releaseHDHRDevice;
+- (void) createHDHRDevice;
+
 @end
 
 @interface HDHomeRunChannel : NSManagedObject
