@@ -35,4 +35,5 @@
 - (void) setCurrentStation:(Z2ITStation*)inStation;
 
 - (void) showScheduleDetailsWithStartingFrame:(NSRect)startingFrame;
+@property (getter=startTime,setter=setStartTime:) CFAbsoluteTime mStartTime;
 @end

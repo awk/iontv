@@ -294,9 +294,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	Z2ITLineup *aLineup = [mCurrentLineup content];
 
 	NSSet *hdhrStations = [aStation hdhrStations];
-	NSEnumerator *anEnumerator = [hdhrStations objectEnumerator];
 	HDHomeRunStation *aHDHRStation;
-	while ((aHDHRStation = [anEnumerator nextObject]) != nil)
+	for (aHDHRStation in hdhrStations)
 	{
 		if (([aHDHRStation z2itStation] == aStation) && ([[[aHDHRStation channel] tuner] lineup] == aLineup))
 		{

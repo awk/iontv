@@ -96,9 +96,8 @@ const int kDefaultPortNumber = 1234;
 - (HDHomeRunTuner *)tunerWithIndex:(int) inIndex
 {
   NSMutableSet *tuners = [self mutableSetValueForKey:@"tuners"];
-  NSEnumerator *anEnumerator = [tuners objectEnumerator];
   HDHomeRunTuner *aTuner = nil;
-  while ((aTuner = [anEnumerator nextObject]) != nil)
+  for (aTuner in tuners)
   {
 	if ([aTuner index] == [NSNumber numberWithInt:inIndex])
 		break;

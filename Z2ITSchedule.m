@@ -23,8 +23,7 @@
   NSError *error;
   NSArray *allSchedules = [inMOC executeFetchRequest:fetchRequest error:&error];
   Z2ITSchedule *aSchedule;
-  NSEnumerator *aScheduleEnumerator = [allSchedules objectEnumerator];
-  while (aSchedule = [aScheduleEnumerator nextObject])
+  for (aSchedule in allSchedules)
   {
     [inMOC deleteObject:aSchedule];
   }

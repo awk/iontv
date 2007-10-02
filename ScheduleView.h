@@ -36,4 +36,5 @@
 - (id) delegate;
 - (void) setDelegate:(id)inDelegate;
 
+@property (setter=setStartTime:) CFAbsoluteTime mStartTime;
 @end

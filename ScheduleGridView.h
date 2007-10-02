@@ -32,4 +32,8 @@
 - (void) setSelectedSchedule:(Z2ITSchedule*)inSchedule;
 - (id) delegate;
 - (void) setDelegate:(id)inDelegate;
+@property (setter=setVisibleTimeSpan:) float mVisibleTimeSpan;
+@property (retain,getter=selectedSchedule) Z2ITSchedule *mSelectedSchedule;
+@property (setter=setStartTime:) CFAbsoluteTime mStartTime;
+@property (setter=setStartStationIndex:) unsigned mStartStationIndex;
 @end

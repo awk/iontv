@@ -242,10 +242,8 @@ const int kDefaultScheduleFetchDuration = 3;
       NSLog(@"Error executing fetch request to find latest schedule");
       return;
   }
-  int i=0;
-  for (i=0; i < [array count]; i++)
+  for (Z2ITStation *aStation in array)
   {
-	Z2ITStation *aStation = [array objectAtIndex:i];
 	NSSet *hdhrStations = [aStation hdhrStations];
 	NSLog(@"Station Callsign = %@, hdhrStations = %@, hdhrStation callSign = %@, hdhrStation programNumber = %@",
 		[aStation callSign], hdhrStations, [[hdhrStations anyObject] callSign], [[hdhrStations anyObject] programNumber]);
@@ -397,4 +395,7 @@ const int kDefaultScheduleFetchDuration = 3;
   }
 }
 
+@synthesize mStoreUpdate;
+@synthesize mUIActivity;
+@synthesize mExitServer;
 @end

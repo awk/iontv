@@ -134,10 +134,8 @@
   if ([array count] > 0)
   {
 	// There are duplicate schedules on this channel - drop them
-	int i = 0;
-	for (i=0; i < [array count]; i++)
+	for (Z2ITSchedule *aSchedule in array)
 	{
-		Z2ITSchedule *aSchedule = [array objectAtIndex:i];
 		if ([aSchedule program] == [value program])
 		{
 			// Program's for both the new and existing schedule are the same - this might be a complete duplicate
@@ -163,9 +161,8 @@
 - (Z2ITLineupMap*)lineupMapForLineupID:(NSString*) inLineupID
 {
   NSSet *lineupMaps = [self lineupMaps];
-  NSEnumerator *lineupEnumerator = [lineupMaps objectEnumerator];
   Z2ITLineupMap *aLineupMap = nil;
-  while (aLineupMap = [lineupEnumerator nextObject])
+  for (aLineupMap in lineupMaps)
   {
     if ([[[aLineupMap lineup] lineupID] compare:inLineupID] == NSOrderedSame)
       break;

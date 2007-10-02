@@ -312,4 +312,5 @@ int sortStationsWithLineup(id thisStation, id otherStation, void *context)
     }
  }
 
+@synthesize mStartTime;
 @end

@@ -212,9 +212,8 @@
 		if (channelsToImport)
 		{
 			[self deleteAllChannelsInMOC:[self managedObjectContext]];
-			NSEnumerator *anEnumerator = [channelsToImport objectEnumerator];
 			NSDictionary *channelInfoDictionary;
-			while ((channelInfoDictionary = [anEnumerator nextObject]) != nil)
+			for (channelInfoDictionary in channelsToImport)
 			{
 				HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:[channelInfoDictionary valueForKey:@"channelType"] andNumber:[channelInfoDictionary valueForKey:@"channelNumber"] inManagedObjectContext:[self managedObjectContext]];
 				[aChannel setTuningType:[channelInfoDictionary valueForKey:@"tuningType"]];
@@ -500,7 +499,6 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   }
 }
 
-
 @end
 
 @implementation HDHomeRunTunerChannelScanThread
@@ -542,9 +540,8 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 
 - (void) importStationsFrom:(NSArray*)inArrayOfStationDictionaries
 {
-	NSEnumerator *anEnumerator = [inArrayOfStationDictionaries objectEnumerator];
 	NSDictionary *stationInfo;
-	while ((stationInfo = [anEnumerator nextObject]) != nil)
+	for (stationInfo in inArrayOfStationDictionaries)
 	{
 		// Create a station and add it to the channel
 		HDHomeRunStation *aStation = [HDHomeRunStation createStationWithProgramNumber:[stationInfo valueForKey:@"programNumber"] forChannel:self inManagedObjectContext:[self managedObjectContext]];

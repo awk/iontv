@@ -40,6 +40,7 @@ const float kScheduleDetailsPopUpTime = 10.0;
 - (NSImage*) cellImageAtLocation:(NSPoint)localPoint withFrame:(NSRect) inFrame  inView:(NSView*)inView;
 - (NSPoint) dragImageLocFor:(NSPoint)localPoint withFrame:(NSRect) inFrame;
 
+@property (retain,getter=station) Z2ITStation    *mStation;
 @end
 
 @interface ScheduleCell : NSTextFieldCell
@@ -273,10 +274,8 @@ const float kScheduleDetailsPopUpTime = 10.0;
 
 - (void) updateForNewStartTime
 {
-    int i=0;
-    for (i=0; i < [mStationsInViewArray count]; i++)
+    for (ScheduleGridLine *aGridLine in mStationsInViewArray)
     {
-      ScheduleGridLine *aGridLine = [mStationsInViewArray objectAtIndex:i];
       [aGridLine setStartTime:mStartTime andDuration:mVisibleTimeSpan];
     }
     [self setNeedsDisplay:YES];
@@ -428,6 +427,10 @@ const float kScheduleDetailsPopUpTime = 10.0;
   [self updateForNewStartTime];
 }
 
+@synthesize mStartTime;
+@synthesize mVisibleTimeSpan;
+@synthesize mStartStationIndex;
+@synthesize mSelectedSchedule;
 @end
 
 @implementation ScheduleGridLine
@@ -466,14 +469,13 @@ const float kScheduleDetailsPopUpTime = 10.0;
   [mCellsInLineArray release];
   mCellsInLineArray = [[NSMutableArray alloc] initWithCapacity:[mSchedulesInLineArray count]];
 
-  int i=0;
-  for (i=0; i < [mSchedulesInLineArray count]; i++)
+  for (id loopItem in mSchedulesInLineArray)
   {
     ScheduleCell *aTextCell = [[ScheduleCell alloc] initTextCell:@"--"];
     [aTextCell setBordered:YES];
-    [aTextCell setRepresentedObject:[mSchedulesInLineArray objectAtIndex:i]];
-    [aTextCell setStringValue:[[[mSchedulesInLineArray objectAtIndex:i] program] title]];
-    if ([mGridView selectedSchedule] == [mSchedulesInLineArray objectAtIndex:i])
+    [aTextCell setRepresentedObject:loopItem];
+    [aTextCell setStringValue:[[loopItem program] title]];
+    if ([mGridView selectedSchedule] == loopItem)
     {
       [mGridView setSelectedCell:aTextCell];
     }
@@ -490,8 +492,7 @@ const float kScheduleDetailsPopUpTime = 10.0;
 - (NSCell*) cellForSchedule:(Z2ITSchedule*)inSchedule
 {
   NSCell *theCell = nil;
-  NSEnumerator *anEnumerator = [mCellsInLineArray objectEnumerator];
-  while ((theCell = [anEnumerator nextObject]) != nil)
+  for (theCell in mCellsInLineArray)
   {
     if ([theCell representedObject] == inSchedule)
       break;
@@ -671,6 +672,7 @@ const float kScheduleDetailsPopUpTime = 10.0;
   return dragImageLoc;
 }
 
+@synthesize mStation;
 @end
 
 @implementation ScheduleCell

@@ -13,12 +13,11 @@
 - (void) updateColumnHeaderCells
 {
     NSArray *columns = [[self tableView] tableColumns];
-    NSEnumerator *cols = [columns objectEnumerator];
     NSTableColumn *col = nil;
     
     AKSourceTableColumnHeaderCell *headerCell;
     
-    while (col = [cols nextObject]) {
+    for (col in columns) {
         headerCell = [[AKSourceTableColumnHeaderCell alloc]  initTextCell:[[col headerCell] stringValue]];
         [col setHeaderCell:headerCell];
         [headerCell release];

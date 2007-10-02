@@ -146,10 +146,8 @@ static NSGradient *sScheduleStationColumnCellSharedGradient = nil;
     float fontSize = [NSFont systemFontSizeForControlSize:NSSmallControlSize];
     NSFont *theFont = [NSFont systemFontOfSize:fontSize];
     
-    int i=0;
-    for (i = 0; i < [mSortedStationsArray count]; i++)
+    for (Z2ITStation *aStation in mSortedStationsArray)
     {
-      Z2ITStation *aStation = [mSortedStationsArray objectAtIndex:i];
       Z2ITLineupMap *aLineupMap = [aStation lineupMapForLineupID:[mCurrentLineup lineupID]];
       NSString *cellString = [NSString stringWithFormat:@"%@ - %@", [aLineupMap channel], [aStation valueForKey:@"callSign"]];
       ScheduleStationColumnCell *aLabelCell = [[ScheduleStationColumnCell alloc] initTextCell:cellString];
@@ -218,4 +216,5 @@ static NSGradient *sScheduleStationColumnCellSharedGradient = nil;
 
 
 
+@synthesize mStartStationIndex;
 @end

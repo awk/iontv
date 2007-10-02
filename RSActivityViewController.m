@@ -19,9 +19,15 @@
 	int currentProgress;
 }
 
+@property size_t activityToken;
+@property int maxProgress;
+@property int currentProgress;
 @end
 
 @implementation RSActivityUnitTestInfo
+@synthesize maxProgress;
+@synthesize currentProgress;
+@synthesize activityToken;
 @end
 
 @implementation RSActivityViewController

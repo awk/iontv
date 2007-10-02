@@ -424,4 +424,5 @@
 	NSLog(@"Cleanup Complete");
 }
 
+@synthesize mRecServer;
 @end

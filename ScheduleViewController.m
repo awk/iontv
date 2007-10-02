@@ -198,10 +198,9 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
       
       // Change the lineup ?
       NSSet *lineupMaps = [[[mCurrentSchedule content] station] lineupMaps];
-      NSEnumerator *mapEnumerator = [lineupMaps objectEnumerator];
       Z2ITLineupMap *aLineupMap;
       bool changeLineup = YES;
-      while ((aLineupMap = [mapEnumerator nextObject]) != nil)
+      for (aLineupMap in lineupMaps)
       {
         if ([aLineupMap lineup] == [mCurrentLineup content])
         {

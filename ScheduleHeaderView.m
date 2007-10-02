@@ -135,13 +135,11 @@ static NSGradient *sScheduleHeaderCellSharedGradient = nil;
     [mStationCell drawWithFrame:cellFrameRect inView:self];
 
     // Subdivide the current bounds width into even spaced pieces (to number of cells in the array)
-    int numberLabelCells = [mLabelCellArray count];
     float aCellWidth = pixelsPerMinute * [parentView timePerLineIncrement];
-    int i=0;
     cellFrameRect = NSMakeRect([ScheduleStationColumnView columnWidth], 0, aCellWidth, [self bounds].size.height);
-    for (i=0; i < numberLabelCells; i++)
+    for (id loopItem in mLabelCellArray)
     {
-      [[mLabelCellArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:self];
+      [loopItem drawWithFrame:cellFrameRect inView:self];
       cellFrameRect.origin.x += aCellWidth;
     }
 }
@@ -159,12 +157,10 @@ static NSGradient *sScheduleHeaderCellSharedGradient = nil;
   // the string as we go
   CFAbsoluteTime cellStartTime, cellEndTime;
   cellStartTime = mStartTime;
-  int numberOfCells = [mLabelCellArray count];
-  int i=0;
   CFGregorianUnits thirtyMinutes;
   memset(&thirtyMinutes,0,sizeof(thirtyMinutes));
   thirtyMinutes.minutes = 30;
-  for (i=0; i < numberOfCells; i++)
+  for (id loopItem in mLabelCellArray)
   {
     cellEndTime = CFAbsoluteTimeAddGregorianUnits(cellStartTime,CFTimeZoneCopySystem(),thirtyMinutes);
     CFGregorianDate cellStartDate = CFAbsoluteTimeGetGregorianDate(cellStartTime,CFTimeZoneCopySystem());
@@ -172,11 +168,12 @@ static NSGradient *sScheduleHeaderCellSharedGradient = nil;
 
     NSString *cellStr = [NSString stringWithFormat:@"%02d:%02d - %02d:%02d", cellStartDate.hour, cellStartDate.minute, cellEndDate.hour, cellEndDate.minute];
     // Set the cell label
-    [[mLabelCellArray objectAtIndex:i] setStringValue:cellStr];
+    [loopItem setStringValue:cellStr];
     // incremement the start date
     cellStartTime = CFAbsoluteTimeAddGregorianUnits(cellStartTime,CFTimeZoneCopySystem(),thirtyMinutes);
   }
   [self setNeedsDisplay:YES];
 }
 
+@synthesize mStartTime;
 @end

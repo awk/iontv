@@ -27,4 +27,5 @@ extern const int kScheduleStationColumnViewCellHeight;
 - (void) setStartStationIndex:(unsigned)inIndex;
 - (id) delegate;
 - (void) setDelegate:(id)inDelegate;
+@property (setter=setStartStationIndex:) unsigned mStartStationIndex;
 @end

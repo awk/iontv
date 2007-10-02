@@ -90,18 +90,16 @@
 - (void) updateStations:(NSXMLNode *)inStationsNode
 {
   NSArray *childNodes = [inStationsNode children];
-  int i, count = [childNodes count];
   if (mReportProgressTo)
   {
     [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Stations"];
-    [mReportProgressTo setActivity:mActivityToken progressMaxValue:count];
+    [mReportProgressTo setActivity:mActivityToken progressMaxValue:[childNodes count]];
   }
   else
     NSLog(@"Updating Stations");
     
-  for (i=0; i < count; i++)
+  for (NSXMLNode *child in childNodes)
   {
-    NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
     if (nodeKind == NSXMLElementKind)
@@ -121,10 +119,8 @@
         NSString *affiliateString = nil;
         int fccChannel = 0;
         NSArray *stationChildNodes = [childElement children];
-        int j, stationChildCount = [stationChildNodes count];
-        for (j=0; j < stationChildCount; j++)
+        for (NSXMLNode *stationChild in stationChildNodes)
         {
-          NSXMLNode *stationChild = [stationChildNodes objectAtIndex:j];
           if ([[stationChild name] compare:@"callSign" options:NSCaseInsensitiveSearch] == NSOrderedSame)
           {
             callSignString = [stationChild stringValue];
@@ -175,16 +171,14 @@
 - (void) updateLineups:(NSXMLNode *)inLineupsNode
 {
   NSArray *childNodes = [inLineupsNode children];
-  int i, count = [childNodes count];
   if (mReportProgressTo)
     [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Lineups"];
   else
     NSLog(@"Updating Lineups");
     
-  for (i=0; i < count; i++)
+  for (NSXMLNode *child in childNodes)
   {
     NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
-    NSXMLNode *child = [childNodes objectAtIndex:i];
 
     NSXMLNodeKind nodeKind = [child kind];
     if (nodeKind == NSXMLElementKind)
@@ -225,9 +219,8 @@
         
         // Now for the map items in the lineup element node
         NSArray *lineupChildNodes = [childElement children];
-        int j, lineupChildCount = [lineupChildNodes count];
-          [mReportProgressTo setActivity:mActivityToken progressMaxValue:lineupChildCount];
-        for (j=0; j < lineupChildCount; j++)
+		[mReportProgressTo setActivity:mActivityToken progressMaxValue:[lineupChildNodes count]];
+        for (NSXMLElement *lineupMap in lineupChildNodes)
         {
           NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
           NSNumber *stationIDNumber = nil;
@@ -236,7 +229,6 @@
           NSDate *fromDate = nil;
           NSDate *toDate = nil;
           
-          NSXMLElement *lineupMap = [lineupChildNodes objectAtIndex:j];
           NSString *tmpStr;
           
 		  [mReportProgressTo setActivity:mActivityToken incrementBy:1];
@@ -773,9 +765,8 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSLog(@"cleanupSchedules - %d schedules before now", [array count]);
   if (array != nil)
   {
-    NSEnumerator *scheduleEnumerator = [array objectEnumerator];
     Z2ITSchedule *aSchedule;
-    while (aSchedule = [scheduleEnumerator nextObject])
+    for (aSchedule in array)
     {
       [mManagedObjectContext deleteObject:aSchedule];
     }
@@ -794,9 +785,8 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   int i=0;
   if (array != nil)
   {
-    NSEnumerator *programEnumerator = [array objectEnumerator];
     Z2ITProgram *aProgram;
-    while (aProgram = [programEnumerator nextObject])
+    for (aProgram in array)
     {
       NSSet *schedules = [aProgram schedules];
       if (schedules && ([schedules count] == 0))

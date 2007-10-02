@@ -72,10 +72,9 @@
 - (NSArray *)stations
 {
   NSMutableSet *lineupMaps = [self mutableSetValueForKey:@"lineupMaps"];
-  NSEnumerator *lineupMapEnumerator = [lineupMaps objectEnumerator];
   Z2ITLineupMap *aLineupMap;
   NSMutableArray *stationsArray = [NSMutableArray arrayWithCapacity:[lineupMaps count]];
-  while (aLineupMap = [lineupMapEnumerator nextObject])
+  for (aLineupMap in lineupMaps)
   {
     [stationsArray addObject:[aLineupMap station]];
   }

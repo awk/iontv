@@ -42,4 +42,5 @@
 
 - (IBAction) quitServer:(id)sender;
 
+@property (retain,getter=recServer) id mRecServer;
 @end

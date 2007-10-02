@@ -22,4 +22,5 @@ extern const int kScheduleHeaderViewDefaultNumberOfCells;
 + (int) headerHeight;
 - (void) updateCellLabels;
 - (void) setStartTime:(CFAbsoluteTime)inStartTime;
+@property (setter=setStartTime:) CFAbsoluteTime mStartTime;
 @end

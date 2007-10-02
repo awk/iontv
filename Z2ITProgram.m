@@ -240,14 +240,11 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSArray *nodes;
   NSError *err;
   nodes = [inXMLElement nodesForXPath:@"./member" error:&err];
-  int i=0;
-  int crewMemberCount = [nodes count];
   
   [self removeCrewMembers:[self crewMembers]];    // Clear the current crew members - we're going to replace them with the contents of the XML
   
-  for (i=0; i < crewMemberCount; i++)
+  for (NSXMLElement *memberElement in nodes)
   {
-      NSXMLElement *memberElement = [nodes objectAtIndex:i];
       Z2ITCrewMember *aCrewMember = [NSEntityDescription insertNewObjectForEntityForName:@"CrewMember"
                   inManagedObjectContext:[self managedObjectContext]];
 
@@ -286,8 +283,6 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSArray *nodes;
   NSError *err;
   nodes = [inXMLElement nodesForXPath:@"./genre" error:&err];
-  int i=0;
-  int genreCount = [nodes count];
   NSDictionary *colorDictionary = [RSColorDictionary colorDictionaryNamed:@"Default"];
   
   [self removeGenres:[self genres]];       // Clear the current genres - we're going to replace them with the contents of the XML
@@ -311,9 +306,8 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 	[self addGenresObject:aGenre];
   }
 
-  for (i=0; i < genreCount; i++)
+  for (NSXMLElement *memberElement in nodes)
   {
-      NSXMLElement *memberElement = [nodes objectAtIndex:i];
 	  NSNumber *relevanceNumber = nil;
 	  NSString *genreClassString = nil;
 	  

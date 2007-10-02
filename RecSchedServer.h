@@ -23,4 +23,7 @@
 - (void) updateSchedule;
 - (id) uiActivity;
 - (id) storeUpdate;
+@property BOOL mExitServer;
+@property (retain,getter=storeUpdate) id mStoreUpdate;
+@property (retain,getter=uiActivity) id mUIActivity;
 @end
