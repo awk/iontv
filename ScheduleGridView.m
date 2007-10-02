@@ -121,6 +121,15 @@
   [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] mouseDown:theEvent withFrame:cellFrameRect];
 }
 
+- (NSMenu*) menuForEvent:(NSEvent*) theEvent
+{
+	NSMenu *theMenu = [self menu];
+	
+	// Handle the mouse down to select a cell.
+	[self mouseDown:theEvent];
+	return theMenu;
+}
+
 - (void) updateStationsInViewArray
 {
   // Update the stations in view array
@@ -216,6 +225,10 @@
   if (delegate && ([delegate respondsToSelector:@selector(setCurrentSchedule:)]))
   {
     [delegate setCurrentSchedule:inSchedule];
+  }
+  if (delegate && ([delegate respondsToSelector:@selector(setCurrentStation:)]))
+  {
+	[delegate setCurrentStation:[inSchedule station]];
   }
 }
 
