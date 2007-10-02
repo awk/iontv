@@ -7,7 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "XMLParsingProgressDisplayProtocol.h"
 
 @class Z2ITSchedule;
 @class ScheduleView;
@@ -15,10 +14,8 @@
 
 extern NSString *RSSSchedulePBoardType;
 
-@interface MainWindowController : NSWindowController <XMLParsingProgressDisplay> {
+@interface MainWindowController : NSWindowController {
   IBOutlet NSSegmentedControl *mGetScheduleButton;
-  IBOutlet NSProgressIndicator *mParsingProgressIndicator;
-  IBOutlet NSTextField *mParsingProgressInfoField;
   IBOutlet NSSplitView *mScheduleSplitView;
   IBOutlet NSSplitView *mTopLevelSplitView;
   IBOutlet NSOutlineView *mViewSelectionOutlineView;
@@ -45,6 +42,8 @@ extern NSString *RSSSchedulePBoardType;
 - (IBAction) recordSeasonPass:(id)sender;
 - (IBAction) watchStation:(id)sender;
 - (IBAction) createWishlist:(id)sender;
+
+- (void) setGetScheduleButtonEnabled:(BOOL)enabled;
 
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule;
 - (Z2ITSchedule*) currentSchedule;

@@ -11,7 +11,7 @@
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
 #import "RecSchedProtocol.h"
-
+#import "MainWindowController.h"
 
 @implementation recsched_AppDelegate
 
@@ -63,19 +63,21 @@
   if (self != nil) {
     [Preferences setupDefaults];
 
+    [self initializeServerConnection];
+
 	// Register ourselves for the display/feedback methods called by the server
     NSConnection *theConnection;
 
     theConnection = [NSConnection defaultConnection];
     [theConnection setRootObject:self];
-    if ([theConnection registerName:kRecUserInterfaceConnectionName] == NO) 
+    if ([theConnection registerName:kRSStoreUpdateConnectionName] == NO) 
     {
             /* Handle error. */
             NSLog(@"Error registering connection");
-            return nil;
     }
-    [self initializeServerConnection];
-	[mRecServer userInterfaceAppAvailable];
+	else
+		[[self recServer] storeUpdateAvailable];
+	
   }
   return self;
 }
@@ -299,7 +301,6 @@
   else
   {
     [self initializeServerConnection];
-	[mRecServer userInterfaceAppAvailable];
   }
 }
 
@@ -353,7 +354,8 @@
     }
 #endif // USE_SYNCSERVICES
     
-	[mRecServer userInterfaceAppUnavailable];
+	if (reply == NSTerminateNow)
+		[[self recServer] storeUpdateUnavailable];
     return reply;
 }
 
@@ -400,23 +402,11 @@
     [super dealloc];
 }
 
-#pragma mark - Parsing Progress Display Protocol
-
-- (void) setParsingInfoString:(NSString*)inInfoString
-{
-	NSLog(@"Parsing - %@", inInfoString);
-}
-
-- (void) setParsingProgressMaxValue:(double)inTotal
-{
-}
-
-- (void) setParsingProgressDoubleValue:(double)inValue
-{
-}
+#pragma mark - Store Update Protocol
 
 - (void) parsingComplete:(id)info
 {
+	[[window delegate] setGetScheduleButtonEnabled:YES];
 	NSLog(@"Parsing Complete");
 }
 

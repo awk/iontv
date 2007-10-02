@@ -7,6 +7,7 @@
 
 #import "tvDataDelivery.h"
 #import "Preferences.h"
+#import "RSActivityDisplayProtocol.h"
 
 #import <Security/Security.h>
 
@@ -296,8 +297,23 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   
   NSDictionary *xtvdDownloadData = (NSDictionary*)downloadInfo;
   
+  id reportProgressTo = [downloadInfo valueForKey:@"reportProgressTo"];
+  BOOL reportProgress = [reportProgressTo conformsToProtocol:@protocol(RSActivityDisplay)];
+  
+  if (reportProgress)
+  {
+	[reportProgressTo beginActivity];
+	[reportProgressTo setActivityInfoString:@"Downloading Schedule Data"];
+	[reportProgressTo setActivityProgressIndeterminate:YES];
+  }
+	
   NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:@"startDateStr"] in_endTime:[xtvdDownloadData valueForKey:@"endDateStr"]];
  
+  if (reportProgress)
+  {
+	[reportProgressTo setActivityProgressIndeterminate:NO];
+	[reportProgressTo endActivity];
+  }
   if ([[xtvdDownloadData valueForKey:@"dataRecipient"] respondsToSelector:@selector(handleDownloadData:)])
     [[xtvdDownloadData valueForKey:@"dataRecipient"] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:downloadResult waitUntilDone:NO];
   [pool release];

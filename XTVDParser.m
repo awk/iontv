@@ -13,7 +13,7 @@
 #import "Z2ITLineup.h"
 #import "Z2ITLineupMap.h"
 #import "Z2ITProgram.h"
-#import "XMLParsingProgressDisplayProtocol.h"
+#import "RSActivityDisplayProtocol.h"
 
 @implementation XTVDParser
 
@@ -59,12 +59,11 @@
 {
   NSArray *childNodes = [inStationsNode children];
   int i, count = [childNodes count];
-  BOOL reportProgress = [inProgressDisplay conformsToProtocol:@protocol(XMLParsingProgressDisplay)];
-  if (reportProgress)
+  if (inProgressDisplay)
   {
-    [inProgressDisplay setParsingInfoString:@"Updating Stations"];
-    [inProgressDisplay setParsingProgressMaxValue:count];
-    [inProgressDisplay setParsingProgressDoubleValue:0];
+    [inProgressDisplay setActivityInfoString:@"Updating Stations"];
+    [inProgressDisplay setActivityProgressMaxValue:count];
+    [inProgressDisplay setActivityProgressDoubleValue:0];
   }
   else
     NSLog(@"Updating Stations");
@@ -81,8 +80,7 @@
       int stationID = -1;
       if (stationIDString)
       {
-        if (reportProgress)
-          [inProgressDisplay setParsingProgressDoubleValue:i];
+          [inProgressDisplay setActivityProgressDoubleValue:i];
           
         stationID = [stationIDString intValue];
       
@@ -147,9 +145,8 @@
 {
   NSArray *childNodes = [inLineupsNode children];
   int i, count = [childNodes count];
-  BOOL reportProgress = [inProgressDisplay conformsToProtocol:@protocol(XMLParsingProgressDisplay)];
-  if (reportProgress)
-    [inProgressDisplay setParsingInfoString:@"Updating Lineups"];
+  if (inProgressDisplay)
+    [inProgressDisplay setActivityInfoString:@"Updating Lineups"];
   else
     NSLog(@"Updating Lineups");
     
@@ -198,8 +195,7 @@
         // Now for the map items in the lineup element node
         NSArray *lineupChildNodes = [childElement children];
         int j, lineupChildCount = [lineupChildNodes count];
-        if (reportProgress)
-          [inProgressDisplay setParsingProgressMaxValue:lineupChildCount];
+          [inProgressDisplay setActivityProgressMaxValue:lineupChildCount];
         for (j=0; j < lineupChildCount; j++)
         {
           NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
@@ -212,8 +208,7 @@
           NSXMLElement *lineupMap = [lineupChildNodes objectAtIndex:j];
           NSString *tmpStr;
           
-          if (reportProgress)
-            [inProgressDisplay setParsingProgressDoubleValue:j];
+		  [inProgressDisplay setActivityProgressDoubleValue:j];
 
           tmpStr = [[lineupMap attributeForName:@"station"] stringValue];
           if (tmpStr)
@@ -293,19 +288,15 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
 {
   NSArray *childNodes = nil;
   int i, count = 0;
-  BOOL reportProgress = [inProgressDisplay conformsToProtocol:@protocol(XMLParsingProgressDisplay)];
-  if (reportProgress)
-    [inProgressDisplay setParsingInfoString:@"Updating Programs"];
+  if (inProgressDisplay)
+    [inProgressDisplay setActivityInfoString:@"Updating Programs"];
   else
     NSLog(@"Updating Programs");
     
   childNodes  = [[inProgramsNode children] sortedArrayUsingFunction:compareProgramsByIDAttribute context:nil];
   count = [childNodes count];
-  if (reportProgress)
-  {
-    [inProgressDisplay setParsingProgressMaxValue:count];
-    [inProgressDisplay setParsingProgressDoubleValue:0];
-  }
+  [inProgressDisplay setActivityProgressMaxValue:count];
+  [inProgressDisplay setActivityProgressDoubleValue:0];
   
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
@@ -345,8 +336,7 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
       NSString *programIDString = [[childElement attributeForName:@"id"] stringValue];
       if (programIDString)
       {
-        if (reportProgress)
-          [inProgressDisplay setParsingProgressDoubleValue:i];
+		[inProgressDisplay setActivityProgressDoubleValue:i];
 
         Z2ITProgram *aProgram  = nil;
         
@@ -381,19 +371,15 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 {
   NSArray *childNodes = nil;
   int i, count = 0;
-  BOOL reportProgress = [inProgressDisplay conformsToProtocol:@protocol(XMLParsingProgressDisplay)];
-  if (reportProgress)
-    [inProgressDisplay setParsingInfoString:@"Updating Production Crew"];
+  if (inProgressDisplay)
+    [inProgressDisplay setActivityInfoString:@"Updating Production Crew"];
   else
     NSLog(@"Updating Production Crew");
     
   childNodes  = [[inProductionCrewNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
   count = [childNodes count];
-  if (reportProgress)
-  {
-    [inProgressDisplay setParsingProgressMaxValue:count];
-    [inProgressDisplay setParsingProgressDoubleValue:0];
-  }
+  [inProgressDisplay setActivityProgressMaxValue:count];
+  [inProgressDisplay setActivityProgressDoubleValue:0];
   
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
@@ -429,8 +415,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     if (nodeKind == NSXMLElementKind)
     {
       NSXMLElement *childElement = (NSXMLElement *)child;
-      if (reportProgress)
-        [inProgressDisplay setParsingProgressDoubleValue:i];
+	  [inProgressDisplay setActivityProgressDoubleValue:i];
 
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
       if (programIDString)
@@ -457,19 +442,15 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 {
   NSArray *childNodes = nil;
   int i, count = 0;
-  BOOL reportProgress = [inProgressDisplay conformsToProtocol:@protocol(XMLParsingProgressDisplay)];
-  if (reportProgress)
-    [inProgressDisplay setParsingInfoString:@"Updating Genres"];
+  if (inProgressDisplay)
+    [inProgressDisplay setActivityInfoString:@"Updating Genres"];
   else
     NSLog(@"Updating Genres");
     
   childNodes = [[inGenresNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
   count = [childNodes count];
-  if (reportProgress)
-  {
-    [inProgressDisplay setParsingProgressMaxValue:count];
-    [inProgressDisplay setParsingProgressDoubleValue:0];
-  }
+  [inProgressDisplay setActivityProgressMaxValue:count];
+  [inProgressDisplay setActivityProgressDoubleValue:0];
   
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
@@ -504,8 +485,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     NSXMLNodeKind nodeKind = [child kind];
     if (nodeKind == NSXMLElementKind)
     {
-      if (reportProgress)
-        [inProgressDisplay setParsingProgressDoubleValue:i];
+	  [inProgressDisplay setActivityProgressDoubleValue:i];
 
       NSXMLElement *childElement = (NSXMLElement *)child;
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
@@ -533,19 +513,15 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 {
   NSArray *childNodes = nil;
   int i, count = [childNodes count];
-  BOOL reportProgress = [inProgressDisplay conformsToProtocol:@protocol(XMLParsingProgressDisplay)];
-  if (reportProgress)
-    [inProgressDisplay setParsingInfoString:@"Updating Schedules"];
+  if (inProgressDisplay)
+    [inProgressDisplay setActivityInfoString:@"Updating Schedules"];
   else
     NSLog(@"Updating Schedules");
 
   childNodes = [[inSchedulesNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
   count = [childNodes count];
-  if (reportProgress)
-  {
-    [inProgressDisplay setParsingProgressMaxValue:count];
-    [inProgressDisplay setParsingProgressDoubleValue:0];
-  }
+  [inProgressDisplay setActivityProgressMaxValue:count];
+  [inProgressDisplay setActivityProgressDoubleValue:0];
   NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
   for (i=0; i < count; i++)
   {
@@ -580,8 +556,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     if (nodeKind == NSXMLElementKind)
     {
       NSXMLElement *childElement = (NSXMLElement *)child;
-      if (reportProgress)
-        [inProgressDisplay setParsingProgressDoubleValue:i];
+	  [inProgressDisplay setActivityProgressDoubleValue:i];
 
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
       if (programIDString)
@@ -692,6 +667,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSDictionary *xtvdParserData = (NSDictionary*)parseInfo;
   
   NSPersistentStoreCoordinator *psc = [xtvdParserData valueForKey:@"persistentStoreCoordinator"];
+  id reportProgressTo = [xtvdParserData valueForKey:@"reportProgressTo"];
   if (psc != nil)
   {
     mManagedObjectContext = [xtvdParserData valueForKey:@"managedObjectContext"];
@@ -701,6 +677,11 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
       [mManagedObjectContext setPersistentStoreCoordinator: psc];
     }
     
+	if ([reportProgressTo conformsToProtocol:@protocol(RSActivityDisplay)] == NO)
+		reportProgressTo = nil;
+	
+	[reportProgressTo beginActivity];
+	
     // when the lineup retrieval and MOC saves, we want to update the same object in the UI's MOC. 
     // So listen for the did save notification from the retrieval/parsing thread MOC
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
@@ -711,7 +692,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     {
       lineupsOnly = [[xtvdParserData valueForKey:@"lineupsOnly"] boolValue];
     }
-    [XTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] reportTo:[xtvdParserData valueForKey:@"reportProgressTo"] inManagedObjectContext:mManagedObjectContext lineupsOnly:lineupsOnly];
+    [XTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] reportTo:reportProgressTo inManagedObjectContext:mManagedObjectContext lineupsOnly:lineupsOnly];
     
     [mManagedObjectContext processPendingChanges];
     
@@ -727,6 +708,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
   
   [[NSFileManager defaultManager] removeFileAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] handler:nil];
+  [reportProgressTo endActivity];
   [[xtvdParserData valueForKey:@"reportCompletionTo"] performSelectorOnMainThread:@selector(parsingComplete:) withObject:nil waitUntilDone:NO];
   [pool release];
 }

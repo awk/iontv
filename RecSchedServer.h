@@ -9,15 +9,18 @@
 #import <Cocoa/Cocoa.h>
 
 #import "RecSchedProtocol.h"
-#import "XMLParsingProgressDisplayProtocol.h"
+#import "RSActivityDisplayProtocol.h"
+#import "RSStoreUpdateProtocol.h"
 
-@interface RecSchedServer : NSObject <RecSchedServerProto, XMLParsingProgressDisplay> {
+@interface RecSchedServer : NSObject <RecSchedServerProto, RSActivityDisplay, RSStoreUpdate> {
     BOOL mExitServer;
 	
-	id mUIApplication;
+	id mUIActivity;
+	id mStoreUpdate;
 }
 
 - (bool) shouldExit;
 - (void) updateSchedule;
-- (id) uiApplication;
+- (id) uiActivity;
+- (id) storeUpdate;
 @end

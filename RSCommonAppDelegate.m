@@ -9,7 +9,8 @@
 #import "RSCommonAppDelegate.h"
 
 NSString *kRecServerConnectionName = @"recsched_bkgd_server";
-NSString *kRecUserInterfaceConnectionName = @"recsched_ui_app";
+NSString *kRecUIActivityConnectionName = @"recsched_ui_activity";
+NSString *kRSStoreUpdateConnectionName = @"resched_store_update";
 
 @implementation RSCommonAppDelegate
 

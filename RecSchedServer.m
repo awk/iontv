@@ -18,6 +18,7 @@
 #import "XTVDParser.h"
 #import "RecordingThread.h"
 #import "HDHomeRunTuner.h"
+#import "RSStoreUpdateProtocol.h"
 
 const int kDefaultScheduleFetchDuration = 3;
 
@@ -31,13 +32,13 @@ const int kDefaultScheduleFetchDuration = 3;
   return self;
 }
 
-- (void) initializeUserInterfaceConnection
+- (void) initializeUIActivityConnection
 {
   // Connect to server
-  mUIApplication = [[NSConnection rootProxyForConnectionWithRegisteredName:kRecUserInterfaceConnectionName  host:nil] retain];
+  mUIActivity = [[NSConnection rootProxyForConnectionWithRegisteredName:kRecUIActivityConnectionName  host:nil] retain];
    
   // check if connection worked.
-  if (mUIApplication == nil) 
+  if (mUIActivity == nil) 
   {
     NSLog(@"couldn't connect with User Interface Application");
   }
@@ -46,13 +47,37 @@ const int kDefaultScheduleFetchDuration = 3;
     //
     // set protocol for the remote object & then register ourselves with the 
     // messaging server.
-    [mUIApplication setProtocolForProxy:@protocol(XMLParsingProgressDisplay)];
+    [mUIActivity setProtocolForProxy:@protocol(RSActivityDisplay)];
   }
 }
 
-- (id) uiApplication
+- (void) initializeStoreUpdateConnection
 {
-	return mUIApplication;
+  // Connect to server
+  mStoreUpdate = [[NSConnection rootProxyForConnectionWithRegisteredName:kRSStoreUpdateConnectionName  host:nil] retain];
+   
+  // check if connection worked.
+  if (mStoreUpdate == nil) 
+  {
+    NSLog(@"couldn't connect with User Interface (store update) Application");
+  }
+  else
+  {
+    //
+    // set protocol for the remote object & then register ourselves with the 
+    // messaging server.
+    [mStoreUpdate setProtocolForProxy:@protocol(RSStoreUpdate)];
+  }
+}
+
+- (id) uiActivity
+{
+	return mUIActivity;
+}
+
+- (id) storeUpdate
+{
+	return mStoreUpdate;
 }
 
 #pragma mark - Internal Methods
@@ -76,7 +101,7 @@ const int kDefaultScheduleFetchDuration = 3;
   NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
   NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
   
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", self, @"dataRecipient", nil];
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", self, @"dataRecipient", self, @"reportProgressTo", nil];
   [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
   [callData release];
 }
@@ -94,12 +119,15 @@ const int kDefaultScheduleFetchDuration = 3;
 
   if (xtvd != nil)
   {
-	id notificationProxy = [self uiApplication];
+	id notificationProxy = [self uiActivity];
 	if (notificationProxy == nil)
 		notificationProxy = self;
+	id completionProxy = [self storeUpdate];
+	if (completionProxy == nil)
+		completionProxy = self;
     NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
         notificationProxy, @"reportProgressTo", 
-        self, @"reportCompletionTo", 
+        completionProxy, @"reportCompletionTo", 
         [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator",
         nil];
     
@@ -112,16 +140,28 @@ const int kDefaultScheduleFetchDuration = 3;
   }
 }
 
-- (void) setParsingInfoString:(NSString*)inInfoString
+- (void) beginActivity
+{
+}
+
+- (void) endActivity
+{
+}
+
+- (void) setActivityInfoString:(NSString*)inInfoString
 {
 	NSLog(@"Parsing - %@", inInfoString);
 }
 
-- (void) setParsingProgressMaxValue:(double)inTotal
+- (void) setActivityProgressIndeterminate:(BOOL) isIndeterminate
 {
 }
 
-- (void) setParsingProgressDoubleValue:(double)inValue
+- (void) setActivityProgressMaxValue:(double)inTotal
+{
+}
+
+- (void) setActivityProgressDoubleValue:(double)inValue
 {
 }
 
@@ -152,17 +192,26 @@ const int kDefaultScheduleFetchDuration = 3;
 
 #pragma mark - Server Methods
 
-- (void) userInterfaceAppAvailable
+- (void) activityDisplayAvailable
 {
-	NSLog(@"userInterfaceAppAvailble - initializing connection");
-	[self initializeUserInterfaceConnection];
+	[self initializeUIActivityConnection];
 }
 
-- (void) userInterfaceAppUnavailable
+- (void) activityDisplayUnavailable
 {
-	NSLog(@"userInterfaceAppUnavailable - clearing connection");
-	[mUIApplication release];
-	mUIApplication = nil;
+	[mUIActivity release];
+	mUIActivity = nil;
+}
+
+- (void) storeUpdateAvailable
+{
+	[self initializeStoreUpdateConnection];
+}
+
+- (void) storeUpdateUnavailable
+{
+	[mStoreUpdate release];
+	mStoreUpdate = nil;
 }
 
 - (bool) shouldExit
@@ -257,6 +306,7 @@ const int kDefaultScheduleFetchDuration = 3;
 {
   NSMutableDictionary *updatedCallData = [NSMutableDictionary dictionaryWithDictionary:callData];
   [updatedCallData setValue:self forKey:@"dataRecipient"];
+  [updatedCallData setValue:[self uiActivity] forKey:@"reportProgressTo"];
   [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:updatedCallData];
 }
 

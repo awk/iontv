@@ -7,11 +7,11 @@
 //
 
 #import "RSCommonAppDelegate.h"
-#import "XMLParsingProgressDisplayProtocol.h"
+#import "RSStoreUpdateProtocol.h"
 
 @class HDHomeRunStation;
 
-@interface recsched_AppDelegate : RSCommonAppDelegate<XMLParsingProgressDisplay>
+@interface recsched_AppDelegate : RSCommonAppDelegate <RSStoreUpdate>
 {
     IBOutlet NSWindow *window;
     IBOutlet NSWindow *mCoreDataProgramWindow;

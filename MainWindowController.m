@@ -231,15 +231,14 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 #pragma mark Action Methods
 
+- (void) setGetScheduleButtonEnabled:(BOOL)enabled
+{
+  [mGetScheduleButton setEnabled:enabled forSegment:0];
+}
+
 - (IBAction) getScheduleAction:(id)sender
 {
-  [mParsingProgressIndicator startAnimation:self];
-  [mParsingProgressIndicator setHidden:NO];
-  [mParsingProgressIndicator setIndeterminate:YES];
-  [mParsingProgressInfoField setStringValue:@"Downloading Schedule Data"];
-  [mParsingProgressInfoField setHidden:NO];
-  
-  [mGetScheduleButton setEnabled:NO forSegment:0];
+  [self setGetScheduleButtonEnabled:NO];
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   
   // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
@@ -326,10 +325,6 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   NSLog(@"getScheduleAction downloadResult xtvd = %@", xtvd);
   [downloadResult release];
 
-  [mParsingProgressIndicator stopAnimation:self];
-  [mParsingProgressIndicator setHidden:YES];
-  [mParsingProgressIndicator setIndeterminate:NO];
-  [mParsingProgressInfoField setHidden:YES];
   if (xtvd != nil)
   {
     NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
@@ -347,52 +342,6 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   }
   else
     [mGetScheduleButton setEnabled:YES];
-}
-
-- (void) setParsingInfoString:(NSString*)inInfoString
-{
-  [mParsingProgressInfoField setStringValue:inInfoString];
-  [mParsingProgressInfoField setHidden:NO];
-}
-
-- (void) setParsingProgressMaxValue:(double)inTotal
-{
-  [mParsingProgressIndicator setMaxValue:inTotal];
-  [mParsingProgressIndicator setHidden:NO];
-}
-
-- (void) setParsingProgressDoubleValue:(double)inValue
-{
-  [mParsingProgressIndicator setDoubleValue:inValue];
-}
-
-- (void) parsingComplete:(id)info
-{
-  [mParsingProgressIndicator setHidden:YES];
-  [mParsingProgressInfoField setHidden:YES];
-
-  // Clear all old items from the store
-//  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-//  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-//  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
-
-  [mParsingProgressIndicator startAnimation:self];
-  [mParsingProgressIndicator setHidden:NO];
-  [mParsingProgressIndicator setIndeterminate:YES];
-  [mParsingProgressInfoField setStringValue:@"Cleanup Old Schedule Data"];
-  [mParsingProgressInfoField setHidden:NO];
-//  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
-//  [callData release];
-
-	[self cleanupComplete:nil];
-}
-
-- (void) cleanupComplete:(id)info
-{
-  [mParsingProgressIndicator stopAnimation:self];
-  [mParsingProgressIndicator setHidden:YES];
-  [mParsingProgressInfoField setHidden:YES];
-  [mGetScheduleButton setEnabled:YES];
 }
 
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule

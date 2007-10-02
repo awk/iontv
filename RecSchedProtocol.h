@@ -13,8 +13,10 @@ extern NSString *kRecServerConnectionName;
 
 @protocol RecSchedServerProto
 
-- (void) userInterfaceAppAvailable;
-- (void) userInterfaceAppUnavailable;
+- (void) activityDisplayAvailable;
+- (void) activityDisplayUnavailable;
+- (void) storeUpdateAvailable;
+- (void) storeUpdateUnavailable;
 
 - (BOOL) addRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID;
 

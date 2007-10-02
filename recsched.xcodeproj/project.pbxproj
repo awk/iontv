@@ -80,6 +80,7 @@
 		EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */; };
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
+		EA686CEA0CA95F5600185188 /* RSActivityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA686CE90CA95F5600185188 /* RSActivityViewController.m */; };
 		EA93F3990C922E53004788CF /* iOnTV.icns in Resources */ = {isa = PBXBuildFile; fileRef = EA93F3980C922E53004788CF /* iOnTV.icns */; };
 		EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
@@ -245,6 +246,10 @@
 		EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleViewController.m; sourceTree = "<group>"; };
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
+		EA686CE80CA95F5600185188 /* RSActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSActivityViewController.h; sourceTree = "<group>"; };
+		EA686CE90CA95F5600185188 /* RSActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSActivityViewController.m; sourceTree = "<group>"; };
+		EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSActivityDisplayProtocol.h; sourceTree = "<group>"; };
+		EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSStoreUpdateProtocol.h; sourceTree = "<group>"; };
 		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
 		EA93F3980C922E53004788CF /* iOnTV.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = iOnTV.icns; path = Images/iOnTV.icns; sourceTree = SOURCE_ROOT; };
 		EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 3.xcdatamodel"; sourceTree = "<group>"; };
@@ -396,6 +401,8 @@
 				32CA4F630368D1EE00C91783 /* recsched_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				EAE655730B9E691000CDB279 /* RecSchedProtocol.h */,
+				EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */,
+				EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";
@@ -576,6 +583,8 @@
 				EA977F5C0C8992CF0043B79E /* RSOutlineView.m */,
 				EA3B404E0C8C79470042C793 /* ScheduleDetailsPopupView.h */,
 				EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */,
+				EA686CE80CA95F5600185188 /* RSActivityViewController.h */,
+				EA686CE90CA95F5600185188 /* RSActivityViewController.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -746,6 +755,7 @@
 				EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */,
 				EA3B40500C8C79470042C793 /* ScheduleDetailsPopupView.m in Sources */,
 				EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */,
+				EA686CEA0CA95F5600185188 /* RSActivityViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
