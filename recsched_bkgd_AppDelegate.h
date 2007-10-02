@@ -15,6 +15,8 @@
 	RecSchedServer *mRecSchedServer;
 }
 
+- (NSURL *)urlForPersistentStore;
+
 #if USE_SYNCSERVICES
 - (ISyncClient *)syncClient;
 - (void)syncAction:(id)sender;
