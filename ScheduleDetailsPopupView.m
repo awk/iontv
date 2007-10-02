@@ -23,6 +23,8 @@ const float kScheduleDetailsPopupHeightPadding = 15.0;
 		mCloseBoxImage = [NSImage imageNamed:@"closebox.png"];
 		mCloseBoxPressedImage = [NSImage imageNamed:@"closebox_pressed.png"];
 		mMouseInCloseBox = NO;
+		
+		[self setWantsLayer:YES];		// Turn on CoreAnimation for this view (and subviews too).
     }
     return self;
 }
@@ -132,12 +134,8 @@ const float kScheduleDetailsPopupHeightPadding = 15.0;
   NSPoint localPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
   if (mTrackingCloseBox && [self mouse:localPoint inRect:[self closeBoxRect]] == YES)
   {
-		NSWindow *parentWindow = [[self window] parentWindow];
-		if (parentWindow)
-		{
-			[parentWindow removeChildWindow:[self window]];
-		}
-		[[self window] orderOut:self];
+		// Fade out the window on close
+		[[[self window] animator] setAlphaValue:0.0];
 	}
 	mMouseInCloseBox = NO;
 	mTrackingCloseBox = NO;

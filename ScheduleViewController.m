@@ -51,6 +51,7 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
 //  [mScheduleDetailsPopupWindow setMovableByWindowBackground:YES];
   [mScheduleDetailsPopupWindow setOpaque:NO];
   [mScheduleDetailsPopupWindow setBackgroundColor:[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:0.0]];
+  [mScheduleDetailsPopupWindow setAlphaValue:0.0];
   
   // Reset the windowLocation origin to zero and increase the size of the view - this give us the space
   // 'outside' in which we can draw the close icon.
@@ -264,11 +265,39 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
   }
 }
 
-- (void) showScheduleDetails:(NSTimer*)theTimer
+- (void) showScheduleDetailsWithStartingFrame:(NSRect)startingFrame
 {
+	if ([mScheduleDetailsPopupWindow alphaValue] == 1.0)
+		return;		// The window is already visible - no  need to show it again.
+		
+	NSRect endWindowFrame = [mScheduleDetailsPopupWindow frame];
+	NSSize endViewSize = [mScheduleDetailsContentView frame].size;
+	
+	// start with the window positioned so that bottom-left aligns with bottom left of the selected schedule
+	startingFrame.origin.x -= kScheduleDetailsPopupWidthPadding;
+	startingFrame.origin.y -= kScheduleDetailsPopupHeightPadding;
+	[mScheduleDetailsPopupWindow setFrameOrigin:startingFrame.origin];
+
+	// Set the content view to match the frame size of the selected schedule.
+	NSSize viewFrameSize = startingFrame.size;
+	viewFrameSize.width += kScheduleDetailsPopupWidthPadding*2;
+	viewFrameSize.height += kScheduleDetailsPopupHeightPadding*2;
+	[mScheduleDetailsContentView setFrameSize:viewFrameSize];
+  
 	[mScheduleDetailsParentWindow addChildWindow:mScheduleDetailsPopupWindow ordered:NSWindowAbove];
+	[mScheduleDetailsPopupWindow setAlphaValue:0.0];
 	[mScheduleDetailsPopupWindow setIsVisible:YES];
 	[mScheduleDetailsPopupWindow makeKeyAndOrderFront:self];
+	
+	// Now animate the window into it's final position
+	[NSAnimationContext beginGrouping];
+	if ([[NSApp currentEvent] modifierFlags] & NSShiftKeyMask)
+		[[NSAnimationContext currentContext] setDuration:1.0];
+	[[mScheduleDetailsPopupWindow animator] setFrame:endWindowFrame display:YES];
+	[[mScheduleDetailsPopupWindow animator] setAlphaValue:1.0];
+	[[mScheduleDetailsContentView animator] setFrameSize:endViewSize];
+	[NSAnimationContext endGrouping];
+	
 }
 
 @end

@@ -33,4 +33,6 @@
 - (IBAction) scheduleControlClicked:(id)sender;
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule;
 - (void) setCurrentStation:(Z2ITStation*)inStation;
+
+- (void) showScheduleDetailsWithStartingFrame:(NSRect)startingFrame;
 @end

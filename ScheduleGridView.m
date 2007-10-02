@@ -398,9 +398,11 @@ const float kScheduleDetailsPopUpTime = 10.0;
 	NSPoint mousePoint = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
 	if ([self mouse:mousePoint inRect:[mScheduleCellTrackingArea rect]])
 	{
-		if (delegate && ([delegate respondsToSelector:@selector(showScheduleDetails:)]))
+		if (delegate && ([delegate respondsToSelector:@selector(showScheduleDetailsWithStartingFrame:)]))
 		{
-			[delegate showScheduleDetails:theTimer];
+			NSRect frameInScreenCoords = [self convertRect:[mScheduleCellTrackingArea rect] toView:nil];
+			frameInScreenCoords.origin = [[self window] convertBaseToScreen:frameInScreenCoords.origin];
+			[delegate showScheduleDetailsWithStartingFrame:frameInScreenCoords];
 		}
 	}
 }
