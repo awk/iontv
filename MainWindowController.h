@@ -14,12 +14,12 @@
 @class RSWishlistController;
 
 @interface MainWindowController : NSWindowController <XMLParsingProgressDisplay> {
-  IBOutlet NSButton *mGetScheduleButton;
+  IBOutlet NSSegmentedControl *mGetScheduleButton;
   IBOutlet NSProgressIndicator *mParsingProgressIndicator;
   IBOutlet NSTextField *mParsingProgressInfoField;
   IBOutlet NSSplitView *mScheduleSplitView;
   IBOutlet NSSplitView *mTopLevelSplitView;
-  IBOutlet NSTableView *mViewSelectionTableView;
+  IBOutlet NSOutlineView *mViewSelectionOutlineView;
   IBOutlet NSView *mDetailView;
   IBOutlet NSView *mScheduleContainerView;
   IBOutlet NSView *mProgramSearchView;
@@ -29,11 +29,8 @@
   IBOutlet NSObjectController *mCurrentSchedule;
   IBOutlet NSObjectController *mCurrentStation;
   IBOutlet NSObjectController *mCurrentLineup;
-  IBOutlet NSArrayController *mViewSelectionArrayController;
+  IBOutlet NSTreeController *mViewSelectionTreeController;
   
-  // Cells used by the Source View selector 'table'
-  NSCell *mSeparatorCell;
-
   float mDetailViewMinHeight;
 }
 

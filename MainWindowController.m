@@ -6,7 +6,6 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
-#import "AKSourceTableClasses.h"
 #import "MainWindowController.h"
 #import "ScheduleView.h"
 #import "tvDataDelivery.h"
@@ -26,13 +25,31 @@ const CGFloat kSourceListMinWidth = 150;
 
 - (void) awakeFromNib
 {
-  [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
-  mSeparatorCell = [[AKSourceSeparatorCell alloc] init];
-  [mViewSelectionArrayController addObject:@"Schedule"];
-  [mViewSelectionArrayController addObject:@"Search"];
-  [mViewSelectionArrayController addObject:@""];    // Separator at row '2'
-  [mViewSelectionArrayController addObserver:self forKeyPath:@"selection" options:0 context:nil];		// Watch for changes to view selection
-  [mViewSelectionArrayController setSelectionIndex:0];
+//  [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
+  
+  // Don't cause resizing when items are expanded
+  [mViewSelectionOutlineView setAutoresizesOutlineColumn:NO];
+  [mViewSelectionOutlineView setAllowsEmptySelection:NO];
+  [mViewSelectionOutlineView setHeaderView:nil];
+  
+  NSDictionary *storeMetaData = [[[NSApp delegate] persistentStoreCoordinator] metadataForPersistentStore:[[NSApp delegate] persistentStore]];
+  if (![storeMetaData valueForKey:@"SourceListNodesSetup"])
+  {
+	[[NSApp delegate] addSourceListNodes];
+  }
+
+  // Sort based on the 'priority' of the node
+  NSSortDescriptor *aSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"priority.value" ascending:YES] autorelease];
+  [mViewSelectionTreeController setSortDescriptors:[NSArray arrayWithObject:aSortDescriptor]];
+  
+  // Start with the very first (Programs) item expanded
+  [mViewSelectionOutlineView reloadItem:nil reloadChildren:YES];
+  [mViewSelectionOutlineView expandItem:nil expandChildren:NO];
+  
+  [mViewSelectionTreeController addObserver:self forKeyPath:@"selection" options:0 context:nil];		// Watch for changes to view selection
+  NSIndexPath *anIndexPath = [NSIndexPath indexPathWithIndex:0];
+  anIndexPath = [anIndexPath indexPathByAddingIndex:0];
+  [mViewSelectionTreeController setSelectionIndexPath:anIndexPath];
   
   mDetailViewMinHeight = [mDetailView frame].size.height;
   NSView *bottomContainerView = [[mScheduleSplitView subviews] objectAtIndex:1];
@@ -76,7 +93,8 @@ const CGFloat kSourceListMinWidth = 150;
   [mParsingProgressIndicator setIndeterminate:YES];
   [mParsingProgressInfoField setStringValue:@"Downloading Schedule Data"];
   [mParsingProgressInfoField setHidden:NO];
-  [mGetScheduleButton setEnabled:NO];
+  
+  [mGetScheduleButton setEnabled:NO forSegment:0];
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   
   // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
@@ -255,14 +273,33 @@ const CGFloat kSourceListMinWidth = 150;
     }
 }
 
+- (void) showSchedule
+{
+	[mScheduleContainerView setHidden:NO];
+	[mProgramSearchView setHidden:YES];
+}
+
+- (void) showSearch
+{
+	[mScheduleContainerView setHidden:YES];
+	[mProgramSearchView setHidden:NO];
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath
 			ofObject:(id)object 
 			change:(NSDictionary *)change
 			context:(void *)context
 {
-    if ((object == mViewSelectionArrayController) && ([keyPath isEqual:@"selection"]))
+    if ((object == mViewSelectionTreeController) && ([keyPath isEqual:@"selection"]))
 	{
-		[self showViewForTableSelection:[mViewSelectionArrayController selectionIndex]];
+		if ([[mViewSelectionTreeController selection] valueForKey:@"actionMessageName"] != NSNoSelectionMarker)
+		{
+			NSLog(@"Show view selection for %@", [[mViewSelectionTreeController selection] valueForKey:@"label"]);
+			SEL actionSelector = NSSelectorFromString([[mViewSelectionTreeController selection] valueForKey:@"actionMessageName"]);
+			if ([self respondsToSelector:actionSelector])
+				[self performSelector:actionSelector];
+		}
+//		[self showViewForTableSelection:[mViewSelectionArrayController selectionIndex]];
     }
 }
 
@@ -339,12 +376,60 @@ const CGFloat kSourceListMinWidth = 150;
 
 - (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	if ((row == 2)  && (tableColumn == nil))
-	{ // separator
-		return mSeparatorCell;
-	}
-	
 	return [tableColumn dataCellForRow:row];
+}
+
+- (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+	if (tableColumn == nil)
+		return [[NSTextFieldCell alloc] init];
+	else
+		return nil;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
+{
+	if (item == nil)
+		return NO;
+	NSManagedObject *aTreeNode = [item representedObject];
+	if ([[aTreeNode valueForKey:@"heading"] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+		return NO;
+	else
+		return YES;
+}
+
+- (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
+{
+	[cell setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
+}
+
+- (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
+{
+	NSManagedObject *aTreeNode = [item representedObject];
+	if ([[aTreeNode valueForKey:@"heading"] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+		return 19;
+	else
+		return 19;
+}
+
+#if 0
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item
+{
+	NSManagedObject *aTreeNode = [item representedObject];
+	if ([[aTreeNode valueForKey:@"heading"] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+		return NO;
+	else
+		return YES;
+}
+#endif
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
+{
+	NSManagedObject *aTreeNode = [item representedObject];
+	if ([[aTreeNode valueForKey:@"heading"] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+		return YES;
+	else
+		return NO;
 }
 
 @end
