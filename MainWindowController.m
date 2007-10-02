@@ -17,6 +17,7 @@
 #import "Z2ITStation.h"
 #import "recsched_AppDelegate.h"
 #import "HDHomeRunTuner.h"
+#import "RecSchedProtocol.h"
 
 @implementation MainWindowController
 
@@ -111,9 +112,9 @@ const CGFloat kSourceListMinWidth = 150;
 
 - (IBAction) recordShow:(id)sender
 {
-//  Z2ITSchedule *aSchedule = [mCurrentSchedule content];
-//  [aSchedule setToBeRecorded:YES];
-//  [mRecServer addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
+  Z2ITSchedule *aSchedule = [mCurrentSchedule content];
+  [aSchedule setToBeRecorded:YES];
+  [[[[NSApplication sharedApplication] delegate] recServer] addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
 }
 
 - (IBAction) recordSeasonPass:(id)sender
