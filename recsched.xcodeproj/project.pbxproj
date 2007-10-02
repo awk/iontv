@@ -83,6 +83,7 @@
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
 		EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA72A7A90C260D79009C63E5 /* ClientDescription.plist */; };
+		EA93F3990C922E53004788CF /* iOnTV.icns in Resources */ = {isa = PBXBuildFile; fileRef = EA93F3980C922E53004788CF /* iOnTV.icns */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
@@ -164,7 +165,7 @@
 		77C8280B06725ACE000B614F /* recsched_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_AppDelegate.h; sourceTree = "<group>"; };
 		77C8280C06725ACE000B614F /* recsched_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_AppDelegate.m; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		8D1107320486CEB800E47090 /* recsched.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recsched.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D1107320486CEB800E47090 /* iOnTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOnTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA06742F0B58084D009B0E27 /* MainWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainWindowController.h; sourceTree = "<group>"; };
 		EA0674300B58084D009B0E27 /* MainWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainWindowController.m; sourceTree = "<group>"; };
 		EA06743D0B580B4D009B0E27 /* tvDataDelivery.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = tvDataDelivery.h; sourceTree = "<group>"; };
@@ -248,6 +249,7 @@
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
 		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
+		EA93F3980C922E53004788CF /* iOnTV.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = iOnTV.icns; path = Images/iOnTV.icns; sourceTree = SOURCE_ROOT; };
 		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSOutlineView.h; sourceTree = "<group>"; };
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSOutlineView.m; sourceTree = "<group>"; };
 		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = "<group>"; };
@@ -366,7 +368,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D1107320486CEB800E47090 /* recsched.app */,
+				8D1107320486CEB800E47090 /* iOnTV.app */,
 				EA2EE03E0C07D2250002420F /* libhdhomerun.a */,
 				EAEC092D0C272E1300C40D5A /* recsched_bkgd.app */,
 			);
@@ -437,6 +439,7 @@
 		EA2939860C0CC89E0053E2B8 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EA93F3980C922E53004788CF /* iOnTV.icns */,
 				EA3B40550C8C7AEE0042C793 /* closebox.png */,
 				EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */,
 				EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */,
@@ -604,7 +607,7 @@
 			name = recsched;
 			productInstallPath = "$(HOME)/Applications";
 			productName = recsched;
-			productReference = 8D1107320486CEB800E47090 /* recsched.app */;
+			productReference = 8D1107320486CEB800E47090 /* iOnTV.app */;
 			productType = "com.apple.product-type.application";
 		};
 		EA2EE03D0C07D2250002420F /* libhdhomerun */ = {
@@ -688,6 +691,7 @@
 				EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */,
 				EA3B40570C8C7AEE0042C793 /* closebox.png in Resources */,
 				EA3B40580C8C7AEE0042C793 /* closebox_pressed.png in Resources */,
+				EA93F3990C922E53004788CF /* iOnTV.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -855,7 +859,7 @@
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
-				PRODUCT_NAME = recsched;
+				PRODUCT_NAME = iOnTV;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
 			};
@@ -969,7 +973,7 @@
 		EAEC092F0C272E1600C40D5A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/recsched.app/Contents/Support";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/iOnTV.app/Contents/Support";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
