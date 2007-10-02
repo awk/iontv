@@ -130,7 +130,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                   
                   if (status == noErr)
                   {
-                    password = [NSString stringWithUTF8String:passwordData];
+                    password = [NSString stringWithCString:passwordData length:passwordLength];
                     SecKeychainItemFreeContent(NULL, passwordData);
                   }
                   else
