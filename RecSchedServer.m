@@ -100,16 +100,23 @@ const int kDefaultScheduleFetchDuration = 3;
 {
 	NSLog(@"parsingComplete");
   // Clear all old items from the store
-//  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-//  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-//  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
-//
-//  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
+#if 0
+  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
+
+  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
+#else
+	// No cleanup performed - just send a fake cleanup complete notification
+	[self cleanupComplete:info];
+#endif
 }
 
 - (void) cleanupComplete:(id)info
 {
 	NSLog(@"cleanupComplete");
+	
+	[[NSApp delegate] syncAction:nil];
 }
 
 #pragma mark - Server Methods
@@ -149,12 +156,10 @@ const int kDefaultScheduleFetchDuration = 3;
 // schedule data and update the database.
 - (void) updateSchedule
 {
-	[self findStations];
-
 	// Set up a timer to fire one hour before the about to be fetched schedule data 'runs out'
 	[NSTimer scheduledTimerWithTimeInterval:(kDefaultScheduleFetchDuration - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:YES]; 
 
-//	[self fetchScheduleWithDuration:kDefaultScheduleFetchDuration];
+	[self fetchScheduleWithDuration:kDefaultScheduleFetchDuration];
 }
 
 - (void) updateScheduleTimer:(NSTimer*)aTimer

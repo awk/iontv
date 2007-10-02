@@ -23,8 +23,6 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 	[[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
 	
 	[mRecSchedServer updateSchedule];
-	
-	[self syncAction:nil];
 }
 
 - (id) init {
@@ -106,7 +104,7 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
     NSError *error = nil;
     ISyncClient *client = [self syncClient];
     if (nil != client) {
-        [[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:NO handler:self error:&error];
+        [[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
     }
     if (nil != error) {
         NSLog(@"syncAction - error occured - %@", error);
