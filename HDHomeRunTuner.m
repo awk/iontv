@@ -10,6 +10,7 @@
 #import "HDHomeRunMO.h"
 #import "CoreData_Macros.h"
 #import "hdhomerun_channelscan.h"
+#import "hdhomerun_video.h"
 #import "ChannelScanProgressDisplayProtocol.h"
 #import "Z2ITLineupMap.h"
 #import "Z2ITLineup.h"
@@ -112,14 +113,8 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
   {
     @synchronized(self)
     {
-      uint32_t local_ip = hdhomerun_device_get_local_machine_addr(mHDHomeRunDevice);
+      ret = hdhomerun_device_stream_start(mHDHomeRunDevice);
 
-      sprintf(value, "%u.%u.%u.%u:%d",
-              (unsigned int)(local_ip >> 24) & 0xFF, (unsigned int)(local_ip >> 16) & 0xFF,
-              (unsigned int)(local_ip >> 8) & 0xFF, (unsigned int)(local_ip >> 0) & 0xFF,
-              kDefaultPortNumber);
-
-      ret = hdhomerun_device_set_tuner_target(mHDHomeRunDevice, value);
     }
   }
   @catch (NSException *exception)
@@ -130,10 +125,31 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
   {
     if (ret < 1)
     {
-      NSLog(@"startStreaming - communication error sending request to hdhomerun device - set target\n");
+      NSLog(@"startStreaming - communication error sending request to hdhomerun device - stream start");
       return;
     }
   }
+}
+
+- (void) stopStreaming
+{
+ @try
+ {
+	 @synchronized(self)
+	 {
+		hdhomerun_device_stream_stop(mHDHomeRunDevice);
+	 }
+ }
+ @catch (NSException * e) {
+	NSLog(@"stopStreaming exception name: %@ reason: %@", [e name], [e reason]);
+ }
+ @finally {
+ }
+}
+
+- (UInt8*) receiveVideoData:(size_t*)outBytesReceived
+{
+	return hdhomerun_device_stream_recv(mHDHomeRunDevice, VIDEO_DATA_BUFFER_SIZE_1S, outBytesReceived);
 }
 
 - (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber
@@ -253,13 +269,6 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 			NSLog(error);
 			[error release];
 		}
-	}
-	NSError *error;
-	[[self managedObjectContext] save:&error];
-	if (error != nil)
-	{
-		NSLog(@"Error occured saving after channel import : %@", error);
-		[error release];
 	}
 }
 
@@ -649,7 +658,8 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 	{
 		// Create a station and add it to the channel
 		HDHomeRunStation *aStation = [HDHomeRunStation createStationWithProgramNumber:[stationInfo valueForKey:@"programNumber"] forChannel:self inManagedObjectContext:[self managedObjectContext]];
-		[aStation setCallSign:[stationInfo valueForKey:@"callSign"]];
+		if ([stationInfo valueForKey:@"callSign"])
+			[aStation setCallSign:[stationInfo valueForKey:@"callSign"]];
 		
 		// If there's a Zap2IT station ID use that to find the matching Zap2It station
 		if ([stationInfo valueForKey:@"Z2ITStationID"])
@@ -719,6 +729,16 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   
   // Set our tuner to start streaming
   [[[self channel] tuner] startStreaming];
+}
+
+- (void) stopStreaming
+{
+	[[[self channel] tuner] stopStreaming];
+}
+
+- (UInt8*) receiveVideoData:(size_t*)outBytesReceived
+{
+	return [[[self channel] tuner] receiveVideoData:outBytesReceived];
 }
 
 - (void) addStationInfoDictionaryTo:(NSMutableArray*)inOutputArray

@@ -41,6 +41,7 @@
 - (void) tuneToChannel:(HDHomeRunChannel*)inChannel;
 - (void) exportChannelMapTo:(NSURL *)inURL;
 - (void) importChannelMapFrom:(NSURL *)inURL;
+- (UInt8*) receiveVideoData:(size_t*)outBytesReceived;
 
 - (void) releaseHDHRDevice;
 - (void) createHDHRDevice;
@@ -92,4 +93,8 @@
 - (void) setZ2ITStation:(Z2ITStation*) value;
 
 - (void) startStreaming;
+- (void) stopStreaming;
+
+- (UInt8*) receiveVideoData:(size_t*)outBytesReceived;
+
 @end
