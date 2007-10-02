@@ -402,6 +402,8 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   }
 }
 
+#pragma mark - Delegate Messages
+
 /**
     Implementation of the applicationShouldTerminate: method, used here to
     handle the saving of changes in the application managed object context
