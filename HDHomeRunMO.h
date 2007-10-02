@@ -11,6 +11,8 @@
 #import "hdhomerun_debug.h"       // Fixes warning from undefined type in device header
 #import "hdhomerun_device.h"
 
+const int kDefaultPortNumber = 1234;
+
 @class HDHomeRunTuner;
 
 @interface HDHomeRun : NSManagedObject {
