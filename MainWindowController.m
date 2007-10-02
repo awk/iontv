@@ -17,6 +17,7 @@
 #import "RBSplitSubView.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
+#import "recsched_AppDelegate.h"
 
 @implementation MainWindowController
 
@@ -165,15 +166,17 @@
   // Clear all old items from the store
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
+//  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
 
   [mParsingProgressIndicator startAnimation:self];
   [mParsingProgressIndicator setHidden:NO];
   [mParsingProgressIndicator setIndeterminate:YES];
   [mParsingProgressInfoField setStringValue:@"Cleanup Old Schedule Data"];
   [mParsingProgressInfoField setHidden:NO];
-  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
+//  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
 //  [callData release];
+
+	[self cleanupComplete:nil];
 }
 
 - (void) cleanupComplete:(id)info
