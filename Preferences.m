@@ -12,6 +12,7 @@
 #import "hdhomerun.h"
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
+#import "RecSchedNotifications.h"
 #import <Security/Security.h>
 
 const float kDurationSliderMinValue = 1.0;
@@ -135,7 +136,12 @@ static Preferences *sSharedInstance = nil;
 - (void)dealloc
 {
     if (self != sSharedInstance)
+    {
+      // Unregister for the update notifications
+      [[NSNotificationCenter defaultCenter] removeObserver:self name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+
       [super dealloc];	// Don't free the shared instance
+    }
 }
 
 - (NSManagedObjectContext *)managedObjectContext
@@ -215,6 +221,11 @@ static Preferences *sSharedInstance = nil;
 	
     // install the toolbar.
     [mPanel setToolbar:toolbar];
+    
+    // Register to receive Managed Object context update notifications - when adding objects in to the context from a seperate
+    // thread (during parsing) 'our' managed object context may not notify the NSObjectControllers that new data has been added
+    // This notification is sent during the end of saving to notify everyone of new content
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateControllers) name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
 }
 
 - (void)showPanel:(id)sender
@@ -528,7 +539,7 @@ static Preferences *sSharedInstance = nil;
     NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath", [NSNumber numberWithBool:YES], @"lineupsOnly", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
     
     // Start our local parsing
-    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:callData];
+    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[[xtvdParseThread alloc] init] withObject:callData];
     
     [callData release];
   }
@@ -568,6 +579,15 @@ static Preferences *sSharedInstance = nil;
 {
   // Cleanup never happens for lineup downloads in the Preferences dialog.
 }
+
+#pragma mark - Notification callbacks
+
+- (void) updateControllers
+{
+  [mLineupArrayController prepareContent];
+  [mStationsArrayController prepareContent];
+}
+
 
 #pragma mark - Toolbar Delegates
 

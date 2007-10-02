@@ -35,6 +35,8 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
     IBOutlet NSButton *mScanChannelsButton;
     
     IBOutlet NSArrayController *mHDHomeRunTunersArrayController;
+    IBOutlet NSArrayController *mLineupArrayController;
+    IBOutlet NSArrayController *mStationsArrayController;
     
     NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
     SecKeychainItemRef mZap2ItKeychainItemRef;
