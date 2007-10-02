@@ -70,6 +70,7 @@
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
 	
+  if ([array count] > 0)
 	aLineup = [array objectAtIndex:0];		// Just take the first lineup we have.
 	
 	// Create the Tuner objects too
@@ -162,7 +163,6 @@ COREDATA_MUTATOR(NSString*, @"name");
 {
   [super awakeFromInsert];
   [self createHDHRDevice];
-  NSLog(@"HDHomeRunMO - awakeFromInsert");
 }
 
 #pragma Uninitialization

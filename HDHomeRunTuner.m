@@ -129,7 +129,6 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 {
   [super awakeFromInsert];
   [self createHDHRDevice];
-  NSLog(@"HDHomeRunMO - awakeFromInsert");
 }
 
 #pragma Uninitialization
