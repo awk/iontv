@@ -34,5 +34,4 @@
 
 - (IBAction) quitServer:(id)sender;
 
-- (void) addSourceListNodes;
 @end

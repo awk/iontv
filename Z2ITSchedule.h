@@ -16,6 +16,7 @@
 }
 
 + (void) clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (NSArray*) fetchSchedulesToBeRecordedInManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
 - (void) setDurationHours:(int)inHours minutes:(int)inMinutes;
 

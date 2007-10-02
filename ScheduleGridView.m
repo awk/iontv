@@ -31,8 +31,12 @@
 - (Z2ITStation*) station;
 - (void) setStartTime:(CFAbsoluteTime)inDate andDuration:(float)inMinutes;
 - (void) drawCellsWithFrame:(NSRect) inFrame inView:(NSView *)inView;
+- (Z2ITSchedule*) scheduleAtLocation:(NSPoint)localPoint withFrame:(NSRect)inFrame;
 - (void) mouseDown:(NSEvent *)theEvent withFrame:(NSRect)inFrame;
 - (NSCell*) cellForSchedule:(Z2ITSchedule*)inSchedule;
+- (NSImage*) cellImageAtLocation:(NSPoint)localPoint withFrame:(NSRect) inFrame  inView:(NSView*)inView;
+- (NSPoint) dragImageLocFor:(NSPoint)localPoint withFrame:(NSRect) inFrame;
+
 @end
 
 @interface ScheduleCell : NSTextFieldCell
@@ -41,6 +45,7 @@
 
 + (NSGradient *)sharedGradient;
 
+- (NSImage*) cellImageWithFrame:(NSRect)inFrame inView:(NSView*)inView;
 @end
 
 @implementation ScheduleGridView
@@ -151,7 +156,60 @@
   
   int scheduleGridLineIndex = localPoint.y / kScheduleStationColumnViewCellHeight;
   if (scheduleGridLineIndex < [mStationsInViewArray count])
+  {
+	cellFrameRect.origin.y = kScheduleStationColumnViewCellHeight * scheduleGridLineIndex;
 	[[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] mouseDown:theEvent withFrame:cellFrameRect];
+  }
+}
+
+- (void) mouseDragged:(NSEvent *)theEvent
+{
+	NSPoint eventLocation = [theEvent locationInWindow];
+	NSPoint localPoint = [self convertPoint:eventLocation fromView:nil];
+	NSRect cellFrameRect;
+	NSImage *scheduleCellImage = nil;
+	NSPoint dragImageLoc = NSMakePoint(0.0, 0.0);
+	Z2ITSchedule* aSchedule = nil;
+	Z2ITStation* theStation = nil;
+	
+	cellFrameRect.origin.x = 0;
+	cellFrameRect.origin.y = 0;
+	cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+	cellFrameRect.size.width = [self bounds].size.width;
+
+	int scheduleGridLineIndex = localPoint.y / kScheduleStationColumnViewCellHeight;
+	if (scheduleGridLineIndex < [mStationsInViewArray count])
+	{
+		cellFrameRect.origin.y = kScheduleStationColumnViewCellHeight * scheduleGridLineIndex;
+		NSImage *anImage = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] cellImageAtLocation:localPoint withFrame:cellFrameRect inView:self];
+		dragImageLoc = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] dragImageLocFor:localPoint withFrame:cellFrameRect];
+		aSchedule = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] scheduleAtLocation:localPoint withFrame:cellFrameRect];
+		theStation = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] station];
+		
+		// Take the returned image and composite it into a new one with some transparency
+		scheduleCellImage = [[NSImage alloc] initWithSize:[anImage size]];
+		[scheduleCellImage lockFocus];
+		[anImage compositeToPoint:NSMakePoint(0, 0) operation:NSCompositeSourceOver fraction:0.5];
+		[scheduleCellImage unlockFocus];
+	}
+	
+	if (aSchedule && theStation && scheduleCellImage)
+	{
+		NSDictionary *dragInfoDict = [NSDictionary dictionaryWithObjectsAndKeys:
+			[[[aSchedule objectID] URIRepresentation] absoluteString], @"scheduleObjectURI",
+			[[[theStation objectID] URIRepresentation] absoluteString], @"stationObjectURI",
+			[[[mCurrentLineup objectID] URIRepresentation] absoluteString], @"currentLineupObjectURI",
+			nil];
+		
+		NSPasteboard *pboard;
+	 
+		pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
+		[pboard declareTypes:[NSArray arrayWithObject:RSSSchedulePBoardType]  owner:self];
+		[pboard setPropertyList:dragInfoDict forType:RSSSchedulePBoardType];
+	 
+		[self dragImage:scheduleCellImage at:dragImageLoc offset:NSMakeSize(0, 0) event:theEvent pasteboard:pboard source:self slideBack:YES];
+	}
+    return;
 }
 
 - (NSMenu*) menuForEvent:(NSEvent*) theEvent
@@ -267,6 +325,19 @@
   }
 }
 
+#pragma mark Drag and Drop
+
+- (NSDragOperation)draggingSourceOperationMask
+{
+	return NSDragOperationGeneric;
+}
+
+- (BOOL)ignoreModifierKeysWhileDragging
+{
+	// No copy/link semantics when dragging
+	return YES;
+}
+
 #pragma mark View Notifications
 
 - (void)frameDidChange: (NSNotification *)notification
@@ -357,6 +428,7 @@
 
   float programRunTime = durationRemaining / 60.0;
   cellFrameRect.size.width = programRunTime * pixelsPerMinute;
+  cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
   return cellFrameRect;
 }
 
@@ -383,6 +455,37 @@
         [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView];
       }
     }
+}
+
+- (Z2ITSchedule*) scheduleAtLocation:(NSPoint)localPoint withFrame:(NSRect)inFrame
+{
+  // Calculate the pixels per minute value
+  float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
+
+  BOOL foundCell = NO;
+  int i=0;
+  Z2ITSchedule *aSchedule = nil;
+  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
+  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++)
+  {
+      aSchedule = [mSchedulesInLineArray objectAtIndex:i];
+      if (aSchedule)
+      {
+        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+        aCellFrameRect.origin.y = 0;
+        aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+        // We always make the click to be in the middle of the cell vertically
+        localPoint.y = kScheduleStationColumnViewCellHeight / 2;
+        if (NSPointInRect(localPoint, aCellFrameRect))
+        {
+          foundCell = YES;
+        }
+      }
+  }
+  if (foundCell)
+	return aSchedule;
+  else
+	return nil;
 }
 
 - (void)mouseDown:(NSEvent *)theEvent withFrame:(NSRect)inFrame
@@ -421,6 +524,71 @@
   }
 }
 
+- (NSImage*) cellImageAtLocation:(NSPoint)localPoint withFrame:(NSRect) inFrame inView:(NSView*)inView
+{
+  // Calculate the pixels per minute value
+  float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
+
+  NSImage *cellImage = nil;
+  
+  BOOL foundCell = NO;
+  int i=0;
+  Z2ITSchedule *aSchedule = nil;
+  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
+  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++)
+  {
+      aSchedule = [mSchedulesInLineArray objectAtIndex:i];
+      if (aSchedule)
+      {
+        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+        aCellFrameRect.origin.y = 0;
+        aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+        // We always make the click to be in the middle of the cell vertically
+        localPoint.y = kScheduleStationColumnViewCellHeight / 2;
+        if (NSPointInRect(localPoint, aCellFrameRect))
+        {
+          foundCell = YES;
+          cellImage  = [[mCellsInLineArray objectAtIndex:i] cellImageWithFrame:aCellFrameRect inView:inView];
+        }
+      }
+  }
+  return cellImage;
+}
+
+- (NSPoint) dragImageLocFor:(NSPoint)localPoint withFrame:(NSRect) inFrame
+{
+  // Calculate the pixels per minute value
+  float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
+
+  NSPoint dragImageLoc = NSMakePoint(0.0, 0.0);
+  
+  BOOL foundCell = NO;
+  int i=0;
+  Z2ITSchedule *aSchedule = nil;
+  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
+  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++)
+  {
+      aSchedule = [mSchedulesInLineArray objectAtIndex:i];
+      if (aSchedule)
+      {
+        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+		aCellFrameRect.origin.y = inFrame.origin.y + aCellFrameRect.size.height;
+		NSRect hitRect = aCellFrameRect;
+		hitRect.origin.y = 0;
+        hitRect.size.height = kScheduleStationColumnViewCellHeight;
+        // We always make the click to be in the middle of the cell vertically
+		localPoint.y = kScheduleStationColumnViewCellHeight / 2;
+        if (NSPointInRect(localPoint, hitRect))
+        {
+          foundCell = YES;
+	      dragImageLoc.x = aCellFrameRect.origin.x;
+	      dragImageLoc.y = aCellFrameRect.origin.y;
+        }
+      }
+  }
+  return dragImageLoc;
+}
+
 @end
 
 @implementation ScheduleCell
@@ -454,7 +622,7 @@ static NSGradient *sScheduleCellSharedGradient = nil;
 	NSTextContainer *textContainer = [[[NSTextContainer alloc] initWithContainerSize: textRect.size] autorelease];
 	NSLayoutManager *layoutManager = [[[NSLayoutManager alloc] init] autorelease];
 
-	[layoutManager setTypesetterBehavior:NSTypesetterBehavior_10_2_WithCompatibility];
+	[layoutManager setTypesetterBehavior:NSTypesetterLatestBehavior /*NSTypesetterBehavior_10_2_WithCompatibility*/];
 	[layoutManager addTextContainer:textContainer];
 	[textStorage addLayoutManager:layoutManager];
 
@@ -462,7 +630,6 @@ static NSGradient *sScheduleCellSharedGradient = nil;
 	[textContainer setLineFragmentPadding:0.0];
 
 	NSRange glyphRange = [layoutManager glyphRangeForTextContainer:textContainer];
-	[controlView lockFocus];
 	if ([self isHighlighted])
 	{
 		[textStorage setForegroundColor:[NSColor whiteColor]];
@@ -473,7 +640,6 @@ static NSGradient *sScheduleCellSharedGradient = nil;
 	}
 	
 	[layoutManager drawGlyphsForGlyphRange: glyphRange atPoint: textRect.origin];
-	[controlView unlockFocus];
 }
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
@@ -567,6 +733,33 @@ static NSGradient *sScheduleCellSharedGradient = nil;
     return [NSColor alternateSelectedControlColor];
   else
     return [NSColor lightGrayColor];
+}
+
+- (NSImage*) cellImageWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
+{
+	// Draw with a zero, zero origin.
+	cellFrame.origin.x = cellFrame.origin.y = 0;
+	
+	// Turn off 'highlight' state (if true)
+	BOOL currentHighlight = [self isHighlighted];
+	[self setHighlighted:NO];
+	
+	NSImage* anImage = [[[NSImage alloc] initWithSize:cellFrame.size] autorelease];
+	// Flip origin (for Text drawing ?)
+	[anImage setFlipped:YES];
+	[anImage lockFocus];
+
+	[self drawWithFrame:cellFrame inView:controlView];
+	
+	[anImage unlockFocus];
+
+	// Restore flip ?
+	[anImage setFlipped:NO];
+	
+	// Restore highlight state
+	[self setHighlighted:currentHighlight];
+	
+	return anImage;
 }
 
 @end

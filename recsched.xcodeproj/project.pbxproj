@@ -80,6 +80,7 @@
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
 		EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA72A7A90C260D79009C63E5 /* ClientDescription.plist */; };
+		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
 		EAE3FB290C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */; };
@@ -240,6 +241,8 @@
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
 		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
+		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSOutlineView.h; sourceTree = "<group>"; };
+		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSOutlineView.m; sourceTree = "<group>"; };
 		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = "<group>"; };
 		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSourceTableClasses.h; sourceTree = "<group>"; };
 		EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKSourceTableClasses.m; sourceTree = "<group>"; };
@@ -555,6 +558,8 @@
 				EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */,
 				EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */,
 				EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */,
+				EA977F5B0C8992CF0043B79E /* RSOutlineView.h */,
+				EA977F5C0C8992CF0043B79E /* RSOutlineView.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -724,6 +729,7 @@
 				EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */,
 				EA4B9FC10C822BD500FBAF95 /* recsched.xcmappingmodel in Sources */,
 				EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */,
+				EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

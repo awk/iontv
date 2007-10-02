@@ -13,6 +13,8 @@
 @class ScheduleView;
 @class RSWishlistController;
 
+extern NSString *RSSSchedulePBoardType;
+
 @interface MainWindowController : NSWindowController <XMLParsingProgressDisplay> {
   IBOutlet NSSegmentedControl *mGetScheduleButton;
   IBOutlet NSProgressIndicator *mParsingProgressIndicator;
@@ -31,7 +33,10 @@
   IBOutlet NSObjectController *mCurrentLineup;
   IBOutlet NSTreeController *mViewSelectionTreeController;
   
+  IBOutlet NSArrayController *mFutureRecordingsArrayController;
+  
   float mDetailViewMinHeight;
+  NSArray *mDraggedNodes;		// Temporary copy of the nodes being dragged around
 }
 
 - (IBAction) getScheduleAction:(id)sender;
@@ -40,8 +45,6 @@
 - (IBAction) recordSeasonPass:(id)sender;
 - (IBAction) watchStation:(id)sender;
 - (IBAction) createWishlist:(id)sender;
-
-- (void) showViewForTableSelection:(int) selectedRow;
 
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule;
 - (Z2ITSchedule*) currentSchedule;

@@ -23,23 +23,157 @@
 const CGFloat kSourceListMaxWidth = 250;
 const CGFloat kSourceListMinWidth = 150;
 
+NSString *RSSSchedulePBoardType = @"RSSchedulePasteboardType";
+NSString *RSSourceListPBoardType = @"RSSourceListPasteboardType";
+
+NSString *RSSourceListNodeProgramsType = @"PROGRAMS";
+NSString *RSSourceListNodeFutureRecordingsType = @"FUTURE RECORDINGS";
+NSString *RSSourceListNodeSeasonPassesType = @"SEASON PASSES";
+
+NSString *RSSourceListExpandableKey = @"expandable";
+NSString *RSSourceListHeadingKey = @"heading";
+NSString *RSSourceListLabelKey = @"label";
+NSString *RSSourceListChildrenKey = @"children";
+NSString *RSSourceListTypeKey = @"type";
+NSString *RSSourceListPriorityKey = @"priority";
+NSString *RSSourceListActionMessageNameKey = @"actionMessageName";
+NSString *RSSourceListCanAcceptDropKey = @"canAcceptDrop";
+NSString *RSSourceListObjectIDKey = @"objectID";
+NSString *RSSourceListDeletableKey = @"deletable";
+NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
+
+#pragma mark Source List Management
+
+- (void) updateSourceListForFutureRecordings
+{
+	NSMutableArray *schedulesToBeRecorded = [NSMutableArray arrayWithArray:[Z2ITSchedule fetchSchedulesToBeRecordedInManagedObjectContext:[[NSApp delegate]managedObjectContext]]];
+	
+	NSArray *treeNodes = [mViewSelectionTreeController content];
+	NSMutableDictionary *aSourceListNode = nil;
+	NSMutableArray *futureRecordingsArray  = nil;
+	for (aSourceListNode in treeNodes)
+	{
+		if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodeFutureRecordingsType)
+		{
+			futureRecordingsArray = [aSourceListNode valueForKey:RSSourceListChildrenKey];
+			break;
+		}
+	}
+	if (futureRecordingsArray)
+	{
+		NSMutableArray *futureRecordingsToDrop = [NSMutableArray arrayWithCapacity:[futureRecordingsArray count]];
+		
+		// Walk the list of schedules to be recorded - if they're already in the future recordings array we can 'drop' them
+		for (NSMutableDictionary* aFutureRecordingNode in futureRecordingsArray)
+		{
+			// Get the Object ID for the schedule
+			NSManagedObjectID *anObjectID = [aFutureRecordingNode valueForKey:RSSourceListObjectIDKey];
+			Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+			
+			// If the schedule isn't in the list of items to be recorded we should drop it from the futureRecordingsArray
+			if (![schedulesToBeRecorded containsObject:aSchedule])
+			{
+				// However we can't just remove it since we're in the middle of iterating over the futureRecordingsArray
+				// so instead we'll add it to an array of recordings to be dropped en masse at the end of iterations.
+				[futureRecordingsToDrop addObject:aFutureRecordingNode];
+			}
+			else
+			{
+				// Lastly we should remove it from the list of schedulesToBeRecorded array 
+				if (aSchedule)
+					[schedulesToBeRecorded removeObject:aSchedule];
+			}
+		}
+		[futureRecordingsArray removeObjectsInArray:futureRecordingsToDrop];
+	}
+	if (!futureRecordingsArray && ([schedulesToBeRecorded count] > 0))
+	{
+		// No future recordings array - create one
+		futureRecordingsArray = [[NSMutableArray alloc] initWithCapacity:[schedulesToBeRecorded count]];
+	}	
+
+	for (Z2ITSchedule *aSchedule in schedulesToBeRecorded)
+	{
+		NSMutableDictionary *aFutureRecordingNode = [[NSMutableDictionary alloc] init];
+		NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+		[dateFormatter setDateStyle:NSDateFormatterShortStyle];
+		[dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+		NSString *timeStr = [dateFormatter stringFromDate:[aSchedule time]];
+		NSString *labelStr = [NSString stringWithFormat:@"%@ - %@", timeStr, [[aSchedule program] title]];
+		[aFutureRecordingNode setValue:labelStr forKey:RSSourceListLabelKey];
+		[aFutureRecordingNode setValue:[aSchedule objectID] forKey:RSSourceListObjectIDKey];
+		[aFutureRecordingNode setValue:@"futureRecordingSelected:" forKey:RSSourceListActionMessageNameKey];
+		[aFutureRecordingNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListDeletableKey];
+		[aFutureRecordingNode setValue:@"deleteFutureRecording:" forKey:RSSourceListDeleteMessageNameKey];
+		[futureRecordingsArray addObject:aFutureRecordingNode];
+	}
+	[aSourceListNode setValue:futureRecordingsArray forKey:RSSourceListChildrenKey];
+}
+
+- (void) addSourceListNodes
+{
+	NSMutableArray *treeNodes = [[NSMutableArray alloc] initWithCapacity:3];
+	
+	NSMutableDictionary *aSourceListNode = [[NSMutableDictionary alloc] init];
+	[aSourceListNode setValue:@"PROGRAMS" forKey:RSSourceListLabelKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:NO] forKey:RSSourceListExpandableKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListHeadingKey];
+	[aSourceListNode setValue:[NSNumber numberWithInt:1] forKey:RSSourceListPriorityKey];
+	[aSourceListNode setValue:[[[NSMutableSet alloc] initWithCapacity:2] autorelease] forKey:RSSourceListChildrenKey];
+	[aSourceListNode setValue:RSSourceListNodeProgramsType forKey:RSSourceListTypeKey];
+	[treeNodes addObject:aSourceListNode];
+	
+	NSMutableDictionary *aChildSourceListNode = [[NSMutableDictionary alloc] init];
+	[aChildSourceListNode setValue:@"Schedule" forKey:RSSourceListLabelKey];
+//	[aChildSourceListNode setValue:aSourceListNode forKey:@"parent"];
+	[aChildSourceListNode setValue:@"showSchedule:" forKey:RSSourceListActionMessageNameKey];
+	[aChildSourceListNode setValue:[NSNumber numberWithInt:1] forKey:RSSourceListPriorityKey];
+	[[aSourceListNode valueForKey:RSSourceListChildrenKey] addObject:aChildSourceListNode];
+	[aChildSourceListNode release];
+	
+	aChildSourceListNode = [[NSMutableDictionary alloc] init];
+	[aChildSourceListNode setValue:@"Search" forKey:RSSourceListLabelKey];
+//	[aChildSourceListNode setValue:aSourceListNode forKey:@"parent"];
+	[aChildSourceListNode setValue:@"showSearch:" forKey:RSSourceListActionMessageNameKey];
+	[aChildSourceListNode setValue:[NSNumber numberWithInt:2] forKey:RSSourceListPriorityKey];
+	[[aSourceListNode valueForKey:RSSourceListChildrenKey] addObject:aChildSourceListNode];
+	[aChildSourceListNode release];
+	[aSourceListNode release];
+	
+	aSourceListNode = [[NSMutableDictionary alloc] init];
+	[aSourceListNode setValue:@"FUTURE RECORDINGS" forKey:RSSourceListLabelKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListExpandableKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListHeadingKey];
+	[aSourceListNode setValue:[NSNumber numberWithInt:2] forKey:RSSourceListPriorityKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListCanAcceptDropKey];
+	[aSourceListNode setValue:RSSourceListNodeFutureRecordingsType forKey:RSSourceListTypeKey];
+	[treeNodes addObject:aSourceListNode];
+	[aSourceListNode release];
+	
+	aSourceListNode = [[NSMutableDictionary alloc] init];
+	[aSourceListNode setValue:@"SEASON PASSES" forKey:RSSourceListLabelKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListExpandableKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListHeadingKey];
+	[aSourceListNode setValue:[NSNumber numberWithInt:3] forKey:RSSourceListPriorityKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListCanAcceptDropKey];
+	[aSourceListNode setValue:RSSourceListNodeSeasonPassesType forKey:RSSourceListTypeKey];
+	[treeNodes addObject:aSourceListNode];
+	[aSourceListNode release];
+	
+	[mViewSelectionTreeController setContent:treeNodes];
+	[treeNodes release];
+}
+
+#pragma mark Initialization/Startup
+
 - (void) awakeFromNib
 {
-//  [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
-  
   // Don't cause resizing when items are expanded
   [mViewSelectionOutlineView setAutoresizesOutlineColumn:NO];
-  [mViewSelectionOutlineView setAllowsEmptySelection:NO];
-  [mViewSelectionOutlineView setHeaderView:nil];
+  [self addSourceListNodes];
   
-  NSDictionary *storeMetaData = [[[NSApp delegate] persistentStoreCoordinator] metadataForPersistentStore:[[NSApp delegate] persistentStore]];
-  if (![storeMetaData valueForKey:@"SourceListNodesSetup"])
-  {
-	[[NSApp delegate] addSourceListNodes];
-  }
-
   // Sort based on the 'priority' of the node
-  NSSortDescriptor *aSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"priority.value" ascending:YES] autorelease];
+  NSSortDescriptor *aSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:RSSourceListPriorityKey ascending:YES] autorelease];
   [mViewSelectionTreeController setSortDescriptors:[NSArray arrayWithObject:aSortDescriptor]];
   
   // Start with the very first (Programs) item expanded
@@ -51,6 +185,16 @@ const CGFloat kSourceListMinWidth = 150;
   anIndexPath = [anIndexPath indexPathByAddingIndex:0];
   [mViewSelectionTreeController setSelectionIndexPath:anIndexPath];
   
+  // Vertical mouse motion can begin a drag.
+  [mViewSelectionOutlineView setVerticalMotionCanBeginDrag:YES];
+  
+  // Register for drag-n-drop on the outline view
+  [mViewSelectionOutlineView registerForDraggedTypes:[NSArray arrayWithObject:RSSSchedulePBoardType]];
+
+	// Observe the arranged list of future recordings - changes to this mean that there are new recordings
+	// or some have been removed and we should update the UI.
+	[mFutureRecordingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
+
   mDetailViewMinHeight = [mDetailView frame].size.height;
   NSView *bottomContainerView = [[mScheduleSplitView subviews] objectAtIndex:1];
   [bottomContainerView addSubview:mScheduleContainerView];
@@ -256,33 +400,24 @@ const CGFloat kSourceListMinWidth = 150;
   return [mCurrentSchedule content];
 }
 
-- (void) showViewForTableSelection:(int)selectedRow
-{
-    switch (selectedRow)
-    {
-      case 0:
-        [mScheduleContainerView setHidden:NO];
-        [mProgramSearchView setHidden:YES];
-        break;
-      case 1:
-        [mScheduleContainerView setHidden:YES];
-        [mProgramSearchView setHidden:NO];
-        break;
-      default:
-        break;
-    }
-}
-
-- (void) showSchedule
+- (void) showSchedule:(id)anArgument
 {
 	[mScheduleContainerView setHidden:NO];
 	[mProgramSearchView setHidden:YES];
 }
 
-- (void) showSearch
+- (void) showSearch:(id)anArgument
 {
 	[mScheduleContainerView setHidden:YES];
 	[mProgramSearchView setHidden:NO];
+}
+
+- (void) futureRecordingSelected:(id)anArgument
+{
+	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
+	Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+	if (aSchedule)
+		[self setCurrentSchedule:aSchedule];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -292,15 +427,19 @@ const CGFloat kSourceListMinWidth = 150;
 {
     if ((object == mViewSelectionTreeController) && ([keyPath isEqual:@"selection"]))
 	{
-		if ([[mViewSelectionTreeController selection] valueForKey:@"actionMessageName"] != NSNoSelectionMarker)
+		if ([[mViewSelectionTreeController selection] valueForKey:RSSourceListActionMessageNameKey] != NSNoSelectionMarker)
 		{
-			NSLog(@"Show view selection for %@", [[mViewSelectionTreeController selection] valueForKey:@"label"]);
-			SEL actionSelector = NSSelectorFromString([[mViewSelectionTreeController selection] valueForKey:@"actionMessageName"]);
+			NSLog(@"Show view selection for %@", [[mViewSelectionTreeController selection] valueForKey:RSSourceListLabelKey]);
+			SEL actionSelector = NSSelectorFromString([[mViewSelectionTreeController selection] valueForKey:RSSourceListActionMessageNameKey]);
 			if ([self respondsToSelector:actionSelector])
-				[self performSelector:actionSelector];
+				[self performSelector:actionSelector withObject:[mViewSelectionTreeController selection]];
 		}
-//		[self showViewForTableSelection:[mViewSelectionArrayController selectionIndex]];
     }
+	if ((object == mFutureRecordingsArrayController) && ([keyPath isEqual:@"arrangedObjects"]))
+	{
+		// The list of future recordings has changed - update the UI.
+		[self updateSourceListForFutureRecordings];
+	}
 }
 
 - (BOOL)validateUserInterfaceItem:(id < NSValidatedUserInterfaceItem >)anItem
@@ -315,11 +454,47 @@ const CGFloat kSourceListMinWidth = 150;
 		}
 	}
 	
+	if ([anItem action] == @selector(delete:))
+	{
+		// Do we have a selection
+		NSTreeNode *theSelection = [mViewSelectionTreeController selection];
+		if (theSelection)
+		{
+			// Is it 'deletable' ?
+			if ([theSelection valueForKey:RSSourceListDeletableKey] != nil)
+			{
+				enableItem = ([[theSelection valueForKey:RSSourceListDeletableKey] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame);
+			}
+		}
+	}
+	
 	if ([anItem action] == @selector(createWishlist:))
 		enableItem = YES;
 		
 	return enableItem;
 }
+
+- (void) deleteFutureRecording:(id)anArgument
+{
+	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
+	Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+	if (aSchedule)
+	{
+		[aSchedule setToBeRecorded:[NSNumber numberWithBool:NO]];
+	}
+}
+
+#pragma mark Window Delegate Methods
+
+/**
+    Returns the NSUndoManager for the window.  In this case, the manager
+    returned is that of the managed object context for the application.
+ */
+ 
+- (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window {
+    return [[[NSApp delegate] managedObjectContext] undoManager];
+}
+
 
 #pragma mark Split View Delegate Methods
 
@@ -356,73 +531,125 @@ const CGFloat kSourceListMinWidth = 150;
 
 #pragma mark View Selection Table Delegate Methods
 
-- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row
-{
-	if (row == 2) { // separator
-		return 4;
-	}
-	
-	return [tableView rowHeight];
-}
-
-- (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row {
-	return row != 2;
-}
-
-- (NSCell *)tableView:(NSTableView *)tableView dataCellForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
-{
-	return [tableColumn dataCellForRow:row];
-}
-
-- (NSCell *)outlineView:(NSOutlineView *)outlineView dataCellForTableColumn:(NSTableColumn *)tableColumn item:(id)item
-{
-	if (tableColumn == nil)
-		return [[NSTextFieldCell alloc] init];
-	else
-		return nil;
-}
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item
 {
 	if (item == nil)
 		return NO;
-	NSManagedObject *aTreeNode = [item representedObject];
-	if ([[aTreeNode valueForKey:@"heading"] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+	NSMutableDictionary *aTreeNode = [item representedObject];
+	NSNumber *headingFlag = [aTreeNode valueForKey:RSSourceListHeadingKey];
+	if (headingFlag && ([headingFlag compare:[NSNumber numberWithBool:YES]] == NSOrderedSame))
 		return NO;
 	else
 		return YES;
 }
 
-- (void)outlineView:(NSOutlineView *)outlineView willDisplayCell:(id)cell forTableColumn:(NSTableColumn *)tableColumn item:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldShowCellExpansionForTableColumn:(NSTableColumn *)tableColumn item:(id)item
 {
-	[cell setFont:[NSFont systemFontOfSize:[NSFont smallSystemFontSize]]];
-}
-
-- (CGFloat)outlineView:(NSOutlineView *)outlineView heightOfRowByItem:(id)item
-{
-	NSManagedObject *aTreeNode = [item representedObject];
-	if ([[aTreeNode valueForKey:@"heading"] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
-		return 19;
+	NSMutableDictionary *aTreeNode = [item representedObject];
+	NSNumber *expandableFlag = [aTreeNode valueForKey:RSSourceListExpandableKey];
+	if (expandableFlag && ([expandableFlag compare:[NSNumber numberWithBool:NO]] == NSOrderedSame))
+		return NO;
 	else
-		return 19;
+		return YES;
 }
 
-#if 0
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldCollapseItem:(id)item
 {
-	NSManagedObject *aTreeNode = [item representedObject];
-	if ([[aTreeNode valueForKey:@"heading"] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+	NSMutableDictionary *aTreeNode = [item representedObject];
+	NSNumber *expandableFlag = [aTreeNode valueForKey:RSSourceListExpandableKey];
+	if (expandableFlag && ([expandableFlag compare:[NSNumber numberWithBool:NO]] == NSOrderedSame))
 		return NO;
 	else
 		return YES;
 }
-#endif
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
 {
-	NSManagedObject *aTreeNode = [item representedObject];
-	if ([[aTreeNode valueForKey:@"heading"] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+	NSMutableDictionary *aTreeNode = [item representedObject];
+	NSNumber *headingFlag = [aTreeNode valueForKey:RSSourceListHeadingKey];
+	if (headingFlag && ([headingFlag compare:[NSNumber numberWithBool:YES]] == NSOrderedSame))
 		return YES;
+	else
+		return NO;
+}
+
+- (void) deleteSelectedRowsOfOutlineView:(NSOutlineView *) aOutlineView
+{
+	NSMutableDictionary *aTreeNode = [mViewSelectionTreeController selection];
+	if (aTreeNode && ([aTreeNode valueForKey:RSSourceListDeleteMessageNameKey] != nil))
+	{
+		// If we have a delete message name then see if we respond to it and call it with the selection
+		SEL deleteSelector = NSSelectorFromString([[mViewSelectionTreeController selection] valueForKey:RSSourceListDeleteMessageNameKey]);
+		if ([self respondsToSelector:deleteSelector])
+			[self performSelector:deleteSelector withObject:aTreeNode];
+	}
+}
+
+#pragma mark NSOutlineView Delegate messages for Drag and Drop
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard 
+{
+    mDraggedNodes = items; // Don't retain since this is just holding temporaral drag information, and it is only used during a drag!  We could put this in the pboard actually.
+    
+    // Provide data for our custom type, and simple NSStrings.
+    [pboard declareTypes:[NSArray arrayWithObjects:RSSourceListPBoardType, nil] owner:self];
+
+    // the actual data doesn't matter since RSSourceListPasteboardType drags aren't recognized by anyone but us!.
+    [pboard setData:[NSData data] forType:RSSourceListPBoardType]; 
+    
+    return YES;
+}
+
+- (BOOL) proposedItemCanAcceptDrop:(id)item
+{
+	BOOL canAcceptDrop = NO;
+	if (item)
+	{
+		NSMutableDictionary *nodeDictionary = ([[item representedObject] isKindOfClass:[NSMutableDictionary class]] ? [item representedObject] : nil);
+		if (nodeDictionary)
+		{
+			if ([nodeDictionary valueForKey:RSSourceListCanAcceptDropKey] && [[nodeDictionary valueForKey:RSSourceListCanAcceptDropKey] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+				canAcceptDrop = YES;
+		}
+	}
+	return canAcceptDrop;
+}
+
+- (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id < NSDraggingInfo >)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
+{
+	if ([self proposedItemCanAcceptDrop:item])
+	{
+		[outlineView setDropItem:item dropChildIndex:-1];	// Retarget all drops to the 'group' heading.
+		return NSDragOperationGeneric;
+	}
+	return NSDragOperationNone;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id < NSDraggingInfo >)info item:(id)item childIndex:(NSInteger)index
+{
+	NSMutableDictionary *nodeDictionary = ([[item representedObject] isKindOfClass:[NSMutableDictionary class]] ? [item representedObject] : nil);
+    NSPasteboard *pboard = [info draggingPasteboard];
+
+	if (nodeDictionary && [self proposedItemCanAcceptDrop:item])
+	{
+		if  (([nodeDictionary valueForKey:RSSourceListTypeKey] == RSSourceListNodeFutureRecordingsType) && ([pboard availableTypeFromArray:[NSArray arrayWithObject:RSSSchedulePBoardType]] != nil))
+		{
+				NSDictionary *dragInfoDict = [pboard propertyListForType:RSSSchedulePBoardType];
+				NSPersistentStoreCoordinator *storeCoordinator = [[NSApp delegate] persistentStoreCoordinator];
+				NSManagedObjectContext *MOC = [[NSApp delegate] managedObjectContext];
+				
+				Z2ITSchedule *aSchedule = (Z2ITSchedule*) [MOC objectWithID:[storeCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:[dragInfoDict valueForKey:@"scheduleObjectURI"]]]];
+				[aSchedule setToBeRecorded:[NSNumber numberWithBool:YES]];
+				[[[[NSApplication sharedApplication] delegate] recServer] addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
+				
+				return YES;
+		}
+		else
+		{
+				return NO;
+		}
+	}
 	else
 		return NO;
 }
