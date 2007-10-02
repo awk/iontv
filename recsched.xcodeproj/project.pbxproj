@@ -44,7 +44,7 @@
 		EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
 		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
 		EA20AE0E0C23589700A9BDBD /* recsched.syncschema in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE010C23589700A9BDBD /* recsched.syncschema */; };
-		EA20AE290C23608C00A9BDBD /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE280C23608C00A9BDBD /* ClientDescription.plist */; };
+		EA20AE290C23608C00A9BDBD /* ClientDescription_Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */; };
 		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
 		EA20AEE40C25C96E00A9BDBD /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
 		EA20AEFB0C25CC5B00A9BDBD /* Z2ITProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8863A0B61598700373CEF /* Z2ITProgram.m */; };
@@ -99,6 +99,7 @@
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
 		EA72A6E90C25D208009C63E5 /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
+		EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA72A7A90C260D79009C63E5 /* ClientDescription.plist */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EAE655480B9D0AA100CDB279 /* recsched_bkgd.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */; };
 		EAE655500B9D0B3300CDB279 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
@@ -216,7 +217,7 @@
 		EA08881D0B86B16C00809664 /* TV-Y7FV.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7FV.tif"; path = "Images/TV-Y7FV.tif"; sourceTree = "<group>"; };
 		EA20ADB90C2330AC00A9BDBD /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		EA20AE010C23589700A9BDBD /* recsched.syncschema */ = {isa = PBXFileReference; lastKnownFileType = folder; path = recsched.syncschema; sourceTree = SOURCE_ROOT; };
-		EA20AE280C23608C00A9BDBD /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = SOURCE_ROOT; };
+		EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription_Server.plist; sourceTree = "<group>"; };
 		EA20AE2D0C23612800A9BDBD /* SyncServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SyncServices.framework; path = /System/Library/Frameworks/SyncServices.framework; sourceTree = "<absolute>"; };
 		EA20AF000C25CCA200A9BDBD /* RecordingThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RecordingThread.h; sourceTree = SOURCE_ROOT; };
 		EA20AF010C25CCA200A9BDBD /* RecordingThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = RecordingThread.m; sourceTree = SOURCE_ROOT; };
@@ -295,6 +296,7 @@
 		EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleViewController.m; sourceTree = "<group>"; };
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
+		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
 		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = "<group>"; };
 		EAE655260B9D08CD00CDB279 /* recsched_bkgd_cl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = recsched_bkgd_cl; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd.m; sourceTree = "<group>"; };
@@ -437,7 +439,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				EA20AE280C23608C00A9BDBD /* ClientDescription.plist */,
+				EA72A7A90C260D79009C63E5 /* ClientDescription.plist */,
+				EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */,
 				EA20AE010C23589700A9BDBD /* recsched.syncschema */,
 				EA2939860C0CC89E0053E2B8 /* Images */,
 				EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */,
@@ -786,7 +789,8 @@
 				EA2939A10C0CC8D70053E2B8 /* top_middle.png in Resources */,
 				EA2939A20C0CC8D70053E2B8 /* top_right.png in Resources */,
 				EA20AE0E0C23589700A9BDBD /* recsched.syncschema in Resources */,
-				EA20AE290C23608C00A9BDBD /* ClientDescription.plist in Resources */,
+				EA20AE290C23608C00A9BDBD /* ClientDescription_Server.plist in Resources */,
+				EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

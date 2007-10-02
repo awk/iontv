@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>DisplayName</key>
-	<string>recsched</string>
+	<string>recsched background server</string>
 	<key>Type</key>
 	<string>app</string>
 	<key>Entities</key>

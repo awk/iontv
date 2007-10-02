@@ -209,7 +209,7 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
             if (![[ISyncManager sharedManager] registerSchemaWithBundlePath:[[NSBundle bundleWithIdentifier:kRecSchedUIAppBundleID] pathForResource:@"recsched" ofType:@"syncschema"]]) {
                 reason = @"error registering the recsched sync schema";
             } else {
-                client = [[ISyncManager sharedManager] registerClientWithIdentifier:clientIdentifier descriptionFilePath:[[NSBundle bundleWithIdentifier:kRecSchedUIAppBundleID] pathForResource:@"ClientDescription" ofType:@"plist"]];
+                client = [[ISyncManager sharedManager] registerClientWithIdentifier:clientIdentifier descriptionFilePath:[[NSBundle bundleWithIdentifier:kRecSchedUIAppBundleID] pathForResource:@"ClientDescription_Server" ofType:@"plist"]];
                 [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeApplication];
                 [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeDevice];
                 [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeServer];
