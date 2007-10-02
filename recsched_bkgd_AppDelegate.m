@@ -35,9 +35,10 @@ NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";			// Here becau
 {
 	NSLog(@"recsched_bkgd_AppDelegate - applicationDidFinishLaunching");
 	[[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
-	[self syncAction:nil];
 	
 	[mRecSchedServer updateSchedule];
+	
+	[self syncAction:nil];
 }
 
 - (id) init {
@@ -247,12 +248,14 @@ NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";			// Here becau
 
 - (void)client:(ISyncClient *)client mightWantToSyncEntityNames:(NSArray *)entityNames
 {
-    NSLog(@"Saving for alert to sync...");
-	[self saveAction:self];
-
-	NSLog(@"syncing with client %@ for entityNames %@", client, entityNames);
+	// Since we save the store after each significant update (after downloading new schedule data for example)
+	// the store on disk is always as up to date as we can make it and there's no need to sync it here.
+	NSLog(@"syncing with client %@", [client displayName]);
 	NSError *error;
-	[[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
+	[[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:NO handler:self error:&error];
+    if (nil != error) {
+        NSLog(@"client: mightWantToSyncEntityNames: - error occured - %@", error);
+    }
 }
 
 - (NSArray *)managedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
@@ -269,14 +272,49 @@ NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";			// Here becau
 
 - (NSDictionary *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushRecord:(NSDictionary *)record forManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
 {
-//    NSLog(@"push %@ = %@", [managedObject objectID], [record description]);
+//		NSLog(@"push %@ = %@", [managedObject objectID], [record description]);
     return record;
 }
 
 - (ISyncChange *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willApplyChange:(ISyncChange *)change toManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
 {
-//    NSLog(@"pull %@", [change description]);
+//		NSLog(@"pull %@", [change description]);
     return change;
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushChangesInSyncSession:(ISyncSession *)session
+{
+	NSLog(@"willPushChangesInSyncSession - session = %@", session);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didPushChangesInSyncSession:(ISyncSession *)session
+{
+	NSLog(@"didPushChangesInSyncSession - session = %@", session);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPullChangesInSyncSession:(ISyncSession *)session
+{
+	NSLog(@"willPullChangesInSyncSession - session = %@", session);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didPullChangesInSyncSession:(ISyncSession *)session
+{
+	NSLog(@"didPullChangesInSyncSession - session = %@", session);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didCancelSyncSession:(ISyncSession *)session error:(NSError *)error
+{
+	NSLog(@"didCancelSyncSession - error = %@", error);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didFinishSyncSession:(ISyncSession *)session
+{
+	NSLog(@"didFinishSyncSession - session = %@", session);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didCommitChanges:(NSDictionary *)changes inSyncSession:(ISyncSession *)session
+{
+	NSLog(@"didCommitChanges - session = %@", session);
 }
 
 #pragma mark Notifications
@@ -284,7 +322,7 @@ NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";			// Here becau
 {
     // enumerate the list
     NSEnumerator *enumerator = [updatedObjects objectEnumerator];
-    NSManagedObject *updatedObject, *staleObject;
+    NSManagedObject *staleObject;
 	NSManagedObjectID *updatedObjectID;
     while ((updatedObjectID = [enumerator nextObject]) != nil) {
 
@@ -330,7 +368,7 @@ NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";			// Here becau
     NSError *error = nil;
     ISyncClient *client = [self syncClient];
     if (nil != client) {
-        [[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
+        [[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:NO handler:self error:&error];
     }
     if (nil != error) {
         NSLog(@"syncAction - error occured - %@", error);
