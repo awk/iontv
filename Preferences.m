@@ -373,6 +373,14 @@ static Preferences *sSharedInstance = nil;
   [theDefaultsController save:sender];
 }
 
+- (NSArray *) z2itStationSortDescriptors
+{
+  NSSortDescriptor* callSignDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"callSign" ascending:YES] autorelease];
+  NSArray* sortDescriptors = [NSArray arrayWithObject:callSignDescriptor];
+
+  return sortDescriptors;
+}
+
 #pragma mark Action Methods
 
 - (void) showZap2ItPrefs:(id)sender
