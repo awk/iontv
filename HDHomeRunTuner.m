@@ -54,9 +54,12 @@ COREDATA_ACCESSOR(HDHomeRun*, @"device")
   
 COREDATA_MUTATOR(HDHomeRun*, @"device")
 
-  [self createHDHRDevice];
   // Register to be told when the device name changes
-  [value addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
+  if (value)
+  {
+	[self createHDHRDevice];
+	[value addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
+  }
 }
 
 - (Z2ITLineup*)lineup
@@ -106,7 +109,6 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 
 - (void) startStreaming
 {
-  char value[64];
   int ret = 0;
 
   @try
@@ -546,14 +548,13 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   mHDHomeRunDevice = nil;
 }
 
-- (void) didTurnIntoFault
+- (void) willTurnIntoFault
 {
   [self releaseHDHRDevice];
   if ([self device])
   {
 	[[self device] removeObserver:self forKeyPath:@"name"];
   }
-  [super didTurnIntoFault];
 }
 
 
@@ -703,11 +704,10 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
     [[self channel] addObserver:self forKeyPath:@"channelNumber" options:NSKeyValueObservingOptionNew context:nil];
 }
 
-- (void) didTurnIntoFault
+- (void) willTurnIntoFault
 {
 	if ([self channel])
 		[[self channel] removeObserver:self forKeyPath:@"channelNumber"];
-	[super didTurnIntoFault];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context

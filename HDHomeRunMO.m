@@ -176,11 +176,9 @@ COREDATA_MUTATOR(NSString*, @"name");
   mHDHomeRunDevice = nil;
 }
 
-- (void) didTurnIntoFault
+- (void) willTurnIntoFault
 {
   [self releaseHDHRDevice];
-  
-  [super didTurnIntoFault];
 }
 
 @end
