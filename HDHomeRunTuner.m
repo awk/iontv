@@ -50,6 +50,13 @@ COREDATA_ACCESSOR(Z2ITLineup*, @"lineup");
 COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 }
 
+- (void) addChannel:(HDHomeRunChannel*)aChannel
+{
+  NSMutableSet *channels = [self mutableSetValueForKey:@"channels"];
+  [aChannel setTuner:self];
+  [channels addObject:aChannel];
+}
+
 - (NSString*) longName
 {
   NSString *name = [NSString stringWithFormat:@"%@ - %d - %@", [[self device] name], [[self index] intValue]+1, [[self lineup] name]];
@@ -66,7 +73,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 
 #pragma Thread Functions
 
-- (int) scanCallBackForType:(NSString *)type andData:(NSString *) data
+- (int) scanCallBackForType:(NSString *)type andData:(NSString *) data withMOC:(NSManagedObjectContext *)inMOC
 {
   int continueScan = 1;
   
@@ -75,7 +82,39 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
   if (mCurrentProgressDisplay && [mCurrentProgressDisplay conformsToProtocol:@protocol(ChannelScanProgressDisplay)])
   {
       if ([type compare:@"SCANNING"] == NSOrderedSame)
+      {
         [mCurrentProgressDisplay incrementChannelScanProgress];
+        
+        if (mCurrentHDHomeRunChannel)
+        {
+          // We have a current channel - does it have any stations ?
+          if ([[mCurrentHDHomeRunChannel stations] count] == 0)
+          {
+            // No - so delete it
+            [inMOC deleteObject:mCurrentHDHomeRunChannel];
+          }
+        }
+        
+        // Parse the channel type and number details from the data string
+        NSString *channelTypeStr;
+        NSNumber *channelNumber;
+        
+        // Channel scanning data has the form : 489000000 (us-cable:68, us-irc:68)  -OR- 485000000 (us-bcast:16)
+        // We need to take the data after the opening bracket and use it to create the channel type and number
+        NSRange openingBracket = [data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"("]];
+        NSString *typeNumberStr = [data substringFromIndex:openingBracket.location+1];
+        NSRange colon = [typeNumberStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]];
+        channelTypeStr = [typeNumberStr substringToIndex:colon.location];
+        NSString *channelNumberStr = [typeNumberStr substringFromIndex:colon.location+1];
+        NSRange endOfNumber = [channelNumberStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@",)"]];
+        channelNumber = [NSNumber numberWithInt:[[channelNumberStr substringToIndex:endOfNumber.location] intValue]];
+        
+        // Create a HDHomeRunChannel to match
+        mCurrentHDHomeRunChannel = [HDHomeRunChannel createChannelWithType:channelTypeStr andNumber:channelNumber inManagedObjectContext:inMOC];
+        
+        // Set the 'current' scanning channel to the one we just created - if there's no lock or programs on this channel we'll delete
+        // it later.
+      }
       if ([mCurrentProgressDisplay abortChannelScan])
       {
         NSLog(@"Abort Channel Scan");
@@ -88,21 +127,42 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 {
 	HDHomeRunTuner *theTuner = va_arg(ap, HDHomeRunTuner *);
-        return [theTuner scanCallBackForType:[NSString stringWithCString:type] andData:[NSString stringWithCString:str]];
+        NSManagedObjectContext *theMOC = va_arg(ap, NSManagedObjectContext*);
+        
+        return [theTuner scanCallBackForType:[NSString stringWithCString:type] andData:[NSString stringWithCString:str] withMOC:theMOC];
 }
 
 // Typically called from a seperate thread to carry out the scanning
 - (void) performScan
 {
+    NSPersistentStoreCoordinator *psc = [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator];
+    NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
+    [managedObjectContext setPersistentStoreCoordinator: psc];
+
+    mCurrentHDHomeRunChannel = nil;
+    
+    [psc lock];
+    
   @synchronized(self)
   
   {
     NSLog(@"HDHomeRunTuner - scanAction for %@", [self longName]);
 
-    channelscan_execute_all(mHDHomeRunDevice, HDHOMERUN_CHANNELSCAN_MODE_SCAN, cmd_scan_callback, self);
+    channelscan_execute_all(mHDHomeRunDevice, HDHOMERUN_CHANNELSCAN_MODE_SCAN, cmd_scan_callback, self, managedObjectContext);
   }
   
   [mCurrentProgressDisplay scanCompleted];
+  
+  if (mCurrentHDHomeRunChannel && [[mCurrentHDHomeRunChannel stations] count] == 0)
+  {
+    // Destroy the current and channel and make sure it's not in the database
+    [managedObjectContext deleteObject:mCurrentHDHomeRunChannel];
+  }
+  
+  mCurrentHDHomeRunChannel = nil;
+  
+  [psc unlock];
+  [managedObjectContext release];
   
   [mCurrentProgressDisplay release];
   mCurrentProgressDisplay = nil;
@@ -161,5 +221,64 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   [pool release];
 }
 
-@end;
+@end
 
+@implementation HDHomeRunChannel
+
++ createChannelWithType:(NSString*)inChannelType andNumber:(NSNumber*)inChannelNumber inManagedObjectContext:(NSManagedObjectContext*) inMOC
+{
+  HDHomeRunChannel *anHDHomeRunChannel = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunChannel" inManagedObjectContext:inMOC];
+  [anHDHomeRunChannel setChannelType:inChannelType];
+  [anHDHomeRunChannel setChannelNumber:inChannelNumber];
+  return anHDHomeRunChannel;
+}
+
+- (NSString*) channelType
+{
+  COREDATA_ACCESSOR(NSString*, @"channelType")
+}
+
+- (void) setChannelType:(NSString*)value
+{
+  COREDATA_MUTATOR(NSString*, @"channelType");
+}
+
+- (NSNumber*) channelNumber
+{
+  COREDATA_ACCESSOR(NSNumber*, @"channelNumber")
+}
+
+- (void) setChannelNumber:(NSNumber*)value
+{
+  COREDATA_MUTATOR(NSNumber*, @"channelNumber");
+}
+
+- (NSString*) tuningType;
+{
+  COREDATA_ACCESSOR(NSString*, @"tuningType")
+}
+
+- (void) setTuningType:(NSString*)value
+{
+  COREDATA_MUTATOR(NSString*, @"tuningType");
+}
+
+- (HDHomeRunTuner*)tuner
+{
+  COREDATA_ACCESSOR(HDHomeRunTuner*, @"tuner")
+}
+
+- (void)setTuner:(HDHomeRunTuner*)value
+{
+  COREDATA_MUTATOR(HDHomeRunTuner*, @"tuner");
+}
+
+
+- (NSMutableSet *)stations;
+{
+  NSMutableSet *stations = [self mutableSetValueForKey:@"stations"];
+  return stations;
+}
+
+
+@end
