@@ -19,12 +19,17 @@
 @end
 
 @interface xtvdParseThread : NSObject
+{
+  NSManagedObjectContext *mManagedObjectContext;
+}
 
-+ (void) performParse:(id)parseInfo;
+- (void) performParse:(id)parseInfo;
 
 @end;
 
 @interface xtvdCleanupThread : NSObject
+{
+}
 
 + (void) performCleanup:(id)cleanupInfo;
 

@@ -148,10 +148,16 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   [mParsingProgressInfoField setHidden:YES];
   if (xtvd != nil)
   {
-    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
+    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
+        self, @"reportProgressTo", 
+        self, @"reportCompletionTo", 
+        [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator",
+        nil];
     
     // Start our local parsing
-    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:callData];
+    xtvdParseThread *aParseThread = [[xtvdParseThread alloc] init];
+    
+    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:aParseThread withObject:callData];
     
     // And tell the bkgd server to parse the same data too
     [mRecServer performParse:callData];
@@ -183,7 +189,7 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 {
   [mParsingProgressIndicator setHidden:YES];
   [mParsingProgressInfoField setHidden:YES];
-  
+
   // Clear all old items from the store
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
@@ -204,10 +210,6 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   [mParsingProgressIndicator setHidden:YES];
   [mParsingProgressInfoField setHidden:YES];
   [mGetScheduleButton setEnabled:YES];
-
-  // Update the schedule grid
-  [mScheduleView sortStationsArray];
-  [mScheduleView updateStationsScroller];
 }
 
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule

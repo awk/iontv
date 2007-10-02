@@ -682,7 +682,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
 @implementation xtvdParseThread
 
-+ (void) performParse:(id)parseInfo
+- (void) performParse:(id)parseInfo
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
@@ -691,28 +691,60 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSPersistentStoreCoordinator *psc = [xtvdParserData valueForKey:@"persistentStoreCoordinator"];
   if (psc != nil)
   {
-    NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-    [managedObjectContext setPersistentStoreCoordinator: psc];
-    [psc lock];
+    mManagedObjectContext = [xtvdParserData valueForKey:@"managedObjectContext"];
+    if (mManagedObjectContext == nil)
+    {
+      mManagedObjectContext = [[NSManagedObjectContext alloc] init];
+      [mManagedObjectContext setPersistentStoreCoordinator: psc];
+    }
+    
+    // when the lineup retrieval and MOC saves, we want to update the same object in the UI's MOC. 
+    // So listen for the did save notification from the retrieval/parsing thread MOC
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
+        name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
+    
     BOOL lineupsOnly = NO;
     if ([xtvdParserData valueForKey:@"lineupsOnly"])
     {
       lineupsOnly = [[xtvdParserData valueForKey:@"lineupsOnly"] boolValue];
     }
-    [XTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] reportTo:[xtvdParserData valueForKey:@"reportProgressTo"] inManagedObjectContext:managedObjectContext lineupsOnly:lineupsOnly];
+    [XTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] reportTo:[xtvdParserData valueForKey:@"reportProgressTo"] inManagedObjectContext:mManagedObjectContext lineupsOnly:lineupsOnly];
+    
+    [mManagedObjectContext processPendingChanges];
     
     NSError *error = nil;
     NSLog(@"performParse - saving");
-    if (![managedObjectContext save:&error])
+    if (![mManagedObjectContext save:&error])
     {
       NSLog(@"performParse - save returned an error %@", error);
     }
-    [psc unlock];
   }
-   
+  
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
+  
   [[NSFileManager defaultManager] removeFileAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] handler:nil];
   [[xtvdParserData valueForKey:@"reportCompletionTo"] performSelectorOnMainThread:@selector(parsingComplete:) withObject:nil waitUntilDone:NO];
   [pool release];
+}
+
+#pragma mark - Notifications
+
+/**
+    Notification sent out when the threads own managedObjectContext has been.  This method
+    ensures updates from the thread (which has its own managed object
+    context) are merged into the application managed object content, so the 
+    user always sees the most current information.
+*/
+
+- (void)threadContextDidSave:(NSNotification *)notification
+{
+    // get the context and the list of updated objects
+    NSSet *updatedObjects = [[notification userInfo] objectForKey:NSUpdatedObjectsKey];
+
+    NSMutableSet *allObjectsSet = [NSMutableSet setWithSet:updatedObjects];
+    [allObjectsSet unionSet:[[notification userInfo] objectForKey:NSInsertedObjectsKey]];
+    
+    [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:allObjectsSet waitUntilDone:NO];
 }
 
 @end;
