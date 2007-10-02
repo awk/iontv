@@ -19,7 +19,7 @@
         if (text == nil || [text isEqualToString:@""]) {
             [self setTitle:@"Title"];
         }
-//        [metalBg setFlipped:YES];
+        [metalBg setFlipped:YES];
         attrs = [[NSMutableDictionary dictionaryWithDictionary:
                                         [[self attributedStringValue] 
                                                     attributesAtIndex:0 
