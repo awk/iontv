@@ -485,6 +485,27 @@ static Preferences *sSharedInstance = nil;
 	[mScanTunersButton setEnabled:YES];
 }
 
+- (void)scanChannelsConfirmationSheetDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+  [[alert window] orderOut:self];
+
+  HDHomeRunTuner *aTuner =  (HDHomeRunTuner *)contextInfo;
+  
+  if (returnCode == NSAlertFirstButtonReturn)
+  {
+
+      mAbortChannelScan = NO;
+      mChannelScanInProgress = YES;
+      
+      [mScanChannelsButton setTitle:@"Stop"];
+
+      [mChannelScanProgressIndicator setHidden:NO];
+      [mChannelScanProgressIndicator setDoubleValue:0];
+	
+      [aTuner scanActionReportingProgressTo:self];
+  }
+}
+
 - (IBAction) scanChannelsButtonAction:(id)sender
 {
   HDHomeRunTuner *aTuner =  [[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0];
@@ -495,15 +516,17 @@ static Preferences *sSharedInstance = nil;
   }
   else if (aTuner)
   {
-      mAbortChannelScan = NO;
-      mChannelScanInProgress = YES;
-      
-      [mScanChannelsButton setTitle:@"Stop"];
+      // Scanning can be a very lengthy process (and resets the list of current channels/stations) so put up a sheet to confirm
+      NSAlert *scanningAlert = [[NSAlert alloc] init];
+      [scanningAlert setMessageText:@"Do you wish to scan?"];
+      [scanningAlert setInformativeText:@"Scanning can take up to 15 minutes - though it can be aborted. Scanning will also clear your current list of stations"];
+      [scanningAlert addButtonWithTitle:@"Scan"];
+      [scanningAlert addButtonWithTitle:@"Cancel"];
+      [scanningAlert setAlertStyle:NSInformationalAlertStyle];
 
-      [mChannelScanProgressIndicator setHidden:NO];
-      [mChannelScanProgressIndicator setDoubleValue:0];
-	
-      [aTuner scanActionReportingProgressTo:self];
+      [scanningAlert beginSheetModalForWindow:mPanel modalDelegate:self
+        didEndSelector:@selector(scanChannelsConfirmationSheetDidEnd: returnCode: contextInfo:)
+        contextInfo:aTuner];
   }
 }
 
