@@ -17,3 +17,14 @@
 
 @end
 
+@interface NSObject(RSOutlineViewDatasource)
+
+- (void) deleteSelectedRowsOfOutlineView:(NSOutlineView*)outlineView;
+
+@end
+
+@interface NSObject(RSOutlineViewDelegate)
+
+- (BOOL) outlineView:(NSOutlineView*)outlineView shouldShowDisclosureTriangleForItem:(id)item;
+
+@end

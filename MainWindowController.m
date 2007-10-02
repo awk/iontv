@@ -463,7 +463,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 			// Is it 'deletable' ?
 			if ([theSelection valueForKey:RSSourceListDeletableKey] != nil)
 			{
-				enableItem = ([[theSelection valueForKey:RSSourceListDeletableKey] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame);
+				enableItem = [[theSelection valueForKey:RSSourceListDeletableKey] boolValue];
 			}
 		}
 	}
@@ -538,7 +538,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 		return NO;
 	NSMutableDictionary *aTreeNode = [item representedObject];
 	NSNumber *headingFlag = [aTreeNode valueForKey:RSSourceListHeadingKey];
-	if (headingFlag && ([headingFlag compare:[NSNumber numberWithBool:YES]] == NSOrderedSame))
+	if (headingFlag && ([headingFlag boolValue] == YES))
 		return NO;
 	else
 		return YES;
@@ -548,7 +548,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 {
 	NSMutableDictionary *aTreeNode = [item representedObject];
 	NSNumber *expandableFlag = [aTreeNode valueForKey:RSSourceListExpandableKey];
-	if (expandableFlag && ([expandableFlag compare:[NSNumber numberWithBool:NO]] == NSOrderedSame))
+	if (expandableFlag && ([expandableFlag boolValue] == NO))
 		return NO;
 	else
 		return YES;
@@ -558,7 +558,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 {
 	NSMutableDictionary *aTreeNode = [item representedObject];
 	NSNumber *expandableFlag = [aTreeNode valueForKey:RSSourceListExpandableKey];
-	if (expandableFlag && ([expandableFlag compare:[NSNumber numberWithBool:NO]] == NSOrderedSame))
+	if (expandableFlag && ([expandableFlag boolValue] == NO))
 		return NO;
 	else
 		return YES;
@@ -568,10 +568,20 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 {
 	NSMutableDictionary *aTreeNode = [item representedObject];
 	NSNumber *headingFlag = [aTreeNode valueForKey:RSSourceListHeadingKey];
-	if (headingFlag && ([headingFlag compare:[NSNumber numberWithBool:YES]] == NSOrderedSame))
+	if (headingFlag && ([headingFlag boolValue] == YES))
 		return YES;
 	else
 		return NO;
+}
+
+- (BOOL) outlineView:(NSOutlineView*)outlineView shouldShowDisclosureTriangleForItem:(id)item
+{
+	NSMutableDictionary *aTreeNode = [item representedObject];
+	NSNumber *expandableFlag = [aTreeNode valueForKey:RSSourceListExpandableKey];
+	if (expandableFlag && ([expandableFlag boolValue] == NO))
+		return NO;
+	else
+		return YES;
 }
 
 - (void) deleteSelectedRowsOfOutlineView:(NSOutlineView *) aOutlineView
@@ -609,7 +619,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 		NSMutableDictionary *nodeDictionary = ([[item representedObject] isKindOfClass:[NSMutableDictionary class]] ? [item representedObject] : nil);
 		if (nodeDictionary)
 		{
-			if ([nodeDictionary valueForKey:RSSourceListCanAcceptDropKey] && [[nodeDictionary valueForKey:RSSourceListCanAcceptDropKey] compare:[NSNumber numberWithBool:YES]] == NSOrderedSame)
+			if ([nodeDictionary valueForKey:RSSourceListCanAcceptDropKey] && ([[nodeDictionary valueForKey:RSSourceListCanAcceptDropKey] boolValue] == YES))
 				canAcceptDrop = YES;
 		}
 	}

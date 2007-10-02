@@ -71,5 +71,20 @@
 	}
 }
 
+- (NSRect)frameOfOutlineCellAtRow:(NSInteger)row
+{
+	id anItem = [self itemAtRow:row];
+	if (anItem && ([[self delegate] respondsToSelector:@selector(outlineView:shouldShowDisclosureTriangleForItem:)] == YES))
+	{
+		if ([[self delegate] outlineView:self shouldShowDisclosureTriangleForItem:anItem] == YES)
+			return [super frameOfOutlineCellAtRow:row];
+		else
+			return NSZeroRect;
+		
+	}
+	else
+		return [super frameOfOutlineCellAtRow:row];
+}
+
 @end
 
