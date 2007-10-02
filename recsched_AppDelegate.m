@@ -300,9 +300,11 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
  
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
 
-    NSError *error;
     int reply = NSTerminateNow;
     
+#if USE_SYNCSERVICES
+    NSError *error;
+
     if (managedObjectContext != nil) {
         if ([managedObjectContext commitEditing]) {
             if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) {
@@ -336,6 +338,7 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
             reply = NSTerminateCancel;
         }
     }
+#endif // USE_SYNCSERVICES
     
     return reply;
 }
