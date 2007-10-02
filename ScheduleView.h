@@ -27,4 +27,7 @@
 - (void) goForward;
 - (float) visibleTimeSpan;
 - (float) timePerLineIncrement;
+- (void) updateStationsScroller;
+- (void) sortStationsArray;
+
 @end
