@@ -93,6 +93,11 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                 
                 // Check to see if we got an unauthorized error
                 CFHTTPMessageRef responseMessage = (CFHTTPMessageRef) [fResult valueForKey:(id)kWSHTTPResponseMessage];
+                if (!responseMessage)
+                {
+                    [self handleError:@"WSMethodInvocationInvoke failed in get response message" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
+                    return nil;
+                }
                 int msgCode = CFHTTPMessageGetResponseStatusCode(responseMessage);
 
                 if (msgCode == 401)
