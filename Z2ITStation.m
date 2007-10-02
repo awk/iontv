@@ -14,17 +14,9 @@
 
 @implementation Z2ITStation
 
-static NSMutableDictionary *sStationsDictionary = nil;
-
 + (Z2ITStation *) fetchStationWithID:(NSNumber*)inStationID inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
   Z2ITStation *aStation;
-  if (sStationsDictionary)
-  {
-    aStation = [sStationsDictionary valueForKey:[inStationID stringValue]];
-    if (aStation)
-      return aStation;
-  }
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
@@ -50,9 +42,6 @@ static NSMutableDictionary *sStationsDictionary = nil;
   else
   {
     aStation = [array objectAtIndex:0];
-    if (!sStationsDictionary)
-      sStationsDictionary = [[NSMutableDictionary alloc] initWithCapacity:300];
-    [sStationsDictionary setValue:aStation forKey:[inStationID stringValue]];
     if ([array count] > 1)
       NSLog(@"fetchStationWithID - multiple (%d) station with ID %@", [array count], inStationID);
     return aStation;
