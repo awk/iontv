@@ -404,8 +404,6 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 // Typically called from a seperate thread to carry out the scanning
 - (void) performScan
 {
-    NSError *error = nil;
-
     NSPersistentStoreCoordinator *psc = [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator];
     NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
     [managedObjectContext setPersistentStoreCoordinator: psc];
