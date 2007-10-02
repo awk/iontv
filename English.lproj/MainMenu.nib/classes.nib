@@ -22,9 +22,9 @@
                 mProgramSearchView = NSView; 
                 mRecServer = id; 
                 mScheduleContainerView = NSView; 
-                mScheduleSplitView = NSSplitView; 
+                mScheduleSplitView = RBSplitView; 
                 mScheduleView = ScheduleView; 
-                mTopLevelSplitView = NSSplitView; 
+                mTopLevelSplitView = RBSplitView; 
                 mViewSelectionArrayController = NSArrayController; 
                 mViewSelectionTableView = NSTableView; 
             }; 
@@ -32,6 +32,7 @@
         }, 
         {CLASS = NSObject; LANGUAGE = ObjC; }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {CLASS = PolishedBackgroundView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {CLASS = PolishedWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
         {
             ACTIONS = {showPanel = id; }; 
@@ -73,6 +74,7 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
+        {CLASS = ThinSplitView; LANGUAGE = ObjC; SUPERCLASS = NSSplitView; }, 
         {
             ACTIONS = {saveAction = id; showCoreDataProgramWindow = id; }; 
             CLASS = "recsched_AppDelegate"; 

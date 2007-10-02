@@ -10,13 +10,14 @@
 
 @class Z2ITSchedule;
 @class ScheduleView;
+@class RBSplitView;
 
 @interface MainWindowController : NSWindowController {
   IBOutlet NSButton *mGetScheduleButton;
   IBOutlet NSProgressIndicator *mParsingProgressIndicator;
   IBOutlet NSTextField *mParsingProgressInfoField;
-  IBOutlet NSSplitView *mScheduleSplitView;
-  IBOutlet NSSplitView *mTopLevelSplitView;
+  IBOutlet RBSplitView *mScheduleSplitView;
+  IBOutlet RBSplitView *mTopLevelSplitView;
   IBOutlet NSTableView *mViewSelectionTableView;
   IBOutlet NSView *mDetailView;
   IBOutlet NSView *mScheduleContainerView;

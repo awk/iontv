@@ -14,26 +14,24 @@
 #import "XTVDParser.h"
 #import "Preferences.h"
 #import "RecSchedProtocol.h"
+#import "RBSplitView.h"
+#import "RBSplitSubView.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
 
-const float kViewSelectionListMaxWidth = 200.0;
 NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 @implementation MainWindowController
 
 - (void) awakeFromNib
 {
-  [mTopLevelSplitView setVertical:YES];
-  [mTopLevelSplitView setDelegate:self];
-  
-  [mViewSelectionTableView selectRow:0 byExtendingSelection:NO];
   [self showViewForTableSelection:[mViewSelectionTableView selectedRow]];
   mSeparatorCell = [[JKSeparatorCell alloc] init];
   mDefaultCell = [[JKImageTextCell alloc] initTextCell:@"Default title"];
   [mViewSelectionArrayController addObject:@"Schedule"];
   [mViewSelectionArrayController addObject:@"Search"];
   [mViewSelectionArrayController addObject:@""];    // Separator at row '2'
+  [mViewSelectionTableView selectRow:0 byExtendingSelection:NO];    // Always start at Row 0 - the schedule selection
   
   mDetailViewMinHeight = [mDetailView frame].size.height;
   NSView *bottomContainerView = [[NSView alloc] initWithFrame:[mScheduleContainerView frame]];
@@ -45,12 +43,12 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   [mProgramSearchView setHidden:YES];
   
   [mScheduleSplitView addSubview:mDetailView];
+  RBSplitSubview *aSubView = [mScheduleSplitView subviewAtPosition:0];
+  [aSubView setMinDimension:0.0 andMaxDimension:mDetailViewMinHeight];
+  [aSubView setDimension:mDetailViewMinHeight];
+  [aSubView setCanCollapse:YES];
   [mScheduleSplitView addSubview:bottomContainerView];
   [bottomContainerView release];
-  
-  [mScheduleSplitView setIsPaneSplitter:NO];
-  [mScheduleSplitView setDelegate:self];
-  [mScheduleSplitView adjustSubviews];
   
   [mCurrentSchedule setContent:nil];
 
@@ -70,19 +68,6 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     [mRecServer setProtocolForProxy:@protocol(RecSchedServerProto)];
   }
 
-}
-
-#pragma mark Splitview delegate methods
-
-- (float)splitView:(NSSplitView *)sender constrainMaxCoordinate:(float)proposedMax ofSubviewAt:(int)offset
-{
-  if (sender == mScheduleSplitView)
-    return proposedMax < mDetailViewMinHeight ? proposedMax : mDetailViewMinHeight;
-  else if (sender == mTopLevelSplitView)
-    return proposedMax < kViewSelectionListMaxWidth ? proposedMax : kViewSelectionListMaxWidth;
-  else
-    return proposedMax;
-    
 }
 
 #pragma mark Action Methods
@@ -250,30 +235,6 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
       default:
         break;
     }
-}
-
-#pragma mark View Selection Table DataSource Methods
-
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
-{
-  return 2;
-}
-
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
-{
-  NSString *aString = nil;
-  
-  // The Table only has one column
-  switch (rowIndex)
-  {
-    case 0:
-      aString = [NSString stringWithString:@"Schedule"];
-      break;
-    case 1:
-      aString = [NSString stringWithString:@"Search"];
-      break;
-  }
-  return aString;
 }
 
 #pragma mark View Selection Table Delegate Methods

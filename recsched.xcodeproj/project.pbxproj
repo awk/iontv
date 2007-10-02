@@ -72,6 +72,8 @@
 		EA2939C30C0CD63E0053E2B8 /* JKSeparatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2939BC0C0CD63E0053E2B8 /* JKSeparatorCell.m */; };
 		EA2939C40C0CD63E0053E2B8 /* JKSourceTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2939BF0C0CD63E0053E2B8 /* JKSourceTableView.m */; };
 		EA2939C50C0CD63E0053E2B8 /* JKVariableCellColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2939C10C0CD63E0053E2B8 /* JKVariableCellColumn.m */; };
+		EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */; };
+		EA293B860C0E1A1E0053E2B8 /* libRBSplitView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA293B760C0E18BC0053E2B8 /* libRBSplitView.a */; };
 		EA2EE03F0C07D2300002420F /* hdhomerun_channelscan.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */; };
 		EA2EE0400C07D2320002420F /* hdhomerun_config.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02B0C07D2130002420F /* hdhomerun_config.c */; };
 		EA2EE0410C07D2340002420F /* hdhomerun_control.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02C0C07D2130002420F /* hdhomerun_control.c */; };
@@ -124,6 +126,41 @@
 			proxyType = 1;
 			remoteGlobalIDString = EA083DF20BA62A5F003C27FA;
 			remoteInfo = recsched_bkgd;
+		};
+		EA293B710C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D1AC9740486D14A00FE50C9 /* RBSplitView.palette */;
+			remoteInfo = Palette;
+		};
+		EA293B730C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D5E002A107328E1100594182 /* RBSplitView.framework */;
+			remoteInfo = Framework;
+		};
+		EA293B750C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D5E003B9073298FC00594182 /* libRBSplitView.a */;
+			remoteInfo = Library;
+		};
+		EA293B770C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D5EA8A09074CF5AB00AE807E /* SampleApp.app */;
+			remoteInfo = SampleApp;
+		};
+		EA293B790C0E18CD0053E2B8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D5E003B8073298FC00594182 /* Library */;
+			remoteInfo = Library;
 		};
 		EA2EE04E0C07D3130002420F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -195,6 +232,9 @@
 		EA2939BF0C0CD63E0053E2B8 /* JKSourceTableView.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = JKSourceTableView.m; sourceTree = SOURCE_ROOT; };
 		EA2939C00C0CD63E0053E2B8 /* JKVariableCellColumn.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = JKVariableCellColumn.h; sourceTree = SOURCE_ROOT; };
 		EA2939C10C0CD63E0053E2B8 /* JKVariableCellColumn.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = JKVariableCellColumn.m; sourceTree = SOURCE_ROOT; };
+		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolishedBackgroundView.h; sourceTree = "<group>"; };
+		EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PolishedBackgroundView.m; sourceTree = "<group>"; };
+		EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RBSplitView.xcodeproj; path = RBSplitView/RBSplitView.xcodeproj; sourceTree = SOURCE_ROOT; };
 		EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_channelscan.c; path = ../libhdhomerun/hdhomerun_channelscan.c; sourceTree = SOURCE_ROOT; };
 		EA2EE02A0C07D2130002420F /* hdhomerun_channelscan.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_channelscan.h; path = ../libhdhomerun/hdhomerun_channelscan.h; sourceTree = SOURCE_ROOT; };
 		EA2EE02B0C07D2130002420F /* hdhomerun_config.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_config.c; path = ../libhdhomerun/hdhomerun_config.c; sourceTree = SOURCE_ROOT; };
@@ -271,6 +311,7 @@
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				EA2EE0680C07D4890002420F /* liblibhdhomerun.a in Frameworks */,
+				EA293B860C0E1A1E0053E2B8 /* libRBSplitView.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -349,6 +390,7 @@
 		29B97314FDCFA39411CA2CEA /* recsched */ = {
 			isa = PBXGroup;
 			children = (
+				EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */,
 				EA2EE0280C07D1EA0002420F /* libhdhomerun */,
 				EAE655370B9D0A3100CDB279 /* Background App */,
 				7756732906782D8800D1FEB8 /* Models */,
@@ -433,6 +475,17 @@
 				EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */,
 			);
 			name = Images;
+			sourceTree = "<group>";
+		};
+		EA293B6A0C0E18BC0053E2B8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				EA293B720C0E18BC0053E2B8 /* RBSplitView.palette */,
+				EA293B740C0E18BC0053E2B8 /* RBSplitView.framework */,
+				EA293B760C0E18BC0053E2B8 /* libRBSplitView.a */,
+				EA293B780C0E18BC0053E2B8 /* SampleApp.app */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		EA2EE0280C07D1EA0002420F /* libhdhomerun */ = {
@@ -534,6 +587,8 @@
 				EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */,
 				EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */,
 				EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */,
+				EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */,
+				EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -563,6 +618,7 @@
 			);
 			dependencies = (
 				EA2EE04F0C07D3130002420F /* PBXTargetDependency */,
+				EA293B7A0C0E18CD0053E2B8 /* PBXTargetDependency */,
 			);
 			name = recsched;
 			productInstallPath = "$(HOME)/Applications";
@@ -629,6 +685,12 @@
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* recsched */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = EA293B6A0C0E18BC0053E2B8 /* Products */;
+					ProjectRef = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* recsched */,
@@ -639,6 +701,37 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		EA293B720C0E18BC0053E2B8 /* RBSplitView.palette */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = RBSplitView.palette;
+			remoteRef = EA293B710C0E18BC0053E2B8 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EA293B740C0E18BC0053E2B8 /* RBSplitView.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = RBSplitView.framework;
+			remoteRef = EA293B730C0E18BC0053E2B8 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EA293B760C0E18BC0053E2B8 /* libRBSplitView.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRBSplitView.a;
+			remoteRef = EA293B750C0E18BC0053E2B8 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		EA293B780C0E18BC0053E2B8 /* SampleApp.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = SampleApp.app;
+			remoteRef = EA293B770C0E18BC0053E2B8 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D1107290486CEB800E47090 /* Resources */ = {
@@ -725,6 +818,7 @@
 				EA2939C30C0CD63E0053E2B8 /* JKSeparatorCell.m in Sources */,
 				EA2939C40C0CD63E0053E2B8 /* JKSourceTableView.m in Sources */,
 				EA2939C50C0CD63E0053E2B8 /* JKVariableCellColumn.m in Sources */,
+				EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -781,6 +875,11 @@
 			target = EA083DF20BA62A5F003C27FA /* recsched_bkgd */;
 			targetProxy = EA083F750BADD1FD003C27FA /* PBXContainerItemProxy */;
 		};
+		EA293B7A0C0E18CD0053E2B8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Library;
+			targetProxy = EA293B790C0E18CD0053E2B8 /* PBXContainerItemProxy */;
+		};
 		EA2EE04F0C07D3130002420F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = EA2EE03D0C07D2250002420F /* libhdhomerun */;
@@ -819,7 +918,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = recsched_Prefix.pch;
-				HEADER_SEARCH_PATHS = ../libhdhomerun;
+				HEADER_SEARCH_PATHS = (
+					RBSplitView/Source,
+					../libhdhomerun,
+				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
@@ -845,7 +947,10 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = recsched_Prefix.pch;
-				HEADER_SEARCH_PATHS = ../libhdhomerun;
+				HEADER_SEARCH_PATHS = (
+					RBSplitView/Source,
+					../libhdhomerun,
+				);
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
