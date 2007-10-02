@@ -98,13 +98,6 @@
   // the string as we go
   CFAbsoluteTime cellStartTime, cellEndTime;
   cellStartTime = mStartTime;
-  CFGregorianDate previousHour = CFAbsoluteTimeGetGregorianDate(cellStartTime,CFTimeZoneCopySystem());
-  if (previousHour.minute > 30)
-    previousHour.minute = 30;
-  else
-    previousHour.minute = 0;
-  previousHour.second = 0;
-  cellStartTime = CFGregorianDateGetAbsoluteTime(previousHour,CFTimeZoneCopySystem());
   int numberOfCells = [mLabelCellArray count];
   int i=0;
   CFGregorianUnits thirtyMinutes;

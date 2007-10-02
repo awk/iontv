@@ -15,6 +15,7 @@
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
+        {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
         {
             ACTIONS = {showPanel = id; }; 
             CLASS = Preferences; 
@@ -37,17 +38,10 @@
             SUPERCLASS = NSView; 
         }, 
         {
-            ACTIONS = {scrollerChanged = id; }; 
+            ACTIONS = {scheduleControlClicked = id; }; 
             CLASS = ScheduleViewController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {
-                mHeaderView = ScheduleHeaderView; 
-                mLineupArrayController = NSArrayController; 
-                mStationArrayController = NSArrayController; 
-                mStationColumnView = ScheduleStationColumnView; 
-                mStationsScroller = NSScroller; 
-                mTimeScroller = NSScroller; 
-            }; 
+            OUTLETS = {mScheduleView = ScheduleView; }; 
             SUPERCLASS = NSObject; 
         }, 
         {

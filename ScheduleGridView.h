@@ -1,27 +1,27 @@
 //
-//  ScheduleStationColumnView.h
+//  ScheduleGridView.h
 //  recsched
 //
-//  Created by Andrew Kimpton on 1/25/07.
+//  Created by Andrew Kimpton on 2/1/07.
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
 
-const int kScheduleStationColumnViewCellHeight = 32;
-
 @class Z2ITLineup;
 
-@interface ScheduleStationColumnView : NSView {
-  NSMutableArray *mStationLabelCellArray;
+@interface ScheduleGridView : NSView {
+  NSMutableArray *mStationsInViewArray;
+  NSMutableArray *mCellsInViewArray;
   NSArray *mSortedStationsArray;
   Z2ITLineup *mCurrentLineup;
   unsigned mStartStationIndex;
+  CFAbsoluteTime mStartTime;
+  float mVisibleTimeSpan;
 }
 
-+ (int) columnWidth;
-- (void) updateCellLabels;
 - (void) setSortedStationsArray:(NSArray*)inArray forLineup:(Z2ITLineup*)inLineup;
-- (unsigned) numberStationsDisplayed;
 - (void) setStartStationIndex:(unsigned)inIndex;
+- (void) setStartTime:(CFAbsoluteTime)inStartTime;
+- (void) setVisibleTimeSpan:(float)inTimeSpan;
 @end

@@ -9,6 +9,7 @@
 #import "ScheduleView.h"
 #import "ScheduleStationColumnView.h"
 #import "ScheduleHeaderView.h"
+#import "ScheduleGridView.h"
 #import "Z2ITStation.h"
 #import "Z2ITLineup.h"
 #import "Z2ITLineupMap.h"
@@ -36,23 +37,11 @@
     if (self) {
         NSRect subViewFrame = NSMakeRect(0, 0, frame.size.width, frame.size.height);
 
-        // Add the time scroller to the bottom of the frame
-        subViewFrame.size.height = [NSScroller scrollerWidth];
-        subViewFrame.size.width -= ([NSScroller scrollerWidth] + [ScheduleStationColumnView columnWidth]);
-        subViewFrame.origin.x = [ScheduleStationColumnView columnWidth];
-        mTimeScroller = [[NSScroller alloc] initWithFrame:subViewFrame];
-        [mTimeScroller setEnabled:YES];
-        [mTimeScroller setAutoresizesSubviews:YES];
-        [mTimeScroller setAutoresizingMask:NSViewWidthSizable];
-        [mTimeScroller setAction:@selector(scrollerChanged:)];
-        [mTimeScroller setTarget:self];
-        
         // Add the station scroller to the right side
         subViewFrame  = NSMakeRect(0, 0, frame.size.width, frame.size.height);
         subViewFrame.size.width = [NSScroller scrollerWidth];
-        subViewFrame.size.height -= ([NSScroller scrollerWidth] + [ScheduleHeaderView headerHeight]);
+        subViewFrame.size.height -= [ScheduleHeaderView headerHeight];
         subViewFrame.origin.x = frame.size.width - [NSScroller scrollerWidth];
-        subViewFrame.origin.y = [NSScroller scrollerWidth];
         
         mStationsScroller = [[NSScroller alloc] initWithFrame:subViewFrame];
         [mStationsScroller setEnabled:YES];
@@ -63,8 +52,7 @@
         
         subViewFrame  = NSMakeRect(0, 0, frame.size.width, frame.size.height);
         subViewFrame.size.width = [ScheduleStationColumnView columnWidth];
-        subViewFrame.size.height -= ([NSScroller scrollerWidth] + [ScheduleHeaderView headerHeight]);
-        subViewFrame.origin.y += [NSScroller scrollerWidth];
+        subViewFrame.size.height -= [ScheduleHeaderView headerHeight];
         mStationColumnView = [[ScheduleStationColumnView alloc] initWithFrame:subViewFrame];
         [mStationColumnView setAutoresizingMask:NSViewHeightSizable];
         
@@ -75,20 +63,41 @@
         mHeaderView = [[ScheduleHeaderView alloc] initWithFrame:subViewFrame];
         [mHeaderView setAutoresizingMask:NSViewWidthSizable|NSViewMinYMargin];
         
-        [self addSubview:mTimeScroller];
+        subViewFrame  = NSMakeRect(0, 0, frame.size.width, frame.size.height);
+        subViewFrame.size.height -= [ScheduleHeaderView headerHeight];
+        subViewFrame.size.width -= ([ScheduleStationColumnView columnWidth] + [NSScroller scrollerWidth]);
+        subViewFrame.origin.x = [ScheduleStationColumnView columnWidth];
+        mGridView = [[ScheduleGridView alloc] initWithFrame:subViewFrame];
+        [mGridView setAutoresizingMask:NSViewHeightSizable|NSViewWidthSizable];
+        
         [self addSubview:mStationsScroller];
         [self addSubview:mStationColumnView];
         [self addSubview:mHeaderView];
-        
-        [mTimeScroller release];
-        [mStationsScroller release];
-        [mStationColumnView release];
-        [mHeaderView release];
+        [self addSubview:mGridView];
         
         mSortedStationsArray = nil;
-
+        CFGregorianDate previousHour = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(),CFTimeZoneCopySystem());
+        if (previousHour.minute > 30)
+          previousHour.minute = 30;
+        else
+          previousHour.minute = 0;
+        previousHour.second = 0;
+        mStartTime = CFGregorianDateGetAbsoluteTime(previousHour,CFTimeZoneCopySystem());
+        [mHeaderView setStartTime:mStartTime];
+        [mGridView setStartTime:mStartTime];
+        [mGridView setVisibleTimeSpan:[self visibleTimeSpan]];
     }
     return self;
+}
+
+- (void) dealloc 
+{
+  [mStationsScroller release];
+  [mStationColumnView release];
+  [mHeaderView release];
+  [mGridView release];
+
+  [super dealloc];
 }
 
 - (void) awakeFromNib
@@ -100,29 +109,31 @@
 
 - (void)drawRect:(NSRect)rect {
     // Drawing code here.
-    [[NSColor redColor] set];
-    [NSBezierPath strokeLineFromPoint:[self bounds].origin toPoint:NSMakePoint([self bounds].origin.x + [self bounds].size.width,[self bounds].origin.y + [self bounds].size.height)];
-    [NSBezierPath strokeLineFromPoint:NSMakePoint([self bounds].origin.x, [self bounds].origin.y + [self bounds].size.height) toPoint:NSMakePoint([self bounds].origin.x + [self bounds].size.width,[self bounds].origin.y)];
+    [[NSColor whiteColor] set];
+    [NSBezierPath fillRect:[self frame]];
+//    [NSBezierPath strokeLineFromPoint:[self bounds].origin toPoint:NSMakePoint([self bounds].origin.x + [self bounds].size.width,[self bounds].origin.y + [self bounds].size.height)];
+//    [NSBezierPath strokeLineFromPoint:NSMakePoint([self bounds].origin.x, [self bounds].origin.y + [self bounds].size.height) toPoint:NSMakePoint([self bounds].origin.x + [self bounds].size.width,[self bounds].origin.y)];
 }
 
-- (IBAction) scrollerChanged:(NSScroller*)inScroller
+- (void) setStartTime:(CFAbsoluteTime)inTime
 {
+  mStartTime = inTime;
+  [mGridView setStartTime:mStartTime];
+  [mHeaderView setStartTime:mStartTime];
+}
+
+- (void) stationsScrollerChanged:(NSScroller *)inScroller
+{
+
     float knobPosition = [inScroller floatValue];
     float newKnobPosition = knobPosition;
     BOOL updateScheduleView = NO;
     
     float lineIncrement = 0;
     float pageIncrement = 0;
-    if (inScroller == mTimeScroller)
-    {
-      lineIncrement = [self timePerLineIncrement] / [self timeSpan];
-      pageIncrement = [self visibleTimeSpan] / [self timeSpan];
-    }
-    if (inScroller == mStationsScroller)
-    {
-      lineIncrement = 1.0f / (float) [mSortedStationsArray count];
-      pageIncrement = (float) [mStationColumnView numberStationsDisplayed] / (float) ([mSortedStationsArray count] - [mStationColumnView numberStationsDisplayed]);
-    }
+
+    lineIncrement = 1.0f / (float) [mSortedStationsArray count];
+    pageIncrement = (float) [mStationColumnView numberStationsDisplayed] / (float) ([mSortedStationsArray count] - [mStationColumnView numberStationsDisplayed]);
     
     switch ([inScroller hitPart]) {
         case NSScrollerIncrementLine:
@@ -157,20 +168,36 @@
     
     if (updateScheduleView)
     {
-      if (inScroller == mTimeScroller)
-      {
-        CFGregorianUnits timeChange;
-        memset(&timeChange, 0, sizeof(timeChange));
-        timeChange.minutes = [inScroller floatValue] * [self timeSpan];
-        CFAbsoluteTime newStartTime = CFAbsoluteTimeAddGregorianUnits(mStartTime,CFTimeZoneCopySystem(),timeChange);
-        [mHeaderView setStartTime:newStartTime];
-      }
-      if (inScroller == mStationsScroller)
-      {
-        unsigned newStartIndex = ([inScroller floatValue] * (float)([mSortedStationsArray count] - [mStationColumnView numberStationsDisplayed]) + 0.5);
-        [mStationColumnView setStartStationIndex:newStartIndex];
-      }
+      unsigned newStartIndex = ([inScroller floatValue] * (float)([mSortedStationsArray count] - [mStationColumnView numberStationsDisplayed]) + 0.5);
+      [mStationColumnView setStartStationIndex:newStartIndex];
+      [mGridView setStartStationIndex:newStartIndex];
     }
+}
+
+- (IBAction) scrollerChanged:(NSScroller*)inScroller
+{
+    if (inScroller == mStationsScroller)
+      [self stationsScrollerChanged:inScroller];
+}
+
+- (void) goBackwards
+{
+  CFGregorianUnits timeChange;
+  memset(&timeChange, 0, sizeof(timeChange));
+  timeChange.minutes = -30;
+  mStartTime = CFAbsoluteTimeAddGregorianUnits(mStartTime,CFTimeZoneCopyDefault(),timeChange);
+  [mGridView setStartTime:mStartTime];
+  [mHeaderView setStartTime:mStartTime];
+}
+
+- (void) goForward
+{
+  CFGregorianUnits timeChange;
+  memset(&timeChange, 0, sizeof(timeChange));
+  timeChange.minutes = 30;
+  mStartTime = CFAbsoluteTimeAddGregorianUnits(mStartTime,CFTimeZoneCopyDefault(),timeChange);
+  [mGridView setStartTime:mStartTime];
+  [mHeaderView setStartTime:mStartTime];
 }
 
 #pragma mark Station list updating methods
@@ -225,6 +252,7 @@ int sortStationsWithLineup(id thisStation, id otherStation, void *context)
   Z2ITLineup* currentLineup = [[mLineupArrayController selectedObjects] objectAtIndex:0];
   mSortedStationsArray =  [aStationsArray sortedArrayUsingFunction:sortStationsWithLineup context:currentLineup];
   [mStationColumnView setSortedStationsArray:mSortedStationsArray forLineup:currentLineup] ;
+  [mGridView setSortedStationsArray:mSortedStationsArray forLineup:currentLineup];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context

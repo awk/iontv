@@ -10,11 +10,12 @@
 
 @class ScheduleHeaderView;
 @class ScheduleStationColumnView;
+@class ScheduleGridView;
 
 @interface ScheduleView : NSView {
   IBOutlet ScheduleHeaderView *mHeaderView;
   IBOutlet ScheduleStationColumnView *mStationColumnView;
-  IBOutlet NSScroller *mTimeScroller;
+  IBOutlet ScheduleGridView *mGridView;
   IBOutlet NSScroller *mStationsScroller;
 
   IBOutlet NSArrayController *mLineupArrayController;
@@ -22,4 +23,6 @@
   CFAbsoluteTime mStartTime;
 }
 
+- (void) goBackwards;
+- (void) goForward;
 @end

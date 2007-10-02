@@ -11,7 +11,6 @@
 #import "Z2ITLineupMap.h"
 #import "Z2ITLineup.h"
 
-const int kScheduleStationColumnViewCellHeight = 16;
 const int kScheduleStationColumnViewDefaultNumberOfCells = 200;
 const int kScheduleStationColumnViewWidth = 95;
 
@@ -56,7 +55,7 @@ const int kScheduleStationColumnViewWidth = 95;
       return;   // Nothing to draw
       
     // We always draw one more cell than neccessary to accomodate partial scrolling
-    numberLabelCells++;
+//    numberLabelCells++;
     
     int i=0;
     for (i=mStartStationIndex; (i < (mStartStationIndex + numberLabelCells)) && (i < [mStationLabelCellArray count]); i++)
