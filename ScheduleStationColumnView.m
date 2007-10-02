@@ -6,6 +6,7 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+#import "CTGradient.h"
 #import "ScheduleStationColumnView.h"
 #import "ScheduleViewController.h"
 #import "Z2ITStation.h"
@@ -15,6 +16,48 @@
 const int kScheduleStationColumnViewDefaultNumberOfCells = 200;
 const int kScheduleStationColumnViewWidth = 95;
 const int kScheduleStationColumnViewCellHeight = 40;
+
+@interface ScheduleStationColumnCell : NSTextFieldCell {
+}
+
+@end
+
+@implementation ScheduleStationColumnCell
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+	// Fill with the dark gray gradient
+	CTGradient *aGradient = [CTGradient gradientWithBeginningColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.3922 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.4980 alpha:1.0]];
+	[aGradient fillRect:cellFrame angle:90.0];
+	
+	// Draw the frame
+	[[NSColor colorWithDeviceRed:0 green:0 blue:0 alpha:0.65] set];
+	[NSBezierPath strokeRect:cellFrame];
+	
+	// Draw the label string
+	NSMutableParagraphStyle *paraInfo = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	[paraInfo  setAlignment:[self alignment]];
+	NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[self textColor], NSForegroundColorAttributeName, paraInfo, NSParagraphStyleAttributeName, nil];
+	[paraInfo release];
+	NSRect stringBounds = [[self stringValue] boundingRectWithSize:cellFrame.size options:0 attributes:stringAttributes];
+	stringBounds.origin.y = cellFrame.origin.y + ((cellFrame.size.height - stringBounds.size.height)/2);
+	stringBounds.size.width = cellFrame.size.width;
+	[[self stringValue] drawInRect:stringBounds withAttributes:stringAttributes];
+	
+	// Draw the top highlight
+	NSPoint topHighlightLeft = cellFrame.origin;
+	topHighlightLeft.y = (cellFrame.origin.y + cellFrame.size.height - 2.0) + 0.5;
+	topHighlightLeft.x = cellFrame.origin.x+1;
+	NSPoint topHighlightRight = topHighlightLeft;
+	topHighlightRight.x = topHighlightLeft.x + cellFrame.size.width-2;
+	[[NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:0.25] set];
+	[NSBezierPath strokeLineFromPoint:topHighlightLeft toPoint:topHighlightRight];
+	[[NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:0.15] set];
+	topHighlightLeft.y--; topHighlightRight.y--;
+	[NSBezierPath strokeLineFromPoint:topHighlightLeft toPoint:topHighlightRight];
+}
+
+@end
 
 @implementation ScheduleStationColumnView
 
@@ -97,11 +140,12 @@ const int kScheduleStationColumnViewCellHeight = 40;
       Z2ITStation *aStation = [mSortedStationsArray objectAtIndex:i];
       Z2ITLineupMap *aLineupMap = [aStation lineupMapForLineupID:[mCurrentLineup lineupID]];
       NSString *cellString = [NSString stringWithFormat:@"%@ - %@", [aLineupMap channel], [aStation valueForKey:@"callSign"]];
-      NSTextFieldCell *aLabelCell = [[NSTextFieldCell alloc] initTextCell:cellString];
-      [aLabelCell setBordered:YES];
+      ScheduleStationColumnCell *aLabelCell = [[ScheduleStationColumnCell alloc] initTextCell:cellString];
+//      [aLabelCell setBordered:YES];
       [aLabelCell setAlignment:NSCenterTextAlignment];
       [aLabelCell setFont:theFont];
       [aLabelCell setControlSize:NSSmallControlSize];
+	  [aLabelCell setTextColor:[NSColor whiteColor]];
       [mStationLabelCellArray addObject:aLabelCell];
       [aLabelCell release];
     }
