@@ -87,8 +87,6 @@
 		EA2EE0780C07D57A0002420F /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
 		EA572E7F0C221C370041A372 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
-		EA572F130C222EC70041A372 /* NSManagedObject+CopyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA572F120C222EC70041A372 /* NSManagedObject+CopyAdditions.m */; };
-		EA572F700C2231250041A372 /* NSManagedObject+CopyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA572F120C222EC70041A372 /* NSManagedObject+CopyAdditions.m */; };
 		EA572F710C22312E0041A372 /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
@@ -281,8 +279,6 @@
 		EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunMO.m; sourceTree = "<group>"; };
 		EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunTuner.h; sourceTree = "<group>"; };
 		EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunTuner.m; sourceTree = "<group>"; };
-		EA572F110C222EC70041A372 /* NSManagedObject+CopyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObject+CopyAdditions.h"; sourceTree = "<group>"; };
-		EA572F120C222EC70041A372 /* NSManagedObject+CopyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObject+CopyAdditions.m"; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
@@ -581,8 +577,6 @@
 				EAF8863A0B61598700373CEF /* Z2ITProgram.m */,
 				EAF8867B0B61740300373CEF /* Z2ITSchedule.h */,
 				EAF8867C0B61740300373CEF /* Z2ITSchedule.m */,
-				EA572F110C222EC70041A372 /* NSManagedObject+CopyAdditions.h */,
-				EA572F120C222EC70041A372 /* NSManagedObject+CopyAdditions.m */,
 			);
 			name = "Data & XML Classes";
 			sourceTree = "<group>";
@@ -838,7 +832,6 @@
 				EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */,
 				EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */,
 				EA294E3C0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m in Sources */,
-				EA572F130C222EC70041A372 /* NSManagedObject+CopyAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -863,7 +856,6 @@
 			files = (
 				EAE655480B9D0AA100CDB279 /* recsched_bkgd.m in Sources */,
 				EAE6555A0B9D1A8300CDB279 /* RecSchedServer.m in Sources */,
-				EA572F700C2231250041A372 /* NSManagedObject+CopyAdditions.m in Sources */,
 				EA572F710C22312E0041A372 /* HDHomeRunMO.m in Sources */,
 				EA20AEFB0C25CC5B00A9BDBD /* Z2ITProgram.m in Sources */,
 				EA20AF020C25CCA200A9BDBD /* RecordingThread.m in Sources */,
