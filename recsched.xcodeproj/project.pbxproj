@@ -84,14 +84,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8D1107260486CEB800E47090 /* recsched */;
+			remoteGlobalIDString = 8D1107260486CEB800E47090;
 			remoteInfo = recsched;
 		};
 		EA083F750BADD1FD003C27FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = EA083DF20BA62A5F003C27FA /* recsched_bkgd */;
+			remoteGlobalIDString = EA083DF20BA62A5F003C27FA;
 			remoteInfo = recsched_bkgd;
 		};
 /* End PBXContainerItemProxy section */
@@ -116,7 +116,7 @@
 		EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = tvDataDelivery.m; sourceTree = "<group>"; };
 		EA06743F0B580B4D009B0E27 /* WSGeneratedObj.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = WSGeneratedObj.h; sourceTree = "<group>"; };
 		EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = WSGeneratedObj.m; sourceTree = "<group>"; };
-		EA083DF30BA62A5F003C27FA /* recsched_bkgd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = recsched_bkgd.app; path = build/Debug/recsched_bkgd.app; sourceTree = "<group>"; };
+		EA083DF30BA62A5F003C27FA /* recsched_bkgd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recsched_bkgd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA083DF50BA62A5F003C27FA /* recsched_bkgd-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "recsched_bkgd-Info.plist"; sourceTree = "<group>"; };
 		EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Z2ITScheduleExtras.h; sourceTree = SOURCE_ROOT; };
 		EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Z2ITScheduleExtras.m; sourceTree = SOURCE_ROOT; };
