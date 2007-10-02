@@ -62,10 +62,10 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {saveAction = id; }; 
+            ACTIONS = {saveAction = id; showCoreDataProgramWindow = id; }; 
             CLASS = "recsched_AppDelegate"; 
             LANGUAGE = ObjC; 
-            OUTLETS = {window = NSWindow; }; 
+            OUTLETS = {mCoreDataProgramWindow = NSWindow; window = NSWindow; }; 
             SUPERCLASS = NSObject; 
         }
     ); 

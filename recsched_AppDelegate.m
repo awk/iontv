@@ -136,6 +136,11 @@
     }
 }
 
+- (IBAction)showCoreDataProgramWindow:(id)sender
+{
+	[mCoreDataProgramWindow makeKeyAndOrderFront:sender];
+}
+
 
 /**
     Implementation of the applicationShouldTerminate: method, used here to

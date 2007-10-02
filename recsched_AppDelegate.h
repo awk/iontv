@@ -11,7 +11,8 @@
 @interface recsched_AppDelegate : NSObject 
 {
     IBOutlet NSWindow *window;
-    
+    IBOutlet NSWindow *mCoreDataProgramWindow;
+	
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
     NSManagedObjectContext *managedObjectContext;
@@ -22,5 +23,6 @@
 - (NSManagedObjectContext *)managedObjectContext;
 
 - (IBAction)saveAction:sender;
+- (IBAction)showCoreDataProgramWindow:(id)sender;
 
 @end
