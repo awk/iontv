@@ -20,7 +20,7 @@
 #import "Z2ITLineup.h"
 #import <Security/Security.h>
 
-#define SCAN_DISABLED 1
+#define SCAN_DISABLED 0
 
 const float kDurationSliderMinValue = 1.0;
 const float kDurationSliderMaxValue = 772.0;
@@ -522,7 +522,7 @@ static Preferences *sSharedInstance = nil;
 #if SCAN_DISABLED
 	int count = 1;
 	struct hdhomerun_discover_device_t result_list[1];
-	result_list[0].device_id = 0x01001B88;
+	result_list[0].device_id = 0x10100B88;
 #else
 	struct hdhomerun_discover_device_t result_list[64];
 	int count = hdhomerun_discover_find_devices(HDHOMERUN_DEVICE_TYPE_TUNER, result_list, 64);
