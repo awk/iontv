@@ -13,6 +13,8 @@
 @interface ScheduleViewController : NSObject {
     IBOutlet ScheduleView *mScheduleView;
     IBOutlet NSSegmentedControl *mScheduleTimeSegmentedControl;
+    IBOutlet NSObjectController *mCurrentSchedule;
+    IBOutlet NSObjectController *mCurrentLineup;
     CFAbsoluteTime mStartTime;
 }
 

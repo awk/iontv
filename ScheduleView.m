@@ -14,7 +14,7 @@
 #import "Z2ITStation.h"
 #import "Z2ITLineup.h"
 #import "Z2ITLineupMap.h"
-
+#import "Z2ITSchedule.h"
 
 @implementation ScheduleView
 
@@ -70,6 +70,7 @@
         subViewFrame.origin.x = [ScheduleStationColumnView columnWidth];
         mGridView = [[ScheduleGridView alloc] initWithFrame:subViewFrame];
         [mGridView setAutoresizingMask:NSViewHeightSizable|NSViewWidthSizable];
+        [mGridView setDelegate:delegate];
         
         [self addSubview:mStationsScroller];
         [self addSubview:mStationColumnView];
@@ -100,7 +101,8 @@
   [mStationColumnView release];
   [mHeaderView release];
   [mGridView release];
-
+  [delegate release];
+  
   [super dealloc];
 }
 
@@ -108,7 +110,8 @@
 {
         // Setup KVO for selected stations
         mSortedStationsArray = nil;
-        [mLineupArrayController addObserver:self forKeyPath:@"selectedObjects" options:0x0 context:NULL];
+        [mCurrentLineup addObserver:self forKeyPath:@"content" options:NSKeyValueObservingOptionNew context:nil];
+        [mCurrentSchedule addObserver:self forKeyPath:@"content" options:NSKeyValueObservingOptionNew context:nil];
         
         // Register to receive Managed Object context update notifications - when adding objects in to the context from a seperate
         // thread (during parsing) 'our' managed object context may not notify the NSObjectControllers that new data has been added
@@ -122,6 +125,23 @@
     [NSBezierPath fillRect:[self frame]];
 //    [NSBezierPath strokeLineFromPoint:[self bounds].origin toPoint:NSMakePoint([self bounds].origin.x + [self bounds].size.width,[self bounds].origin.y + [self bounds].size.height)];
 //    [NSBezierPath strokeLineFromPoint:NSMakePoint([self bounds].origin.x, [self bounds].origin.y + [self bounds].size.height) toPoint:NSMakePoint([self bounds].origin.x + [self bounds].size.width,[self bounds].origin.y)];
+}
+
+- (id) delegate
+{
+  return delegate;
+}
+
+- (void) setDelegate:(id)inDelegate
+{
+  if (delegate != inDelegate)
+  {
+    [delegate release];
+    delegate = [inDelegate retain];
+  }
+  
+  // Also set the delegate on our 'contained' subview that handles the grid
+  [mGridView setDelegate:inDelegate];
 }
 
 - (void) setStartTime:(CFAbsoluteTime)inTime
@@ -189,6 +209,23 @@
       [self stationsScrollerChanged:inScroller];
 }
 
+- (void) scrollToStation:(Z2ITStation*) inStation
+{
+  int stationIndex = [mSortedStationsArray indexOfObject:inStation];
+  if (stationIndex != NSNotFound)   // It might not be in the current array - since we may need to change lineups (somewhere else)
+  {
+    int currStartIndex = ([mStationsScroller floatValue] * (float)([mSortedStationsArray count] - [mStationColumnView numberStationsDisplayed]) + 0.5);
+    if ((stationIndex < currStartIndex) || (stationIndex > currStartIndex + [mStationColumnView numberStationsDisplayed]))
+    {
+        // Incorrect conversion here for scroller value
+        float newScroller = stationIndex / ((float)([mSortedStationsArray count] - [mStationColumnView numberStationsDisplayed]) + 0.5);
+        [mStationsScroller setFloatValue:newScroller];
+        [mStationColumnView setStartStationIndex:stationIndex];
+        [mGridView setStartStationIndex:stationIndex];
+    }
+  }
+}
+
 #pragma mark Station list updating methods
 
 // Compare two stations according to their overall lineup channel numbers (major and minor)
@@ -237,25 +274,52 @@ int sortStationsWithLineup(id thisStation, id otherStation, void *context)
 
 - (void) sortStationsArray
 {  
-  NSArray *aStationsArray = [[[mLineupArrayController selectedObjects] objectAtIndex:0] stations];
-  Z2ITLineup* currentLineup = [[mLineupArrayController selectedObjects] objectAtIndex:0];
+  NSArray *aStationsArray = [[mCurrentLineup content] stations];
+  Z2ITLineup* currentLineup = [mCurrentLineup content];
   mSortedStationsArray =  [aStationsArray sortedArrayUsingFunction:sortStationsWithLineup context:currentLineup];
   [mStationColumnView setSortedStationsArray:mSortedStationsArray forLineup:currentLineup] ;
   [mGridView setSortedStationsArray:mSortedStationsArray forLineup:currentLineup];
 }
 
+- (void) updateForCurrentSchedule
+{
+  // Set the time (if we have to change it)
+  CFAbsoluteTime startTime = [[[mCurrentSchedule content] time] timeIntervalSinceReferenceDate];
+  CFAbsoluteTime endTime = [[[mCurrentSchedule content] endTime] timeIntervalSinceReferenceDate];
+  if ((endTime < mStartTime)
+      || (startTime > mStartTime + ([self visibleTimeSpan] * 60)))
+  {
+    // We need to set the view to the nearest 30 minutes prior to the selected item
+    startTime = startTime - (30*60);
+    startTime = floor(startTime / (30*60)) * (30*60);
+    [self setStartTime:startTime];
+  }
+
+  // Scroll if the selected station is not visible
+  [self scrollToStation:[[mCurrentSchedule content] station]];
+  [mGridView setSelectedSchedule:[mCurrentSchedule content]];
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if ((object == mLineupArrayController) && ([keyPath isEqual:@"selectedObjects"]))
+    if ((object == mCurrentLineup) && ([keyPath isEqual:@"content"]))
     {
+      // Update the stations list
       [self sortStationsArray];
       [self updateStationsScroller];
+
+      // Make sure the current schedule item is visible
+      [self updateForCurrentSchedule];
+    }
+    if ((object == mCurrentSchedule) && ([keyPath isEqual:@"content"]))
+    {
+      [self updateForCurrentSchedule];
     }
  }
 
 - (void) updateControllers
 {
-  [mLineupArrayController prepareContent];
+  [mCurrentLineup prepareContent];
 }
 
 @end

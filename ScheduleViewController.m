@@ -8,6 +8,12 @@
 
 #import "ScheduleViewController.h"
 #import "ScheduleView.h"
+#import "Z2ITSchedule.h"
+#import "Z2ITStation.h"
+#import "Z2ITLineup.h"
+#import "Z2ITLineupMap.h"
+
+@class Z2ITSchedule;
 
 enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
 
@@ -32,6 +38,7 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
 {
   [self updateSegmentDisplay];
   [self updateSegmentMenus];
+  [mCurrentSchedule addObserver:self forKeyPath:@"content" options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (void) goBackwards
@@ -61,6 +68,11 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
 {
   mStartTime = inStartTime;
   [mScheduleView setStartTime:mStartTime];
+}
+
+- (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule
+{
+  [mCurrentSchedule setContent:inSchedule];
 }
 
 - (void) updateSegmentDisplay
@@ -145,6 +157,40 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
     {
       // Update the segment display for the new time
       [self updateSegmentDisplay];
+    }
+    if ((object == mCurrentSchedule) && ([keyPath isEqual:@"content"]))
+    {
+      // Set the time (if we have to change it)
+      CFAbsoluteTime startTime = [[[mCurrentSchedule content] time] timeIntervalSinceReferenceDate];
+      CFAbsoluteTime endTime = [[[mCurrentSchedule content] endTime] timeIntervalSinceReferenceDate];
+      if ((endTime < mStartTime)
+          || (startTime > mStartTime + ([mScheduleView visibleTimeSpan] * 60)))
+      {
+        // We need to set the view to the nearest 30 minutes prior to the selected item
+        startTime = startTime - (30*60);
+        startTime = floor(startTime / (30*60)) * (30*60);
+        [self setStartTime:startTime];
+      }
+      
+      // Change the lineup ?
+      NSSet *lineupMaps = [[[mCurrentSchedule content] station] lineupMaps];
+      NSEnumerator *mapEnumerator = [lineupMaps objectEnumerator];
+      Z2ITLineupMap *aLineupMap;
+      bool changeLineup = YES;
+      while ((aLineupMap = [mapEnumerator nextObject]) != nil)
+      {
+        if ([aLineupMap lineup] == [mCurrentLineup content])
+        {
+          changeLineup = NO;
+          break;
+        }
+      }
+      if (changeLineup)
+      {
+        // We can just change the current lineup to any object referenced in the lineups map set since we know that the current
+        // lineup does not include the selected program.
+        [mCurrentLineup setContent:[[lineupMaps anyObject] lineup]];
+      }
     }
  }
 

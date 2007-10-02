@@ -56,11 +56,13 @@
             CLASS = ScheduleView; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                delegate = id; 
+                mCurrentLineup = NSObjectController; 
+                mCurrentSchedule = NSObjectController; 
+                mGridView = ScheduleGridView; 
                 mHeaderView = ScheduleHeaderView; 
-                mLineupArrayController = NSArrayController; 
                 mStationColumnView = ScheduleStationColumnView; 
                 mStationsScroller = NSScroller; 
-                mTimeScroller = NSScroller; 
             }; 
             SUPERCLASS = NSView; 
         }, 
@@ -69,6 +71,8 @@
             CLASS = ScheduleViewController; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                mCurrentLineup = NSObjectController; 
+                mCurrentSchedule = NSObjectController; 
                 mScheduleTimeSegmentedControl = NSSegmentedControl; 
                 mScheduleView = ScheduleView; 
             }; 

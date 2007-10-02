@@ -25,14 +25,15 @@
 
 - (id) initWithGridView:(ScheduleGridView*)inGridView;
 - (void) setStation:(Z2ITStation*)inStation;
+- (Z2ITStation*) station;
 - (void) setStartTime:(CFAbsoluteTime)inDate andDuration:(float)inMinutes;
 - (void) drawCellsWithFrame:(NSRect) inFrame inView:(NSView *)inView;
 - (void) mouseDown:(NSEvent *)theEvent withFrame:(NSRect)inFrame;
+- (NSCell*) cellForSchedule:(Z2ITSchedule*)inSchedule;
 @end
 
-@interface ScheduleCell : NSActionCell
+@interface ScheduleCell : NSTextFieldCell
 {
-  Z2ITSchedule *mSchedule;
 }
 
 @end
@@ -45,7 +46,6 @@
         // Initialization code here.
         int numStationsInView = frame.size.height / kScheduleStationColumnViewCellHeight;
         mStationsInViewArray = [[NSMutableArray alloc] initWithCapacity:numStationsInView];
-//        mCellsInViewArray = [[NSMutableArray alloc] initWithCapacity:numStationsInView];
         mStartStationIndex = 0;
         mStartTime = CFAbsoluteTimeGetCurrent();
 
@@ -55,6 +55,32 @@
           object: self];
     }
     return self;
+}
+
+- (void) dealloc 
+{
+  [delegate release];
+  [mSelectedSchedule release];
+  [super dealloc];
+}
+
+- (id) delegate
+{
+  return delegate;
+}
+
+- (void) setDelegate:(id)inDelegate
+{
+  if (delegate != inDelegate)
+  {
+    [delegate release];
+    delegate = [inDelegate retain];
+  }
+}
+ 
+- (BOOL) acceptsFirstResponder
+{
+  return YES;
 }
 
 - (void)drawRect:(NSRect)rect {
@@ -87,6 +113,9 @@
   cellFrameRect.origin.y = [self bounds].size.height;
   cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
   cellFrameRect.size.width = [self bounds].size.width;
+  
+  if ([self acceptsFirstResponder])
+    [[self window] makeFirstResponder:self];
   
   int scheduleGridLineIndex = ([self frame].size.height - localPoint.y) / kScheduleStationColumnViewCellHeight;
   [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] mouseDown:theEvent withFrame:cellFrameRect];
@@ -158,6 +187,36 @@
   [mSelectedCell autorelease];
   mSelectedCell = [inCell retain];
   [mSelectedCell setHighlighted:YES];
+  [self setNeedsDisplay:YES];
+}
+
+- (void) setSelectedSchedule:(Z2ITSchedule*)inSchedule
+{
+  NSEnumerator *anEnumerator = [mStationsInViewArray objectEnumerator];
+  ScheduleGridLine *aGridLine;
+  while ((aGridLine = [anEnumerator nextObject]) != nil)
+  {
+    if ([aGridLine station] == [inSchedule station])
+    {
+      NSCell *aCell = [aGridLine cellForSchedule:inSchedule];
+      [self setSelectedCell:aCell];
+    }
+  }
+  [mSelectedSchedule autorelease];
+  mSelectedSchedule = [inSchedule retain];
+}
+
+- (Z2ITSchedule*) selectedSchedule
+{
+  return mSelectedSchedule;
+}
+
+- (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule
+{
+  if (delegate && ([delegate respondsToSelector:@selector(setCurrentSchedule:)]))
+  {
+    [delegate setCurrentSchedule:inSchedule];
+  }
 }
 
 #pragma mark View Notifications
@@ -187,6 +246,11 @@
   mStation = [inStation retain];
 }
 
+- (Z2ITStation*)station
+{
+  return mStation;
+}
+
 - (void) setStartTime:(CFAbsoluteTime)inTime andDuration:(float)inMinutes
 {
   mStartTime = inTime;
@@ -199,12 +263,18 @@
   // Remove and reallocate all the display cells
   [mCellsInLineArray release];
   mCellsInLineArray = [[NSMutableArray alloc] initWithCapacity:[mSchedulesInLineArray count]];
+
   int i=0;
   for (i=0; i < [mSchedulesInLineArray count]; i++)
   {
     ScheduleCell *aTextCell = [[ScheduleCell alloc] initTextCell:@"--"];
     [aTextCell setBordered:YES];
-    [aTextCell setObjectValue:[mSchedulesInLineArray objectAtIndex:i]];
+    [aTextCell setRepresentedObject:[mSchedulesInLineArray objectAtIndex:i]];
+    [aTextCell setStringValue:[[[mSchedulesInLineArray objectAtIndex:i] program] title]];
+    if ([mGridView selectedSchedule] == [mSchedulesInLineArray objectAtIndex:i])
+    {
+      [mGridView setSelectedCell:aTextCell];
+    }
     [mCellsInLineArray addObject:aTextCell];
     [aTextCell release];
   }
@@ -213,6 +283,18 @@
 - (void) scheduleCellClicked:(id)sender
 {
   NSLog(@"scheduleCellClicked - sender = %@", sender);
+}
+
+- (NSCell*) cellForSchedule:(Z2ITSchedule*)inSchedule
+{
+  NSCell *theCell = nil;
+  NSEnumerator *anEnumerator = [mCellsInLineArray objectEnumerator];
+  while ((theCell = [anEnumerator nextObject]) != nil)
+  {
+    if ([theCell representedObject] == inSchedule)
+      break;
+  }
+  return theCell;
 }
 
 - (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute
@@ -291,11 +373,7 @@
   }
   if (foundCell)
   {
-    MainWindowController *mwc = [[mGridView window] delegate];
-    if ([mwc class] == [MainWindowController class])
-    {
-      [mwc setCurrentSchedule:aSchedule];
-    }
+    [mGridView setCurrentSchedule:aSchedule];
     [mGridView setNeedsDisplay:YES];
   }
 }
@@ -304,29 +382,45 @@
 
 @implementation ScheduleCell
 
-- (void) setObjectValue:(id)anObject
+- (NSColor *)highlightColorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-  [mSchedule autorelease];
-  mSchedule = [anObject retain];
+  NSLog(@"highlightColorWithFrame - title = %@", [[[self representedObject] program] title]);
+  if ([[controlView window] firstResponder] == controlView)
+    return [NSColor alternateSelectedControlColor];
+  else
+    return [NSColor lightGrayColor];
 }
 
+#if 0
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
+  const int kCellInset = 4;
+  NSString *titleString = [[[self representedObject] program] title];
+  
   if ([self isHighlighted])
   {
     [NSGraphicsContext saveGraphicsState];
-    [[NSColor colorForControlTint:NSGraphiteControlTint] set];
+    [[NSColor selectedMenuItemColor] setFill];
     [NSBezierPath fillRect:cellFrame];
+
+    [[NSColor selectedMenuItemTextColor] setStroke];
+    
+    [titleString drawInRect:cellFrame withAttributes:nil];
+
     [NSGraphicsContext restoreGraphicsState];
   }
+  else
+  {
+    // Inset the cell frame rect a little
+    cellFrame.size.width -= kCellInset;
+    cellFrame.size.height -= kCellInset;
+    cellFrame.origin.x += kCellInset/2;
+    cellFrame.origin.y += kCellInset/2;
   
-  // Inset the cell frame rect a little
-  cellFrame.size.width -= 4;
-  cellFrame.size.height -= 4;
-  cellFrame.origin.x += 2;
-  cellFrame.origin.y += 2;
-  NSString *titleString = [[mSchedule program] title];
-  [titleString drawInRect:cellFrame withAttributes:nil];
+    [titleString drawInRect:cellFrame withAttributes:nil];
+  }
 }
+#endif
 
 @end
+

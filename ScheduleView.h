@@ -11,6 +11,8 @@
 @class ScheduleHeaderView;
 @class ScheduleStationColumnView;
 @class ScheduleGridView;
+@class Z2ITSchedule;
+@class Z2ITStation;
 
 @interface ScheduleView : NSView {
   IBOutlet ScheduleHeaderView *mHeaderView;
@@ -18,16 +20,21 @@
   IBOutlet ScheduleGridView *mGridView;
   IBOutlet NSScroller *mStationsScroller;
 
-  IBOutlet NSArrayController *mLineupArrayController;
+  IBOutlet NSObjectController *mCurrentLineup;
+  IBOutlet NSObjectController *mCurrentSchedule;
   NSArray *mSortedStationsArray;
   CFAbsoluteTime mStartTime;
+  IBOutlet id delegate;       // Note no 'm' here so that it 'looks like' all the other delegate mechanisms in IB.
 }
 
 - (void) setStartTime:(CFAbsoluteTime) inStartTime;
+- (void) scrollToStation:(Z2ITStation*) inStation;
 - (float) visibleTimeSpan;
 - (float) timePerLineIncrement;
 - (void) updateStationsScroller;
 - (void) sortStationsArray;
 - (void) updateControllers;
+- (id) delegate;
+- (void) setDelegate:(id)inDelegate;
 
 @end
