@@ -52,6 +52,17 @@
 		EA0888250B86B16D00809664 /* TV-Y7.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881C0B86B16C00809664 /* TV-Y7.tif */; };
 		EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881D0B86B16C00809664 /* TV-Y7FV.tif */; };
 		EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */; };
+		EA2EE03F0C07D2300002420F /* hdhomerun_channelscan.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */; };
+		EA2EE0400C07D2320002420F /* hdhomerun_config.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02B0C07D2130002420F /* hdhomerun_config.c */; };
+		EA2EE0410C07D2340002420F /* hdhomerun_control.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02C0C07D2130002420F /* hdhomerun_control.c */; };
+		EA2EE0420C07D23D0002420F /* hdhomerun_video.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0370C07D2130002420F /* hdhomerun_video.c */; };
+		EA2EE0430C07D23D0002420F /* hdhomerun_pkt.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0350C07D2130002420F /* hdhomerun_pkt.c */; };
+		EA2EE0440C07D23F0002420F /* hdhomerun_discover.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0320C07D2130002420F /* hdhomerun_discover.c */; };
+		EA2EE0450C07D2400002420F /* hdhomerun_device.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0300C07D2130002420F /* hdhomerun_device.c */; };
+		EA2EE0460C07D2410002420F /* hdhomerun_debug.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02E0C07D2130002420F /* hdhomerun_debug.c */; };
+		EA2EE0680C07D4890002420F /* liblibhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */; };
+		EA2EE0780C07D57A0002420F /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
+		EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
 		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
@@ -94,6 +105,13 @@
 			remoteGlobalIDString = EA083DF20BA62A5F003C27FA;
 			remoteInfo = recsched_bkgd;
 		};
+		EA2EE04E0C07D3130002420F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA2EE03D0C07D2250002420F /* libhdhomerun */;
+			remoteInfo = libhdhomerun;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -131,6 +149,28 @@
 		EA08881D0B86B16C00809664 /* TV-Y7FV.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7FV.tif"; path = "Images/TV-Y7FV.tif"; sourceTree = "<group>"; };
 		EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramSearchViewController.h; sourceTree = "<group>"; };
 		EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgramSearchViewController.m; sourceTree = "<group>"; };
+		EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_channelscan.c; path = ../libhdhomerun/hdhomerun_channelscan.c; sourceTree = SOURCE_ROOT; };
+		EA2EE02A0C07D2130002420F /* hdhomerun_channelscan.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_channelscan.h; path = ../libhdhomerun/hdhomerun_channelscan.h; sourceTree = SOURCE_ROOT; };
+		EA2EE02B0C07D2130002420F /* hdhomerun_config.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_config.c; path = ../libhdhomerun/hdhomerun_config.c; sourceTree = SOURCE_ROOT; };
+		EA2EE02C0C07D2130002420F /* hdhomerun_control.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_control.c; path = ../libhdhomerun/hdhomerun_control.c; sourceTree = SOURCE_ROOT; };
+		EA2EE02D0C07D2130002420F /* hdhomerun_control.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_control.h; path = ../libhdhomerun/hdhomerun_control.h; sourceTree = SOURCE_ROOT; };
+		EA2EE02E0C07D2130002420F /* hdhomerun_debug.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_debug.c; path = ../libhdhomerun/hdhomerun_debug.c; sourceTree = SOURCE_ROOT; };
+		EA2EE02F0C07D2130002420F /* hdhomerun_debug.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_debug.h; path = ../libhdhomerun/hdhomerun_debug.h; sourceTree = SOURCE_ROOT; };
+		EA2EE0300C07D2130002420F /* hdhomerun_device.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_device.c; path = ../libhdhomerun/hdhomerun_device.c; sourceTree = SOURCE_ROOT; };
+		EA2EE0310C07D2130002420F /* hdhomerun_device.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_device.h; path = ../libhdhomerun/hdhomerun_device.h; sourceTree = SOURCE_ROOT; };
+		EA2EE0320C07D2130002420F /* hdhomerun_discover.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_discover.c; path = ../libhdhomerun/hdhomerun_discover.c; sourceTree = SOURCE_ROOT; };
+		EA2EE0330C07D2130002420F /* hdhomerun_discover.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_discover.h; path = ../libhdhomerun/hdhomerun_discover.h; sourceTree = SOURCE_ROOT; };
+		EA2EE0340C07D2130002420F /* hdhomerun_os.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_os.h; path = ../libhdhomerun/hdhomerun_os.h; sourceTree = SOURCE_ROOT; };
+		EA2EE0350C07D2130002420F /* hdhomerun_pkt.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_pkt.c; path = ../libhdhomerun/hdhomerun_pkt.c; sourceTree = SOURCE_ROOT; };
+		EA2EE0360C07D2130002420F /* hdhomerun_pkt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_pkt.h; path = ../libhdhomerun/hdhomerun_pkt.h; sourceTree = SOURCE_ROOT; };
+		EA2EE0370C07D2130002420F /* hdhomerun_video.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_video.c; path = ../libhdhomerun/hdhomerun_video.c; sourceTree = SOURCE_ROOT; };
+		EA2EE0380C07D2130002420F /* hdhomerun_video.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_video.h; path = ../libhdhomerun/hdhomerun_video.h; sourceTree = SOURCE_ROOT; };
+		EA2EE0390C07D2130002420F /* hdhomerun.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun.h; path = ../libhdhomerun/hdhomerun.h; sourceTree = SOURCE_ROOT; };
+		EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = liblibhdhomerun.a; path = build/Debug/liblibhdhomerun.a; sourceTree = "<group>"; };
+		EA2EE0760C07D57A0002420F /* HDHomeRunMO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunMO.h; sourceTree = "<group>"; };
+		EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunMO.m; sourceTree = "<group>"; };
+		EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunTuner.h; sourceTree = "<group>"; };
+		EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunTuner.m; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
@@ -184,6 +224,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				EA2EE0680C07D4890002420F /* liblibhdhomerun.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,6 +233,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA083E170BA62BAA003C27FA /* AppKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA2EE03C0C07D2250002420F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,6 +295,7 @@
 				8D1107320486CEB800E47090 /* recsched.app */,
 				EAE655260B9D08CD00CDB279 /* rechsched_bkgd_cl */,
 				EA083DF30BA62A5F003C27FA /* recsched_bkgd.app */,
+				EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -254,6 +303,7 @@
 		29B97314FDCFA39411CA2CEA /* recsched */ = {
 			isa = PBXGroup;
 			children = (
+				EA2EE0280C07D1EA0002420F /* libhdhomerun */,
 				EAE655370B9D0A3100CDB279 /* Background App */,
 				7756732906782D8800D1FEB8 /* Models */,
 				080E96DDFE201D6D7F000001 /* Classes */,
@@ -317,6 +367,30 @@
 			name = Models;
 			sourceTree = "<group>";
 		};
+		EA2EE0280C07D1EA0002420F /* libhdhomerun */ = {
+			isa = PBXGroup;
+			children = (
+				EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */,
+				EA2EE02A0C07D2130002420F /* hdhomerun_channelscan.h */,
+				EA2EE02B0C07D2130002420F /* hdhomerun_config.c */,
+				EA2EE02C0C07D2130002420F /* hdhomerun_control.c */,
+				EA2EE02D0C07D2130002420F /* hdhomerun_control.h */,
+				EA2EE02E0C07D2130002420F /* hdhomerun_debug.c */,
+				EA2EE02F0C07D2130002420F /* hdhomerun_debug.h */,
+				EA2EE0300C07D2130002420F /* hdhomerun_device.c */,
+				EA2EE0310C07D2130002420F /* hdhomerun_device.h */,
+				EA2EE0320C07D2130002420F /* hdhomerun_discover.c */,
+				EA2EE0330C07D2130002420F /* hdhomerun_discover.h */,
+				EA2EE0340C07D2130002420F /* hdhomerun_os.h */,
+				EA2EE0350C07D2130002420F /* hdhomerun_pkt.c */,
+				EA2EE0360C07D2130002420F /* hdhomerun_pkt.h */,
+				EA2EE0370C07D2130002420F /* hdhomerun_video.c */,
+				EA2EE0380C07D2130002420F /* hdhomerun_video.h */,
+				EA2EE0390C07D2130002420F /* hdhomerun.h */,
+			);
+			name = libhdhomerun;
+			sourceTree = "<group>";
+		};
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
 			isa = PBXGroup;
 			children = (
@@ -332,6 +406,10 @@
 		EAF890110B66DC2E00373CEF /* Data & XML Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EA2EE0760C07D57A0002420F /* HDHomeRunMO.h */,
+				EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */,
+				EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */,
+				EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */,
 				EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */,
 				EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */,
 				EAF886900B6293B200373CEF /* CoreData_Macros.h */,
@@ -382,6 +460,16 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		EA2EE03A0C07D2250002420F /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		8D1107260486CEB800E47090 /* recsched */ = {
 			isa = PBXNativeTarget;
@@ -394,6 +482,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EA2EE04F0C07D3130002420F /* PBXTargetDependency */,
 			);
 			name = recsched;
 			productInstallPath = "$(HOME)/Applications";
@@ -417,6 +506,23 @@
 			productName = recsched_bkgd;
 			productReference = EA083DF30BA62A5F003C27FA /* recsched_bkgd.app */;
 			productType = "com.apple.product-type.application";
+		};
+		EA2EE03D0C07D2250002420F /* libhdhomerun */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA2EE04A0C07D26E0002420F /* Build configuration list for PBXNativeTarget "libhdhomerun" */;
+			buildPhases = (
+				EA2EE03A0C07D2250002420F /* Headers */,
+				EA2EE03B0C07D2250002420F /* Sources */,
+				EA2EE03C0C07D2250002420F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libhdhomerun;
+			productName = libhdhomerun;
+			productReference = EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 		EAE655250B9D08CD00CDB279 /* rechsched_bkgd_cl */ = {
 			isa = PBXNativeTarget;
@@ -449,6 +555,7 @@
 				EAE655250B9D08CD00CDB279 /* rechsched_bkgd_cl */,
 				EA083DF20BA62A5F003C27FA /* recsched_bkgd */,
 				EA083F720BADD1F7003C27FA /* All recsched */,
+				EA2EE03D0C07D2250002420F /* libhdhomerun */,
 			);
 		};
 /* End PBXProject section */
@@ -516,6 +623,8 @@
 				EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */,
 				EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */,
 				EA083E480BA77D47003C27FA /* Z2ITScheduleExtras.m in Sources */,
+				EA2EE0780C07D57A0002420F /* HDHomeRunMO.m in Sources */,
+				EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -532,6 +641,21 @@
 				EA083DFD0BA62AA8003C27FA /* recsched_DataModel.xcdatamodel in Sources */,
 				EA083E190BA62C57003C27FA /* recsched_bkgd.m in Sources */,
 				EA083E220BA62F40003C27FA /* RecSchedServer.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA2EE03B0C07D2250002420F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA2EE03F0C07D2300002420F /* hdhomerun_channelscan.c in Sources */,
+				EA2EE0400C07D2320002420F /* hdhomerun_config.c in Sources */,
+				EA2EE0410C07D2340002420F /* hdhomerun_control.c in Sources */,
+				EA2EE0420C07D23D0002420F /* hdhomerun_video.c in Sources */,
+				EA2EE0430C07D23D0002420F /* hdhomerun_pkt.c in Sources */,
+				EA2EE0440C07D23F0002420F /* hdhomerun_discover.c in Sources */,
+				EA2EE0450C07D2400002420F /* hdhomerun_device.c in Sources */,
+				EA2EE0460C07D2410002420F /* hdhomerun_debug.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -556,6 +680,11 @@
 			isa = PBXTargetDependency;
 			target = EA083DF20BA62A5F003C27FA /* recsched_bkgd */;
 			targetProxy = EA083F750BADD1FD003C27FA /* PBXContainerItemProxy */;
+		};
+		EA2EE04F0C07D3130002420F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA2EE03D0C07D2250002420F /* libhdhomerun */;
+			targetProxy = EA2EE04E0C07D3130002420F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -590,8 +719,14 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = recsched_Prefix.pch;
+				HEADER_SEARCH_PATHS = ../libhdhomerun;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
 				PRODUCT_NAME = recsched;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
@@ -610,8 +745,14 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = recsched_Prefix.pch;
+				HEADER_SEARCH_PATHS = ../libhdhomerun;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
+				);
+				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
 				PRODUCT_NAME = recsched;
 				WRAPPER_EXTENSION = app;
 			};
@@ -709,6 +850,36 @@
 			};
 			name = Release;
 		};
+		EA2EE04B0C07D26E0002420F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = libhdhomerun;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EA2EE04C0C07D26E0002420F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PREBINDING = NO;
+				PRODUCT_NAME = libhdhomerun;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		EAE6552B0B9D08EC00CDB279 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -789,6 +960,15 @@
 			buildConfigurations = (
 				EA083FC80BAF827B003C27FA /* Debug */,
 				EA083FC90BAF827B003C27FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA2EE04A0C07D26E0002420F /* Build configuration list for PBXNativeTarget "libhdhomerun" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA2EE04B0C07D26E0002420F /* Debug */,
+				EA2EE04C0C07D26E0002420F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

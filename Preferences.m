@@ -9,6 +9,8 @@
 #import "Preferences.h"
 #import "tvDataDelivery.h"
 #import "XTVDParser.h"
+#import "hdhomerun.h"
+#import "HDHomeRunMO.h"
 #import <Security/Security.h>
 
 const float kDurationSliderMinValue = 1.0;
@@ -419,6 +421,33 @@ static Preferences *sSharedInstance = nil;
 
 - (IBAction) scanDevicesButtonAction:(id)sender
 {
+	[mScanTunersButton setEnabled:NO];
+	[mTunerScanProgressIndicator setHidden:NO];
+	[mTunerScanProgressIndicator startAnimation:sender];
+	
+	struct hdhomerun_discover_device_t result_list[64];
+	int count = hdhomerun_discover_find_devices(HDHOMERUN_DEVICE_TYPE_TUNER, result_list, 64);
+	
+	[mTunerScanProgressIndicator stopAnimation:sender];
+	[mTunerScanProgressIndicator setHidden:YES];
+
+	if (count > 0)
+	{
+		int i=0;
+		for (i=0; i < count; i++)
+		{
+			// See if an entry already exists
+			HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+			if (!anHDHomeRun)
+			{
+			  // Otherwise we just create a new one
+			  anHDHomeRun = [HDHomeRun createHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+			  [anHDHomeRun release];		// We don't actually need it here - we just need to create it
+			}
+		}
+	}
+	
+	[mScanTunersButton setEnabled:YES];
 }
 
 #pragma mark Callback Methods
