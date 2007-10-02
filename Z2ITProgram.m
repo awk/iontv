@@ -331,7 +331,6 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   Z2ITStation *aStation = [Z2ITStation fetchStationWithID:stationID inManagedObjectContext:[self managedObjectContext]];
   if (aStation)
   {
-    [aStation addSchedule:aSchedule];
     [aSchedule setTime:timeDate];
     [aSchedule setDurationHours:durationHours minutes:durationMins];
     [aSchedule setRepeat:repeat];
@@ -347,6 +346,13 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
       [aSchedule setPartNumber:partNumber];
     if (totalNumberPartsNumber)
       [aSchedule setTotalNumberParts:totalNumberPartsNumber];
+
+	// If this schedule already exists in matching form on the station (i.e. we're doing an update rather than just grabbing new data)
+	// addSchedule will return false and we should delete the schedule here.
+    if (![aStation addSchedule:aSchedule])
+	{
+		[[self managedObjectContext] deleteObject:aSchedule];
+	}
   }
   else
   {
