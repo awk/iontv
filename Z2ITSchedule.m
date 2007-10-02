@@ -7,6 +7,7 @@
 //
 
 #import "Z2ITSchedule.h"
+#import "Z2ITProgram.h"
 #import "CoreData_Macros.h"
 #import "recsched_AppDelegate.h"
 
@@ -148,6 +149,16 @@ COREDATA_ACCESSOR(NSNumber*, @"totalNumberParts")
 COREDATA_MUTATOR(NSNumber*, @"totalNumberParts")
 }
 
+- (NSString *) partNumberString
+{
+  if (([self partNumber] == nil) || ([self totalNumberParts] == nil))
+    return nil;
+  if (([[self partNumber] intValue] == 0) || ([[self totalNumberParts] intValue] == 0))
+    return nil;
+    
+  return [NSString stringWithFormat:@"Part %@ of %@", [self partNumber], [self totalNumberParts]];
+}
+
 // Accessor and mutator for the close captioned attribute
 - (bool)repeat
 {
@@ -211,6 +222,58 @@ COREDATA_ACCESSOR(NSString*, @"tvRating")
 - (void)setTvRating:(NSString *)value
 {
 COREDATA_MUTATOR(NSString*, @"tvRating")
+}
+
+- (NSImage *) tvRatingImage
+{
+  NSImage *image = nil;
+  
+  [NSImage imageNamed:[self tvRatingImageName]];
+  if (image == nil)
+  {
+    NSLog(@"tvRatingImage no image for %@", [self tvRatingImageName]);
+  }
+  return image;
+}
+
+- (NSString *) tvRatingImageName
+{
+  if ([self tvRating] == nil)
+    return nil;
+  else
+    return [NSString stringWithFormat:@"%@.tif", [self tvRating]];
+}
+
+- (NSString *) tvRatingImagePath
+{
+  if ([self tvRatingImageName] == nil)
+    return nil;
+  NSString *imagePath = [[NSBundle mainBundle] pathForImageResource:[self tvRatingImageName]];
+  return imagePath;
+}
+
+- (NSString *) programDetailsStr
+{
+  NSString *aString = nil;
+  if ([[self program] descriptionStr] != nil)
+  {
+    NSMutableString *detailsString = [[NSMutableString alloc] initWithString:[[self program] descriptionStr]];
+    if ([self repeat])
+    {
+      [detailsString appendString:@" Repeat."];
+    }
+    if ([self dolby] != nil)
+    {
+      [detailsString appendFormat:@" %@.", [self dolby]];
+    }
+    if ([self subtitled])
+    {
+      [detailsString appendFormat:@" Subtitled."];
+    }
+    aString = [NSString stringWithString:detailsString];
+    [detailsString release];
+  }
+  return aString;
 }
 
 @end

@@ -67,8 +67,11 @@
 - (NSDate *)endTime;
 - (void)setEndTime:(NSDate*)value;
 
-// Accessor and mutator for the dolby attribute
+// Accessor and mutator for the TV Rating attribute
 - (NSString *)tvRating;
 - (void)setTvRating:(NSString *)value;
+- (NSString *) tvRatingImageName;
+- (NSImage *) tvRatingImage;
 
+- (NSString *) programDetailsStr;
 @end
