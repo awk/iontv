@@ -142,7 +142,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
     {
       @synchronized(self)
       {
-        const char *programNumString = [[inProgramNumber stringValue] cString];
+        const char *programNumString = [[inProgramNumber stringValue] cStringUsingEncoding:NSASCIIStringEncoding];
         ret = hdhomerun_device_set_tuner_program(mHDHomeRunDevice, programNumString);
       }
     }
@@ -171,7 +171,7 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
       @synchronized(self)
       {
         char value[64];
-        sprintf(value, "%s:%d", [[inChannel tuningType] cString], [[inChannel channelNumber] intValue] );
+        sprintf(value, "%s:%d", [[inChannel tuningType]  cStringUsingEncoding:NSASCIIStringEncoding], [[inChannel channelNumber] intValue] );
         
         ret = hdhomerun_device_set_tuner_channel(mHDHomeRunDevice, value);
       }
