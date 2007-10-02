@@ -285,7 +285,7 @@ static Preferences *sSharedInstance = nil;
       
       if (status == noErr)
       {
-        NSString *passwordString = [NSString stringWithUTF8String:passwordData];
+		NSString *passwordString = [NSString stringWithCString:passwordData length:passwordLength];
         [mZap2ItPasswordField setStringValue:passwordString];
         SecKeychainItemFreeContent(NULL, passwordData);
       }
