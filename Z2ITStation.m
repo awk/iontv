@@ -242,4 +242,32 @@ static NSMutableDictionary *sStationsDictionary = nil;
   return [aSchedule program];
 }
 
+- (NSArray *)schedulesBetweenStartTime:(CFAbsoluteTime) inStartTime andEndTime:(CFAbsoluteTime) inEndTime
+{
+  NSDate *startDate = [NSDate dateWithTimeIntervalSinceReferenceDate:inStartTime];
+  NSDate *endDate = [NSDate dateWithTimeIntervalSinceReferenceDate:inEndTime];
+
+  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
+
+  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:moc];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+  
+  // Find all programs (schedules) on this station which are on the air between the two times, 
+  // this includes programs starting before the given inStartTime but end after the given inStartTime,
+  // as well as all programs with start times between the two input values
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"((station == %@) AND (time >= %@) AND (time <= %@)) OR ((station == %@) AND (time < %@) AND (endTime > %@))", self, startDate, endDate, self, startDate, startDate];
+  [request setPredicate:predicate];
+   
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
+  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+  [sortDescriptor release];
+   
+  NSError *error = nil;
+  NSArray *array = [moc executeFetchRequest:request error:&error];
+
+  return array;
+}
+
 @end

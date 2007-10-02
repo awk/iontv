@@ -21,6 +21,7 @@
 // Fetch the program object for the program on air at the specified time
 - (Z2ITProgram*)programAtTime:(CFAbsoluteTime) inAirTime;
 - (Z2ITSchedule*)scheduleAtTime:(CFAbsoluteTime) inAirTime;
+- (NSArray *)schedulesBetweenStartTime:(CFAbsoluteTime) inStartTime andEndTime:(CFAbsoluteTime) inEndTime;
 
 // Accessor and mutator for the Station ID attribute
 - (NSNumber *)stationID;
