@@ -31,6 +31,30 @@ const int kDefaultScheduleFetchDuration = 3;
   return self;
 }
 
+- (void) initializeUserInterfaceConnection
+{
+  // Connect to server
+  mUIApplication = [[NSConnection rootProxyForConnectionWithRegisteredName:kRecUserInterfaceConnectionName  host:nil] retain];
+   
+  // check if connection worked.
+  if (mUIApplication == nil) 
+  {
+    NSLog(@"couldn't connect with User Interface Application");
+  }
+  else
+  {
+    //
+    // set protocol for the remote object & then register ourselves with the 
+    // messaging server.
+    [mUIApplication setProtocolForProxy:@protocol(XMLParsingProgressDisplay)];
+  }
+}
+
+- (id) uiApplication
+{
+	return mUIApplication;
+}
+
 #pragma mark - Internal Methods
 
 - (void) fetchScheduleWithDuration:(int)inHours
@@ -70,8 +94,11 @@ const int kDefaultScheduleFetchDuration = 3;
 
   if (xtvd != nil)
   {
+	id notificationProxy = [self uiApplication];
+	if (notificationProxy == nil)
+		notificationProxy = self;
     NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
-        self, @"reportProgressTo", 
+        notificationProxy, @"reportProgressTo", 
         self, @"reportCompletionTo", 
         [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator",
         nil];
@@ -124,6 +151,19 @@ const int kDefaultScheduleFetchDuration = 3;
 }
 
 #pragma mark - Server Methods
+
+- (void) userInterfaceAppAvailable
+{
+	NSLog(@"userInterfaceAppAvailble - initializing connection");
+	[self initializeUserInterfaceConnection];
+}
+
+- (void) userInterfaceAppUnavailable
+{
+	NSLog(@"userInterfaceAppUnavailable - clearing connection");
+	[mUIApplication release];
+	mUIApplication = nil;
+}
 
 - (bool) shouldExit
 {
@@ -215,7 +255,9 @@ const int kDefaultScheduleFetchDuration = 3;
 
 - (oneway void) performDownload:(NSDictionary*)callData
 {
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
+  NSMutableDictionary *updatedCallData = [NSMutableDictionary dictionaryWithDictionary:callData];
+  [updatedCallData setValue:self forKey:@"dataRecipient"];
+  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:updatedCallData];
 }
 
 // Add an HDHomeRun device with the specified ID - return YES if a new device was created and added.

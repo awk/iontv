@@ -12,7 +12,6 @@
 #import "HDHomeRunTuner.h"
 #import "RecSchedProtocol.h"
 
-NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 @implementation recsched_AppDelegate
 
@@ -63,7 +62,20 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   self = [super init];
   if (self != nil) {
     [Preferences setupDefaults];
+
+	// Register ourselves for the display/feedback methods called by the server
+    NSConnection *theConnection;
+
+    theConnection = [NSConnection defaultConnection];
+    [theConnection setRootObject:self];
+    if ([theConnection registerName:kRecUserInterfaceConnectionName] == NO) 
+    {
+            /* Handle error. */
+            NSLog(@"Error registering connection");
+            return nil;
+    }
     [self initializeServerConnection];
+	[mRecServer userInterfaceAppAvailable];
   }
   return self;
 }
@@ -287,6 +299,7 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   else
   {
     [self initializeServerConnection];
+	[mRecServer userInterfaceAppAvailable];
   }
 }
 
@@ -340,6 +353,7 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     }
 #endif // USE_SYNCSERVICES
     
+	[mRecServer userInterfaceAppUnavailable];
     return reply;
 }
 
@@ -384,6 +398,31 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 - (void) dealloc {
 
     [super dealloc];
+}
+
+#pragma mark - Parsing Progress Display Protocol
+
+- (void) setParsingInfoString:(NSString*)inInfoString
+{
+	NSLog(@"Parsing - %@", inInfoString);
+}
+
+- (void) setParsingProgressMaxValue:(double)inTotal
+{
+}
+
+- (void) setParsingProgressDoubleValue:(double)inValue
+{
+}
+
+- (void) parsingComplete:(id)info
+{
+	NSLog(@"Parsing Complete");
+}
+
+- (void) cleanupComplete:(id)info
+{
+	NSLog(@"Cleanup Complete");
 }
 
 @end

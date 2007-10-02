@@ -13,9 +13,11 @@
 
 @interface RecSchedServer : NSObject <RecSchedServerProto, XMLParsingProgressDisplay> {
     BOOL mExitServer;
+	
+	id mUIApplication;
 }
 
 - (bool) shouldExit;
 - (void) updateSchedule;
-
+- (id) uiApplication;
 @end

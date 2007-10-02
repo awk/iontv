@@ -7,10 +7,11 @@
 //
 
 #import "RSCommonAppDelegate.h"
+#import "XMLParsingProgressDisplayProtocol.h"
 
 @class HDHomeRunStation;
 
-@interface recsched_AppDelegate : RSCommonAppDelegate
+@interface recsched_AppDelegate : RSCommonAppDelegate<XMLParsingProgressDisplay>
 {
     IBOutlet NSWindow *window;
     IBOutlet NSWindow *mCoreDataProgramWindow;

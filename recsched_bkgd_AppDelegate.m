@@ -13,7 +13,6 @@
 
 NSString *kRecSchedUIAppBundleID = @"org.awkward.recsched";
 NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
-NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we don't link Preferences.m into the server
 

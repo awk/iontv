@@ -6,6 +6,7 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+extern NSString *kRecUserInterfaceConnectionName;
 
 @protocol XMLParsingProgressDisplay
 - (void) setParsingInfoString:(NSString*)inInfoString;

@@ -8,6 +8,8 @@
 
 #import "RSCommonAppDelegate.h"
 
+NSString *kRecServerConnectionName = @"recsched_bkgd_server";
+NSString *kRecUserInterfaceConnectionName = @"recsched_ui_app";
 
 @implementation RSCommonAppDelegate
 
