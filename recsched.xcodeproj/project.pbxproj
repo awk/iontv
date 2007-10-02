@@ -76,6 +76,8 @@
 		EA2EE0680C07D4890002420F /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
 		EA2EE0780C07D57A0002420F /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
+		EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
+		EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
 		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
@@ -109,6 +111,8 @@
 		EAEC0A270C283C7F00C40D5A /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
 		EAEC0A280C283C8100C40D5A /* Z2ITLineupMap.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */; };
 		EAEC0A290C283C8200C40D5A /* Z2ITSchedule.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8867C0B61740300373CEF /* Z2ITSchedule.m */; };
+		EAF4EA220C5EB0AB003EC697 /* AKColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */; };
+		EAF4EACF0C5F90B1003EC697 /* AKColorExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */; };
 		EAF882700B5DC0BD00373CEF /* XTVDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */; };
 		EAF883100B5DCE4900373CEF /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
 		EAF883DE0B5ECB5B00373CEF /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
@@ -231,6 +235,8 @@
 		EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunMO.m; sourceTree = "<group>"; };
 		EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunTuner.h; sourceTree = "<group>"; };
 		EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunTuner.m; sourceTree = "<group>"; };
+		EA308FB50C66A7470005E89B /* RSColorDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSColorDictionary.h; sourceTree = "<group>"; };
+		EA308FB60C66A7470005E89B /* RSColorDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSColorDictionary.m; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
@@ -261,6 +267,10 @@
 		EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd_main.m; sourceTree = "<group>"; };
 		EAEC09560C27422800C40D5A /* recsched_bkgd_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_bkgd_AppDelegate.h; sourceTree = "<group>"; };
 		EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd_AppDelegate.m; sourceTree = "<group>"; };
+		EAF4EA0D0C5CC686003EC697 /* AKColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKColorCell.h; sourceTree = "<group>"; };
+		EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKColorCell.m; sourceTree = "<group>"; };
+		EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKColorExtensions.h; sourceTree = "<group>"; };
+		EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKColorExtensions.m; sourceTree = "<group>"; };
 		EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XTVDParser.h; sourceTree = "<group>"; };
 		EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XTVDParser.m; sourceTree = "<group>"; };
 		EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITStation.h; sourceTree = "<group>"; };
@@ -321,6 +331,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EA308FB40C66A70D0005E89B /* Support Classes */,
 				EAF890120B66DC6400373CEF /* View & UI Classes */,
 				EAF890110B66DC2E00373CEF /* Data & XML Classes */,
 				77C8280B06725ACE000B614F /* recsched_AppDelegate.h */,
@@ -482,6 +493,15 @@
 			name = libhdhomerun;
 			sourceTree = "<group>";
 		};
+		EA308FB40C66A70D0005E89B /* Support Classes */ = {
+			isa = PBXGroup;
+			children = (
+				EA308FB50C66A7470005E89B /* RSColorDictionary.h */,
+				EA308FB60C66A7470005E89B /* RSColorDictionary.m */,
+			);
+			name = "Support Classes";
+			sourceTree = "<group>";
+		};
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
 			isa = PBXGroup;
 			children = (
@@ -561,6 +581,10 @@
 				EA293E870C10A8040053E2B8 /* ChannelScanProgressDisplayProtocol.h */,
 				EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */,
 				EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */,
+				EAF4EA0D0C5CC686003EC697 /* AKColorCell.h */,
+				EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */,
+				EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */,
+				EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -740,6 +764,9 @@
 				EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */,
 				EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */,
 				EA7110E90C557A7A007022CF /* CTGradient.m in Sources */,
+				EAF4EA220C5EB0AB003EC697 /* AKColorCell.m in Sources */,
+				EAF4EACF0C5F90B1003EC697 /* AKColorExtensions.m in Sources */,
+				EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -775,6 +802,7 @@
 				EAEC0A270C283C7F00C40D5A /* Z2ITLineup.m in Sources */,
 				EAEC0A280C283C8100C40D5A /* Z2ITLineupMap.m in Sources */,
 				EAEC0A290C283C8200C40D5A /* Z2ITSchedule.m in Sources */,
+				EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
