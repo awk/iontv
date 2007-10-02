@@ -14,8 +14,17 @@
 
 @implementation Z2ITStation
 
+static NSMutableDictionary *sStationsDictionary = nil;
+
 + (Z2ITStation *) fetchStationWithID:(NSNumber*)inStationID
 {
+  Z2ITStation *aStation;
+  if (sStationsDictionary)
+  {
+    aStation = [sStationsDictionary valueForKey:[inStationID stringValue]];
+    if (aStation)
+      return aStation;
+  }
   recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
 
   NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
@@ -37,20 +46,19 @@
       NSLog(@"Error executing fetch request to find station with ID %@", inStationID);
       return nil;
   }
-  if ([array count] == 1)
+  if ([array count] == 0)
   {
-    Z2ITStation *aStation = [array objectAtIndex:0];
-    [aStation retain];
-    return aStation;
-  }
-  else if ([array count] == 0)
-  {
-      return nil;
+    return nil;
   }
   else
   {
+    aStation = [array objectAtIndex:0];
+    if (!sStationsDictionary)
+      sStationsDictionary = [[NSMutableDictionary alloc] initWithCapacity:300];
+    [sStationsDictionary setValue:aStation forKey:[inStationID stringValue]];
+    if ([array count] > 1)
       NSLog(@"fetchStationWithID - multiple (%d) station with ID %@", [array count], inStationID);
-      return nil;
+    return aStation;
   }
 }
 

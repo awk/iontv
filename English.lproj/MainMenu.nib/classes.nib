@@ -15,6 +15,13 @@
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
+        {
+            ACTIONS = {showPanel = id; }; 
+            CLASS = Preferences; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {mPanel = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
         {CLASS = ScheduleHeaderView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {CLASS = ScheduleStationColumnView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {

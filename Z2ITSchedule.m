@@ -8,8 +8,29 @@
 
 #import "Z2ITSchedule.h"
 #import "CoreData_Macros.h"
+#import "recsched_AppDelegate.h"
 
 @implementation Z2ITSchedule
+
++ (void) clearAllSchedules
+{
+  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
+  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
+
+  NSFetchRequest *fetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+  [fetchRequest setEntity:
+          [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:moc]];
+   
+  // Execute the fetch
+  NSError *error;
+  NSArray *allSchedules = [moc executeFetchRequest:fetchRequest error:&error];
+  Z2ITSchedule *aSchedule;
+  NSEnumerator *aScheduleEnumerator = [allSchedules objectEnumerator];
+  while (aSchedule = [aScheduleEnumerator nextObject])
+  {
+    [moc deleteObject:aSchedule];
+  }
+}
 
 - (void) setDurationHours:(int)inHours minutes:(int)inMinutes
 {

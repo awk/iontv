@@ -15,6 +15,8 @@
 
 }
 
++ (void) clearAllSchedules;
+
 - (void) setDurationHours:(int)inHours minutes:(int)inMinutes;
 
 // Accessor and mutator for the Program relationship

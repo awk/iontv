@@ -16,6 +16,12 @@
 		EA0674310B58084D009B0E27 /* MainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674300B58084D009B0E27 /* MainWindowController.m */; };
 		EA0674410B580B4D009B0E27 /* tvDataDelivery.m in Sources */ = {isa = PBXBuildFile; fileRef = EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */; };
 		EA0674420B580B4D009B0E27 /* WSGeneratedObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */; };
+		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
+		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
+		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
+		EA5FAFCA0B6FB50D00CCD5D5 /* DiscreteDurationSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC90B6FB50D00CCD5D5 /* DiscreteDurationSlider.m */; };
+		EA5FAFD80B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFD70B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m */; };
+		EA5FB6D80B7028B000CCD5D5 /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */; };
 		EAF882700B5DC0BD00373CEF /* XTVDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */; };
 		EAF883100B5DCE4900373CEF /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
 		EAF883DE0B5ECB5B00373CEF /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
@@ -49,6 +55,16 @@
 		EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = tvDataDelivery.m; sourceTree = "<group>"; };
 		EA06743F0B580B4D009B0E27 /* WSGeneratedObj.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = WSGeneratedObj.h; sourceTree = "<group>"; };
 		EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = WSGeneratedObj.m; sourceTree = "<group>"; };
+		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
+		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
+		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
+		EA5FAFC10B6FB49400CCD5D5 /* FixedNSControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = FixedNSControl.h; sourceTree = SOURCE_ROOT; };
+		EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = FixedNSControl.m; sourceTree = SOURCE_ROOT; };
+		EA5FAFC80B6FB50D00CCD5D5 /* DiscreteDurationSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscreteDurationSlider.h; sourceTree = "<group>"; };
+		EA5FAFC90B6FB50D00CCD5D5 /* DiscreteDurationSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiscreteDurationSlider.m; sourceTree = "<group>"; };
+		EA5FAFD60B6FB58900CCD5D5 /* DiscreteDurationSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscreteDurationSliderCell.h; sourceTree = "<group>"; };
+		EA5FAFD70B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiscreteDurationSliderCell.m; sourceTree = "<group>"; };
+		EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = UserDefaults.plist; sourceTree = SOURCE_ROOT; };
 		EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XTVDParser.h; sourceTree = "<group>"; };
 		EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XTVDParser.m; sourceTree = "<group>"; };
 		EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITStation.h; sourceTree = "<group>"; };
@@ -94,6 +110,8 @@
 				77C8280C06725ACE000B614F /* recsched_AppDelegate.m */,
 				EA06742F0B58084D009B0E27 /* MainWindowController.h */,
 				EA0674300B58084D009B0E27 /* MainWindowController.m */,
+				EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */,
+				EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -149,6 +167,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */,
+				EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */,
 				EAF8919D0B66F2F800373CEF /* metal_column_header.png */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
@@ -201,6 +221,8 @@
 		EAF890120B66DC6400373CEF /* View Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EA5FAFC10B6FB49400CCD5D5 /* FixedNSControl.h */,
+				EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */,
 				EAF8919A0B66F2D200373CEF /* iTableColumnHeaderCell.h */,
 				EAF8919B0B66F2D200373CEF /* iTableColumnHeaderCell.m */,
 				EAF890150B66DC8400373CEF /* ScheduleHeaderView.h */,
@@ -209,6 +231,10 @@
 				EAF8956B0B69023D00373CEF /* ScheduleStationColumnView.m */,
 				EAF89D8C0B6A8CFD00373CEF /* ScheduleView.h */,
 				EAF89D8D0B6A8CFD00373CEF /* ScheduleView.m */,
+				EA5FAFC80B6FB50D00CCD5D5 /* DiscreteDurationSlider.h */,
+				EA5FAFC90B6FB50D00CCD5D5 /* DiscreteDurationSlider.m */,
+				EA5FAFD60B6FB58900CCD5D5 /* DiscreteDurationSliderCell.h */,
+				EA5FAFD70B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m */,
 			);
 			name = "View Classes";
 			sourceTree = "<group>";
@@ -257,6 +283,8 @@
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				EAF8919E0B66F2F800373CEF /* metal_column_header.png in Resources */,
+				EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */,
+				EA5FB6D80B7028B000CCD5D5 /* UserDefaults.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,6 +311,10 @@
 				EAF8919C0B66F2D300373CEF /* iTableColumnHeaderCell.m in Sources */,
 				EAF8956C0B69023D00373CEF /* ScheduleStationColumnView.m in Sources */,
 				EAF89D8E0B6A8CFD00373CEF /* ScheduleView.m in Sources */,
+				EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */,
+				EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */,
+				EA5FAFCA0B6FB50D00CCD5D5 /* DiscreteDurationSlider.m in Sources */,
+				EA5FAFD80B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

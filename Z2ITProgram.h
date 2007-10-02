@@ -20,6 +20,9 @@
 // Fetch the Program with the given ID from the Managed Object Context
 + (Z2ITProgram *) fetchProgramWithID:(NSString*)inProgramID;
 
+// Fetch all the programs present with supplied IDs
++ (NSArray *) fetchProgramsWithIDS:(NSArray*)inProgramIDS;
+
 - (void) addToSchedule:(Z2ITSchedule *)inSchedule;
 
 - (void) addProductionCrewWithXMLElement:(NSXMLElement *)inXMLElement;
@@ -98,6 +101,9 @@
 - (NSSet *)crewMembers;
 - (void)clearCrewMembers;
 - (void)addCrewMember:(Z2ITCrewMember *)value;
+
+// Accessor and mutator for the schedules relationship
+- (NSSet *)schedules;
 @end
 
 @interface Z2ITCrewMember : NSManagedObject {

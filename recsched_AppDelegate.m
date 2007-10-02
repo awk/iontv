@@ -7,9 +7,17 @@
 //
 
 #import "recsched_AppDelegate.h"
+#import "Preferences.h"
 
 @implementation recsched_AppDelegate
 
+- (id) init {
+  self = [super init];
+  if (self != nil) {
+    [Preferences setupDefaults];
+  }
+  return self;
+}
 
 /**
     Returns the support folder for the application, used to store the Core Data
@@ -73,9 +81,9 @@
         [fileManager createDirectoryAtPath:applicationSupportFolder attributes:nil];
     }
     
-    url = [NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched.xml"]];
+    url = [NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched.dat"]];
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
-    if (![persistentStoreCoordinator addPersistentStoreWithType:NSXMLStoreType configuration:nil URL:url options:nil error:&error]){
+    if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error]){
         [[NSApplication sharedApplication] presentError:error];
     }    
 

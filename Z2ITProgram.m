@@ -14,6 +14,9 @@
 
 @implementation Z2ITProgram
 
+static NSMutableDictionary *sAdvisoriesDictionary = nil;
+static NSMutableDictionary *sGenreClassDictionary = nil;
+
 BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName)
 {
   BOOL retValue = NO;
@@ -37,7 +40,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"programID == %@", inProgramID];
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"programID IN %@", [NSArray arrayWithObject:inProgramID]];
   [request setPredicate:predicate];
    
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"programID" ascending:YES];
@@ -66,6 +69,26 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
       NSLog(@"fetchProgramWithID - multiple (%d) lineups with ID %@", [array count], inProgramID);
       return nil;
   }
+}
+
++ (NSArray *) fetchProgramsWithIDS:(NSArray*)inProgramIDS
+{
+  recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
+  NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
+
+  NSFetchRequest *fetchRequest = [[[NSFetchRequest alloc] init] autorelease];
+  [fetchRequest setEntity:
+          [NSEntityDescription entityForName:@"Program" inManagedObjectContext:moc]];
+  [fetchRequest setPredicate: [NSPredicate predicateWithFormat: @"(programID IN %@)", inProgramIDS]];
+   
+  // make sure the results are sorted as well
+  [fetchRequest setSortDescriptors: [NSArray arrayWithObject:
+          [[[NSSortDescriptor alloc] initWithKey: @"programID"
+                  ascending:YES] autorelease]]];
+  // Execute the fetch
+  NSError *error;
+  NSArray *programsMatchingNames = [moc executeFetchRequest:fetchRequest error:&error];
+  return programsMatchingNames;
 }
 
 - (void) addToSchedule:(Z2ITSchedule *)inSchedule
@@ -499,12 +522,27 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 - (void)clearAdvisories
 {
   NSMutableSet *advisories = [self mutableSetValueForKey:@"advisories"];
+  NSEnumerator *advisoriesEnumerator = [advisories objectEnumerator];
+  NSManagedObject *anAdvisory;
+  while (anAdvisory = [advisoriesEnumerator nextObject])
+  {
+    [[self managedObjectContext] deleteObject:anAdvisory];
+  }
   [advisories removeAllObjects];
 }
 
 // Fetch the Advisory Object with the given string from the Managed Object Context
 + (NSManagedObject *) fetchAdvisoryWithName:(NSString*)inAdvisoryString
 {
+  NSManagedObject *anAdvisory = nil;
+  
+  if (sAdvisoriesDictionary)
+  {
+    anAdvisory = [sAdvisoriesDictionary objectForKey:inAdvisoryString];
+    if (anAdvisory)
+      return anAdvisory;
+  }
+  
   recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
 
   NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
@@ -526,22 +564,20 @@ COREDATA_MUTATOR(NSNumber*,@"year")
       NSLog(@"Error executing fetch request to find advisory %@", inAdvisoryString);
       return nil;
   }
-  if ([array count] == 1)
-  {
-    NSManagedObject *anAdvisory = [array objectAtIndex:0];
-    [anAdvisory retain];
-    return anAdvisory;
-  }
-  else if ([array count] == 0)
+  
+  if ([array count] == 0)
   {
       return nil;
   }
   else
   {
+    anAdvisory = [array objectAtIndex:0];
+    if ([array count] > 1)
       NSLog(@"fetchAdvisoryWithName - multiple (%d) advisories with name %@", [array count], inAdvisoryString);
-      NSManagedObject *anAdvisory = [array objectAtIndex:0];
-      [anAdvisory retain];
-      return anAdvisory;
+    if (!sAdvisoriesDictionary)
+      sAdvisoriesDictionary = [[NSMutableDictionary alloc] initWithCapacity:50];
+    [sAdvisoriesDictionary setValue:anAdvisory forKey:inAdvisoryString];
+    return anAdvisory;
   }
 }
 
@@ -554,11 +590,9 @@ COREDATA_MUTATOR(NSNumber*,@"year")
     newAdvisory = [NSEntityDescription
         insertNewObjectForEntityForName:@"Advisory"
         inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-    [newAdvisory retain];
     [newAdvisory setValue:value forKey:@"name"];
   }
   [advisories addObject:newAdvisory];
-  [newAdvisory release];
 }
 
 // Accessor and mutator for the genres relationships
@@ -571,6 +605,12 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 - (void)clearGenres
 {
   NSMutableSet *genresSet = [self mutableSetValueForKey:@"genres"];
+  NSEnumerator *genreEnumerator = [genresSet objectEnumerator];
+  Z2ITGenre *aGenre;
+  while (aGenre = [genreEnumerator nextObject])
+  {
+    [[self managedObjectContext] deleteObject:aGenre];
+  }
   [genresSet removeAllObjects];
 }
 
@@ -589,6 +629,12 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 - (void)clearCrewMembers
 {
   NSMutableSet *crewMembersSet = [self mutableSetValueForKey:@"crewMembers"];
+  NSEnumerator *crewEnumerator = [crewMembersSet objectEnumerator];
+  Z2ITCrewMember *aCrewMember;
+  while (aCrewMember = [crewEnumerator nextObject])
+  {
+    [[self managedObjectContext] deleteObject:aCrewMember];
+  }
   [crewMembersSet removeAllObjects];
 }
 
@@ -598,13 +644,30 @@ COREDATA_MUTATOR(NSNumber*,@"year")
   [crewMembersSet addObject:value];
 }
 
+- (NSSet *)schedules
+{
+  NSMutableSet *schedulesSet = [self mutableSetValueForKey:@"schedules"];
+  return schedulesSet;
+}
 @end
+
+static NSMutableDictionary *sCrewRoleDictionary = nil;
 
 @implementation Z2ITCrewMember
 
 // Fetch the CrewRole Object with the given string from the Managed Object Context
 + (NSManagedObject *) fetchCrewRoleWithName:(NSString*)inCrewRoleNameString
 {
+  // Initialze the crew role dictionary we use to speed up queries.
+  if (!sCrewRoleDictionary)
+    sCrewRoleDictionary = [[NSMutableDictionary alloc] initWithCapacity:50];
+  else
+  {
+    // We have a dictionary does it have an entry for our name ?
+    id aCrewRole = [sCrewRoleDictionary valueForKey:inCrewRoleNameString];
+    if (aCrewRole)
+      return aCrewRole;
+  }
   recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
 
   NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
@@ -629,6 +692,7 @@ COREDATA_MUTATOR(NSNumber*,@"year")
   if ([array count] == 1)
   {
     NSManagedObject *aCrewRole = [array objectAtIndex:0];
+    [sCrewRoleDictionary setValue:aCrewRole forKey:inCrewRoleNameString];
     [aCrewRole retain];
     return aCrewRole;
   }
@@ -640,6 +704,7 @@ COREDATA_MUTATOR(NSNumber*,@"year")
   {
       NSLog(@"fetchCrewRoleWithName - multiple (%d) crew roles with name %@", [array count], inCrewRoleNameString);
       NSManagedObject *aCrewRole = [array objectAtIndex:0];
+      [sCrewRoleDictionary setValue:aCrewRole forKey:inCrewRoleNameString];
       [aCrewRole retain];
       return aCrewRole;
   }
@@ -703,6 +768,14 @@ COREDATA_MUTATOR(NSString*,@"givenname")
 // Fetch the GenreClass Object with the given string from the Managed Object Context
 + (NSManagedObject *) fetchGenreClassWithName:(NSString*)inGenreClassNameString
 {
+  NSManagedObject *aGenreClass = nil;
+  if (sGenreClassDictionary)
+  {
+    aGenreClass = [sGenreClassDictionary valueForKey:inGenreClassNameString];
+    if (aGenreClass)
+      return aGenreClass;
+  }
+  
   recsched_AppDelegate *recschedAppDelegate = [[NSApplication sharedApplication] delegate];
 
   NSManagedObjectContext *moc = [recschedAppDelegate managedObjectContext];
@@ -724,22 +797,19 @@ COREDATA_MUTATOR(NSString*,@"givenname")
       NSLog(@"Error executing fetch request to find genre class name %@", inGenreClassNameString);
       return nil;
   }
-  if ([array count] == 1)
+  if ([array count] == 0)
   {
-    NSManagedObject *aGenreClass = [array objectAtIndex:0];
-    [aGenreClass retain];
-    return aGenreClass;
-  }
-  else if ([array count] == 0)
-  {
-      return nil;
+    return nil;
   }
   else
   {
+    aGenreClass = [array objectAtIndex:0];
+    if (!sGenreClassDictionary)
+      sGenreClassDictionary = [[NSMutableDictionary alloc] initWithCapacity:50];
+    [sGenreClassDictionary setValue:aGenreClass forKey:inGenreClassNameString];
+    if ([array count] > 1)
       NSLog(@"fetchGenreClassWithName - multiple (%d) genre classes with name %@", [array count], inGenreClassNameString);
-      NSManagedObject *aGenreClass = [array objectAtIndex:0];
-      [aGenreClass retain];
-      return aGenreClass;
+    return aGenreClass;
   }
 }
 
@@ -757,14 +827,12 @@ COREDATA_MUTATOR(NSString*,@"givenname")
     aGenreClass = [NSEntityDescription
         insertNewObjectForEntityForName:@"GenreClass"
         inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-    [aGenreClass retain];
     [aGenreClass setValue:value forKey:@"name"];
   }
 
   [self willChangeValueForKey: @"genreClass"]; 
   [self setPrimitiveValue:aGenreClass forKey: @"genreClass"]; 
   [self didChangeValueForKey: @"genreClass"]; 
-  [aGenreClass release];
 }
 
 // Accessor and mutator for the surname attribute

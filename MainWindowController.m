@@ -9,6 +9,7 @@
 #import "MainWindowController.h"
 #import "tvDataDelivery.h"
 #import "XTVDParser.h"
+#import "Preferences.h"
 
 @implementation MainWindowController
 
@@ -46,8 +47,9 @@
   // Retrieve 'n' hours of data
   CFGregorianUnits retrieveRange;
   memset(&retrieveRange, 0, sizeof(retrieveRange));
-  retrieveRange.hours = 1;
-  
+  float hours = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationPrefStr] floatValue];
+  retrieveRange.hours = (int) hours;
+    
   CFAbsoluteTime endTime = CFAbsoluteTimeAddGregorianUnits(currentTime, NULL, retrieveRange);
   CFGregorianDate endDate = CFAbsoluteTimeGetGregorianDate(endTime,NULL);
   
@@ -107,14 +109,26 @@
 {
   [mParsingProgressIndicator setHidden:YES];
   [mParsingProgressInfoField setHidden:YES];
-  [mGetScheduleButton setEnabled:YES];
   
   // Clear all old items from the store
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", [[[NSApplication sharedApplication] delegate] managedObjectContext], @"managedObjectContext", nil];
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", nil];
+
+  [mParsingProgressIndicator startAnimation:self];
+  [mParsingProgressIndicator setHidden:NO];
+  [mParsingProgressIndicator setIndeterminate:YES];
+  [mParsingProgressInfoField setStringValue:@"Cleanup Old Schedule Data"];
+  [mParsingProgressInfoField setHidden:NO];
   [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
 //  [callData release];
 }
 
+- (void) cleanupComplete:(id)info
+{
+  [mParsingProgressIndicator stopAnimation:self];
+  [mParsingProgressIndicator setHidden:YES];
+  [mParsingProgressInfoField setHidden:YES];
+  [mGetScheduleButton setEnabled:YES];
+}
 @end

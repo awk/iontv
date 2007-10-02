@@ -60,9 +60,9 @@
   NSArray *childNodes = [inStationsNode children];
   int i, count = [childNodes count];
   
-//  [inMainWindowController performSelectorOnMainThread:@selector(handleDownloadData:) withObject:downloadResult waitUntilDone:YES];
   [inMainWindowController setParsingInfoString:@"Updating Stations"];
   [inMainWindowController setParsingProgressMaxValue:count];
+  [inMainWindowController setParsingProgressDoubleValue:0];
   for (i=0; i < count; i++)
   {
     NSXMLNode *child = [childNodes objectAtIndex:i];
@@ -118,7 +118,6 @@
           aStation = [NSEntityDescription
               insertNewObjectForEntityForName:@"Station"
               inManagedObjectContext:[recschedAppDelegate managedObjectContext]];
-          [aStation retain];
           [aStation setStationID:[NSNumber numberWithInt:stationID]];
         }
         
@@ -264,12 +263,49 @@
   }
 }
 
+// Compare two programs for their program ID
+int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, void *context)
+{
+  NSString *programIDStringThisXMLProgramNode = [[thisXMLProgramNode attributeForName:@"id"] stringValue];
+  NSString *programIDStringOtherXMLProgramNode = [[otherXMLProgramNode attributeForName:@"id"] stringValue];
+  return [programIDStringThisXMLProgramNode compare:programIDStringOtherXMLProgramNode];
+}
+
 + (void) updatePrograms:(NSXMLNode *)inProgramsNode reportTo:(MainWindowController*)inMainWindowController
 {
-  NSArray *childNodes = [inProgramsNode children];
-  int i, count = [childNodes count];
+  NSArray *childNodes = nil;
+  int i, count = 0;
   [inMainWindowController setParsingInfoString:@"Updating Programs"];
+
+  childNodes  = [[inProgramsNode children] sortedArrayUsingFunction:compareProgramsByIDAttribute context:nil];
+  count = [childNodes count];
   [inMainWindowController setParsingProgressMaxValue:count];
+  [inMainWindowController setParsingProgressDoubleValue:0];
+  
+  NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
+  for (i=0; i < count; i++)
+  {
+    NSXMLNode *child = [childNodes objectAtIndex:i];
+
+    NSXMLNodeKind nodeKind = [child kind];
+    if (nodeKind == NSXMLElementKind)
+    {
+      NSXMLElement *childElement = (NSXMLElement *)child;
+      NSString *programIDString = [[childElement attributeForName:@"id"] stringValue];
+      if (programIDString)
+      {
+        [programIDArray addObject:programIDString];
+      }
+    }
+  }
+  [programIDArray sortUsingSelector:@selector(compare:)];
+  NSArray *existingProgramsArray;
+  existingProgramsArray = [Z2ITProgram fetchProgramsWithIDS:programIDArray];
+  [programIDArray release];
+  programIDArray = nil;
+  
+  int existingProgramIndex = 0;
+  int existingProgramCount = [existingProgramsArray count];
   for (i=0; i < count; i++)
   {
     NSXMLNode *child = [childNodes objectAtIndex:i];
@@ -282,30 +318,68 @@
       if (programIDString)
       {
         [inMainWindowController setParsingProgressDoubleValue:i];
-        Z2ITProgram *aProgram  = [Z2ITProgram fetchProgramWithID:programIDString];
+        Z2ITProgram *aProgram  = nil;
+        
+        if ((existingProgramIndex < existingProgramCount) && ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame))
+        {
+          aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
+          existingProgramIndex++;
+        }
+        
         if (!aProgram)
         {
           aProgram = [NSEntityDescription insertNewObjectForEntityForName:@"Program"
                   inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-          [aProgram retain];
         }
         
         [aProgram setProgramID:programIDString];
         [aProgram initializeWithXMLElement:childElement];
-                
-        [aProgram release];
-        aProgram = NULL;
       }
     }
   }
 }
 
+int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNode, void *context)
+{
+  NSString *programIDStringThisXMLCrewNode = [[thisXMLProgramNode attributeForName:@"program"] stringValue];
+  NSString *programIDStringOtherXMLCrewNode = [[otherXMLProgramNode attributeForName:@"program"] stringValue];
+  return [programIDStringThisXMLCrewNode compare:programIDStringOtherXMLCrewNode];
+}
+
 + (void) updateProductionCrew:(NSXMLNode *)inProductionCrewNode reportTo:(MainWindowController*)inMainWindowController
 {
-  NSArray *childNodes = [inProductionCrewNode children];
-  int i, count = [childNodes count];
+  NSArray *childNodes = nil;
+  int i, count = 0;
   [inMainWindowController setParsingInfoString:@"Updating Production Crew"];
+  
+  childNodes  = [[inProductionCrewNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
+  count = [childNodes count];
   [inMainWindowController setParsingProgressMaxValue:count];
+  [inMainWindowController setParsingProgressDoubleValue:0];
+  
+  NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
+  for (i=0; i < count; i++)
+  {
+    NSXMLNode *child = [childNodes objectAtIndex:i];
+
+    NSXMLNodeKind nodeKind = [child kind];
+    if (nodeKind == NSXMLElementKind)
+    {
+      NSXMLElement *childElement = (NSXMLElement *)child;
+      NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
+      if (programIDString)
+      {
+        [programIDArray addObject:programIDString];
+      }
+    }
+  }
+  [programIDArray sortUsingSelector:@selector(compare:)];
+  NSArray *existingProgramsArray;
+  existingProgramsArray = [Z2ITProgram fetchProgramsWithIDS:programIDArray];
+  [programIDArray release];
+  programIDArray = nil;
+  int existingProgramIndex = 0;
+  
   for (i=0; i < count; i++)
   {
     NSXMLNode *child = [childNodes objectAtIndex:i];
@@ -318,17 +392,18 @@
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
       if (programIDString)
       {
-        Z2ITProgram *aProgram  = [Z2ITProgram fetchProgramWithID:programIDString];
-        if (!aProgram)
+        Z2ITProgram *aProgram  = nil;
+        if ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame)
         {
-          NSLog(@"updateProductionCrew - could not program with id %@", programIDString);
-          break;
+          aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
+          existingProgramIndex++;
         }
-        
-        [aProgram addProductionCrewWithXMLElement:childElement];
-                
-        [aProgram release];
-        aProgram = NULL;
+        else
+        {
+          NSLog(@"updateProductionCrew - could not find a program with id %@", programIDString);
+        }
+        if (aProgram)
+          [aProgram addProductionCrewWithXMLElement:childElement];
       }
     }
   }
@@ -336,10 +411,37 @@
 
 + (void) updateGenres:(NSXMLNode *)inGenresNode reportTo:(MainWindowController*)inMainWindowController
 {
-  NSArray *childNodes = [inGenresNode children];
-  int i, count = [childNodes count];
+  NSArray *childNodes = nil;
+  int i, count = 0;
   [inMainWindowController setParsingInfoString:@"Updating Genres"];
+  
+  childNodes = [[inGenresNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
+  count = [childNodes count];
   [inMainWindowController setParsingProgressMaxValue:count];
+  [inMainWindowController setParsingProgressDoubleValue:0];
+  NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
+  for (i=0; i < count; i++)
+  {
+    NSXMLNode *child = [childNodes objectAtIndex:i];
+
+    NSXMLNodeKind nodeKind = [child kind];
+    if (nodeKind == NSXMLElementKind)
+    {
+      NSXMLElement *childElement = (NSXMLElement *)child;
+      NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
+      if (programIDString)
+      {
+        [programIDArray addObject:programIDString];
+      }
+    }
+  }
+  [programIDArray sortUsingSelector:@selector(compare:)];
+  NSArray *existingProgramsArray;
+  existingProgramsArray = [Z2ITProgram fetchProgramsWithIDS:programIDArray];
+  [programIDArray release];
+  programIDArray = nil;
+  int existingProgramIndex = 0;
+
   for (i=0; i < count; i++)
   {
     NSXMLNode *child = [childNodes objectAtIndex:i];
@@ -352,17 +454,18 @@
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
       if (programIDString)
       {
-        Z2ITProgram *aProgram  = [Z2ITProgram fetchProgramWithID:programIDString];
-        if (!aProgram)
+        Z2ITProgram *aProgram  = nil;
+        if ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame)
         {
-          NSLog(@"updateGenres - could not program with id %@", programIDString);
-          break;
+          aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
+          existingProgramIndex++;
         }
-        
-        [aProgram addGenreWithXMLElement:childElement];
-                
-        [aProgram release];
-        aProgram = NULL;
+        else
+        {
+          NSLog(@"updateGenres - could not find a program with id %@", programIDString);
+        }
+        if (aProgram)
+          [aProgram addGenreWithXMLElement:childElement];
       }
     }
   }
@@ -370,10 +473,40 @@
 
 + (void) updateSchedules:(NSXMLNode *)inSchedulesNode reportTo:(MainWindowController*)inMainWindowController
 {
-  NSArray *childNodes = [inSchedulesNode children];
+  NSArray *childNodes = nil;
   int i, count = [childNodes count];
   [inMainWindowController setParsingInfoString:@"Updating Schedules"];
+
+  // Start by clearing all the existing schedules - this collection replaces everything to date
+  [Z2ITSchedule clearAllSchedules];
+  
+  childNodes = [[inSchedulesNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
+  count = [childNodes count];
   [inMainWindowController setParsingProgressMaxValue:count];
+  [inMainWindowController setParsingProgressDoubleValue:0];
+  NSMutableArray *programIDArray = [[NSMutableArray alloc] initWithCapacity:count];
+  for (i=0; i < count; i++)
+  {
+    NSXMLNode *child = [childNodes objectAtIndex:i];
+
+    NSXMLNodeKind nodeKind = [child kind];
+    if (nodeKind == NSXMLElementKind)
+    {
+      NSXMLElement *childElement = (NSXMLElement *)child;
+      NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
+      if (programIDString)
+      {
+        [programIDArray addObject:programIDString];
+      }
+    }
+  }
+  [programIDArray sortUsingSelector:@selector(compare:)];
+  NSArray *existingProgramsArray;
+  existingProgramsArray = [Z2ITProgram fetchProgramsWithIDS:programIDArray];
+  [programIDArray release];
+  programIDArray = nil;
+  int existingProgramIndex = 0;
+  
   for (i=0; i < count; i++)
   {
     NSXMLNode *child = [childNodes objectAtIndex:i];
@@ -386,17 +519,32 @@
       NSString *programIDString = [[childElement attributeForName:@"program"] stringValue];
       if (programIDString)
       {
-        Z2ITProgram *aProgram  = [Z2ITProgram fetchProgramWithID:programIDString];
-        if (!aProgram)
+        Z2ITProgram *aProgram  = nil;
+      
+        // A program might exist more than once in the schedule, so we may have multiple sequential entries for the same program,
+        // instead of advancing with each successful test we advance only if we don't have a match
+        if ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame)
         {
-          NSLog(@"updateSchedules - could not find program with id %@", programIDString);
-          break;
+          aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
         }
         
-        [aProgram addScheduleWithXMLElement:childElement];
-                
-        [aProgram release];
-        aProgram = NULL;
+        if (!aProgram)
+        {
+          existingProgramIndex++;
+          if ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame)
+          {
+            aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
+          }
+        }
+        
+        if (aProgram)
+        {
+          [aProgram addScheduleWithXMLElement:childElement];
+        }
+        else
+        {
+          NSLog(@"updateSchedules - could not find a program with id %@", programIDString);
+        }
       }
     }
   }
@@ -466,6 +614,7 @@
   
   [XTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] reportTo:[xtvdParserData valueForKey:@"reportProgressTo"]];
  
+  [[NSFileManager defaultManager] removeFileAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] handler:nil];
   [[xtvdParserData valueForKey:@"reportProgressTo"] performSelectorOnMainThread:@selector(parsingComplete:) withObject:nil waitUntilDone:YES];
   [pool release];
 }
@@ -482,9 +631,10 @@
   
   NSPredicate *oldSchedulesPredicate = [NSPredicate predicateWithFormat:@"endTime < %@", inDate];
   [request setPredicate:oldSchedulesPredicate];
-   
+  
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
+  NSLog(@"cleanupSchedules - %d schedules before now", [array count]);
   if (array != nil)
   {
     NSEnumerator *scheduleEnumerator = [array objectEnumerator];
@@ -502,20 +652,24 @@
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
   
-  NSPredicate *unscheduledProgramsPredicate = [NSPredicate predicateWithFormat:@"ALL schedules == nil"];
-  [request setPredicate:unscheduledProgramsPredicate];
-   
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
+  int i=0;
   if (array != nil)
   {
     NSEnumerator *programEnumerator = [array objectEnumerator];
     Z2ITProgram *aProgram;
     while (aProgram = [programEnumerator nextObject])
     {
-      [inMOC deleteObject:aProgram];
+      NSSet *schedules = [aProgram schedules];
+      if (schedules && ([schedules count] == 0))
+      {
+        [inMOC deleteObject:aProgram];
+        i++;
+      }
     }
   }
+  NSLog(@"cleanupUnschedulePrograms - %d programs %d were deleted", [array count], i);
 }
 
 + (void) performCleanup:(id)cleanupInfo
@@ -524,13 +678,15 @@
   
   NSDictionary *xtvdCleanupInfo = (NSDictionary*)cleanupInfo;
 
-  NSManagedObjectContext *moc = [xtvdCleanupInfo valueForKey:@"managedObjectContext"];
+//  NSManagedObjectContext *moc = [xtvdCleanupInfo valueForKey:@"managedObjectContext"];
+  NSManagedObjectContext *moc = [[[NSApplication sharedApplication] delegate] managedObjectContext];
   NSDate *currentDate = [xtvdCleanupInfo valueForKey:@"currentDate"];
   
   [self cleanupSchedulesIn:moc before:currentDate];
   
   [self cleanupUnscheduledProgramsIn:moc];
-  
+  [[xtvdCleanupInfo valueForKey:@"reportProgressTo"] performSelectorOnMainThread:@selector(cleanupComplete:) withObject:nil waitUntilDone:YES];
+
   [pool release];
 }
 
