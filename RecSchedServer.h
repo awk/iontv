@@ -7,10 +7,11 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <SyncServices/SyncServices.h>
 
 #import "RecSchedProtocol.h"
 
-@interface RecSchedServer : NSObject <RecSchedServerProto> {
+@interface RecSchedServer : NSObject <RecSchedServerProto, NSPersistentStoreCoordinatorSyncing> {
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
     NSManagedObjectContext *managedObjectContext;
@@ -23,5 +24,8 @@
 - (NSManagedObjectContext *)managedObjectContext;
 
 - (bool) shouldExit;
+
+- (ISyncClient *)syncClient;
+- (void)syncAction:(id)sender;
 
 @end

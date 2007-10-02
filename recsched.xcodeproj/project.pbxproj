@@ -14,7 +14,7 @@
 			);
 			dependencies = (
 				EA083F740BADD1FD003C27FA /* PBXTargetDependency */,
-				EA083F760BADD1FD003C27FA /* PBXTargetDependency */,
+				EA572F490C2230A40041A372 /* PBXTargetDependency */,
 			);
 			name = "All recsched";
 			productName = "All recsched";
@@ -31,16 +31,6 @@
 		EA0674310B58084D009B0E27 /* MainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674300B58084D009B0E27 /* MainWindowController.m */; };
 		EA0674410B580B4D009B0E27 /* tvDataDelivery.m in Sources */ = {isa = PBXBuildFile; fileRef = EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */; };
 		EA0674420B580B4D009B0E27 /* WSGeneratedObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */; };
-		EA083DF60BA62A81003C27FA /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
-		EA083DF70BA62A84003C27FA /* Z2ITLineupMap.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */; };
-		EA083DF80BA62A85003C27FA /* Z2ITProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8863A0B61598700373CEF /* Z2ITProgram.m */; };
-		EA083DF90BA62A86003C27FA /* Z2ITSchedule.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8867C0B61740300373CEF /* Z2ITSchedule.m */; };
-		EA083DFA0BA62A87003C27FA /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
-		EA083DFB0BA62A8B003C27FA /* XTVDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */; };
-		EA083DFD0BA62AA8003C27FA /* recsched_DataModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 770B37EC0679A11B001EADE2 /* recsched_DataModel.xcdatamodel */; };
-		EA083E170BA62BAA003C27FA /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97324FDCFA39411CA2CEA /* AppKit.framework */; };
-		EA083E190BA62C57003C27FA /* recsched_bkgd.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */; };
-		EA083E220BA62F40003C27FA /* RecSchedServer.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE655590B9D1A8300CDB279 /* RecSchedServer.m */; };
 		EA083E480BA77D47003C27FA /* Z2ITScheduleExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */; };
 		EA08881E0B86B16D00809664 /* CC.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888150B86B16C00809664 /* CC.tif */; };
 		EA08881F0B86B16D00809664 /* HD.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888160B86B16C00809664 /* HD.tif */; };
@@ -51,6 +41,15 @@
 		EA0888240B86B16D00809664 /* TV-Y.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881B0B86B16C00809664 /* TV-Y.tif */; };
 		EA0888250B86B16D00809664 /* TV-Y7.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881C0B86B16C00809664 /* TV-Y7.tif */; };
 		EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881D0B86B16C00809664 /* TV-Y7FV.tif */; };
+		EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
+		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
+		EA20AE0E0C23589700A9BDBD /* recsched.syncschema in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE010C23589700A9BDBD /* recsched.syncschema */; };
+		EA20AE290C23608C00A9BDBD /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE280C23608C00A9BDBD /* ClientDescription.plist */; };
+		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
+		EA20AEE40C25C96E00A9BDBD /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
+		EA20AEFB0C25CC5B00A9BDBD /* Z2ITProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8863A0B61598700373CEF /* Z2ITProgram.m */; };
+		EA20AF020C25CCA200A9BDBD /* RecordingThread.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20AF010C25CCA200A9BDBD /* RecordingThread.m */; };
+		EA20AF050C25CD2500A9BDBD /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
 		EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */; };
 		EA29391E0C0CB2740053E2B8 /* HexNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */; };
 		EA2939800C0CC83F0053E2B8 /* PolishedWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = EA29397F0C0CC83F0053E2B8 /* PolishedWindow.m */; };
@@ -84,9 +83,13 @@
 		EA2EE0440C07D23F0002420F /* hdhomerun_discover.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0320C07D2130002420F /* hdhomerun_discover.c */; };
 		EA2EE0450C07D2400002420F /* hdhomerun_device.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0300C07D2130002420F /* hdhomerun_device.c */; };
 		EA2EE0460C07D2410002420F /* hdhomerun_debug.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02E0C07D2130002420F /* hdhomerun_debug.c */; };
-		EA2EE0680C07D4890002420F /* liblibhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */; };
+		EA2EE0680C07D4890002420F /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
 		EA2EE0780C07D57A0002420F /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
+		EA572E7F0C221C370041A372 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
+		EA572F130C222EC70041A372 /* NSManagedObject+CopyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA572F120C222EC70041A372 /* NSManagedObject+CopyAdditions.m */; };
+		EA572F700C2231250041A372 /* NSManagedObject+CopyAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA572F120C222EC70041A372 /* NSManagedObject+CopyAdditions.m */; };
+		EA572F710C22312E0041A372 /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
 		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
@@ -97,6 +100,7 @@
 		EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */; };
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
+		EA72A6E90C25D208009C63E5 /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EAE655480B9D0AA100CDB279 /* recsched_bkgd.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */; };
 		EAE655500B9D0B3300CDB279 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
@@ -122,46 +126,46 @@
 			remoteGlobalIDString = 8D1107260486CEB800E47090;
 			remoteInfo = recsched;
 		};
-		EA083F750BADD1FD003C27FA /* PBXContainerItemProxy */ = {
+		EA20AEE60C25C99D00A9BDBD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = EA083DF20BA62A5F003C27FA;
-			remoteInfo = recsched_bkgd;
+			remoteGlobalIDString = EA2EE03D0C07D2250002420F;
+			remoteInfo = libhdhomerun;
 		};
 		EA293B710C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = 8D1AC9740486D14A00FE50C9 /* RBSplitView.palette */;
+			remoteGlobalIDString = 8D1AC9740486D14A00FE50C9;
 			remoteInfo = Palette;
 		};
 		EA293B730C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D5E002A107328E1100594182 /* RBSplitView.framework */;
+			remoteGlobalIDString = D5E002A107328E1100594182;
 			remoteInfo = Framework;
 		};
 		EA293B750C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D5E003B9073298FC00594182 /* libRBSplitView.a */;
+			remoteGlobalIDString = D5E003B9073298FC00594182;
 			remoteInfo = Library;
 		};
 		EA293B770C0E18BC0053E2B8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
 			proxyType = 2;
-			remoteGlobalIDString = D5EA8A09074CF5AB00AE807E /* SampleApp.app */;
+			remoteGlobalIDString = D5EA8A09074CF5AB00AE807E;
 			remoteInfo = SampleApp;
 		};
 		EA293B790C0E18CD0053E2B8 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = EA293B5E0C0E18BC0053E2B8 /* RBSplitView.xcodeproj */;
 			proxyType = 1;
-			remoteGlobalIDString = D5E003B8073298FC00594182 /* Library */;
+			remoteGlobalIDString = D5E003B8073298FC00594182;
 			remoteInfo = Library;
 		};
 		EA2EE04E0C07D3130002420F /* PBXContainerItemProxy */ = {
@@ -170,6 +174,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = EA2EE03D0C07D2250002420F;
 			remoteInfo = libhdhomerun;
+		};
+		EA572F480C2230A40041A372 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EAE655250B9D08CD00CDB279;
+			remoteInfo = recsched_bkgd_cl;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -193,7 +204,6 @@
 		EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = tvDataDelivery.m; sourceTree = "<group>"; };
 		EA06743F0B580B4D009B0E27 /* WSGeneratedObj.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = WSGeneratedObj.h; sourceTree = "<group>"; };
 		EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = WSGeneratedObj.m; sourceTree = "<group>"; };
-		EA083DF30BA62A5F003C27FA /* recsched_bkgd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recsched_bkgd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA083DF50BA62A5F003C27FA /* recsched_bkgd-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "recsched_bkgd-Info.plist"; sourceTree = "<group>"; };
 		EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Z2ITScheduleExtras.h; sourceTree = SOURCE_ROOT; };
 		EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Z2ITScheduleExtras.m; sourceTree = SOURCE_ROOT; };
@@ -206,6 +216,12 @@
 		EA08881B0B86B16C00809664 /* TV-Y.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y.tif"; path = "Images/TV-Y.tif"; sourceTree = "<group>"; };
 		EA08881C0B86B16C00809664 /* TV-Y7.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7.tif"; path = "Images/TV-Y7.tif"; sourceTree = "<group>"; };
 		EA08881D0B86B16C00809664 /* TV-Y7FV.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7FV.tif"; path = "Images/TV-Y7FV.tif"; sourceTree = "<group>"; };
+		EA20ADB90C2330AC00A9BDBD /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
+		EA20AE010C23589700A9BDBD /* recsched.syncschema */ = {isa = PBXFileReference; lastKnownFileType = folder; path = recsched.syncschema; sourceTree = SOURCE_ROOT; };
+		EA20AE280C23608C00A9BDBD /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = SOURCE_ROOT; };
+		EA20AE2D0C23612800A9BDBD /* SyncServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SyncServices.framework; path = /System/Library/Frameworks/SyncServices.framework; sourceTree = "<absolute>"; };
+		EA20AF000C25CCA200A9BDBD /* RecordingThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RecordingThread.h; sourceTree = SOURCE_ROOT; };
+		EA20AF010C25CCA200A9BDBD /* RecordingThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = RecordingThread.m; sourceTree = SOURCE_ROOT; };
 		EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramSearchViewController.h; sourceTree = "<group>"; };
 		EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgramSearchViewController.m; sourceTree = "<group>"; };
 		EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HexNumberFormatter.h; sourceTree = "<group>"; };
@@ -260,11 +276,13 @@
 		EA2EE0370C07D2130002420F /* hdhomerun_video.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_video.c; path = ../libhdhomerun/hdhomerun_video.c; sourceTree = SOURCE_ROOT; };
 		EA2EE0380C07D2130002420F /* hdhomerun_video.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_video.h; path = ../libhdhomerun/hdhomerun_video.h; sourceTree = SOURCE_ROOT; };
 		EA2EE0390C07D2130002420F /* hdhomerun.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun.h; path = ../libhdhomerun/hdhomerun.h; sourceTree = SOURCE_ROOT; };
-		EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibhdhomerun.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA2EE03E0C07D2250002420F /* libhdhomerun.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhdhomerun.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA2EE0760C07D57A0002420F /* HDHomeRunMO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunMO.h; sourceTree = "<group>"; };
 		EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunMO.m; sourceTree = "<group>"; };
 		EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunTuner.h; sourceTree = "<group>"; };
 		EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunTuner.m; sourceTree = "<group>"; };
+		EA572F110C222EC70041A372 /* NSManagedObject+CopyAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObject+CopyAdditions.h"; sourceTree = "<group>"; };
+		EA572F120C222EC70041A372 /* NSManagedObject+CopyAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObject+CopyAdditions.m"; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
@@ -282,7 +300,7 @@
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
 		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = "<group>"; };
-		EAE655260B9D08CD00CDB279 /* rechsched_bkgd_cl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = rechsched_bkgd_cl; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAE655260B9D08CD00CDB279 /* recsched_bkgd_cl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = recsched_bkgd_cl; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd.m; sourceTree = "<group>"; };
 		EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_bkgd_prefix.pch; sourceTree = "<group>"; };
 		EAE655580B9D1A8300CDB279 /* RecSchedServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecSchedServer.h; sourceTree = "<group>"; };
@@ -318,16 +336,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
-				EA2EE0680C07D4890002420F /* liblibhdhomerun.a in Frameworks */,
+				EA2EE0680C07D4890002420F /* libhdhomerun.a in Frameworks */,
 				EA293B860C0E1A1E0053E2B8 /* libRBSplitView.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EA083DF10BA62A5F003C27FA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EA083E170BA62BAA003C27FA /* AppKit.framework in Frameworks */,
+				EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */,
+				EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */,
+				EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,6 +356,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				EAE655500B9D0B3300CDB279 /* Foundation.framework in Frameworks */,
+				EA572E7F0C221C370041A372 /* CoreData.framework in Frameworks */,
+				EA20AEE40C25C96E00A9BDBD /* libhdhomerun.a in Frameworks */,
+				EA72A6E90C25D208009C63E5 /* SyncServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,9 +404,8 @@
 			isa = PBXGroup;
 			children = (
 				8D1107320486CEB800E47090 /* recsched.app */,
-				EAE655260B9D08CD00CDB279 /* rechsched_bkgd_cl */,
-				EA083DF30BA62A5F003C27FA /* recsched_bkgd.app */,
-				EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */,
+				EAE655260B9D08CD00CDB279 /* recsched_bkgd_cl */,
+				EA2EE03E0C07D2250002420F /* libhdhomerun.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -426,6 +441,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EA20AE280C23608C00A9BDBD /* ClientDescription.plist */,
+				EA20AE010C23589700A9BDBD /* recsched.syncschema */,
 				EA2939860C0CC89E0053E2B8 /* Images */,
 				EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */,
 				EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */,
@@ -440,6 +457,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EA20AE2D0C23612800A9BDBD /* SyncServices.framework */,
+				EA20ADB90C2330AC00A9BDBD /* Security.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -525,6 +544,8 @@
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
 			isa = PBXGroup;
 			children = (
+				EA20AF000C25CCA200A9BDBD /* RecordingThread.h */,
+				EA20AF010C25CCA200A9BDBD /* RecordingThread.m */,
 				EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */,
 				EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */,
 				EAE655580B9D1A8300CDB279 /* RecSchedServer.h */,
@@ -560,6 +581,8 @@
 				EAF8863A0B61598700373CEF /* Z2ITProgram.m */,
 				EAF8867B0B61740300373CEF /* Z2ITSchedule.h */,
 				EAF8867C0B61740300373CEF /* Z2ITSchedule.m */,
+				EA572F110C222EC70041A372 /* NSManagedObject+CopyAdditions.h */,
+				EA572F120C222EC70041A372 /* NSManagedObject+CopyAdditions.m */,
 			);
 			name = "Data & XML Classes";
 			sourceTree = "<group>";
@@ -640,23 +663,6 @@
 			productReference = 8D1107320486CEB800E47090 /* recsched.app */;
 			productType = "com.apple.product-type.application";
 		};
-		EA083DF20BA62A5F003C27FA /* recsched_bkgd */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = EA083FC40BAF827B003C27FA /* Build configuration list for PBXNativeTarget "recsched_bkgd" */;
-			buildPhases = (
-				EA083DEF0BA62A5F003C27FA /* Resources */,
-				EA083DF00BA62A5F003C27FA /* Sources */,
-				EA083DF10BA62A5F003C27FA /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = recsched_bkgd;
-			productName = recsched_bkgd;
-			productReference = EA083DF30BA62A5F003C27FA /* recsched_bkgd.app */;
-			productType = "com.apple.product-type.application";
-		};
 		EA2EE03D0C07D2250002420F /* libhdhomerun */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = EA2EE04A0C07D26E0002420F /* Build configuration list for PBXNativeTarget "libhdhomerun" */;
@@ -671,12 +677,12 @@
 			);
 			name = libhdhomerun;
 			productName = libhdhomerun;
-			productReference = EA2EE03E0C07D2250002420F /* liblibhdhomerun.a */;
+			productReference = EA2EE03E0C07D2250002420F /* libhdhomerun.a */;
 			productType = "com.apple.product-type.library.static";
 		};
-		EAE655250B9D08CD00CDB279 /* rechsched_bkgd_cl */ = {
+		EAE655250B9D08CD00CDB279 /* recsched_bkgd_cl */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = EAE6552A0B9D08EC00CDB279 /* Build configuration list for PBXNativeTarget "rechsched_bkgd_cl" */;
+			buildConfigurationList = EAE6552A0B9D08EC00CDB279 /* Build configuration list for PBXNativeTarget "recsched_bkgd_cl" */;
 			buildPhases = (
 				EAE655230B9D08CD00CDB279 /* Sources */,
 				EAE655240B9D08CD00CDB279 /* Frameworks */,
@@ -684,10 +690,11 @@
 			buildRules = (
 			);
 			dependencies = (
+				EA20AEE70C25C99D00A9BDBD /* PBXTargetDependency */,
 			);
-			name = rechsched_bkgd_cl;
+			name = recsched_bkgd_cl;
 			productName = rechsched_bkgd;
-			productReference = EAE655260B9D08CD00CDB279 /* rechsched_bkgd_cl */;
+			productReference = EAE655260B9D08CD00CDB279 /* recsched_bkgd_cl */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -696,6 +703,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 26FC0A880875C7B200E6366F /* Build configuration list for PBXProject "recsched" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* recsched */;
 			projectDirPath = "";
@@ -706,10 +714,10 @@
 				},
 			);
 			projectRoot = "";
+			shouldCheckCompatibility = 1;
 			targets = (
 				8D1107260486CEB800E47090 /* recsched */,
-				EAE655250B9D08CD00CDB279 /* rechsched_bkgd_cl */,
-				EA083DF20BA62A5F003C27FA /* recsched_bkgd */,
+				EAE655250B9D08CD00CDB279 /* recsched_bkgd_cl */,
 				EA083F720BADD1F7003C27FA /* All recsched */,
 				EA2EE03D0C07D2250002420F /* libhdhomerun */,
 			);
@@ -783,13 +791,8 @@
 				EA2939A00C0CC8D70053E2B8 /* top_left.png in Resources */,
 				EA2939A10C0CC8D70053E2B8 /* top_middle.png in Resources */,
 				EA2939A20C0CC8D70053E2B8 /* top_right.png in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EA083DEF0BA62A5F003C27FA /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				EA20AE0E0C23589700A9BDBD /* recsched.syncschema in Resources */,
+				EA20AE290C23608C00A9BDBD /* ClientDescription.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -835,22 +838,7 @@
 				EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */,
 				EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */,
 				EA294E3C0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		EA083DF00BA62A5F003C27FA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				EA083DF60BA62A81003C27FA /* Z2ITLineup.m in Sources */,
-				EA083DF70BA62A84003C27FA /* Z2ITLineupMap.m in Sources */,
-				EA083DF80BA62A85003C27FA /* Z2ITProgram.m in Sources */,
-				EA083DF90BA62A86003C27FA /* Z2ITSchedule.m in Sources */,
-				EA083DFA0BA62A87003C27FA /* Z2ITStation.m in Sources */,
-				EA083DFB0BA62A8B003C27FA /* XTVDParser.m in Sources */,
-				EA083DFD0BA62AA8003C27FA /* recsched_DataModel.xcdatamodel in Sources */,
-				EA083E190BA62C57003C27FA /* recsched_bkgd.m in Sources */,
-				EA083E220BA62F40003C27FA /* RecSchedServer.m in Sources */,
+				EA572F130C222EC70041A372 /* NSManagedObject+CopyAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -875,6 +863,11 @@
 			files = (
 				EAE655480B9D0AA100CDB279 /* recsched_bkgd.m in Sources */,
 				EAE6555A0B9D1A8300CDB279 /* RecSchedServer.m in Sources */,
+				EA572F700C2231250041A372 /* NSManagedObject+CopyAdditions.m in Sources */,
+				EA572F710C22312E0041A372 /* HDHomeRunMO.m in Sources */,
+				EA20AEFB0C25CC5B00A9BDBD /* Z2ITProgram.m in Sources */,
+				EA20AF020C25CCA200A9BDBD /* RecordingThread.m in Sources */,
+				EA20AF050C25CD2500A9BDBD /* Z2ITStation.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -886,10 +879,10 @@
 			target = 8D1107260486CEB800E47090 /* recsched */;
 			targetProxy = EA083F730BADD1FD003C27FA /* PBXContainerItemProxy */;
 		};
-		EA083F760BADD1FD003C27FA /* PBXTargetDependency */ = {
+		EA20AEE70C25C99D00A9BDBD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = EA083DF20BA62A5F003C27FA /* recsched_bkgd */;
-			targetProxy = EA083F750BADD1FD003C27FA /* PBXContainerItemProxy */;
+			target = EA2EE03D0C07D2250002420F /* libhdhomerun */;
+			targetProxy = EA20AEE60C25C99D00A9BDBD /* PBXContainerItemProxy */;
 		};
 		EA293B7A0C0E18CD0053E2B8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -900,6 +893,11 @@
 			isa = PBXTargetDependency;
 			target = EA2EE03D0C07D2250002420F /* libhdhomerun */;
 			targetProxy = EA2EE04E0C07D3130002420F /* PBXContainerItemProxy */;
+		};
+		EA572F490C2230A40041A372 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EAE655250B9D08CD00CDB279 /* recsched_bkgd_cl */;
+			targetProxy = EA572F480C2230A40041A372 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -945,6 +943,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = recsched;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = YES;
@@ -985,7 +984,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 			};
 			name = Debug;
 		};
@@ -996,56 +995,6 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
-			};
-			name = Release;
-		};
-		EA083FC50BAF827B003C27FA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INFOPLIST_FILE = "recsched_bkgd-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = recsched_bkgd;
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
-			};
-			name = Debug;
-		};
-		EA083FC60BAF827B003C27FA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				INFOPLIST_FILE = "recsched_bkgd-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Foundation,
-					"-framework",
-					AppKit,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = recsched_bkgd;
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -1082,7 +1031,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INSTALL_PATH = /usr/local/lib;
 				PREBINDING = NO;
-				PRODUCT_NAME = libhdhomerun;
+				PRODUCT_NAME = hdhomerun;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1104,6 +1053,7 @@
 		EAE6552B0B9D08EC00CDB279 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/recsched.app/Contents/Support";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1112,6 +1062,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = recsched_bkgd_prefix.pch;
 				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = "\"$(BUILD_DIR)/$(CONFIGURATION)\"";
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,
@@ -1119,7 +1070,7 @@
 					AppKit,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = rechsched_bkgd_cl;
+				PRODUCT_NAME = recsched_bkgd_cl;
 				ZERO_LINK = YES;
 			};
 			name = Debug;
@@ -1141,7 +1092,7 @@
 					AppKit,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = rechsched_bkgd;
+				PRODUCT_NAME = recsched_bkgd_cl;
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -1167,15 +1118,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EA083FC40BAF827B003C27FA /* Build configuration list for PBXNativeTarget "recsched_bkgd" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				EA083FC50BAF827B003C27FA /* Debug */,
-				EA083FC60BAF827B003C27FA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		EA083FC70BAF827B003C27FA /* Build configuration list for PBXAggregateTarget "All recsched" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1194,7 +1136,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		EAE6552A0B9D08EC00CDB279 /* Build configuration list for PBXNativeTarget "rechsched_bkgd_cl" */ = {
+		EAE6552A0B9D08EC00CDB279 /* Build configuration list for PBXNativeTarget "recsched_bkgd_cl" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				EAE6552B0B9D08EC00CDB279 /* Debug */,

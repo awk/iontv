@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>DisplayName</key>
+	<string>recsched</string>
+	<key>Type</key>
+	<string>app</string>
+	<key>Entities</key>
+	<dict>
+		<key>org.awkward.recsched.HDHomeRun</key>
+		<array>
+			<string>com.apple.syncservices.RecordEntityName</string>
+			<string>deviceID</string>
+			<string>name</string>
+			<string>tuners</string>
+		</array>
+
+		<key>org.awkward.recsched.HDHomeRunTuner</key>
+		<array>
+			<string>com.apple.syncservices.RecordEntityName</string>
+			<string>index</string>
+			<string>channels</string>
+			<string>device</string>
+			<string>lineup</string>
+		</array>
+
+		<key>org.awkward.recsched.HDHomeRunChannel</key>
+		<array>
+			<string>com.apple.syncservices.RecordEntityName</string>
+			<string>channelNumber</string>
+			<string>channelType</string>
+			<string>tuningType</string>
+			<string>stations</string>
+			<string>tuner</string>
+		</array>
+
+		<key>org.awkward.recsched.HDHomeRunStation</key>
+		<array>
+			<string>com.apple.syncservices.RecordEntityName</string>
+			<string>callSign</string>
+			<string>programNumber</string>
+			<string>channel</string>
+			<string>z2itStation</string>
+		</array>
+
+		<key>org.awkward.recsched.Lineup</key>
+		<array>
+			<string>com.apple.syncservices.RecordEntityName</string>
+			<string>device</string>
+			<string>lineupID</string>
+			<string>location</string>
+			<string>name</string>
+			<string>postalCode</string>
+			<string>type</string>
+			<string>userLineupName</string>
+			<string>lineupMaps</string>
+			<string>tuners</string>
+		</array>
+
+		<key>org.awkward.recsched.LineupMap</key>
+		<array>
+			<string>com.apple.syncservices.RecordEntityName</string>
+			<string>channel</string>
+			<string>channelMinor</string>
+			<string>from</string>
+			<string>to</string>
+			<string>lineup</string>
+			<string>station</string>
+		</array>
+
+		<key>org.awkward.recsched.Station</key>
+		<array>
+			<string>com.apple.syncservices.RecordEntityName</string>
+			<string>affiliate</string>
+			<string>callSign</string>
+			<string>fccChannelNumber</string>
+			<string>name</string>
+			<string>stationID</string>
+			<string>hdhrStations</string>
+			<string>lineupMaps</string>
+			<string>schedules</string>
+		</array>
+	</dict>
+</dict>
+</plist>

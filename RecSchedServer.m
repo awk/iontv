@@ -8,9 +8,15 @@
 
 #import "RecSchedServer.h"
 
+#import "HDHomeRunMO.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
+#import "Z2ITStation.h"
 #import "XTVDParser.h"
+#import "RecordingThread.h"
+
+NSString *kRecSchedUIAppBundleID = @"org.awkward.recsched";
+NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 
 @implementation RecSchedServer
 
@@ -32,6 +38,9 @@
   self = [super init];
   if (self != nil) {
     mExitServer = NO;
+	
+	[[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
+	[self syncAction:nil];
   }
   return self;
 }
@@ -50,13 +59,8 @@
         return managedObjectModel;
     }
 	
-    NSMutableSet *allBundles = [[NSMutableSet alloc] init];
-    [allBundles addObject: [NSBundle mainBundle]];
-    [allBundles addObjectsFromArray: [NSBundle allFrameworks]];
-    
-    managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles: [allBundles allObjects]] retain];
-    [allBundles release];
-    
+	managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:[NSArray arrayWithObject:[NSBundle bundleWithIdentifier:kRecSchedUIAppBundleID]]] retain];
+
     return managedObjectModel;
 }
 
@@ -164,19 +168,9 @@
                 // Typically, this process should be altered to include application-specific 
                 // recovery steps.  
 //                NSArray *detailedErrors = [[error userInfo] valueForKey:@"NSDetailedErrors"];
-                BOOL errorResult = [[NSApplication sharedApplication] presentError:error];
-				
-                if (errorResult == YES) {
-                    reply = NSTerminateCancel;
-                } 
 
-                else {
-					
-                    int alertReturn = NSRunAlertPanel(nil, @"Could not save changes while quitting. Quit anyway?" , @"Quit anyway", @"Cancel", nil);
-                    if (alertReturn == NSAlertAlternateReturn) {
-                        reply = NSTerminateCancel;	
-                    }
-                }
+                NSLog(@"applicationShouldTerminate - errors in Managed Object Context - %@", error);
+                reply = NSTerminateNow;
             }
         } 
         
@@ -201,6 +195,69 @@
     [super dealloc];
 }
 
+#pragma mark Sync
+
+- (ISyncClient *)syncClient
+{
+    NSString *clientIdentifier = kRecSchedServerBundleID;
+    NSString *reason = @"unknown error";
+    ISyncClient *client;
+
+    @try {
+        client = [[ISyncManager sharedManager] clientWithIdentifier:clientIdentifier];
+        if (nil == client) {
+            if (![[ISyncManager sharedManager] registerSchemaWithBundlePath:[[NSBundle bundleWithIdentifier:kRecSchedUIAppBundleID] pathForResource:@"recsched" ofType:@"syncschema"]]) {
+                reason = @"error registering the recsched sync schema";
+            } else {
+                client = [[ISyncManager sharedManager] registerClientWithIdentifier:clientIdentifier descriptionFilePath:[[NSBundle bundleWithIdentifier:kRecSchedUIAppBundleID] pathForResource:@"ClientDescription" ofType:@"plist"]];
+                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeApplication];
+                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeDevice];
+                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeServer];
+                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypePeer];
+            }
+        }
+    }
+    @catch (id exception) {
+        client = nil;
+        reason = [exception reason];
+    }
+
+    if (nil == client) {
+        NSRunAlertPanel(@"You can not sync your recsched data.", [NSString stringWithFormat:@"Failed to register the sync client: %@", reason], @"OK", nil, nil);
+    }
+    
+    return client;
+}
+
+- (void)client:(ISyncClient *)client mightWantToSyncEntityNames:(NSArray *)entityNames
+{
+    NSLog(@"Saving for alert to sync...");
+	[self saveAction:self];
+}
+
+- (NSArray *)managedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
+{
+    return [NSArray arrayWithObject:[self managedObjectContext]];
+}
+
+- (NSArray *)managedObjectContextsToReloadWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
+{
+    return [NSArray arrayWithObject:[self managedObjectContext]];
+}
+
+- (NSDictionary *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushRecord:(NSDictionary *)record forManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
+{
+    NSLog(@"push %@ = %@", [managedObject objectID], [record description]);
+    return record;
+}
+
+- (ISyncChange *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willApplyChange:(ISyncChange *)change toManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
+{
+    NSLog(@"pull %@", [change description]);
+    return change;
+}
+
+
 #pragma mark - Server Methods
 
 - (bool) shouldExit
@@ -208,11 +265,46 @@
 	return mExitServer;
 }
 
+- (void)syncAction:(id)sender
+{
+    NSError *error = nil;
+    ISyncClient *client = [self syncClient];
+    if (nil != client) {
+        [[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
+    }
+    if (nil != error) {
+        NSLog(@"syncAction - error occured - %@", error);
+    }
+}
+
 - (BOOL) addRecordingOfProgram:(NSManagedObject*) aProgram
             withSchedule:(NSManagedObject*)aSchedule
 {
-  NSLog(@"addRecordingOfProgram\n%@\n%@", aProgram, aSchedule);
-  return YES;
+  Z2ITStation *aStation = [(Z2ITSchedule *)aSchedule station];
+  Z2ITProgram *myProgram = [Z2ITProgram fetchProgramWithID:[(Z2ITProgram *)(aProgram) programID] inManagedObjectContext:[self managedObjectContext]];
+  NSSet *mySchedules = [myProgram schedules];
+  NSEnumerator *anEnumerator = [mySchedules objectEnumerator];
+  Z2ITSchedule *mySchedule = nil;
+  BOOL foundMatch = NO;
+  while (mySchedule = [anEnumerator nextObject])
+  {
+    // Compare with time intervals since that will take into account any timezone discrepancies
+    if (([[aStation stationID] intValue] == [[[mySchedule station] stationID] intValue]) && ([[mySchedule time] timeIntervalSinceDate:[(Z2ITSchedule*)aSchedule time]] == 0))
+    {
+      foundMatch = YES;
+      break;
+    }
+  }
+  if (foundMatch)
+  {
+    [[RecordingThreadController alloc]initWithProgram:myProgram andSchedule:mySchedule];
+    return YES;
+  }
+  else
+  {
+    NSLog(@"Could not find matching local schedule for the program");
+    return NO;
+  }
 }
 
 - (BOOL) addRecordingWithName:(NSString*) name
@@ -226,13 +318,16 @@
   NSDictionary *newParseInfo = [NSDictionary dictionaryWithObjectsAndKeys:[parseInfo objectForKey:@"xmlFilePath"], @"xmlFilePath", self, @"reportCompletionTo", [self persistentStoreCoordinator], @"persistentStoreCoordinator", NULL];
   
   NSLog(@"performParse - newParseInfo = %@", newParseInfo);
-  [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:newParseInfo];
+//  [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:newParseInfo];
 }
 
 - (void) quitServer:(id)sender
 {
-  NSLog(@"Server shutting down");
-  mExitServer = YES;
+  if ([self applicationShouldTerminate:[NSApplication sharedApplication]])
+  {
+    NSLog(@"Server shutting down");
+    mExitServer = YES;
+  }
 }
 
 #pragma Callback Methods
@@ -241,11 +336,11 @@
 {
   NSLog(@"parsingComplete");
   // Clear all old items from the store
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportCompletionTo", [self persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
+//  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+//  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
+//  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportCompletionTo", [self persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
 
-  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
+//  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
 }
 
 - (void) cleanupComplete:(id)info

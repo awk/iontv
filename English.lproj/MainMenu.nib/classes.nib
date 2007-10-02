@@ -7,7 +7,6 @@
             ACTIONS = {
                 cleanupAction = id; 
                 getScheduleAction = id; 
-                quitServer = id; 
                 recordSeasonPass = id; 
                 recordShow = id; 
             }; 
@@ -20,7 +19,6 @@
                 mParsingProgressIndicator = NSProgressIndicator; 
                 mParsingProgressInfoField = NSTextField; 
                 mProgramSearchView = NSView; 
-                mRecServer = id; 
                 mScheduleContainerView = NSView; 
                 mScheduleSplitView = RBSplitView; 
                 mScheduleView = ScheduleView; 
@@ -80,10 +78,15 @@
         }, 
         {CLASS = ThinSplitView; LANGUAGE = ObjC; SUPERCLASS = NSSplitView; }, 
         {
-            ACTIONS = {saveAction = id; showCoreDataProgramWindow = id; }; 
+            ACTIONS = {quitServer = id; saveAction = id; showCoreDataProgramWindow = id; }; 
             CLASS = "recsched_AppDelegate"; 
             LANGUAGE = ObjC; 
-            OUTLETS = {mCoreDataProgramWindow = NSWindow; window = NSWindow; }; 
+            OUTLETS = {
+                mCoreDataProgramWindow = NSWindow; 
+                mRecServer = id; 
+                mServerMenuItem = NSMenuItem; 
+                window = NSWindow; 
+            }; 
             SUPERCLASS = NSObject; 
         }
     ); 

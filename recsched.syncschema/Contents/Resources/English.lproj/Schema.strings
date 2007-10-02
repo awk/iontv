@@ -1,0 +1,19 @@
+/* Localized strings from Schema.plist file */
+
+/* Data Class */
+"org.awkard.recsched" = "Recsched";
+
+/* Singular Data Class Name: Used for any UI that needs a singular name.*/
+"Singular:org.awkward.recsched" = "recsched";
+
+/* Entity: A media item such as a photo taken at an event. */
+"org.awkward.recshed.HDHomeRun" = "HDHomeRun Device";
+
+/* Attribute: guid. */
+"org.awkward.recsched.HDHomeRun/guid" = "Globally Unique Identifier";
+
+/* Attribute: text. */
+"org.awkward.recsched.HDHomeRun/deviceID" = "Device Identifier";
+
+/* Attribute: creation date. */
+"org.awkward.recsched.HDHomeRun/name" = "Name";
