@@ -124,7 +124,15 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     
     url = [NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched.dat"]];
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
-    if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error]){
+	NSPersistentStore *store = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error];
+    if (store != nil)
+	{
+		NSURL *fastSyncDetailURL;
+        fastSyncDetailURL = [NSURL fileURLWithPath:[applicationSupportFolder stringByAppendingPathComponent:@"org.awkward.recsched.fastsyncstore"]];
+        [persistentStoreCoordinator setStoresFastSyncDetailsAtURL:fastSyncDetailURL forPersistentStore:store];
+	}
+	else
+	{
         [[NSApplication sharedApplication] presentError:error];
     }    
 
@@ -210,28 +218,44 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 {
     NSLog(@"Saving for alert to sync...");
 	[self saveAction:self];
+
+	NSLog(@"syncing with client %@ for entityNames %@", client, entityNames);
+	NSError *error;
+	[[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
 }
 
 - (NSArray *)managedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
 {
-    return [NSArray arrayWithObject:[self managedObjectContext]];
+	NSManagedObjectContext *aContext = [self managedObjectContext];
+    return [NSArray arrayWithObject:aContext];
 }
 
-- (NSArray *)managedObjectContextsToReloadWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
+- (NSArray *)managedObjectContextsToReloadAfterSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
 {
-    return [NSArray arrayWithObject:[self managedObjectContext]];
+	NSManagedObjectContext *aContext = [self managedObjectContext];
+    return [NSArray arrayWithObject:aContext];
 }
 
 - (NSDictionary *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushRecord:(NSDictionary *)record forManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
 {
-    NSLog(@"push %@ = %@", [managedObject objectID], [record description]);
+//    NSLog(@"push %@ = %@", [managedObject objectID], [record description]);
     return record;
 }
 
 - (ISyncChange *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willApplyChange:(ISyncChange *)change toManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
 {
-    NSLog(@"pull %@", [change description]);
+//    NSLog(@"pull %@", [change description]);
     return change;
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didCancelSyncSession:(ISyncSession *)session error:(NSError *)error
+{
+	NSLog(@"didCancelSyncSession - error = %@", error);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didFinishSyncSession:(ISyncSession *)session
+{
+	NSLog(@"didFinishSyncSession");
 }
 
 #pragma mark - Actions
@@ -247,6 +271,10 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     NSError *error = nil;
     if (![[self managedObjectContext] save:&error]) {
         [[NSApplication sharedApplication] presentError:error];
+    }
+	else
+	{
+        [self syncAction:sender];
     }
 }
 
@@ -427,20 +455,22 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     // enumerate the list
     NSEnumerator *enumerator = [updatedObjects objectEnumerator];
     NSManagedObject *updatedObject, *staleObject;
-    while ((updatedObject = [enumerator nextObject]) != nil) {
+	NSManagedObjectID *updatedObjectID;
+    while ((updatedObjectID = [enumerator nextObject]) != nil) {
 
         // if the object that was updated (in the recipe context) also has been fetched into the app delegate 
         // context, we want to refresh the object merging in the changes from the persistent store. Otherwise
         // the information will look out of date.
-        staleObject = [[self managedObjectContext] objectRegisteredForID:[updatedObject objectID]];
+        staleObject = [[self managedObjectContext] objectRegisteredForID:updatedObjectID/*[updatedObject objectID]*/];
         if (staleObject != nil) 
         {
             [[self managedObjectContext] refreshObject:staleObject mergeChanges:NO];   
         }
         else
         {
-          staleObject = [[self managedObjectContext] objectWithID:[updatedObject objectID]];
+          staleObject = [[self managedObjectContext] objectWithID:updatedObjectID/*[updatedObject objectID]*/];
         }
+//		NSLog(@"updateForSavedContext - staleObject = %@", staleObject);
     }    
     
     // Lastly do a 'performPendingChanges' to make sure everything is picked up correctly - in particular that
@@ -450,6 +480,8 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     
     // And notifiy everyone else a save just occured - which probably means new objects were added to this context
     [[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationManagedObjectContextUpdated object:[self managedObjectContext]];
+	
+	[self syncAction:self];
 }
 
 #pragma mark - Notifications
