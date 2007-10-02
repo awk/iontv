@@ -47,6 +47,9 @@
 		EA20AE290C23608C00A9BDBD /* ClientDescription_Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */; };
 		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
 		EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */; };
+		EA289D160C720FCE00D2EE7B /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
+		EA289D170C720FCF00D2EE7B /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
+		EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
 		EA29391E0C0CB2740053E2B8 /* HexNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */; };
 		EA2939800C0CC83F0053E2B8 /* PolishedWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = EA29397F0C0CC83F0053E2B8 /* PolishedWindow.m */; };
 		EA2939950C0CC8D70053E2B8 /* bottom_left.png in Resources */ = {isa = PBXBuildFile; fileRef = EA2939870C0CC8D70053E2B8 /* bottom_left.png */; };
@@ -131,6 +134,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 8D1107260486CEB800E47090;
 			remoteInfo = recsched;
+		};
+		EA289D260C72100600D2EE7B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = EA2EE03D0C07D2250002420F;
+			remoteInfo = libhdhomerun;
 		};
 		EA2EE04E0C07D3130002420F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -319,6 +329,7 @@
 				EAEC09640C27452C00C40D5A /* SyncServices.framework in Frameworks */,
 				EAEC09650C27453200C40D5A /* Cocoa.framework in Frameworks */,
 				EAEC09D80C275BC500C40D5A /* Security.framework in Frameworks */,
+				EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -644,6 +655,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				EA289D270C72100600D2EE7B /* PBXTargetDependency */,
 			);
 			name = recsched_bkgd;
 			productName = recsched_bkgd;
@@ -797,6 +809,8 @@
 				EAEC0A280C283C8100C40D5A /* Z2ITLineupMap.m in Sources */,
 				EAEC0A290C283C8200C40D5A /* Z2ITSchedule.m in Sources */,
 				EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */,
+				EA289D160C720FCE00D2EE7B /* HDHomeRunTuner.m in Sources */,
+				EA289D170C720FCF00D2EE7B /* HDHomeRunMO.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -807,6 +821,11 @@
 			isa = PBXTargetDependency;
 			target = 8D1107260486CEB800E47090 /* recsched */;
 			targetProxy = EA083F730BADD1FD003C27FA /* PBXContainerItemProxy */;
+		};
+		EA289D270C72100600D2EE7B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = EA2EE03D0C07D2250002420F /* libhdhomerun */;
+			targetProxy = EA289D260C72100600D2EE7B /* PBXContainerItemProxy */;
 		};
 		EA2EE04F0C07D3130002420F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -987,6 +1006,7 @@
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				INFOPLIST_FILE = "recsched_bkgd-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
+				LIBRARY_SEARCH_PATHS = build/Debug;
 				OTHER_LDFLAGS = (
 					"-framework",
 					Foundation,

@@ -7,7 +7,7 @@
 //
 
 #import "RecSchedServer.h"
-
+#import "recsched_bkgd_AppDelegate.h"
 #import "HDHomeRunMO.h"
 #import "tvDataDelivery.h"
 #import "Z2ITProgram.h"
@@ -192,6 +192,65 @@ const int kDefaultScheduleFetchDuration = 3;
     NSLog(@"Could not find matching local schedule for the program");
     return NO;
   }
+}
+
+- (oneway void) pushHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex
+{
+	NSLog(@"pushHDHomeRunChannelsAndStations deviceID = %d, tunerIndex = %d, channels = %@", deviceID, tunerIndex, channelsArray);
+
+	HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:deviceID] inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	if (anHDHomeRun)
+	{
+		HDHomeRunTuner *aTuner = [anHDHomeRun tunerWithIndex:tunerIndex];
+		if (aTuner)
+		{
+			// Fetch a sorted (by channelNumber) array from the managed object context.
+			// This should entirely match (one for one) the channelNumber array that has been passed in to this method.
+			NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"HDHomeRunChannel" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+			NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+			[request setEntity:entityDescription];
+
+			NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tuner == %@", aTuner];
+			[request setPredicate:predicate];
+
+			NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES];
+			[request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+			[sortDescriptor release];
+
+			NSError *error = nil;
+			NSArray *myChannelsArray = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
+			if (error || myChannelsArray == nil)
+			{
+				NSLog(@"pushHDHomeRunChannelsAndStations: Error executing fetch to find channels - error = %@", error);
+				return;
+			}
+			
+			int channelIdx = 0;
+			for ( ; channelIdx < [channelsArray count]; channelIdx++)
+			{
+				NSDictionary *aChannelDictionary = [channelsArray objectAtIndex:channelIdx];
+				
+				// Get the channel from the tuner
+				HDHomeRunChannel *aChannel = [myChannelsArray objectAtIndex:channelIdx];
+				if ([[aChannel channelNumber] compare:[aChannelDictionary valueForKey:@"channelNumber"]] != NSOrderedSame)
+				{
+					NSLog(@"Unexpected misalignment in channel arrays %@ != %@", aChannel, aChannelDictionary);
+					break;
+				}
+				
+				// Remove all the stations on the given channel - they'll be replaced with the data from the array
+				[aChannel clearAllStations];
+				
+				// Add all the stations in the array for this channel
+				[aChannel importStationsFrom:[aChannelDictionary valueForKey:@"stations"]];
+			}
+			if (channelIdx > 0)
+			{
+				// processed some stations - save the MOC
+				[[NSApp delegate] saveAction:self];
+			}
+		}
+	}
 }
 
 - (void) quitServer:(id)sender
