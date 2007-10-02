@@ -12,7 +12,7 @@
 
 @interface ScheduleGridView : NSView {
   NSMutableArray *mStationsInViewArray;
-  NSMutableArray *mCellsInViewArray;
+//  NSMutableArray *mCellsInViewArray;
   NSArray *mSortedStationsArray;
   Z2ITLineup *mCurrentLineup;
   unsigned mStartStationIndex;
