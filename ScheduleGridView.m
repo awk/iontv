@@ -384,43 +384,11 @@
 
 - (NSColor *)highlightColorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
-  NSLog(@"highlightColorWithFrame - title = %@", [[[self representedObject] program] title]);
   if ([[controlView window] firstResponder] == controlView)
     return [NSColor alternateSelectedControlColor];
   else
     return [NSColor lightGrayColor];
 }
-
-#if 0
-- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
-  const int kCellInset = 4;
-  NSString *titleString = [[[self representedObject] program] title];
-  
-  if ([self isHighlighted])
-  {
-    [NSGraphicsContext saveGraphicsState];
-    [[NSColor selectedMenuItemColor] setFill];
-    [NSBezierPath fillRect:cellFrame];
-
-    [[NSColor selectedMenuItemTextColor] setStroke];
-    
-    [titleString drawInRect:cellFrame withAttributes:nil];
-
-    [NSGraphicsContext restoreGraphicsState];
-  }
-  else
-  {
-    // Inset the cell frame rect a little
-    cellFrame.size.width -= kCellInset;
-    cellFrame.size.height -= kCellInset;
-    cellFrame.origin.x += kCellInset/2;
-    cellFrame.origin.y += kCellInset/2;
-  
-    [titleString drawInRect:cellFrame withAttributes:nil];
-  }
-}
-#endif
 
 @end
 
