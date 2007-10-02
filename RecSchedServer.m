@@ -15,6 +15,9 @@
 #import "Z2ITStation.h"
 #import "XTVDParser.h"
 #import "RecordingThread.h"
+#import "HDHomeRunTuner.h"
+
+const int kDefaultScheduleFetchDuration = 3;
 
 @implementation RecSchedServer
 
@@ -116,19 +119,15 @@
 	return mExitServer;
 }
 
-// If the current schedule data is more than one hour out of date then download new
-// schedule data and update the database.
-- (void) updateSchedule
+- (void) findStations
 {
-	// Find the start time of the most 'recent' schedule item.
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:NO];
-  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
-  [sortDescriptor release];
-   
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"callSign == %@", @"WGBH"];
+  [request setPredicate:predicate];
+  
   NSError *error = nil;
   NSArray *array = [[[[NSApplication sharedApplication] delegate] managedObjectContext] executeFetchRequest:request error:&error];
   if (array == nil)
@@ -136,20 +135,32 @@
       NSLog(@"Error executing fetch request to find latest schedule");
       return;
   }
-	
-  BOOL fetchSchedule = NO;
-  if ([array count] > 0)
+  int i=0;
+  for (i=0; i < [array count]; i++)
   {
-	NSDate *latestScheduleTime = [[array objectAtIndex:0] time];
-	NSLog(@"latestScheduleTime = %@", latestScheduleTime);
+	Z2ITStation *aStation = [array objectAtIndex:i];
+	NSSet *hdhrStations = [aStation hdhrStations];
+	NSLog(@"Station Callsign = %@, hdhrStations = %@, hdhrStation callSign = %@, hdhrStation programNumber = %@",
+		[aStation callSign], hdhrStations, [[hdhrStations anyObject] callSign], [[hdhrStations anyObject] programNumber]);
   }
-  else
-	fetchSchedule = YES;		// No schedules - fetch some
-  
-  if (fetchSchedule)
-  {
-	[self fetchScheduleWithDuration:3];
-  }
+}
+
+// If the current schedule data is more than one hour out of date then download new
+// schedule data and update the database.
+- (void) updateSchedule
+{
+	[self findStations];
+
+	// Set up a timer to fire one hour before the about to be fetched schedule data 'runs out'
+	[NSTimer scheduledTimerWithTimeInterval:(kDefaultScheduleFetchDuration - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:YES]; 
+
+//	[self fetchScheduleWithDuration:kDefaultScheduleFetchDuration];
+}
+
+- (void) updateScheduleTimer:(NSTimer*)aTimer
+{
+	NSLog(@"Time to update the schedule!");
+	[self fetchScheduleWithDuration:kDefaultScheduleFetchDuration];
 }
 
 - (BOOL) addRecordingOfProgram:(NSManagedObject*) aProgram
@@ -172,6 +183,7 @@
   }
   if (foundMatch)
   {
+	NSLog(@"My Program = %@, My Schedule = %@", myProgram, mySchedule);
     [[RecordingThreadController alloc]initWithProgram:myProgram andSchedule:mySchedule];
     return YES;
   }
@@ -180,20 +192,6 @@
     NSLog(@"Could not find matching local schedule for the program");
     return NO;
   }
-}
-
-- (BOOL) addRecordingWithName:(NSString*) name
-{
-	NSLog(@"addRecordingWithName - name  = %@", name);
-	return YES;
-}
-
-- (void) performParse:(NSDictionary *)parseInfo
-{
-  NSDictionary *newParseInfo = [NSDictionary dictionaryWithObjectsAndKeys:[parseInfo objectForKey:@"xmlFilePath"], @"xmlFilePath", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", NULL];
-  
-  NSLog(@"performParse - newParseInfo = %@", newParseInfo);
-//  [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:newParseInfo];
 }
 
 - (void) quitServer:(id)sender
