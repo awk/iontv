@@ -40,6 +40,7 @@
 - (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber;
 - (void) tuneToChannel:(HDHomeRunChannel*)inChannel;
 - (void) exportChannelMapTo:(NSURL *)inURL;
+- (void) importChannelMapFrom:(NSURL *)inURL;
 
 - (void) releaseHDHRDevice;
 - (void) createHDHRDevice;
@@ -68,6 +69,8 @@
 - (NSMutableSet *)stations;
 
 - (void) addStation:(HDHomeRunStation*)inStation;
+- (void) importStationsFrom:(NSArray*)inArrayOfStationDictionaries;
+
 @end
 
 @interface HDHomeRunStation : NSManagedObject

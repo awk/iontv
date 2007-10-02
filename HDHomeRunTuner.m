@@ -227,6 +227,42 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 	}
 }
 
+- (void) importChannelMapFrom:(NSURL *)inURL
+{
+	NSData *xmlData = [NSData dataWithContentsOfURL:inURL];
+	
+	if (xmlData)
+	{
+		NSString *error;
+		NSArray *channelsToImport = [NSPropertyListSerialization propertyListFromData:xmlData mutabilityOption:NSPropertyListImmutable format:nil errorDescription:&error];
+		if (channelsToImport)
+		{
+			[self deleteAllChannelsInMOC:[self managedObjectContext]];
+			NSEnumerator *anEnumerator = [channelsToImport objectEnumerator];
+			NSDictionary *channelInfoDictionary;
+			while ((channelInfoDictionary = [anEnumerator nextObject]) != nil)
+			{
+				HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:[channelInfoDictionary valueForKey:@"channelType"] andNumber:[channelInfoDictionary valueForKey:@"channelNumber"] inManagedObjectContext:[self managedObjectContext]];
+				[aChannel setTuningType:[channelInfoDictionary valueForKey:@"tuningType"]];
+				[aChannel importStationsFrom:[channelInfoDictionary valueForKey:@"stations"]];
+				[self addChannel:aChannel];
+			}
+		}
+		else
+		{
+			NSLog(error);
+			[error release];
+		}
+	}
+	NSError *error;
+	[[self managedObjectContext] save:&error];
+	if (error != nil)
+	{
+		NSLog(@"Error occured saving after channel import : %@", error);
+		[error release];
+	}
+}
+
 #pragma mark - Notifications
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -504,7 +540,10 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 - (void) didTurnIntoFault
 {
   [self releaseHDHRDevice];
-  
+  if ([self device])
+  {
+	[[self device] removeObserver:self forKeyPath:@"name"];
+  }
   [super didTurnIntoFault];
 }
 
@@ -602,6 +641,32 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 	[inOutputArray addObject:infoDictionary];
 }
 
+- (void) importStationsFrom:(NSArray*)inArrayOfStationDictionaries
+{
+	NSEnumerator *anEnumerator = [inArrayOfStationDictionaries objectEnumerator];
+	NSDictionary *stationInfo;
+	while ((stationInfo = [anEnumerator nextObject]) != nil)
+	{
+		// Create a station and add it to the channel
+		HDHomeRunStation *aStation = [HDHomeRunStation createStationWithProgramNumber:[stationInfo valueForKey:@"programNumber"] forChannel:self inManagedObjectContext:[self managedObjectContext]];
+		[aStation setCallSign:[stationInfo valueForKey:@"callSign"]];
+		
+		// If there's a Zap2IT station ID use that to find the matching Zap2It station
+		if ([stationInfo valueForKey:@"Z2ITStationID"])
+		{
+			Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithID:[stationInfo valueForKey:@"Z2ITStationID"] inManagedObjectContext:[self managedObjectContext]];
+			if (!aZ2ITStation)
+			{
+				// No Station ID match - perhaps the callsign ?
+				aZ2ITStation = [Z2ITStation fetchStationWithCallSign:[stationInfo valueForKey:@"Z2ITCallSign"] inLineup:[[self tuner] lineup] inManagedObjectContext:[self managedObjectContext]];
+			}
+			if (aZ2ITStation)
+			{
+				[aStation setZ2ITStation:aZ2ITStation];
+			}
+		}
+	}
+}
 @end
 
 @implementation HDHomeRunStation
@@ -626,6 +691,13 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   // Register to be told when the device name changes
   if ([self channel])
     [[self channel] addObserver:self forKeyPath:@"channelNumber" options:NSKeyValueObservingOptionNew context:nil];
+}
+
+- (void) didTurnIntoFault
+{
+	if ([self channel])
+		[[self channel] removeObserver:self forKeyPath:@"channelNumber"];
+	[super didTurnIntoFault];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -702,12 +774,12 @@ COREDATA_ACCESSOR(HDHomeRunChannel*, @"channel");
 - (void) setChannel:(HDHomeRunChannel*) value
 {
   if ([self channel])
-    [[self channel] removeObserver:self forKeyPath:@"channel"];
+    [[self channel] removeObserver:self forKeyPath:@"channelNumber"];
     
   COREDATA_MUTATOR(HDHomeRunChannel*, @"channel");
 
   // Register to be told when the device name changes
-  [value addObserver:self forKeyPath:@"channel" options:NSKeyValueObservingOptionNew context:nil];
+  [value addObserver:self forKeyPath:@"channelNumber" options:NSKeyValueObservingOptionNew context:nil];
 }
 
 - (Z2ITStation*) Z2ITStation

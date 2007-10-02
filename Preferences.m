@@ -548,6 +548,16 @@ static Preferences *sSharedInstance = nil;
 	[aSavePanel beginSheetForDirectory:docPath file:nil modalForWindow:mPanel modalDelegate:self didEndSelector:@selector(exportChannelPanelDidEnd: returnCode: contextInfo:)  contextInfo:nil];
 }
 
+- (IBAction) importHDHomeRunChannelMap:(id)sender
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *docPath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+
+	NSOpenPanel *anOpenPanel = [NSOpenPanel openPanel];
+	[anOpenPanel setAccessoryView:mExportChannelTunerSelectionView];
+	[anOpenPanel beginSheetForDirectory:docPath file:nil types:[NSArray arrayWithObject:@"xml"] modalForWindow:mPanel modalDelegate:self didEndSelector:@selector(importChannelPanelDidEnd: returnCode: contextInfo:) contextInfo:nil];
+} 
+
 #pragma mark Channel Scan Progress Display Protocol
 
 - (void) incrementChannelScanProgress
@@ -630,16 +640,42 @@ static Preferences *sSharedInstance = nil;
   // Cleanup never happens for lineup downloads in the Preferences dialog.
 }
 
-#pragma mark Save Panel Delegate Methods
+#pragma mark Open/Save Panel Delegate Methods
 
-- (void)exportChannelPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
+- (void)exportChannelPanelDidEnd:(NSSavePanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
 {
 	if (returnCode == NSOKButton)
 	{
 		// Send the selected tuner an export message with the destination file
 		if ([[mHDHomeRunTunersArrayController selectedObjects] count] == 1)
-			[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] exportChannelMapTo:[sheet URL]];
+			[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] exportChannelMapTo:[panel URL]];
 	}
+}
+
+- (void)importChannelPanelDidEnd:(NSOpenPanel *)panel returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
+{
+	if (returnCode == NSOKButton)
+	{
+		// Send the selected tuner an import message with the source file
+		if ([[mHDHomeRunTunersArrayController selectedObjects] count] == 1)
+		{
+			[panel orderOut:self];
+			NSAlert *confirmAlert = [NSAlert alertWithMessageText:@"Continue with Import?" 
+				defaultButton:nil /*OK*/ alternateButton:@"Cancel" otherButton:nil
+				informativeTextWithFormat:@"Importing channels will clear all channels currently present on Tuner: %@", [[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] longName]];
+			[confirmAlert beginSheetModalForWindow:mPanel modalDelegate:self didEndSelector:@selector(confirmImportAlertDidEnd: returnCode: contextInfo:) contextInfo:[[panel URL] copy]];
+		}
+	}
+}
+
+- (void) confirmImportAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	NSURL *importURL = (NSURL*)contextInfo;
+	if (returnCode == NSAlertDefaultReturn)
+	{
+		[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] importChannelMapFrom:importURL];
+	}
+	[importURL release];	// Copied in the file open panel did end delegate
 }
 
 #pragma mark - Notification callbacks

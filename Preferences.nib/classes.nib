@@ -36,6 +36,8 @@
 				<string>id</string>
 				<key>getAccountButtonAction</key>
 				<string>id</string>
+				<key>importHDHomeRunChannelMap</key>
+				<string>id</string>
 				<key>okButtonAction</key>
 				<string>id</string>
 				<key>retrieveLineupsButtonAction</key>

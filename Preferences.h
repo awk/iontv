@@ -72,4 +72,5 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
 - (IBAction) scanChannelsButtonAction:(id)sender;
 - (IBAction) viewHDHRStation:(id)sender;
 - (IBAction) exportHDHomeRunChannelMap:(id)sender;
+- (IBAction) importHDHomeRunChannelMap:(id)sender;
 @end
