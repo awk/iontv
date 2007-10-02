@@ -14,7 +14,7 @@
 			);
 			dependencies = (
 				EA083F740BADD1FD003C27FA /* PBXTargetDependency */,
-				EA572F490C2230A40041A372 /* PBXTargetDependency */,
+				EAEC094B0C27410700C40D5A /* PBXTargetDependency */,
 			);
 			name = "All recsched";
 			productName = "All recsched";
@@ -100,10 +100,32 @@
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
 		EA72A6E90C25D208009C63E5 /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
 		EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA72A7A90C260D79009C63E5 /* ClientDescription.plist */; };
+		EA72A7D70C26A5CC009C63E5 /* tvDataDelivery.m in Sources */ = {isa = PBXBuildFile; fileRef = EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */; };
+		EA72A7D90C26A5E3009C63E5 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
+		EA72A7DB0C26A608009C63E5 /* WSGeneratedObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EAE655480B9D0AA100CDB279 /* recsched_bkgd.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE6553C0B9D0A5B00CDB279 /* recsched_bkgd.m */; };
 		EAE655500B9D0B3300CDB279 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		EAE6555A0B9D1A8300CDB279 /* RecSchedServer.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE655590B9D1A8300CDB279 /* RecSchedServer.m */; };
+		EAEC09370C272E8800C40D5A /* recsched_bkgd_main.m in Sources */ = {isa = PBXBuildFile; fileRef = EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */; };
+		EAEC09580C27422800C40D5A /* recsched_bkgd_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */; };
+		EAEC09630C27452600C40D5A /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
+		EAEC09640C27452C00C40D5A /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
+		EAEC09650C27453200C40D5A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		EAEC099D0C27496600C40D5A /* recsched.syncschema in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE010C23589700A9BDBD /* recsched.syncschema */; };
+		EAEC09AD0C2749FC00C40D5A /* recsched_DataModel.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 770B37EC0679A11B001EADE2 /* recsched_DataModel.xcdatamodel */; };
+		EAEC09BC0C274A7700C40D5A /* ClientDescription_Server.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */; };
+		EAEC09D00C275AA400C40D5A /* RecSchedServer.m in Sources */ = {isa = PBXBuildFile; fileRef = EAE655590B9D1A8300CDB279 /* RecSchedServer.m */; };
+		EAEC09D40C275B6400C40D5A /* tvDataDelivery.m in Sources */ = {isa = PBXBuildFile; fileRef = EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */; };
+		EAEC09D50C275B6E00C40D5A /* Z2ITProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8863A0B61598700373CEF /* Z2ITProgram.m */; };
+		EAEC09D70C275BB500C40D5A /* WSGeneratedObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */; };
+		EAEC09D80C275BC500C40D5A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
+		EAEC09DA0C275BE700C40D5A /* RecordingThread.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20AF010C25CCA200A9BDBD /* RecordingThread.m */; };
+		EAEC09DC0C275C2100C40D5A /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
+		EAEC0A250C283C6F00C40D5A /* XTVDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */; };
+		EAEC0A270C283C7F00C40D5A /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
+		EAEC0A280C283C8100C40D5A /* Z2ITLineupMap.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */; };
+		EAEC0A290C283C8200C40D5A /* Z2ITSchedule.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8867C0B61740300373CEF /* Z2ITSchedule.m */; };
 		EAF882700B5DC0BD00373CEF /* XTVDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */; };
 		EAF883100B5DCE4900373CEF /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
 		EAF883DE0B5ECB5B00373CEF /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
@@ -174,12 +196,12 @@
 			remoteGlobalIDString = EA2EE03D0C07D2250002420F;
 			remoteInfo = libhdhomerun;
 		};
-		EA572F480C2230A40041A372 /* PBXContainerItemProxy */ = {
+		EAEC094A0C27410700C40D5A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = EAE655250B9D08CD00CDB279;
-			remoteInfo = recsched_bkgd_cl;
+			remoteGlobalIDString = EAEC092C0C272E1200C40D5A;
+			remoteInfo = recsched_bkgd;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -304,6 +326,10 @@
 		EAE655580B9D1A8300CDB279 /* RecSchedServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecSchedServer.h; sourceTree = "<group>"; };
 		EAE655590B9D1A8300CDB279 /* RecSchedServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecSchedServer.m; sourceTree = "<group>"; };
 		EAE655730B9E691000CDB279 /* RecSchedProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecSchedProtocol.h; sourceTree = "<group>"; };
+		EAEC092D0C272E1300C40D5A /* recsched_bkgd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recsched_bkgd.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd_main.m; sourceTree = "<group>"; };
+		EAEC09560C27422800C40D5A /* recsched_bkgd_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_bkgd_AppDelegate.h; sourceTree = "<group>"; };
+		EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd_AppDelegate.m; sourceTree = "<group>"; };
 		EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XTVDParser.h; sourceTree = "<group>"; };
 		EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XTVDParser.m; sourceTree = "<group>"; };
 		EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITStation.h; sourceTree = "<group>"; };
@@ -357,6 +383,18 @@
 				EA572E7F0C221C370041A372 /* CoreData.framework in Frameworks */,
 				EA20AEE40C25C96E00A9BDBD /* libhdhomerun.a in Frameworks */,
 				EA72A6E90C25D208009C63E5 /* SyncServices.framework in Frameworks */,
+				EA72A7D90C26A5E3009C63E5 /* Security.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAEC092B0C272E1200C40D5A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAEC09630C27452600C40D5A /* CoreData.framework in Frameworks */,
+				EAEC09640C27452C00C40D5A /* SyncServices.framework in Frameworks */,
+				EAEC09650C27453200C40D5A /* Cocoa.framework in Frameworks */,
+				EAEC09D80C275BC500C40D5A /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -404,6 +442,7 @@
 				8D1107320486CEB800E47090 /* recsched.app */,
 				EAE655260B9D08CD00CDB279 /* recsched_bkgd_cl */,
 				EA2EE03E0C07D2250002420F /* libhdhomerun.a */,
+				EAEC092D0C272E1300C40D5A /* recsched_bkgd.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -550,6 +589,9 @@
 				EAE655580B9D1A8300CDB279 /* RecSchedServer.h */,
 				EAE655590B9D1A8300CDB279 /* RecSchedServer.m */,
 				EA083DF50BA62A5F003C27FA /* recsched_bkgd-Info.plist */,
+				EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */,
+				EAEC09560C27422800C40D5A /* recsched_bkgd_AppDelegate.h */,
+				EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */,
 			);
 			name = "Background App";
 			sourceTree = "<group>";
@@ -694,6 +736,23 @@
 			productReference = EAE655260B9D08CD00CDB279 /* recsched_bkgd_cl */;
 			productType = "com.apple.product-type.tool";
 		};
+		EAEC092C0C272E1200C40D5A /* recsched_bkgd */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EAEC09340C272E4E00C40D5A /* Build configuration list for PBXNativeTarget "recsched_bkgd" */;
+			buildPhases = (
+				EAEC09290C272E1200C40D5A /* Resources */,
+				EAEC092A0C272E1200C40D5A /* Sources */,
+				EAEC092B0C272E1200C40D5A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = recsched_bkgd;
+			productName = recsched_bkgd;
+			productReference = EAEC092D0C272E1300C40D5A /* recsched_bkgd.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -711,12 +770,12 @@
 				},
 			);
 			projectRoot = "";
-			shouldCheckCompatibility = 1;
 			targets = (
 				8D1107260486CEB800E47090 /* recsched */,
 				EAE655250B9D08CD00CDB279 /* recsched_bkgd_cl */,
 				EA083F720BADD1F7003C27FA /* All recsched */,
 				EA2EE03D0C07D2250002420F /* libhdhomerun */,
+				EAEC092C0C272E1200C40D5A /* recsched_bkgd */,
 			);
 		};
 /* End PBXProject section */
@@ -794,6 +853,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EAEC09290C272E1200C40D5A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAEC099D0C27496600C40D5A /* recsched.syncschema in Resources */,
+				EAEC09BC0C274A7700C40D5A /* ClientDescription_Server.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -864,6 +932,28 @@
 				EA20AEFB0C25CC5B00A9BDBD /* Z2ITProgram.m in Sources */,
 				EA20AF020C25CCA200A9BDBD /* RecordingThread.m in Sources */,
 				EA20AF050C25CD2500A9BDBD /* Z2ITStation.m in Sources */,
+				EA72A7D70C26A5CC009C63E5 /* tvDataDelivery.m in Sources */,
+				EA72A7DB0C26A608009C63E5 /* WSGeneratedObj.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EAEC092A0C272E1200C40D5A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EAEC09370C272E8800C40D5A /* recsched_bkgd_main.m in Sources */,
+				EAEC09580C27422800C40D5A /* recsched_bkgd_AppDelegate.m in Sources */,
+				EAEC09AD0C2749FC00C40D5A /* recsched_DataModel.xcdatamodel in Sources */,
+				EAEC09D00C275AA400C40D5A /* RecSchedServer.m in Sources */,
+				EAEC09D40C275B6400C40D5A /* tvDataDelivery.m in Sources */,
+				EAEC09D50C275B6E00C40D5A /* Z2ITProgram.m in Sources */,
+				EAEC09D70C275BB500C40D5A /* WSGeneratedObj.m in Sources */,
+				EAEC09DA0C275BE700C40D5A /* RecordingThread.m in Sources */,
+				EAEC09DC0C275C2100C40D5A /* Z2ITStation.m in Sources */,
+				EAEC0A250C283C6F00C40D5A /* XTVDParser.m in Sources */,
+				EAEC0A270C283C7F00C40D5A /* Z2ITLineup.m in Sources */,
+				EAEC0A280C283C8100C40D5A /* Z2ITLineupMap.m in Sources */,
+				EAEC0A290C283C8200C40D5A /* Z2ITSchedule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -890,10 +980,10 @@
 			target = EA2EE03D0C07D2250002420F /* libhdhomerun */;
 			targetProxy = EA2EE04E0C07D3130002420F /* PBXContainerItemProxy */;
 		};
-		EA572F490C2230A40041A372 /* PBXTargetDependency */ = {
+		EAEC094B0C27410700C40D5A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = EAE655250B9D08CD00CDB279 /* recsched_bkgd_cl */;
-			targetProxy = EA572F480C2230A40041A372 /* PBXContainerItemProxy */;
+			target = EAEC092C0C272E1200C40D5A /* recsched_bkgd */;
+			targetProxy = EAEC094A0C27410700C40D5A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1093,6 +1183,57 @@
 			};
 			name = Release;
 		};
+		EAEC092F0C272E1600C40D5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/recsched.app/Contents/Support";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "recsched_bkgd-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = recsched_bkgd;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EAEC09300C272E1600C40D5A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/recsched.app/Contents/Support";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INFOPLIST_FILE = "recsched_bkgd-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = recsched_bkgd;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1137,6 +1278,15 @@
 			buildConfigurations = (
 				EAE6552B0B9D08EC00CDB279 /* Debug */,
 				EAE6552C0B9D08EC00CDB279 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EAEC09340C272E4E00C40D5A /* Build configuration list for PBXNativeTarget "recsched_bkgd" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EAEC092F0C272E1600C40D5A /* Debug */,
+				EAEC09300C272E1600C40D5A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

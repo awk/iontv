@@ -7,25 +7,15 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import <SyncServices/SyncServices.h>
 
 #import "RecSchedProtocol.h"
+#import "XMLParsingProgressDisplayProtocol.h"
 
-@interface RecSchedServer : NSObject <RecSchedServerProto, NSPersistentStoreCoordinatorSyncing> {
-    NSPersistentStoreCoordinator *persistentStoreCoordinator;
-    NSManagedObjectModel *managedObjectModel;
-    NSManagedObjectContext *managedObjectContext;
-    
+@interface RecSchedServer : NSObject <RecSchedServerProto, XMLParsingProgressDisplay> {
     BOOL mExitServer;
 }
 
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
-- (NSManagedObjectModel *)managedObjectModel;
-- (NSManagedObjectContext *)managedObjectContext;
-
 - (bool) shouldExit;
-
-- (ISyncClient *)syncClient;
-- (void)syncAction:(id)sender;
+- (void) updateSchedule;
 
 @end
