@@ -6,6 +6,7 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+#import "RecSchedNotifications.h"
 #import "ScheduleView.h"
 #import "ScheduleStationColumnView.h"
 #import "ScheduleHeaderView.h"
@@ -92,6 +93,9 @@
 
 - (void) dealloc 
 {
+  // Unregister for the update notifications
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+  
   [mStationsScroller release];
   [mStationColumnView release];
   [mHeaderView release];
@@ -105,6 +109,11 @@
         // Setup KVO for selected stations
         mSortedStationsArray = nil;
         [mLineupArrayController addObserver:self forKeyPath:@"selectedObjects" options:0x0 context:NULL];
+        
+        // Register to receive Managed Object context update notifications - when adding objects in to the context from a seperate
+        // thread (during parsing) 'our' managed object context may not notify the NSObjectControllers that new data has been added
+        // This notification is sent during the end of saving to notify everyone of new content
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateControllers) name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
 }
 
 - (void)drawRect:(NSRect)rect {
@@ -227,7 +236,7 @@ int sortStationsWithLineup(id thisStation, id otherStation, void *context)
 }
 
 - (void) sortStationsArray
-{
+{  
   NSArray *aStationsArray = [[[mLineupArrayController selectedObjects] objectAtIndex:0] stations];
   Z2ITLineup* currentLineup = [[mLineupArrayController selectedObjects] objectAtIndex:0];
   mSortedStationsArray =  [aStationsArray sortedArrayUsingFunction:sortStationsWithLineup context:currentLineup];
@@ -244,5 +253,9 @@ int sortStationsWithLineup(id thisStation, id otherStation, void *context)
     }
  }
 
+- (void) updateControllers
+{
+  [mLineupArrayController prepareContent];
+}
 
 @end

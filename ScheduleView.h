@@ -28,5 +28,6 @@
 - (float) timePerLineIncrement;
 - (void) updateStationsScroller;
 - (void) sortStationsArray;
+- (void) updateControllers;
 
 @end
