@@ -139,25 +139,14 @@ COREDATA_MUTATOR(NSNumber*, @"deviceID")
 	return [self tunerWithIndex:1];
 }
 
+- (NSString *)name
+{
+COREDATA_ACCESSOR(NSString*, @"name");
+}
 
-//- (HDHomeRunTuner *)tuner0
-//{
-//COREDATA_ACCESSOR(HDHomeRunTuner*, @"tuner0")
-//}
-//
-//- (void)setTuner0:(HDHomeRunTuner *)value
-//{
-//COREDATA_MUTATOR(HDHomeRunTuner*, @"tuner0")
-//}
-//
-//- (HDHomeRunTuner *)tuner1
-//{
-//COREDATA_ACCESSOR(HDHomeRunTuner*, @"tuner1")
-//}
-//
-//- (void)setTuner1:(HDHomeRunTuner *)value
-//{
-//COREDATA_MUTATOR(HDHomeRunTuner*, @"tuner1")
-//}
-//
+- (void) setName:(NSString*)value
+{
+COREDATA_MUTATOR(NSString*, @"name");
+}
+
 @end

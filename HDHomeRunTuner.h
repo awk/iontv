@@ -22,4 +22,6 @@
 
 - (Z2ITLineup*)lineup;
 - (void) setLineup:(Z2ITLineup*)value;
+
+- (NSString*) longName;
 @end

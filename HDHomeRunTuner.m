@@ -41,4 +41,10 @@ COREDATA_ACCESSOR(Z2ITLineup*, @"lineup");
 COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
 }
 
+- (NSString*) longName
+{
+  NSString *name = [NSString stringWithFormat:@"%@ - %@ - %@", [[self device] name], [self index], [[self lineup] name]];
+  return name;
+}
+
 @end

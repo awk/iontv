@@ -21,6 +21,8 @@
 
 - (NSNumber *)deviceID;
 - (void)setDeviceID:(NSNumber *)value;
+- (NSString *)name;
+- (void)setName:(NSString*)value;
 
 - (void) addTuner:(HDHomeRunTuner *)aTuner;
 
