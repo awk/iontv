@@ -50,9 +50,9 @@ const int kScheduleStationColumnViewCellHeight = 40;
 	topHighlightLeft.x = cellFrame.origin.x+1;
 	NSPoint topHighlightRight = topHighlightLeft;
 	topHighlightRight.x = topHighlightLeft.x + cellFrame.size.width-2;
-	[[NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:0.25] set];
+	[[NSColor colorWithDeviceRed:0.7176 green:0.7176 blue:0.7176 alpha:1.0] set];
 	[NSBezierPath strokeLineFromPoint:topHighlightLeft toPoint:topHighlightRight];
-	[[NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:0.15] set];
+	[[NSColor colorWithDeviceRed:0.498 green:0.498 blue:0.498 alpha:1.0] set];
 	topHighlightLeft.y--; topHighlightRight.y--;
 	[NSBezierPath strokeLineFromPoint:topHighlightLeft toPoint:topHighlightRight];
 }
@@ -101,7 +101,7 @@ const int kScheduleStationColumnViewCellHeight = 40;
 }
  
 - (void)drawRect:(NSRect)rect {
-    // Drawing code here.
+	// Draw the content cells
     NSRect cellFrameRect;
     cellFrameRect.origin.x = 0;
     cellFrameRect.origin.y = [self bounds].size.height;
@@ -114,7 +114,7 @@ const int kScheduleStationColumnViewCellHeight = 40;
       return;   // Nothing to draw
       
     // We always draw one more cell than neccessary to accomodate partial scrolling
-//    numberLabelCells++;
+    numberLabelCells++;
     
     int i=0;
     for (i=mStartStationIndex; (i < (mStartStationIndex + numberLabelCells)) && (i < [mStationLabelCellArray count]); i++)
