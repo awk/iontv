@@ -12,11 +12,12 @@ extern const int kScheduleStationColumnViewCellHeight;
 
 @class Z2ITLineup;
 
-@interface ScheduleStationColumnView : NSView {
+@interface ScheduleStationColumnView : NSControl {
   NSMutableArray *mStationLabelCellArray;
   NSArray *mSortedStationsArray;
   Z2ITLineup *mCurrentLineup;
   unsigned mStartStationIndex;
+  id delegate;
 }
 
 + (int) columnWidth;
@@ -24,4 +25,6 @@ extern const int kScheduleStationColumnViewCellHeight;
 - (void) setSortedStationsArray:(NSArray*)inArray forLineup:(Z2ITLineup*)inLineup;
 - (unsigned) numberStationsDisplayed;
 - (void) setStartStationIndex:(unsigned)inIndex;
+- (id) delegate;
+- (void) setDelegate:(id)inDelegate;
 @end

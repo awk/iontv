@@ -7,6 +7,7 @@
 //
 
 #import "ScheduleStationColumnView.h"
+#import "ScheduleViewController.h"
 #import "Z2ITStation.h"
 #import "Z2ITLineupMap.h"
 #import "Z2ITLineup.h"
@@ -42,6 +43,20 @@ const int kScheduleStationColumnViewCellHeight = 40;
   [super dealloc];
 }
 
+- (id) delegate
+{
+  return delegate;
+}
+
+- (void) setDelegate:(id)inDelegate
+{
+  if (delegate != inDelegate)
+  {
+    [delegate release];
+    delegate = [inDelegate retain];
+  }
+}
+ 
 - (void)drawRect:(NSRect)rect {
     // Drawing code here.
     NSRect cellFrameRect;
@@ -114,6 +129,37 @@ const int kScheduleStationColumnViewCellHeight = 40;
   mStartStationIndex = inIndex;
   [self setNeedsDisplay:YES];
 }
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  NSPoint eventLocation = [theEvent locationInWindow];
+  NSPoint localPoint = [self convertPoint:eventLocation fromView:nil];
+  NSRect cellFrameRect;
+  cellFrameRect.origin.x = 0;
+  cellFrameRect.origin.y = [self bounds].size.height;
+  cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+  cellFrameRect.size.width = [self bounds].size.width;
+  
+  if ([self acceptsFirstResponder])
+    [[self window] makeFirstResponder:self];
+  
+  int scheduleGridLineIndex = ([self frame].size.height - localPoint.y) / kScheduleStationColumnViewCellHeight;
+  Z2ITStation *selectedStation = [mSortedStationsArray objectAtIndex:scheduleGridLineIndex+mStartStationIndex];
+  if ([self delegate] && ([[self delegate] respondsToSelector:@selector(setCurrentStation:)]))
+  {
+    [[self delegate] setCurrentStation:selectedStation];
+  }
+}
+
+- (NSMenu*) menuForEvent:(NSEvent*) theEvent
+{
+	NSMenu *theMenu = [self menu];
+	
+	// Handle the mouse down to select a cell.
+	[self mouseDown:theEvent];
+	return theMenu;
+}
+
 
 
 @end
