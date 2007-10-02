@@ -9,6 +9,7 @@
 #import "MainWindowController.h"
 #import "ScheduleGridView.h"
 #import "ScheduleStationColumnView.h"
+#import "ScheduleViewController.h"
 #import "Z2ITStation.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
