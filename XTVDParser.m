@@ -718,6 +718,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     {
       NSLog(@"performParse - save returned an error %@", error);
     }
+
   }
   
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
@@ -744,7 +745,15 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     NSMutableSet *allObjectsSet = [NSMutableSet setWithSet:updatedObjects];
     [allObjectsSet unionSet:[[notification userInfo] objectForKey:NSInsertedObjectsKey]];
     
-    [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:allObjectsSet waitUntilDone:NO];
+	NSMutableSet *allObjectIDsSet = [[NSMutableSet alloc] initWithCapacity:[allObjectsSet count]];
+	NSEnumerator *anEnumerator = [allObjectsSet objectEnumerator];
+	NSManagedObject *aManagedObject;
+	while ((aManagedObject = [anEnumerator nextObject]) != nil)
+	{
+		[allObjectIDsSet addObject:[aManagedObject objectID]];
+	}
+	if ([[[NSApplication sharedApplication] delegate] respondsToSelector:@selector(updateForSavedContext:)])
+		[[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:allObjectIDsSet waitUntilDone:NO];
 }
 
 @end;
