@@ -14,9 +14,6 @@
 
 @implementation Z2ITProgram
 
-static NSMutableDictionary *sAdvisoriesDictionary = nil;
-static NSMutableDictionary *sGenreClassDictionary = nil;
-
 BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName)
 {
   BOOL retValue = NO;
@@ -204,11 +201,18 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   }
 
   nodes = [inXMLElement nodesForXPath:@"./advisories/advisory" error:&err];
+  
+  NSArray *advisoryRelationships = [[self entity] relationshipsWithDestinationEntity:[NSEntityDescription entityForName:@"Advisory" inManagedObjectContext:[self managedObjectContext]]];
+  int maxNumAdvisories = 0;
+  if ([advisoryRelationships count] > 0)
+  {
+	maxNumAdvisories = [[advisoryRelationships objectAtIndex:0] maxCount];
+  }
   [self clearAdvisories];   // Clear the advisories - we're going to replace them with the contents of the XML
   if ([nodes count] > 0 )
   {
     int i=0;
-    for (i=0; i < [nodes count]; i++)
+    for (i=0; (i < [nodes count]) && (i < maxNumAdvisories); i++)
     {
       NSString *advStr = [[nodes objectAtIndex:i] stringValue];
       [self addAdvisory:advStr];
@@ -519,12 +523,6 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 - (void)clearAdvisories
 {
   NSMutableSet *advisories = [self mutableSetValueForKey:@"advisories"];
-  NSEnumerator *advisoriesEnumerator = [advisories objectEnumerator];
-  NSManagedObject *anAdvisory;
-  while (anAdvisory = [advisoriesEnumerator nextObject])
-  {
-    [[self managedObjectContext] deleteObject:anAdvisory];
-  }
   [advisories removeAllObjects];
 }
 
@@ -532,13 +530,6 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 + (NSManagedObject *) fetchAdvisoryWithName:(NSString*)inAdvisoryString inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
   NSManagedObject *anAdvisory = nil;
-  
-  if (sAdvisoriesDictionary)
-  {
-    anAdvisory = [sAdvisoriesDictionary objectForKey:inAdvisoryString];
-    if (anAdvisory)
-      return anAdvisory;
-  }
   
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Advisory" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
@@ -568,9 +559,6 @@ COREDATA_MUTATOR(NSNumber*,@"year")
     anAdvisory = [array objectAtIndex:0];
     if ([array count] > 1)
       NSLog(@"fetchAdvisoryWithName - multiple (%d) advisories with name %@", [array count], inAdvisoryString);
-    if (!sAdvisoriesDictionary)
-      sAdvisoriesDictionary = [[NSMutableDictionary alloc] initWithCapacity:50];
-    [sAdvisoriesDictionary setValue:anAdvisory forKey:inAdvisoryString];
     return anAdvisory;
   }
 }
@@ -587,6 +575,7 @@ COREDATA_MUTATOR(NSNumber*,@"year")
     [newAdvisory setValue:value forKey:@"name"];
   }
   [advisories addObject:newAdvisory];
+  [[newAdvisory mutableSetValueForKey:@"programs"] addObject:self];
 }
 
 // Accessor and mutator for the genres relationships
@@ -645,23 +634,11 @@ COREDATA_MUTATOR(NSNumber*,@"year")
 }
 @end
 
-static NSMutableDictionary *sCrewRoleDictionary = nil;
-
 @implementation Z2ITCrewMember
 
 // Fetch the CrewRole Object with the given string from the Managed Object Context
 + (NSManagedObject *) fetchCrewRoleWithName:(NSString*)inCrewRoleNameString inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
-  // Initialze the crew role dictionary we use to speed up queries.
-  if (!sCrewRoleDictionary)
-    sCrewRoleDictionary = [[NSMutableDictionary alloc] initWithCapacity:50];
-  else
-  {
-    // We have a dictionary does it have an entry for our name ?
-    id aCrewRole = [sCrewRoleDictionary valueForKey:inCrewRoleNameString];
-    if (aCrewRole)
-      return aCrewRole;
-  }
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"CrewRole" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
@@ -683,7 +660,6 @@ static NSMutableDictionary *sCrewRoleDictionary = nil;
   if ([array count] == 1)
   {
     NSManagedObject *aCrewRole = [array objectAtIndex:0];
-    [sCrewRoleDictionary setValue:aCrewRole forKey:inCrewRoleNameString];
     [aCrewRole retain];
     return aCrewRole;
   }
@@ -695,7 +671,6 @@ static NSMutableDictionary *sCrewRoleDictionary = nil;
   {
       NSLog(@"fetchCrewRoleWithName - multiple (%d) crew roles with name %@", [array count], inCrewRoleNameString);
       NSManagedObject *aCrewRole = [array objectAtIndex:0];
-      [sCrewRoleDictionary setValue:aCrewRole forKey:inCrewRoleNameString];
       [aCrewRole retain];
       return aCrewRole;
   }
@@ -727,7 +702,7 @@ static NSMutableDictionary *sCrewRoleDictionary = nil;
   [self willChangeValueForKey: @"role"]; 
   [self setPrimitiveValue:aCrewRole forKey: @"role"]; 
   [self didChangeValueForKey: @"role"]; 
-  [aCrewRole release];
+//  [aCrewRole release];
 }
 
 // Accessor and mutator for the surname attribute
@@ -760,13 +735,6 @@ COREDATA_MUTATOR(NSString*,@"givenname")
 + (NSManagedObject *) fetchGenreClassWithName:(NSString*)inGenreClassNameString inManagedObjectContext:(NSManagedObjectContext *)inMOC
 {
   NSManagedObject *aGenreClass = nil;
-  if (sGenreClassDictionary)
-  {
-    aGenreClass = [sGenreClassDictionary valueForKey:inGenreClassNameString];
-    if (aGenreClass)
-      return aGenreClass;
-  }
-  
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"GenreClass" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
@@ -792,9 +760,6 @@ COREDATA_MUTATOR(NSString*,@"givenname")
   else
   {
     aGenreClass = [array objectAtIndex:0];
-    if (!sGenreClassDictionary)
-      sGenreClassDictionary = [[NSMutableDictionary alloc] initWithCapacity:50];
-    [sGenreClassDictionary setValue:aGenreClass forKey:inGenreClassNameString];
     if ([array count] > 1)
       NSLog(@"fetchGenreClassWithName - multiple (%d) genre classes with name %@", [array count], inGenreClassNameString);
     return aGenreClass;
