@@ -7,12 +7,18 @@
 //
 
 #import "MainWindowController.h"
+#import "ScheduleViewController.h"
 #import "ScheduleGridView.h"
 #import "ScheduleStationColumnView.h"
 #import "ScheduleViewController.h"
 #import "Z2ITStation.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
+
+typedef int ScheduleTruncationFlags;
+const int ScheduleTruncationNone = 0;
+const int ScheduleTruncationBeginning = 1;
+const int ScheduleTruncationEnd = 1 << 1;
 
 @interface ScheduleGridLine : NSObject
 {
@@ -36,6 +42,8 @@
 @interface ScheduleCell : NSTextFieldCell
 {
 }
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView truncateFlags:(ScheduleTruncationFlags)truncationFlags;
 
 @end
 
@@ -311,11 +319,13 @@
   return theCell;
 }
 
-- (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute
+- (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute truncateFlags:(ScheduleTruncationFlags*)outTruncationFlags
 {
   NSRect cellFrameRect;
   NSTimeInterval durationRemaining;
   NSTimeInterval offsetFromStart = [[inSchedule time] timeIntervalSinceDate:[NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime]];
+  if (outTruncationFlags)
+	*outTruncationFlags = ScheduleTruncationNone;
   if (offsetFromStart > 0)
   {
     durationRemaining = [[inSchedule endTime] timeIntervalSinceDate:[inSchedule time]];
@@ -323,6 +333,8 @@
   }
   else
   {
+	if (outTruncationFlags)
+		*outTruncationFlags |= ScheduleTruncationBeginning;
     durationRemaining = [[inSchedule endTime] timeIntervalSinceDate:[NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime]];
     cellFrameRect.origin.x = 0;
   }
@@ -346,12 +358,13 @@
       Z2ITSchedule *aSchedule = [mSchedulesInLineArray objectAtIndex:i];
       if (aSchedule)
       {
-        cellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+		ScheduleTruncationFlags scheduleTruncation;
+        cellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute truncateFlags:&scheduleTruncation];
         cellFrameRect.origin.y = inFrame.origin.y;
         cellFrameRect.size.height = inFrame.size.height;
         
         // Draw the cell
-        [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView];
+        [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView truncateFlags:scheduleTruncation];
       }
     }
 }
@@ -373,7 +386,7 @@
       aSchedule = [mSchedulesInLineArray objectAtIndex:i];
       if (aSchedule)
       {
-        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute truncateFlags:nil];
         aCellFrameRect.origin.y = 0;
         aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
         // We always make the click to be in the middle of the cell vertically
@@ -395,6 +408,42 @@
 @end
 
 @implementation ScheduleCell
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView truncateFlags:(ScheduleTruncationFlags)truncationFlags
+{
+	// Curved corners radius
+	float radius = 7.0;
+	NSBezierPath *framePath = nil;
+	
+	if (truncationFlags & ScheduleTruncationBeginning)
+	{
+	  framePath = [NSBezierPath bezierPath];      // Clamp radius to be no larger than half the rect's width or height.
+      float clampedRadius = MIN(radius, 0.5 * MIN(cellFrame.size.width, cellFrame.size.height));
+
+      NSPoint topLeft = NSMakePoint(NSMinX(cellFrame), NSMaxY(cellFrame));
+      NSPoint topRight = NSMakePoint(NSMaxX(cellFrame), NSMaxY(cellFrame));
+      NSPoint bottomRight = NSMakePoint(NSMaxX(cellFrame), NSMinY(cellFrame));
+
+      [framePath moveToPoint:cellFrame.origin];
+      [framePath appendBezierPathWithArcFromPoint:cellFrame.origin toPoint:bottomRight radius:clampedRadius];
+      [framePath appendBezierPathWithArcFromPoint:bottomRight toPoint:topRight    radius:clampedRadius];
+      [framePath appendBezierPathWithArcFromPoint:topRight    toPoint:topLeft     radius:clampedRadius];	
+	  [framePath lineToPoint:topLeft];	
+	}
+
+	if (truncationFlags == ScheduleTruncationNone)
+	{
+		framePath = [NSBezierPath bezierPathWithRoundedRect:cellFrame xRadius:radius yRadius:radius];
+	}
+	
+	if (framePath)
+	{
+		[[NSColor blackColor] set];
+		[framePath stroke];
+	}
+	
+	[super drawInteriorWithFrame:cellFrame inView:controlView];
+}
 
 - (NSColor *)highlightColorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
