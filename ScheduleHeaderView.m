@@ -7,6 +7,7 @@
 //
 
 #import "ScheduleHeaderView.h"
+#import "ScheduleView.h"
 #import "ScheduleStationColumnView.h"
 #import "iTableColumnHeaderCell.h"
 
@@ -70,6 +71,9 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
 
 - (void)drawRect:(NSRect)rect {
     // Drawing code here.
+    ScheduleView *parentView = (ScheduleView*) [self superview];
+    float pixelsPerMinute = ([self frame].size.width - [ScheduleStationColumnView columnWidth]) / ([parentView visibleTimeSpan]);
+
     NSRect cellFrameRect;
     cellFrameRect.origin.x = cellFrameRect.origin.y = 0;
     cellFrameRect.size.height = [self bounds].size.height;
@@ -77,7 +81,7 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
     [mStationCell drawWithFrame:cellFrameRect inView:self];
     // Subdivide the current bounds width into even spaced pieces (to number of cells in the array)
     int numberLabelCells = [mLabelCellArray count];
-    int aCellWidth = ([self bounds].size.width - [ScheduleStationColumnView columnWidth]) / numberLabelCells;
+    float aCellWidth = pixelsPerMinute * [parentView timePerLineIncrement];
     int i=0;
     cellFrameRect = NSMakeRect([ScheduleStationColumnView columnWidth], 0, aCellWidth, [self bounds].size.height);
     for (i=0; i < numberLabelCells; i++)

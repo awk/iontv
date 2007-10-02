@@ -186,14 +186,21 @@
       Z2ITSchedule *aSchedule = [mSchedulesInLineArray objectAtIndex:i];
       if (aSchedule)
       {
+        NSTimeInterval durationRemaining;
         NSTimeInterval offsetFromStart = [[aSchedule time] timeIntervalSinceDate:[NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime]];
         if (offsetFromStart > 0)
+        {
+          durationRemaining = [[aSchedule endTime] timeIntervalSinceDate:[aSchedule time]];
           cellFrameRect.origin.x = (offsetFromStart / 60.0) * pixelsPerMinute;
+        }
         else
+        {
+          durationRemaining = [[aSchedule endTime] timeIntervalSinceDate:[NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime]];
           cellFrameRect.origin.x = 0;
-        NSTimeInterval durationRemaining = [[aSchedule endTime] timeIntervalSinceDate:[NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime]];
+        }
         float programRunTime = durationRemaining / 60.0;
         cellFrameRect.size.width = programRunTime * pixelsPerMinute;
+
         // Draw the cell
         [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView];
       }

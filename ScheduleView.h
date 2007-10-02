@@ -25,4 +25,6 @@
 
 - (void) goBackwards;
 - (void) goForward;
+- (float) visibleTimeSpan;
+- (float) timePerLineIncrement;
 @end
