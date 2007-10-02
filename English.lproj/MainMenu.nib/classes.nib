@@ -1,6 +1,8 @@
 {
     IBClasses = (
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = JKSourceTableView; LANGUAGE = ObjC; SUPERCLASS = NSTableView; }, 
+        {CLASS = JKVariableCellColumn; LANGUAGE = ObjC; SUPERCLASS = NSTableColumn; }, 
         {
             ACTIONS = {
                 cleanupAction = id; 
@@ -23,11 +25,14 @@
                 mScheduleSplitView = NSSplitView; 
                 mScheduleView = ScheduleView; 
                 mTopLevelSplitView = NSSplitView; 
+                mViewSelectionArrayController = NSArrayController; 
                 mViewSelectionTableView = NSTableView; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
+        {CLASS = NSObject; LANGUAGE = ObjC; }, 
         {CLASS = NSSegmentedControl; LANGUAGE = ObjC; SUPERCLASS = NSControl; }, 
+        {CLASS = PolishedWindow; LANGUAGE = ObjC; SUPERCLASS = NSWindow; }, 
         {
             ACTIONS = {showPanel = id; }; 
             CLASS = Preferences; 
