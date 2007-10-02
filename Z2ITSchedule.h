@@ -67,6 +67,10 @@
 - (NSDate *)endTime;
 - (void)setEndTime:(NSDate*)value;
 
+// Accessor and mutator for the to be recorded attribute
+- (bool)toBeRecorded;
+- (void)setToBeRecorded:(bool)value;
+
 // Accessor and mutator for the TV Rating attribute
 - (NSString *)tvRating;
 - (void)setTvRating:(NSString *)value;

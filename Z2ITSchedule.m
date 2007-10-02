@@ -210,6 +210,17 @@ COREDATA_ACCESSOR(NSDate*, @"endTime");
 COREDATA_MUTATOR(NSDate*, @"endTime");
 }
 
+- (bool)toBeRecorded
+{
+COREDATA_BOOL_ACCESSOR(@"toBeRecorded");
+}
+
+- (void)setToBeRecorded:(bool)value
+{
+COREDATA_BOOL_MUTATOR(@"toBeRecorded");
+}
+
+
 // Accessor and mutator for the dolby attribute
 - (NSString *)tvRating
 {
