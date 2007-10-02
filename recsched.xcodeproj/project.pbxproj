@@ -78,6 +78,7 @@
 		EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
 		EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
+		EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3090C30C6AB59E0005E89B /* RSWishlistController.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
 		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
@@ -88,7 +89,6 @@
 		EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */; };
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
-		EA7110E90C557A7A007022CF /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = EA7110E80C557A7A007022CF /* CTGradient.m */; };
 		EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA72A7A90C260D79009C63E5 /* ClientDescription.plist */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
@@ -237,6 +237,8 @@
 		EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunTuner.m; sourceTree = "<group>"; };
 		EA308FB50C66A7470005E89B /* RSColorDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSColorDictionary.h; sourceTree = "<group>"; };
 		EA308FB60C66A7470005E89B /* RSColorDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSColorDictionary.m; sourceTree = "<group>"; };
+		EA3090C20C6AB59E0005E89B /* RSWishlistController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSWishlistController.h; sourceTree = "<group>"; };
+		EA3090C30C6AB59E0005E89B /* RSWishlistController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSWishlistController.m; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
@@ -253,8 +255,6 @@
 		EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleViewController.m; sourceTree = "<group>"; };
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
-		EA7110E70C557A7A007022CF /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradient.h; sourceTree = SOURCE_ROOT; };
-		EA7110E80C557A7A007022CF /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CTGradient.m; sourceTree = SOURCE_ROOT; };
 		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
 		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = "<group>"; };
 		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSourceTableClasses.h; sourceTree = "<group>"; };
@@ -342,6 +342,8 @@
 				EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */,
 				EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */,
 				EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */,
+				EA3090C20C6AB59E0005E89B /* RSWishlistController.h */,
+				EA3090C30C6AB59E0005E89B /* RSWishlistController.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -551,8 +553,6 @@
 		EAF890120B66DC6400373CEF /* View & UI Classes */ = {
 			isa = PBXGroup;
 			children = (
-				EA7110E70C557A7A007022CF /* CTGradient.h */,
-				EA7110E80C557A7A007022CF /* CTGradient.m */,
 				EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */,
 				EA29397E0C0CC83F0053E2B8 /* PolishedWindow.h */,
 				EA29397F0C0CC83F0053E2B8 /* PolishedWindow.m */,
@@ -763,10 +763,10 @@
 				EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */,
 				EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */,
 				EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */,
-				EA7110E90C557A7A007022CF /* CTGradient.m in Sources */,
 				EAF4EA220C5EB0AB003EC697 /* AKColorCell.m in Sources */,
 				EAF4EACF0C5F90B1003EC697 /* AKColorExtensions.m in Sources */,
 				EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */,
+				EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
