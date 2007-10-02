@@ -88,7 +88,7 @@
   cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
   cellFrameRect.size.width = [self bounds].size.width;
   
-  int scheduleGridLineIndex = [mStationsInViewArray count] - (localPoint.y / kScheduleStationColumnViewCellHeight);
+  int scheduleGridLineIndex = ([self frame].size.height - localPoint.y) / kScheduleStationColumnViewCellHeight;
   [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] mouseDown:theEvent withFrame:cellFrameRect];
 }
 
@@ -150,6 +150,14 @@
 {
   mVisibleTimeSpan = inTimeSpan;
   [self updateForNewStartTime];
+}
+
+- (void) setSelectedCell:(NSCell*)inCell
+{
+  [mSelectedCell setHighlighted:NO];
+  [mSelectedCell autorelease];
+  mSelectedCell = [inCell retain];
+  [mSelectedCell setHighlighted:YES];
 }
 
 #pragma mark View Notifications
@@ -231,7 +239,7 @@
 {
     NSRect cellFrameRect;
     cellFrameRect = inFrame;  // Start with the input dimensions
-
+        
     int i=0;
   // Calculate the pixels per minute value
     float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
@@ -245,6 +253,7 @@
         cellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
         cellFrameRect.origin.y = inFrame.origin.y;
         cellFrameRect.size.height = inFrame.size.height;
+        
         // Draw the cell
         [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView];
       }
@@ -276,6 +285,7 @@
         if (NSPointInRect(localPoint, aCellFrameRect))
         {
           foundCell = YES;
+          [mGridView setSelectedCell:[mCellsInLineArray objectAtIndex:i]];
         }
       }
   }
@@ -286,6 +296,7 @@
     {
       [mwc setCurrentSchedule:aSchedule];
     }
+    [mGridView setNeedsDisplay:YES];
   }
 }
 
@@ -301,6 +312,14 @@
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
 {
+  if ([self isHighlighted])
+  {
+    [NSGraphicsContext saveGraphicsState];
+    [[NSColor colorForControlTint:NSGraphiteControlTint] set];
+    [NSBezierPath fillRect:cellFrame];
+    [NSGraphicsContext restoreGraphicsState];
+  }
+  
   // Inset the cell frame rect a little
   cellFrame.size.width -= 4;
   cellFrame.size.height -= 4;

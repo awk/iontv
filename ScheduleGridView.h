@@ -18,6 +18,7 @@
   unsigned mStartStationIndex;
   CFAbsoluteTime mStartTime;
   float mVisibleTimeSpan;
+  NSCell *mSelectedCell;
 }
 
 - (void) setSortedStationsArray:(NSArray*)inArray forLineup:(Z2ITLineup*)inLineup;
