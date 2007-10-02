@@ -16,6 +16,7 @@
 
 @interface HDHomeRunTuner : NSManagedObject {
   struct hdhomerun_device_t *mHDHomeRunDevice;
+  id mCurrentProgressDisplay;
 }
 
 - (NSNumber *) index;
@@ -28,6 +29,6 @@
 
 - (NSString*) longName;
 
-- (void) scanAction;
+- (void) scanActionReportingProgressTo:(id)progressDisplay;
 
 @end

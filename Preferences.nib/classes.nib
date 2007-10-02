@@ -15,6 +15,7 @@
                 getAccountButtonAction = id; 
                 okButtonAction = id; 
                 retrieveLineupsButtonAction = id; 
+                scanChannelsButtonAction = id; 
                 scanDevicesButtonAction = id; 
                 showPanel = id; 
             }; 
@@ -22,13 +23,16 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 mChannelPrefsView = NSView; 
+                mChannelScanProgressIndicator = NSProgressIndicator; 
                 mDurationSlider = DiscreteDurationSlider; 
                 mDurationTextField = NSTextField; 
+                mHDHomeRunTunersArrayController = NSArrayController; 
                 mPanel = id; 
                 mParsingProgressIndicator = NSProgressIndicator; 
                 mParsingProgressInfoField = NSTextField; 
                 mPrefsContainerView = NSView; 
                 mRetrieveLineupsButton = NSButton; 
+                mScanChannelsButton = NSButton; 
                 mScanTunersButton = NSButton; 
                 mTunerPrefsView = NSView; 
                 mTunerScanProgressIndicator = NSProgressIndicator; 

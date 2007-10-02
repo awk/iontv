@@ -11,6 +11,7 @@
 #import "XTVDParser.h"
 #import "hdhomerun.h"
 #import "HDHomeRunMO.h"
+#import "HDHomeRunTuner.h"
 #import <Security/Security.h>
 
 const float kDurationSliderMinValue = 1.0;
@@ -361,6 +362,8 @@ static Preferences *sSharedInstance = nil;
   [theDefaultsController save:sender];
 }
 
+#pragma mark Action Methods
+
 - (void) showZap2ItPrefs:(id)sender
 {
 	[self showPrefsView:mZap2ItPrefsView];
@@ -378,12 +381,18 @@ static Preferences *sSharedInstance = nil;
 
 - (IBAction) okButtonAction:(id)sender
 {
+  if (mChannelScanInProgress)
+    mAbortChannelScan = YES;
+    
   [self savePrefs:sender];
-	[mPanel orderOut:sender];
+  [mPanel orderOut:sender];
 }
 
 - (IBAction) cancelButtonAction:(id)sender
 {
+  if (mChannelScanInProgress)
+    mAbortChannelScan = YES;
+
   [[NSUserDefaultsController sharedUserDefaultsController] revert:sender];
 	[mPanel orderOut:sender];
 }
@@ -454,6 +463,47 @@ static Preferences *sSharedInstance = nil;
 	}
 	
 	[mScanTunersButton setEnabled:YES];
+}
+
+- (IBAction) scanChannelsButtonAction:(id)sender
+{
+  HDHomeRunTuner *aTuner =  [[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0];
+
+  if (mChannelScanInProgress)
+  {
+    mAbortChannelScan = YES;
+  }
+  else if (aTuner)
+  {
+      mAbortChannelScan = NO;
+      mChannelScanInProgress = YES;
+      
+      [mScanChannelsButton setTitle:@"Stop"];
+
+      [mChannelScanProgressIndicator setHidden:NO];
+      [mChannelScanProgressIndicator setDoubleValue:0];
+	
+      [aTuner scanActionReportingProgressTo:self];
+  }
+}
+
+#pragma mark Channel Scan Progress Display Protocol
+
+- (void) incrementChannelScanProgress
+{
+  [mChannelScanProgressIndicator incrementBy:1.0];
+}
+
+- (BOOL) abortChannelScan
+{
+  return mAbortChannelScan;
+}
+
+- (void) scanCompleted
+{
+  mChannelScanInProgress = NO;
+  [mScanChannelsButton setTitle:@"Scan"];
+  [mChannelScanProgressIndicator setHidden:YES];
 }
 
 #pragma mark Callback Methods

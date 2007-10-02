@@ -7,13 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "ChannelScanProgressDisplayProtocol.h"
 
 extern NSString *kScheduleDownloadDurationPrefStr;
 extern NSString *kWebServicesZap2ItUsernamePrefStr;
 
 @class DiscreteDurationSlider;
 
-@interface Preferences : NSObject {
+@interface Preferences : NSObject <ChannelScanProgressDisplay> {
 
     IBOutlet NSTextField *mDurationTextField;
     IBOutlet DiscreteDurationSlider *mDurationSlider;
@@ -29,8 +30,16 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
     IBOutlet NSButton *mRetrieveLineupsButton;
     IBOutlet NSProgressIndicator *mTunerScanProgressIndicator;
     IBOutlet NSButton *mScanTunersButton;
+    IBOutlet NSProgressIndicator *mChannelScanProgressIndicator;
+    IBOutlet NSButton *mScanChannelsButton;
+    
+    IBOutlet NSArrayController *mHDHomeRunTunersArrayController;
+    
     NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
     SecKeychainItemRef mZap2ItKeychainItemRef;
+
+    BOOL mAbortChannelScan;
+    BOOL mChannelScanInProgress;
 }
 
 + (Preferences *)sharedInstance;
@@ -54,4 +63,5 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
 - (IBAction) getAccountButtonAction:(id)sender;
 - (IBAction) retrieveLineupsButtonAction:(id)sender;
 - (IBAction) scanDevicesButtonAction:(id)sender;
+- (IBAction) scanChannelsButtonAction:(id)sender;
 @end
