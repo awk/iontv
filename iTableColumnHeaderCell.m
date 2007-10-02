@@ -7,7 +7,7 @@
 //
 
 #import "iTableColumnHeaderCell.h"
-
+#import "CTGradient.h"
 
 @implementation iTableColumnHeaderCell
 
@@ -15,11 +15,6 @@
 - (id)initTextCell:(NSString *)text
 {
     if (self = [super initTextCell:text]) {
-        metalBg = [[NSImage imageNamed:@"metal_column_header.png"] retain];
-        if (text == nil || [text isEqualToString:@""]) {
-            [self setTitle:@"Title"];
-        }
-        [metalBg setFlipped:YES];
         attrs = [[NSMutableDictionary dictionaryWithDictionary:
                                         [[self attributedStringValue] 
                                                     attributesAtIndex:0 
@@ -33,7 +28,6 @@
 
 - (void)dealloc
 {
-    [metalBg release];
     [attrs release];
     [super dealloc];
 }
@@ -41,33 +35,14 @@
 
 - (void)drawWithFrame:(NSRect)inFrame inView:(NSView*)inView
 {
-    /* Draw metalBg lowest pixel along the bottom of inFrame. */
-    NSRect tempSrc = NSZeroRect;
-    tempSrc.size = [metalBg size];
-    tempSrc.origin.y = tempSrc.size.height - 1.0;
-    tempSrc.size.height = 1.0;
-    
-    NSRect tempDst = inFrame;
-    tempDst.origin.y = inFrame.size.height - 1.0;
-    tempDst.size.height = 1.0;
-    
-    [metalBg drawInRect:tempDst 
-               fromRect:tempSrc 
-              operation:NSCompositeSourceOver 
-               fraction:1.0];
-    
-    /* Draw rest of metalBg along width of inFrame. */
-    tempSrc.origin.y = 0.0;
-    tempSrc.size.height = [metalBg size].height - 1.0;
-    
-    tempDst.origin.y = 1.0;
-    tempDst.size.height = inFrame.size.height - 2.0;
-    
-    [metalBg drawInRect:tempDst 
-               fromRect:tempSrc 
-              operation:NSCompositeSourceOver 
-               fraction:1.0];
-    
+	CTGradient *headerGradient;
+	if ([inView isFlipped])
+		headerGradient = [CTGradient gradientWithBeginningColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0]];
+	else
+		headerGradient = [CTGradient gradientWithBeginningColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0]];
+
+	[headerGradient fillRect:inFrame angle:90.0];
+
     /* Draw white text centered, but offset down-left. */
     float offset = 0.5;
     [attrs setValue:[NSColor colorWithCalibratedWhite:1.0 alpha:0.7] 
@@ -96,7 +71,6 @@
 - (id)copyWithZone:(NSZone *)zone
 {
     id newCopy = [super copyWithZone:zone];
-    [metalBg retain];
     [attrs retain];
     return newCopy;
 }

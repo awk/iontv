@@ -10,7 +10,6 @@
 
 
 @interface iTableColumnHeaderCell : NSTableHeaderCell {
-    NSImage *metalBg;
     NSMutableDictionary *attrs;
 }
 

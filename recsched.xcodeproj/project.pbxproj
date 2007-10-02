@@ -86,6 +86,7 @@
 		EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */; };
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
+		EA7110E90C557A7A007022CF /* CTGradient.m in Sources */ = {isa = PBXBuildFile; fileRef = EA7110E80C557A7A007022CF /* CTGradient.m */; };
 		EA72A7AA0C260D79009C63E5 /* ClientDescription.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA72A7A90C260D79009C63E5 /* ClientDescription.plist */; };
 		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
@@ -116,7 +117,6 @@
 		EAF8867D0B61740300373CEF /* Z2ITSchedule.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8867C0B61740300373CEF /* Z2ITSchedule.m */; };
 		EAF890170B66DC8400373CEF /* ScheduleHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF890160B66DC8400373CEF /* ScheduleHeaderView.m */; };
 		EAF8919C0B66F2D300373CEF /* iTableColumnHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8919B0B66F2D200373CEF /* iTableColumnHeaderCell.m */; };
-		EAF8919E0B66F2F800373CEF /* metal_column_header.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF8919D0B66F2F800373CEF /* metal_column_header.png */; };
 		EAF8956C0B69023D00373CEF /* ScheduleStationColumnView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8956B0B69023D00373CEF /* ScheduleStationColumnView.m */; };
 		EAF89D8E0B6A8CFD00373CEF /* ScheduleView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF89D8D0B6A8CFD00373CEF /* ScheduleView.m */; };
 /* End PBXBuildFile section */
@@ -247,6 +247,8 @@
 		EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleViewController.m; sourceTree = "<group>"; };
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
+		EA7110E70C557A7A007022CF /* CTGradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CTGradient.h; sourceTree = SOURCE_ROOT; };
+		EA7110E80C557A7A007022CF /* CTGradient.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = CTGradient.m; sourceTree = SOURCE_ROOT; };
 		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
 		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = "<group>"; };
 		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSourceTableClasses.h; sourceTree = "<group>"; };
@@ -276,7 +278,6 @@
 		EAF890160B66DC8400373CEF /* ScheduleHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleHeaderView.m; sourceTree = "<group>"; };
 		EAF8919A0B66F2D200373CEF /* iTableColumnHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iTableColumnHeaderCell.h; sourceTree = SOURCE_ROOT; };
 		EAF8919B0B66F2D200373CEF /* iTableColumnHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iTableColumnHeaderCell.m; sourceTree = SOURCE_ROOT; };
-		EAF8919D0B66F2F800373CEF /* metal_column_header.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = metal_column_header.png; path = Images/metal_column_header.png; sourceTree = "<group>"; };
 		EAF8956A0B69023D00373CEF /* ScheduleStationColumnView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleStationColumnView.h; sourceTree = "<group>"; };
 		EAF8956B0B69023D00373CEF /* ScheduleStationColumnView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleStationColumnView.m; sourceTree = "<group>"; };
 		EAF89D8C0B6A8CFD00373CEF /* ScheduleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleView.h; sourceTree = "<group>"; };
@@ -398,7 +399,6 @@
 				EA2939860C0CC89E0053E2B8 /* Images */,
 				EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */,
 				EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */,
-				EAF8919D0B66F2F800373CEF /* metal_column_header.png */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
@@ -531,6 +531,8 @@
 		EAF890120B66DC6400373CEF /* View & UI Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EA7110E70C557A7A007022CF /* CTGradient.h */,
+				EA7110E80C557A7A007022CF /* CTGradient.m */,
 				EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */,
 				EA29397E0C0CC83F0053E2B8 /* PolishedWindow.h */,
 				EA29397F0C0CC83F0053E2B8 /* PolishedWindow.m */,
@@ -656,7 +658,6 @@
 			files = (
 				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
-				EAF8919E0B66F2F800373CEF /* metal_column_header.png in Resources */,
 				EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */,
 				EA5FB6D80B7028B000CCD5D5 /* UserDefaults.plist in Resources */,
 				EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */,
@@ -738,6 +739,7 @@
 				EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */,
 				EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */,
 				EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */,
+				EA7110E90C557A7A007022CF /* CTGradient.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
