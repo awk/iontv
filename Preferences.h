@@ -9,6 +9,8 @@
 #import <Cocoa/Cocoa.h>
 
 extern NSString *kScheduleDownloadDurationPrefStr;
+extern NSString *kWebServicesZap2ItUsernamePrefStr;
+
 @class DiscreteDurationSlider;
 
 @interface Preferences : NSObject {
@@ -16,11 +18,19 @@ extern NSString *kScheduleDownloadDurationPrefStr;
     IBOutlet NSTextField *mDurationTextField;
     IBOutlet DiscreteDurationSlider *mDurationSlider;
     IBOutlet id mPanel;
-	IBOutlet NSView* mPrefsContainerView;
-	IBOutlet NSView* mZap2ItPrefsView;
-	IBOutlet NSView* mTunerPrefsView;
-	IBOutlet NSView* mChannelPrefsView;
+    IBOutlet NSView* mPrefsContainerView;
+    IBOutlet NSView* mZap2ItPrefsView;
+    IBOutlet NSView* mTunerPrefsView;
+    IBOutlet NSView* mChannelPrefsView;
+    IBOutlet NSTextField *mZap2ItUsernameField;
+    IBOutlet NSTextField *mZap2ItPasswordField;
+    IBOutlet NSProgressIndicator *mParsingProgressIndicator;
+    IBOutlet NSTextField *mParsingProgressInfoField;
+    IBOutlet NSButton *mRetrieveLineupsButton;
+    IBOutlet NSProgressIndicator *mTunerScanProgressIndicator;
+    IBOutlet NSButton *mScanTunersButton;
     NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
+    SecKeychainItemRef mZap2ItKeychainItemRef;
 }
 
 + (Preferences *)sharedInstance;
@@ -39,5 +49,7 @@ extern NSString *kScheduleDownloadDurationPrefStr;
 - (IBAction) durationSliderChanged:(NSSlider *)inSlider;
 - (IBAction) okButtonAction:(id)sender;
 - (IBAction) cancelButtonAction:(id)sender;
-
+- (IBAction) getAccountButtonAction:(id)sender;
+- (IBAction) retrieveLineupsButtonAction:(id)sender;
+- (IBAction) scanDevicesButtonAction:(id)sender;
 @end

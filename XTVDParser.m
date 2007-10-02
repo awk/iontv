@@ -17,7 +17,7 @@
 
 @implementation XTVDParser
 
-+ (void) parseXMLFile:(NSString *)filePath reportTo:(MainWindowController*)inMainWindowController inManagedObjectContext:(NSManagedObjectContext*)inMOC
++ (void) parseXMLFile:(NSString *)filePath reportTo:(MainWindowController*)inMainWindowController inManagedObjectContext:(NSManagedObjectContext*)inMOC  lineupsOnly:(BOOL)inLineupsOnly
 {
     NSXMLDocument *xmlDoc;
     NSError *err=nil;
@@ -46,7 +46,7 @@
     }
     
     // Now that we have a document we can traverse it to create the CoreData objects
-    [self traverseXMLDocument:xmlDoc reportTo:inMainWindowController inManagedObjectContext:inMOC];
+    [self traverseXMLDocument:xmlDoc reportTo:inMainWindowController inManagedObjectContext:inMOC lineupsOnly:inLineupsOnly];
     [xmlDoc release];
 }
 
@@ -235,9 +235,7 @@
             toDate = [NSDate dateWithNaturalLanguageString:tmpStr];
 
           Z2ITStation *mapStation = [Z2ITStation fetchStationWithID:stationIDNumber inManagedObjectContext:inMOC];
-          if (!mapStation)
-            NSLog(@"updateLineups - Failed to find station with ID %@", stationIDNumber);
-          else
+          if (mapStation)
           {
             Z2ITLineupMap *aLineupMap = [aLineup fetchLineupMapWithStationID:stationIDNumber];
             if (!aLineupMap)
@@ -261,6 +259,10 @@
 
             [aLineupMap release];
             aLineupMap = NULL;
+          }
+          else
+          {
+//            NSLog(@"updateLineups - Failed to find station with ID %@", stationIDNumber);
           }
           
         [subPool release];
@@ -610,7 +612,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   }
 }
 
-+ (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument reportTo:(MainWindowController*)inMainWindowController inManagedObjectContext:(NSManagedObjectContext *)inMOC
++ (void) traverseXMLDocument:(NSXMLDocument*) inXMLDocument reportTo:(MainWindowController*)inMainWindowController inManagedObjectContext:(NSManagedObjectContext *)inMOC lineupsOnly:(BOOL)inLineupsOnly
 {
   NSError *err;
   NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
@@ -632,7 +634,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//programs" error:&err];
-  if ([nodes count] > 0 )
+  if (([nodes count] > 0 ) && !inLineupsOnly)
   {
         NSXMLNode* thePrograms = [nodes objectAtIndex:0];
         // Update the stations list
@@ -642,7 +644,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//productionCrew" error:&err];
-  if ([nodes count] > 0 )
+  if (([nodes count] > 0 ) && !inLineupsOnly)
   {
         NSXMLNode* theProductionCrew = [nodes objectAtIndex:0];
         // Update the stations list
@@ -652,7 +654,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//genres" error:&err];
-  if ([nodes count] > 0 )
+  if (([nodes count] > 0 ) && !inLineupsOnly)
   {
         NSXMLNode* theGenres = [nodes objectAtIndex:0];
         // Update the genres list
@@ -662,7 +664,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//schedules" error:&err];
-  if ([nodes count] > 0 )
+  if (([nodes count] > 0 ) && !inLineupsOnly)
   {
         NSXMLNode* theSchedules = [nodes objectAtIndex:0];
         // Update the stations list
@@ -687,7 +689,12 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
     [managedObjectContext setPersistentStoreCoordinator: psc];
     [psc lock];
-    [XTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] reportTo:[xtvdParserData valueForKey:@"reportProgressTo"] inManagedObjectContext:managedObjectContext];
+    BOOL lineupsOnly = NO;
+    if ([xtvdParserData valueForKey:@"lineupsOnly"])
+    {
+      lineupsOnly = [[xtvdParserData valueForKey:@"lineupsOnly"] boolValue];
+    }
+    [XTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] reportTo:[xtvdParserData valueForKey:@"reportProgressTo"] inManagedObjectContext:managedObjectContext lineupsOnly:lineupsOnly];
     
     NSError *error = nil;
     NSLog(@"performParse - saving");

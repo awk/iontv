@@ -4,5 +4,7 @@
 <dict>
 	<key>scheduleDownloadDuration</key>
 	<real>3</real>
+        <key>zap2itUsername</key>
+        <string></string>
 </dict>
 </plist>

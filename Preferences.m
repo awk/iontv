@@ -7,7 +7,9 @@
 //
 
 #import "Preferences.h"
-
+#import "tvDataDelivery.h"
+#import "XTVDParser.h"
+#import <Security/Security.h>
 
 const float kDurationSliderMinValue = 1.0;
 const float kDurationSliderMaxValue = 772.0;
@@ -21,6 +23,9 @@ const int k336HoursTick = 17;   // 2 weeks
 NSString *kZap2ItPreferencesToolbarIdentifier = @"Zap2It";
 NSString *kTunersPreferencesToolbarIdentifier = @"Tuners";
 NSString *kChannelsPreferencesToolbarIdentifier = @"Channels";
+NSString *kZap2ItLabsURL = @"http://labs.zap2it.com";
+
+NSString *kWebServicesZap2ItUsernamePrefStr = @"zap2itUsername";
 
 NSString *kScheduleDownloadDurationPrefStr = @"scheduleDownloadDuration";
 
@@ -102,7 +107,7 @@ static Preferences *sSharedInstance = nil;
     // if your application supports resetting a subset of the defaults to 
     // factory values, you should set those values 
     // in the shared user defaults controller
-    resettableUserDefaultsKeys=[NSArray arrayWithObjects:kScheduleDownloadDurationPrefStr,nil];
+    resettableUserDefaultsKeys=[NSArray arrayWithObjects:kScheduleDownloadDurationPrefStr, kWebServicesZap2ItUsernamePrefStr, nil];
     initialValuesDict=[userDefaultsValuesDict dictionaryWithValuesForKeys:resettableUserDefaultsKeys];
     
     // Set the initial values in the shared user defaults controller 
@@ -119,6 +124,7 @@ static Preferences *sSharedInstance = nil;
     {
         sSharedInstance = self;
         [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:@"values.scheduleDownloadDuration" options:NSKeyValueObservingOptionNew context:nil];
+        [[NSUserDefaultsController sharedUserDefaultsController] setAppliesImmediately:NO];
     }
     return sSharedInstance;
 }
@@ -193,7 +199,7 @@ static Preferences *sSharedInstance = nil;
     [toolbar setAutosavesConfiguration: YES]; 
     
     // tell the toolbar to show icons only by default
-    [toolbar setDisplayMode: NSToolbarDisplayModeIconOnly];
+    [toolbar setDisplayMode: NSToolbarDisplayModeIconAndLabel];
 	
 	// Start with the Zap2It prefs
 	[toolbar setSelectedItemIdentifier:kZap2ItPreferencesToolbarIdentifier];
@@ -215,9 +221,9 @@ static Preferences *sSharedInstance = nil;
 	[mPanel setHidesOnDeactivate:NO];
 	[mPanel setExcludedFromWindowsMenu:YES];
 	[mPanel setMenu:nil];
-        [self updateUI];
         [mPanel center];
     }
+    [self updateUI];
     [mPanel makeKeyAndOrderFront:nil];
 }
 
@@ -242,6 +248,28 @@ static Preferences *sSharedInstance = nil;
         }
         if (newSliderValue >= 0.0)
           [mDurationSlider setDoubleValue:newSliderValue];
+          
+          
+    // Attempt to retrieve the Username and password fields for the Zap2It site
+    NSString* zap2ItUsernameString = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesZap2ItUsernamePrefStr];
+    if (zap2ItUsernameString)
+    {
+      [mZap2ItUsernameField setStringValue:zap2ItUsernameString];
+
+      const char *serverNameUTF8 = [kWebServicesZap2ItHostname UTF8String];
+      const char *accountNameUTF8 = [zap2ItUsernameString UTF8String];
+      const char *pathUTF8 = [kWebServicesZap2ItPath UTF8String];
+      UInt32 passwordLength;
+      void *passwordData;
+      OSStatus status = SecKeychainFindInternetPassword(NULL,strlen(serverNameUTF8),serverNameUTF8, 0, NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, &passwordLength, &passwordData, &mZap2ItKeychainItemRef);
+      
+      if (status == noErr)
+      {
+        NSString *passwordString = [NSString stringWithUTF8String:passwordData];
+        [mZap2ItPasswordField setStringValue:passwordString];
+        SecKeychainItemFreeContent(NULL, passwordData);
+      }
+    }
 }
 
 - (void) updateDurationLabel
@@ -283,6 +311,48 @@ static Preferences *sSharedInstance = nil;
     }
 }
 
+- (void) savePrefs:(id)sender
+{
+  NSUserDefaultsController *theDefaultsController  = [NSUserDefaultsController sharedUserDefaultsController];
+  if ([mZap2ItUsernameField stringValue])
+  {
+    [[theDefaultsController values] setValue:[mZap2ItUsernameField stringValue] forKey:kWebServicesZap2ItUsernamePrefStr];
+    const char *serverNameUTF8 = [kWebServicesZap2ItHostname UTF8String];
+    const char *accountNameUTF8 = [[mZap2ItUsernameField stringValue] UTF8String];
+    const char *pathUTF8 = [kWebServicesZap2ItPath UTF8String];
+    UInt32 passwordLength;
+    const void *passwordData;
+    
+    // Call AddInternetPassword - if it's already in the keychain then update it
+    OSStatus status;
+    if (mZap2ItKeychainItemRef == nil)
+    {
+      NSString *passwordString = [mZap2ItPasswordField stringValue];
+      passwordData = [passwordString UTF8String];
+      passwordLength = strlen(passwordData);
+      status = SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mZap2ItKeychainItemRef);
+    }
+    else
+    {
+      // The item already exists - we just need to change the password.
+      // And the Account name
+      void *accountNameAttributeData = malloc(strlen([[mZap2ItUsernameField stringValue] UTF8String]));
+      memcpy(accountNameAttributeData, [[mZap2ItUsernameField stringValue] UTF8String], strlen([[mZap2ItUsernameField stringValue] UTF8String]));
+      
+      SecKeychainAttribute accountNameAttribute;
+      accountNameAttribute.tag = kSecAccountItemAttr;
+      accountNameAttribute.data = accountNameAttributeData;
+      accountNameAttribute.length = strlen([[mZap2ItUsernameField stringValue] UTF8String]);
+      SecKeychainAttributeList attrList;
+      attrList.count = 1;
+      attrList.attr = &accountNameAttribute;
+      status = SecKeychainItemModifyAttributesAndData(mZap2ItKeychainItemRef, &attrList, passwordLength, passwordData);
+      free(accountNameAttributeData);
+    }
+  }
+  [theDefaultsController save:sender];
+}
+
 - (void) showZap2ItPrefs:(id)sender
 {
 	[self showPrefsView:mZap2ItPrefsView];
@@ -300,12 +370,113 @@ static Preferences *sSharedInstance = nil;
 
 - (IBAction) okButtonAction:(id)sender
 {
+  [self savePrefs:sender];
 	[mPanel orderOut:sender];
 }
 
 - (IBAction) cancelButtonAction:(id)sender
 {
+  [[NSUserDefaultsController sharedUserDefaultsController] revert:sender];
 	[mPanel orderOut:sender];
+}
+
+- (IBAction) getAccountButtonAction:(id)sender
+{
+  [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:kZap2ItLabsURL]];
+}
+
+- (IBAction) retrieveLineupsButtonAction:(id)sender
+{
+  [mParsingProgressIndicator startAnimation:self];
+  [mParsingProgressIndicator setHidden:NO];
+  [mParsingProgressIndicator setIndeterminate:YES];
+  [mParsingProgressInfoField setStringValue:@"Downloading Lineup Data"];
+  [mParsingProgressInfoField setHidden:NO];
+  [mRetrieveLineupsButton setEnabled:NO];
+
+  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
+  
+  // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
+  // Zap2It expects
+  CFGregorianDate startDate = CFAbsoluteTimeGetGregorianDate(currentTime,NULL);
+  
+  // Retrieve 'n' hours of data
+  CFGregorianUnits retrieveRange;
+  memset(&retrieveRange, 0, sizeof(retrieveRange));
+
+  retrieveRange.minutes = 0;
+    
+  CFAbsoluteTime endTime = CFAbsoluteTimeAddGregorianUnits(currentTime, NULL, retrieveRange);
+  CFGregorianDate endDate = CFAbsoluteTimeGetGregorianDate(endTime,NULL);
+  
+  NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
+  NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
+  
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", self, @"dataRecipient", nil];
+  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
+  [callData release];
+}
+
+- (IBAction) scanDevicesButtonAction:(id)sender
+{
+}
+
+#pragma mark Callback Methods
+
+- (void) handleDownloadData:(id)inDownloadResult
+{
+
+  [mParsingProgressIndicator stopAnimation:self];
+  [mParsingProgressIndicator setHidden:YES];
+  [mParsingProgressIndicator setIndeterminate:NO];
+  [mParsingProgressInfoField setHidden:YES];
+
+  NSDictionary *downloadResult = (NSDictionary*)inDownloadResult;
+  NSDictionary *messages = [downloadResult valueForKey:@"messages"];
+  NSDictionary *xtvd = [downloadResult valueForKey:@"xtvd"];
+  NSLog(@"getScheduleAction downloadResult messages = %@", messages);
+  NSLog(@"getScheduleAction downloadResult xtvd = %@", xtvd);
+  [downloadResult release];
+
+  if (xtvd != nil)
+  {
+    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath", [NSNumber numberWithBool:YES], @"lineupsOnly", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
+    
+    // Start our local parsing
+    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[xtvdParseThread class] withObject:callData];
+    
+    [callData release];
+  }
+}
+
+- (void) setParsingInfoString:(NSString*)inInfoString
+{
+  [mParsingProgressInfoField setStringValue:inInfoString];
+  [mParsingProgressInfoField setHidden:NO];
+}
+
+- (void) setParsingProgressMaxValue:(double)inTotal
+{
+  [mParsingProgressIndicator setMaxValue:inTotal];
+  [mParsingProgressIndicator setHidden:NO];
+}
+
+- (void) setParsingProgressDoubleValue:(double)inValue
+{
+  [mParsingProgressIndicator setDoubleValue:inValue];
+}
+
+- (void) parsingComplete:(id)info
+{
+  [mParsingProgressIndicator setHidden:YES];
+  [mParsingProgressInfoField setHidden:YES];
+  [mRetrieveLineupsButton setEnabled:YES];
+ 
+//  [mParsingProgressIndicator startAnimation:self];
+//  [mParsingProgressIndicator setHidden:NO];
+//  [mParsingProgressIndicator setIndeterminate:YES];
+//  [mParsingProgressInfoField setStringValue:@"Cleanup Old Schedule Data"];
+//  [mParsingProgressInfoField setHidden:NO];
 }
 
 #pragma mark - Toolbar Delegates

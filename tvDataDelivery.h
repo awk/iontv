@@ -12,6 +12,9 @@
 #import <Foundation/Foundation.h>
 #import "WSGeneratedObj.h"
 
+extern NSString *kWebServicesZap2ItHostname;
+extern NSString *kWebServicesZap2ItPath;
+
 @interface tvDataDelivery : WSGeneratedObj
 
 // We just override some SOAP processing messages to perform authentication
