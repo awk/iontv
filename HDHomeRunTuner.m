@@ -427,7 +427,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   {
     NSLog(@"Exception during scan = %@, reason: %@", [anException name], [anException reason]); 
   }
-  [mCurrentProgressDisplay scanCompleted];
+  [mCurrentProgressDisplay scanCompletedOnTuner:self];
   
   if (mCurrentHDHomeRunChannel && [[mCurrentHDHomeRunChannel stations] count] == 0)
   {
@@ -442,10 +442,12 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
       name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   
+#if USE_SYNCSERVICES
   if (![managedObjectContext save:&error])
   {
     NSLog(@"Channel scan - save returned an error %@", error);
   }
+#endif // USE_SYNCSERVICES
   
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   
@@ -568,6 +570,17 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 	}
 }
 
+- (void) clearAllStations 
+{ 
+  NSMutableSet *stations = [self mutableSetValueForKey:@"stations"]; 
+  while ([stations count] > 0) 
+  { 
+        HDHomeRunStation *aStation = [stations anyObject]; 
+        [stations removeObject:aStation]; 
+        [[self managedObjectContext] deleteObject:aStation]; 
+  } 
+}
+	
 @dynamic channelNumber;
 @dynamic channelType;
 @dynamic tuningType;

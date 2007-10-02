@@ -68,6 +68,7 @@
 @property (retain) HDHomeRunTuner * tuner;
 
 - (void) importStationsFrom:(NSArray*)inArrayOfStationDictionaries;
+- (void) clearAllStations;
 
 @end
 
@@ -95,7 +96,6 @@
 
 - (void) startStreaming;
 - (void) stopStreaming;
-
 - (UInt8*) receiveVideoData:(size_t*)outBytesReceived;
 
 @end
