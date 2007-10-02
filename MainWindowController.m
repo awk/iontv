@@ -13,13 +13,10 @@
 #import "tvDataDelivery.h"
 #import "XTVDParser.h"
 #import "Preferences.h"
-#import "RecSchedProtocol.h"
 #import "RBSplitView.h"
 #import "RBSplitSubView.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
-
-NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 @implementation MainWindowController
 
@@ -52,21 +49,6 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
   
   [mCurrentSchedule setContent:nil];
 
-  // Connect to server
-  mRecServer = [[NSConnection rootProxyForConnectionWithRegisteredName:kRecServerConnectionName  host:nil] retain];
-   
-  // check if connection worked.
-  if (mRecServer == nil) 
-  {
-    NSLog(@"couldn't connect with server\n");
-  }
-  else
-  {
-    //
-    // set protocol for the remote object & then register ourselves with the 
-    // messaging server.
-    [mRecServer setProtocolForProxy:@protocol(RecSchedServerProto)];
-  }
 
 }
 
@@ -114,21 +96,14 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 - (IBAction) recordShow:(id)sender
 {
-  Z2ITSchedule *aSchedule = [mCurrentSchedule content];
+//  Z2ITSchedule *aSchedule = [mCurrentSchedule content];
 //  [aSchedule setToBeRecorded:YES];
-  [mRecServer addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
+//  [mRecServer addRecordingOfProgram:[aSchedule program] withSchedule:aSchedule];
 }
 
 - (IBAction) recordSeasonPass:(id)sender
 {
 	NSLog(@"Create a season pass");
-}
-
-- (IBAction) quitServer:(id)sender
-{
-  if (mRecServer)
-    [mRecServer quitServer:sender];
-  mRecServer = nil;
 }
 
 #pragma mark Callback Methods
@@ -158,9 +133,6 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     xtvdParseThread *aParseThread = [[xtvdParseThread alloc] init];
     
     [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:aParseThread withObject:callData];
-    
-    // And tell the bkgd server to parse the same data too
-    [mRecServer performParse:callData];
     
     [callData release];
   }

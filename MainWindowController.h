@@ -32,14 +32,12 @@
   NSCell *mDefaultCell;
 
   float mDetailViewMinHeight;
-  id mRecServer;
 }
 
 - (IBAction) getScheduleAction:(id)sender;
 - (IBAction) cleanupAction:(id)sender;
 - (IBAction) recordShow:(id)sender;
 - (IBAction) recordSeasonPass:(id)sender;
-- (IBAction) quitServer:(id)sender;
 
 - (void) showViewForTableSelection:(int) selectedRow;
 
