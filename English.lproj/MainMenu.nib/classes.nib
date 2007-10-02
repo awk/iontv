@@ -12,8 +12,11 @@
                 mParsingProgressIndicator = NSProgressIndicator; 
                 mParsingProgressInfoField = NSTextField; 
                 mScheduleContainerView = NSView; 
+                mScheduleSearchView = NSView; 
+                mScheduleSplitView = NSSplitView; 
                 mScheduleView = ScheduleView; 
-                mSplitView = NSSplitView; 
+                mTopLevelSplitView = NSSplitView; 
+                mViewSelectionTableView = NSTableView; 
             }; 
             SUPERCLASS = NSWindowController; 
         }, 
@@ -43,7 +46,10 @@
             ACTIONS = {scheduleControlClicked = id; }; 
             CLASS = ScheduleViewController; 
             LANGUAGE = ObjC; 
-            OUTLETS = {mScheduleView = ScheduleView; }; 
+            OUTLETS = {
+                mScheduleTimeSegmentedControl = NSSegmentedControl; 
+                mScheduleView = ScheduleView; 
+            }; 
             SUPERCLASS = NSObject; 
         }, 
         {
