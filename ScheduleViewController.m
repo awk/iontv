@@ -75,6 +75,11 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
   [mCurrentSchedule setContent:inSchedule];
 }
 
+- (void) setCurrentStation:(Z2ITStation*)inStation
+{
+  [mCurrentStation setContent:inStation];
+}
+
 - (void) updateSegmentDisplay
 {
   NSCalendarDate *calendarDate = [NSCalendarDate dateWithTimeIntervalSinceReferenceDate:[self startTime]];

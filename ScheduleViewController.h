@@ -9,11 +9,14 @@
 #import <Cocoa/Cocoa.h>
 
 @class ScheduleView;
+@class Z2ITSchedule;
+@class Z2ITStation;
 
 @interface ScheduleViewController : NSObject {
     IBOutlet ScheduleView *mScheduleView;
     IBOutlet NSSegmentedControl *mScheduleTimeSegmentedControl;
     IBOutlet NSObjectController *mCurrentSchedule;
+    IBOutlet NSObjectController *mCurrentStation;
     IBOutlet NSObjectController *mCurrentLineup;
     CFAbsoluteTime mStartTime;
 }
@@ -23,4 +26,6 @@
 - (CFAbsoluteTime) startTime;
 - (void) setStartTime:(CFAbsoluteTime)inStartTime;
 - (IBAction) scheduleControlClicked:(id)sender;
+- (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule;
+- (void) setCurrentStation:(Z2ITStation*)inStation;
 @end
