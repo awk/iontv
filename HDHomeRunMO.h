@@ -31,6 +31,8 @@ extern const int kDefaultPortNumber;
 
 - (void) addTuner:(HDHomeRunTuner *)aTuner;
 
+- (HDHomeRunTuner *)tunerWithIndex:(int) inIndex;
+
 - (HDHomeRunTuner*) tuner0;
 //- (void)setTuner0:(HDHomeRunTuner*) value;
 
