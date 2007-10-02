@@ -14,7 +14,7 @@
     
   	<key>ManagedObjectModels</key>
 	<array>
-        <string>../../../recsched_DataModel.mom</string>
+        <string>../../../recsched_DataModel.momd/recsched_DataModel.mom</string>
     </array>  
     
 	<key>Name</key>
