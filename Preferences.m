@@ -17,6 +17,8 @@ const int k24HoursTick   = 9;   // 1 day
 const int k168HoursTick = 15;   // 1 week
 const int k336HoursTick = 17;   // 2 weeks
 
+NSString *kScheduleDownloadDurationPrefStr = @"scheduleDownloadDuration";
+
 struct discreteSliderMarks
 {
   int tickMark;

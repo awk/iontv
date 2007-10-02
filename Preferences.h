@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-NSString *kScheduleDownloadDurationPrefStr = @"scheduleDownloadDuration";
+extern NSString *kScheduleDownloadDurationPrefStr;
 @class DiscreteDurationSlider;
 
 @interface Preferences : NSObject {
