@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-const int kScheduleHeaderViewDefaultNumberOfCells = 6;
+extern const int kScheduleHeaderViewDefaultNumberOfCells;
 
 
 @interface ScheduleHeaderView : NSView {
