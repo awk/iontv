@@ -6,27 +6,71 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+#import "CTGradient.h"
 #import "ScheduleHeaderView.h"
 #import "ScheduleView.h"
 #import "ScheduleStationColumnView.h"
 
 const int kScheduleHeaderViewDefaultNumberOfCells = 6;
 
+@interface ScheduleHeaderCell : NSTextFieldCell {
+}
+
+@end
+
+@implementation ScheduleHeaderCell
+
+- (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+{
+	// set line width to 0 (smallest possible line - ie one pixel)
+	[NSBezierPath setDefaultLineWidth:0.0];
+
+	// Draw background
+	CTGradient *aGradient = [CTGradient gradientWithBeginningColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:187.0/255.0 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:219.0/255.0 alpha:1.0]];
+	[aGradient fillRect:cellFrame angle:90.0];
+	
+	// Draw top/bottom lines
+	[[NSColor colorWithDeviceRed:85.0/255.0 green:85.0/255.0 blue:85.0/255.0 alpha:1.0] set];
+	NSRect topBottomRect = cellFrame;
+	topBottomRect.size.height = 1.0;
+	[NSBezierPath strokeLineFromPoint:topBottomRect.origin toPoint:NSMakePoint(topBottomRect.origin.x + topBottomRect.size.width, topBottomRect.origin.y)];
+	
+	topBottomRect.origin.y = cellFrame.origin.y + cellFrame.size.height - 1.5;
+	[[NSColor colorWithDeviceRed:64.0/255.0 green:64.0/255.0 blue:64.0/255.0 alpha:1.0] set];
+	[NSBezierPath strokeLineFromPoint:topBottomRect.origin toPoint:NSMakePoint(topBottomRect.origin.x + topBottomRect.size.width, topBottomRect.origin.y)];
+
+	// Draw left/right sides
+	NSRect dividerRect = cellFrame;
+	dividerRect.origin.x =floor(dividerRect.origin.x)+0.5;
+	dividerRect.size.height -= 3.0;
+	dividerRect.origin.y += 1.0;
+	[[NSColor colorWithDeviceRed:1.0 green:1.0 blue:1.0 alpha:0.25] set];
+	[NSBezierPath strokeLineFromPoint:dividerRect.origin toPoint:NSMakePoint(dividerRect.origin.x, dividerRect.origin.y+dividerRect.size.height)];
+	
+	dividerRect.origin.x = floor(cellFrame.origin.x + cellFrame.size.width) - 0.5;
+	[[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:0.25] set];
+	[NSBezierPath strokeLineFromPoint:dividerRect.origin toPoint:NSMakePoint(dividerRect.origin.x, dividerRect.origin.y+dividerRect.size.height)];
+
+	// Draw the label string
+	NSMutableParagraphStyle *paraInfo = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	[paraInfo  setAlignment:[self alignment]];
+	NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[self textColor], NSForegroundColorAttributeName, paraInfo, NSParagraphStyleAttributeName, [self font], NSFontAttributeName, nil];
+	[paraInfo release];
+	NSRect stringBounds = [[self stringValue] boundingRectWithSize:cellFrame.size options:0 attributes:stringAttributes];
+	stringBounds.origin.y = cellFrame.origin.y + ((cellFrame.size.height - stringBounds.size.height)/2);
+	stringBounds.origin.x = cellFrame.origin.x;
+	stringBounds.size.width = cellFrame.size.width;
+	[[self stringValue] drawInRect:stringBounds withAttributes:stringAttributes];
+	
+}
+
+@end
+
 @implementation ScheduleHeaderView
 
 + (int) headerHeight
 {
-        float fontSize = [NSFont systemFontSizeForControlSize:NSSmallControlSize];
-        NSFont *theFont = [NSFont systemFontOfSize:fontSize];
-        
-        NSTextFieldCell *aStationCell = [[NSTextFieldCell alloc] initTextCell:@"Station"];
-        [aStationCell setBordered:YES];
-        [aStationCell setAlignment:NSCenterTextAlignment];
-        [aStationCell setFont:theFont];
-        [aStationCell setControlSize:NSSmallControlSize];
-        NSSize cellSize = [aStationCell cellSize];
-        [aStationCell release];
-        return cellSize.height;
+		return 18;
 }
 
 - (id)initWithFrame:(NSRect)frame {
@@ -38,8 +82,8 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
         float fontSize = [NSFont systemFontSizeForControlSize:NSSmallControlSize];
         NSFont *theFont = [NSFont systemFontOfSize:fontSize];
         
-        mStationCell = [[NSTextFieldCell alloc] initTextCell:@"Station"];
-        [mStationCell setBordered:YES];
+        mStationCell = [[ScheduleHeaderCell alloc] initTextCell:@"Station"];
+        [mStationCell setBordered:NO];
         [mStationCell setAlignment:NSCenterTextAlignment];
         [mStationCell setFont:theFont];
         [mStationCell setControlSize:NSSmallControlSize];
@@ -47,16 +91,15 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
         int i=0;
         for (i = 0; i < kScheduleHeaderViewDefaultNumberOfCells; i++)
         {
-          NSTextFieldCell *aLabelCell = [[NSTextFieldCell alloc] initTextCell:@"--"];
-          [aLabelCell setBordered:YES];
+          ScheduleHeaderCell *aLabelCell = [[ScheduleHeaderCell alloc] initTextCell:@"--"];
+          [aLabelCell setBordered:NO];
           [aLabelCell setAlignment:NSCenterTextAlignment];
           [aLabelCell setFont:theFont];
           [aLabelCell setControlSize:NSSmallControlSize];
           [mLabelCellArray addObject:aLabelCell];
           [aLabelCell release];
         }
-        NSSize cellSize = [[mLabelCellArray objectAtIndex:0] cellSize];
-        [self setFrameSize:NSMakeSize(frame.size.width,cellSize.height)];
+        [self setFrameSize:NSMakeSize(frame.size.width,[ScheduleHeaderView headerHeight])];
         [self updateCellLabels];
     }
     return self;
@@ -69,15 +112,17 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
 }
 
 - (void)drawRect:(NSRect)rect {
-    // Drawing code here.
-    ScheduleView *parentView = (ScheduleView*) [self superview];
+	// Draw contents (labels)
+	ScheduleView *parentView = (ScheduleView*) [self superview];
     float pixelsPerMinute = ([self frame].size.width - [ScheduleStationColumnView columnWidth]) / ([parentView visibleTimeSpan]);
 
     NSRect cellFrameRect;
     cellFrameRect.origin.x = cellFrameRect.origin.y = 0;
     cellFrameRect.size.height = [self bounds].size.height;
     cellFrameRect.size.width = [ScheduleStationColumnView columnWidth];
+	[mStationCell cellSizeForBounds:cellFrameRect];
     [mStationCell drawWithFrame:cellFrameRect inView:self];
+
     // Subdivide the current bounds width into even spaced pieces (to number of cells in the array)
     int numberLabelCells = [mLabelCellArray count];
     float aCellWidth = pixelsPerMinute * [parentView timePerLineIncrement];
