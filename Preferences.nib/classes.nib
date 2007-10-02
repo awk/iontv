@@ -14,6 +14,12 @@
 		</dict>
 		<dict>
 			<key>CLASS</key>
+			<string>NSObject</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
 			<string>DiscreteDurationSlider</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -72,6 +78,8 @@
 				<key>mExportChannelTunerSelectionView</key>
 				<string>NSView</string>
 				<key>mGenreArrayController</key>
+				<string>NSArrayController</string>
+				<key>mHDHomeRunDevicesArrayController</key>
 				<string>NSArrayController</string>
 				<key>mHDHomeRunTunersArrayController</key>
 				<string>NSArrayController</string>

@@ -18,5 +18,11 @@ extern NSString *kRecServerConnectionName;
 
 - (oneway void) quitServer:(id)sender;
 
+// Schedule Retrieval
 - (oneway void) performDownload:(NSDictionary*)callData;
+
+// HDHomeRun Device Management
+- (BOOL) addHDHomeRunWithID:(NSNumber*)deviceID;
+- (void) setHDHomeRunDeviceWithID:(NSNumber*)deviceID nameTo:(NSString*)name tuner0LineupIDTo:(NSString*)tuner0LineupID tuner1LineupIDTo:(NSString*) tuner1LineupID;
+- (oneway void) setHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex; 
 @end

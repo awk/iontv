@@ -6,10 +6,11 @@
 //  Copyright 2007 __MyCompanyName__. All rights reserved.
 //
 
+@class HDHomeRunTuner;
 
 @protocol ChannelScanProgressDisplay
 - (void) incrementChannelScanProgress;
 - (BOOL) abortChannelScan;
-- (void) scanCompleted;
+- (void) scanCompletedOnTuner:(HDHomeRunTuner*)inTuner;
 @end
 

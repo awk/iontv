@@ -14,7 +14,10 @@
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
 #import "recsched_AppDelegate.h"
+#import "RecSchedProtocol.h"
 #import "RSColorDictionary.h"
+#import "HDHomeRunMO.h"
+#import "Z2ITLineup.h"
 #import <Security/Security.h>
 
 #define SCAN_DISABLED 1
@@ -393,6 +396,27 @@ static Preferences *sSharedInstance = nil;
   return sortDescriptors;
 }
 
+- (void) pushHDHomeRunStationsOnTuner:(HDHomeRunTuner *)inTuner 
+{ 
+	if ([[NSApp delegate] recServer]) 
+	{ 
+		// Start by adding all the channels on this tuner to an array 
+		NSMutableSet *channelsSet = [inTuner mutableSetValueForKey:@"channels"]; 
+
+		// Create an array to hold the dictionaries of channel info 
+		NSMutableArray *channelsOnTuner = [NSMutableArray arrayWithCapacity:[channelsSet count]]; 
+
+		// Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array 
+		[channelsSet makeObjectsPerformSelector:@selector(addChannelInfoDictionaryTo:) withObject:channelsOnTuner]; 
+
+		NSSortDescriptor *channelDescriptor =[[[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES] autorelease]; 
+		NSArray *sortDescriptors=[NSArray arrayWithObject:channelDescriptor]; 
+		NSArray *sortedArray=[channelsOnTuner sortedArrayUsingDescriptors:sortDescriptors]; 
+
+		[[[NSApp delegate] recServer] setHDHomeRunChannelsAndStations:sortedArray onDeviceID:[[[inTuner device] deviceID] intValue] forTunerIndex:[[inTuner index] intValue]]; 
+	} 
+}
+	
 #pragma mark Action Methods
 
 - (void) showSDPrefs:(id)sender
@@ -427,6 +451,17 @@ static Preferences *sSharedInstance = nil;
   // The CoreData store might have changes because of editting the tuner settings and channel map.
   if ([[[[NSApplication sharedApplication] delegate] managedObjectContext] hasChanges])
 	[[[NSApplication sharedApplication] delegate] saveAction:nil];
+#else
+	
+	// Walk the list of HDHomeRunDevices and send the details to the server
+	NSArray *hdhomerunDevices = [mHDHomeRunDevicesArrayController arrangedObjects];
+	for (HDHomeRun *anHDHomeRunDevice in hdhomerunDevices)
+	{
+		[[[NSApp delegate] recServer] setHDHomeRunDeviceWithID:[anHDHomeRunDevice deviceID]
+			nameTo:[anHDHomeRunDevice name]
+			tuner0LineupIDTo:[[[anHDHomeRunDevice tuner0] lineup] lineupID]
+			tuner1LineupIDTo:[[[anHDHomeRunDevice tuner1] lineup] lineupID]];
+	}
 #endif // USE_SYNCSERVICES
 }
 
@@ -499,15 +534,19 @@ static Preferences *sSharedInstance = nil;
 	if (count > 0)
 	{
 		int i=0;
+		BOOL devicesAdded = NO;
 		for (i=0; i < count; i++)
 		{
+			// Send a message to the background server to get it to create a matching Device
+			if ([[[NSApp delegate] recServer] addHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id]])
+				devicesAdded = YES;
+
 			// See if an entry already exists
 			HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
 			if (!anHDHomeRun)
 			{
 			  // Otherwise we just create a new one
-			  anHDHomeRun = [HDHomeRun createHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-			  [anHDHomeRun release];		// We don't actually need it here - we just need to create it
+			  [HDHomeRun createHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
 			}
 		}
 	}
@@ -618,11 +657,13 @@ static Preferences *sSharedInstance = nil;
   return mAbortChannelScan;
 }
 
-- (void) scanCompleted
+- (void) scanCompletedOnTuner:(HDHomeRunTuner*)inTuner
 {
-  mChannelScanInProgress = NO;
-  [mScanChannelsButton setTitle:@"Scan"];
-  [mChannelScanProgressIndicator setHidden:YES];
+	mChannelScanInProgress = NO;
+	[mScanChannelsButton setTitle:@"Scan"];
+	[mChannelScanProgressIndicator setHidden:YES];
+
+	[self pushHDHomeRunStationsOnTuner:inTuner];
 }
 
 #pragma mark Callback Methods
@@ -729,6 +770,7 @@ static Preferences *sSharedInstance = nil;
 	if (returnCode == NSAlertDefaultReturn)
 	{
 		[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] importChannelMapFrom:importURL];
+		[self pushHDHomeRunStationsOnTuner:[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0]];
 	}
 	[importURL release];	// Copied in the file open panel did end delegate
 }

@@ -36,6 +36,7 @@ extern NSString *kWebServicesSDUsernamePrefStr;
     IBOutlet NSButton *mScanChannelsButton;
     IBOutlet NSTableView *mColorsTable;
 	
+    IBOutlet NSArrayController *mHDHomeRunDevicesArrayController;
     IBOutlet NSArrayController *mHDHomeRunTunersArrayController;
     IBOutlet NSArrayController *mGenreArrayController;
     IBOutlet NSArrayController *mVisibleStationsArrayController;    // This is the subset of station entities that correspond to the selected HDHR Device/Tuner combo.

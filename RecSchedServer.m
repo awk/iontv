@@ -10,6 +10,7 @@
 #import "recsched_bkgd_AppDelegate.h"
 #import "HDHomeRunMO.h"
 #import "tvDataDelivery.h"
+#import "Z2ITLineup.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
@@ -158,10 +159,23 @@ const int kDefaultScheduleFetchDuration = 3;
 // schedule data and update the database.
 - (void) updateSchedule
 {
+	// For now we'll just determine the 'up to date' ness by using the last written date on the CoreData store
+	NSURL *storeURL = [[NSApp delegate] urlForPersistentStore];
+	NSError *error = nil;
+	NSDictionary *storeAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[storeURL path] error:&error];
+	BOOL updateScheduleNow = YES;
+	if (!error)
+	{
+		// -3600 is one hour in the past
+		if ([[storeAttributes valueForKey:NSFileModificationDate] timeIntervalSinceNow] > -3600)
+			updateScheduleNow = NO;
+	}
+	
 	// Set up a timer to fire one hour before the about to be fetched schedule data 'runs out'
 	[NSTimer scheduledTimerWithTimeInterval:(kDefaultScheduleFetchDuration - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:YES]; 
-
-	[self fetchScheduleWithDuration:kDefaultScheduleFetchDuration];
+	
+	if (updateScheduleNow)
+		[self fetchScheduleWithDuration:kDefaultScheduleFetchDuration];
 }
 
 - (void) updateScheduleTimer:(NSTimer*)aTimer
@@ -205,6 +219,76 @@ const int kDefaultScheduleFetchDuration = 3;
 - (oneway void) performDownload:(NSDictionary*)callData
 {
   [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
+}
+
+// Add an HDHomeRun device with the specified ID - return YES if a new device was created and added.
+- (BOOL) addHDHomeRunWithID:(NSNumber*)deviceID
+{
+	// See if an entry already exists
+	HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:deviceID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	if (!anHDHomeRun)
+	{
+	  // Otherwise we just create a new one
+	  [HDHomeRun createHDHomeRunWithID:deviceID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	  return YES;
+	}
+	return NO;
+}
+
+- (void) setHDHomeRunDeviceWithID:(NSNumber*)deviceID nameTo:(NSString*)name tuner0LineupIDTo:(NSString*)tuner0LineupID tuner1LineupIDTo:(NSString*) tuner1LineupID
+{
+	// See if an entry already exists
+	HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:deviceID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	if (anHDHomeRun)
+	{
+		[anHDHomeRun setName:name];
+		
+		Z2ITLineup *aLineup = [Z2ITLineup fetchLineupWithID:tuner0LineupID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+		[[anHDHomeRun tuner0] setLineup:aLineup];
+		aLineup = [Z2ITLineup fetchLineupWithID:tuner1LineupID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+		[[anHDHomeRun tuner1] setLineup:aLineup];
+	}
+	else
+	{
+		NSLog(@"setHDHomeRunDeviceWithID - cannot find device with ID %@", deviceID);
+	}
+}
+
+- (oneway void) setHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex
+{
+	NSLog(@"setHDHomeRunChannelsAndStations deviceID = %d, tunerIndex = %d", deviceID, tunerIndex); 
+
+	HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:deviceID] inManagedObjectContext:[[NSApp delegate] managedObjectContext]]; 
+	if (anHDHomeRun) 
+	{ 
+		HDHomeRunTuner *aTuner = [anHDHomeRun tunerWithIndex:tunerIndex]; 
+		if (aTuner) 
+		{ 
+			// Remove all the channels current on the tuner - we're going to replace them.
+			[aTuner removeChannels:[aTuner channels]];
+			
+			int channelIdx = 0; 
+			for (NSDictionary *aChannelDictionary in channelsArray) 
+			{ 
+				NSLog(@"setHDHomeRunChannelsAndStations new channel number %d type %@ stations %@", [aChannelDictionary valueForKey:@"channelNumber"], [aChannelDictionary valueForKey:@"channelType"], [aChannelDictionary valueForKey:@"stations"]);
+				// Create a new channel for this tuner
+				HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:[aChannelDictionary valueForKey:@"channelType"] andNumber:[aChannelDictionary valueForKey:@"channelNumber"] inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+				[aTuner addChannelsObject:aChannel];
+				
+				// Remove all the stations on the given channel - they'll be replaced with the data from the array 
+				[aChannel clearAllStations]; 
+
+				// Add all the stations in the array for this channel 
+				[aChannel importStationsFrom:[aChannelDictionary valueForKey:@"stations"]]; 
+			} 
+
+			if (channelIdx > 0) 
+			{ 
+				// processed some stations - save the MOC 
+				[[NSApp delegate] saveAction:self]; 
+			} 
+		} 
+	} 
 }
 
 - (void) quitServer:(id)sender
