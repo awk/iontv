@@ -27,6 +27,7 @@
                 mDurationSlider = DiscreteDurationSlider; 
                 mDurationTextField = NSTextField; 
                 mHDHomeRunTunersArrayController = NSArrayController; 
+                mLineupArrayController = NSArrayController; 
                 mPanel = id; 
                 mParsingProgressIndicator = NSProgressIndicator; 
                 mParsingProgressInfoField = NSTextField; 
@@ -34,6 +35,7 @@
                 mRetrieveLineupsButton = NSButton; 
                 mScanChannelsButton = NSButton; 
                 mScanTunersButton = NSButton; 
+                mStationsArrayController = NSArrayController; 
                 mTunerPrefsView = NSView; 
                 mTunerScanProgressIndicator = NSProgressIndicator; 
                 mZap2ItPasswordField = NSTextField; 
