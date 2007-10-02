@@ -16,6 +16,15 @@
 		EA0674310B58084D009B0E27 /* MainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674300B58084D009B0E27 /* MainWindowController.m */; };
 		EA0674410B580B4D009B0E27 /* tvDataDelivery.m in Sources */ = {isa = PBXBuildFile; fileRef = EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */; };
 		EA0674420B580B4D009B0E27 /* WSGeneratedObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */; };
+		EA08881E0B86B16D00809664 /* CC.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888150B86B16C00809664 /* CC.tif */; };
+		EA08881F0B86B16D00809664 /* HD.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888160B86B16C00809664 /* HD.tif */; };
+		EA0888200B86B16D00809664 /* TV-14.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888170B86B16C00809664 /* TV-14.tif */; };
+		EA0888210B86B16D00809664 /* TV-G.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888180B86B16C00809664 /* TV-G.tif */; };
+		EA0888220B86B16D00809664 /* TV-MA.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888190B86B16C00809664 /* TV-MA.tif */; };
+		EA0888230B86B16D00809664 /* TV-PG.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881A0B86B16C00809664 /* TV-PG.tif */; };
+		EA0888240B86B16D00809664 /* TV-Y.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881B0B86B16C00809664 /* TV-Y.tif */; };
+		EA0888250B86B16D00809664 /* TV-Y7.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881C0B86B16C00809664 /* TV-Y7.tif */; };
+		EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881D0B86B16C00809664 /* TV-Y7FV.tif */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAEBE0B6D788500CCD5D5 /* Preferences.nib in Resources */ = {isa = PBXBuildFile; fileRef = EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */; };
 		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
@@ -26,6 +35,7 @@
 		EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */; };
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
+		EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */ = {isa = PBXBuildFile; fileRef = EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */; };
 		EAF882700B5DC0BD00373CEF /* XTVDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */; };
 		EAF883100B5DCE4900373CEF /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
 		EAF883DE0B5ECB5B00373CEF /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
@@ -59,6 +69,15 @@
 		EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = tvDataDelivery.m; sourceTree = "<group>"; };
 		EA06743F0B580B4D009B0E27 /* WSGeneratedObj.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = WSGeneratedObj.h; sourceTree = "<group>"; };
 		EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = WSGeneratedObj.m; sourceTree = "<group>"; };
+		EA0888150B86B16C00809664 /* CC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CC.tif; path = Images/CC.tif; sourceTree = "<group>"; };
+		EA0888160B86B16C00809664 /* HD.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HD.tif; path = Images/HD.tif; sourceTree = "<group>"; };
+		EA0888170B86B16C00809664 /* TV-14.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-14.tif"; path = "Images/TV-14.tif"; sourceTree = "<group>"; };
+		EA0888180B86B16C00809664 /* TV-G.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-G.tif"; path = "Images/TV-G.tif"; sourceTree = "<group>"; };
+		EA0888190B86B16C00809664 /* TV-MA.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-MA.tif"; path = "Images/TV-MA.tif"; sourceTree = "<group>"; };
+		EA08881A0B86B16C00809664 /* TV-PG.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-PG.tif"; path = "Images/TV-PG.tif"; sourceTree = "<group>"; };
+		EA08881B0B86B16C00809664 /* TV-Y.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y.tif"; path = "Images/TV-Y.tif"; sourceTree = "<group>"; };
+		EA08881C0B86B16C00809664 /* TV-Y7.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7.tif"; path = "Images/TV-Y7.tif"; sourceTree = "<group>"; };
+		EA08881D0B86B16C00809664 /* TV-Y7FV.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7FV.tif"; path = "Images/TV-Y7FV.tif"; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
 		EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Preferences.nib; sourceTree = "<group>"; };
@@ -75,6 +94,7 @@
 		EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleViewController.m; sourceTree = "<group>"; };
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
+		EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = headphone.tif; path = Images/headphone.tif; sourceTree = SOURCE_ROOT; };
 		EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XTVDParser.h; sourceTree = "<group>"; };
 		EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XTVDParser.m; sourceTree = "<group>"; };
 		EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITStation.h; sourceTree = "<group>"; };
@@ -177,6 +197,16 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */,
+				EA0888150B86B16C00809664 /* CC.tif */,
+				EA0888160B86B16C00809664 /* HD.tif */,
+				EA0888170B86B16C00809664 /* TV-14.tif */,
+				EA0888180B86B16C00809664 /* TV-G.tif */,
+				EA0888190B86B16C00809664 /* TV-MA.tif */,
+				EA08881A0B86B16C00809664 /* TV-PG.tif */,
+				EA08881B0B86B16C00809664 /* TV-Y.tif */,
+				EA08881C0B86B16C00809664 /* TV-Y7.tif */,
+				EA08881D0B86B16C00809664 /* TV-Y7FV.tif */,
 				EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */,
 				EA5FAEBD0B6D788500CCD5D5 /* Preferences.nib */,
 				EAF8919D0B66F2F800373CEF /* metal_column_header.png */,
@@ -303,6 +333,16 @@
 				EA5FB6D80B7028B000CCD5D5 /* UserDefaults.plist in Resources */,
 				EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */,
 				EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */,
+				EA08881E0B86B16D00809664 /* CC.tif in Resources */,
+				EA08881F0B86B16D00809664 /* HD.tif in Resources */,
+				EA0888200B86B16D00809664 /* TV-14.tif in Resources */,
+				EA0888210B86B16D00809664 /* TV-G.tif in Resources */,
+				EA0888220B86B16D00809664 /* TV-MA.tif in Resources */,
+				EA0888230B86B16D00809664 /* TV-PG.tif in Resources */,
+				EA0888240B86B16D00809664 /* TV-Y.tif in Resources */,
+				EA0888250B86B16D00809664 /* TV-Y7.tif in Resources */,
+				EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */,
+				EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
