@@ -1,51 +1,116 @@
-{
-    IBClasses = (
-        {
-            CLASS = DiscreteDurationSlider; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {mDurationField = NSTextField; }; 
-            SUPERCLASS = NSSlider; 
-        }, 
-        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
-        {CLASS = HexNumberFormatter; LANGUAGE = ObjC; SUPERCLASS = NSNumberFormatter; }, 
-        {
-            ACTIONS = {
-                cancelButtonAction = id; 
-                durationSliderChanged = id; 
-                getAccountButtonAction = id; 
-                okButtonAction = id; 
-                retrieveLineupsButtonAction = id; 
-                scanChannelsButtonAction = id; 
-                scanDevicesButtonAction = id; 
-                showPanel = id; 
-                viewHDHRStation = id; 
-            }; 
-            CLASS = Preferences; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {
-                mChannelPrefsView = NSView; 
-                mChannelScanProgressIndicator = NSProgressIndicator; 
-                mDurationSlider = DiscreteDurationSlider; 
-                mDurationTextField = NSTextField; 
-                mHDHomeRunTunersArrayController = NSArrayController; 
-                mLineupArrayController = NSArrayController; 
-                mPanel = id; 
-                mParsingProgressIndicator = NSProgressIndicator; 
-                mParsingProgressInfoField = NSTextField; 
-                mPrefsContainerView = NSView; 
-                mRetrieveLineupsButton = NSButton; 
-                mScanChannelsButton = NSButton; 
-                mScanTunersButton = NSButton; 
-                mStationsArrayController = NSArrayController; 
-                mTunerPrefsView = NSView; 
-                mTunerScanProgressIndicator = NSProgressIndicator; 
-                mVisibleStationsArrayController = NSArrayController; 
-                mZap2ItPasswordField = NSTextField; 
-                mZap2ItPrefsView = NSView; 
-                mZap2ItUsernameField = NSTextField; 
-            }; 
-            SUPERCLASS = NSObject; 
-        }
-    ); 
-    IBVersion = 1; 
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IBClasses</key>
+	<array>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>DiscreteDurationSlider</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>mDurationField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSSlider</string>
+		</dict>
+		<dict>
+			<key>ACTIONS</key>
+			<dict>
+				<key>cancelButtonAction</key>
+				<string>id</string>
+				<key>durationSliderChanged</key>
+				<string>NSSlider</string>
+				<key>exportHDHomeRunChannelMap</key>
+				<string>id</string>
+				<key>getAccountButtonAction</key>
+				<string>id</string>
+				<key>okButtonAction</key>
+				<string>id</string>
+				<key>retrieveLineupsButtonAction</key>
+				<string>id</string>
+				<key>scanChannelsButtonAction</key>
+				<string>id</string>
+				<key>scanDevicesButtonAction</key>
+				<string>id</string>
+				<key>showPanel</key>
+				<string>id</string>
+				<key>viewHDHRStation</key>
+				<string>id</string>
+			</dict>
+			<key>CLASS</key>
+			<string>Preferences</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>OUTLETS</key>
+			<dict>
+				<key>mChannelPrefsView</key>
+				<string>NSView</string>
+				<key>mChannelScanProgressIndicator</key>
+				<string>NSProgressIndicator</string>
+				<key>mDurationSlider</key>
+				<string>DiscreteDurationSlider</string>
+				<key>mDurationTextField</key>
+				<string>NSTextField</string>
+				<key>mExportChannelTunerSelectionView</key>
+				<string>NSView</string>
+				<key>mHDHomeRunTunersArrayController</key>
+				<string>NSArrayController</string>
+				<key>mLineupArrayController</key>
+				<string>NSArrayController</string>
+				<key>mPanel</key>
+				<string>id</string>
+				<key>mParsingProgressIndicator</key>
+				<string>NSProgressIndicator</string>
+				<key>mParsingProgressInfoField</key>
+				<string>NSTextField</string>
+				<key>mPrefsContainerView</key>
+				<string>NSView</string>
+				<key>mRetrieveLineupsButton</key>
+				<string>NSButton</string>
+				<key>mScanChannelsButton</key>
+				<string>NSButton</string>
+				<key>mScanTunersButton</key>
+				<string>NSButton</string>
+				<key>mStationsArrayController</key>
+				<string>NSArrayController</string>
+				<key>mTunerPrefsView</key>
+				<string>NSView</string>
+				<key>mTunerScanProgressIndicator</key>
+				<string>NSProgressIndicator</string>
+				<key>mVisibleStationsArrayController</key>
+				<string>NSArrayController</string>
+				<key>mZap2ItPasswordField</key>
+				<string>NSTextField</string>
+				<key>mZap2ItPrefsView</key>
+				<string>NSView</string>
+				<key>mZap2ItUsernameField</key>
+				<string>NSTextField</string>
+			</dict>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>HexNumberFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSNumberFormatter</string>
+		</dict>
+	</array>
+	<key>IBVersion</key>
+	<string>1</string>
+</dict>
+</plist>

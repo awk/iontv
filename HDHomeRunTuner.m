@@ -194,6 +194,39 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
   }
 }
 
+- (void) exportChannelMapTo:(NSURL *)inURL
+{
+	// Start by adding all the channels on this tuner to an array
+	NSMutableSet *channelsSet = [self mutableSetValueForKey:@"channels"];
+
+	// Create an array to hold the dictionaries of channel info
+	NSMutableArray *channelsOnTuner = [NSMutableArray arrayWithCapacity:[channelsSet count]];
+
+	// Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array
+	[channelsSet makeObjectsPerformSelector:@selector(addChannelInfoDictionaryTo:) withObject:channelsOnTuner];
+	
+	NSSortDescriptor *channelDescriptor =[[[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES] autorelease];
+	NSArray *sortDescriptors=[NSArray arrayWithObject:channelDescriptor];
+	NSArray *sortedArray=[channelsOnTuner sortedArrayUsingDescriptors:sortDescriptors];
+	
+	NSData *xmlData;
+	NSString *error;
+	 
+	xmlData = [NSPropertyListSerialization dataFromPropertyList:sortedArray
+										   format:NSPropertyListXMLFormat_v1_0
+										   errorDescription:&error];
+	if(xmlData)
+	{
+		NSLog(@"No error creating XML data.");
+		[xmlData writeToURL:inURL atomically:YES];
+	}
+	else
+	{
+		NSLog(error);
+		[error release];
+	}
+}
+
 #pragma mark - Notifications
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -555,6 +588,20 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   [inStation setChannel:self];
 }
 
+- (void) addChannelInfoDictionaryTo:(NSMutableArray *)inOutputArray
+{
+	// Create an array and use it to hold serialized info for each station on this channel
+	NSMutableArray *stationsOnChannelArray = [NSMutableArray arrayWithCapacity:[[self stations] count]];
+	
+	// Call each station in turn to add their details to the array
+	[[self stations] makeObjectsPerformSelector:@selector(addStationInfoDictionaryTo:) withObject:stationsOnChannelArray];
+	
+	// Add the station array and other channel info to a dictionary and add that to the output array
+	
+	NSDictionary *infoDictionary = [NSDictionary dictionaryWithObjectsAndKeys:[self channelType], @"channelType", [self channelNumber], @"channelNumber", [self tuningType], @"tuningType", stationsOnChannelArray, @"stations", nil];
+	[inOutputArray addObject:infoDictionary];
+}
+
 @end
 
 @implementation HDHomeRunStation
@@ -600,6 +647,24 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   
   // Set our tuner to start streaming
   [[[self channel] tuner] startStreaming];
+}
+
+- (void) addStationInfoDictionaryTo:(NSMutableArray*)inOutputArray
+{
+	// Build a dictionary of info about this station (program number, scanned callsign and Z2ITStation mapped callsign - if any).
+	NSMutableDictionary *infoDictionary = [NSMutableDictionary dictionaryWithCapacity:4];
+	[infoDictionary setValue:[self programNumber] forKey:@"programNumber"];
+	if ([self callSign])
+		[infoDictionary setValue:[self callSign] forKey:@"callSign"];
+	if ([self Z2ITStation])
+	{
+		[infoDictionary setValue:[[self Z2ITStation] stationID] forKey:@"Z2ITStationID"];
+		if ([[self Z2ITStation] callSign])
+			[infoDictionary setValue:[[self Z2ITStation] callSign] forKey:@"Z2ITCallSign"];
+	}
+	
+	// and add it to the output array
+	[inOutputArray addObject:infoDictionary];
 }
 
 #pragma mark - CoreData Accessors and Mutators

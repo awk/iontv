@@ -39,6 +39,8 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
     IBOutlet NSArrayController *mStationsArrayController;           // This is all the station entitiies in the MOC
     IBOutlet NSArrayController *mVisibleStationsArrayController;    // This is the subset of station entities that correspond to the selected HDHR Device/Tuner combo.
     
+	IBOutlet NSView *mExportChannelTunerSelectionView;
+	
     NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
     SecKeychainItemRef mZap2ItKeychainItemRef;
 
@@ -69,4 +71,5 @@ extern NSString *kWebServicesZap2ItUsernamePrefStr;
 - (IBAction) scanDevicesButtonAction:(id)sender;
 - (IBAction) scanChannelsButtonAction:(id)sender;
 - (IBAction) viewHDHRStation:(id)sender;
+- (IBAction) exportHDHomeRunChannelMap:(id)sender;
 @end

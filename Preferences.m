@@ -537,6 +537,17 @@ static Preferences *sSharedInstance = nil;
   [[[NSApplication sharedApplication] delegate] launchVLCAction:sender withParentWindow:mPanel startStreaming:selectedStation];
 }
 
+- (IBAction) exportHDHomeRunChannelMap:(id)sender
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *docPath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+
+	NSSavePanel *aSavePanel = [NSSavePanel savePanel];
+	[aSavePanel setAccessoryView:mExportChannelTunerSelectionView];
+	[aSavePanel setRequiredFileType:@"xml"];
+	[aSavePanel beginSheetForDirectory:docPath file:nil modalForWindow:mPanel modalDelegate:self didEndSelector:@selector(exportChannelPanelDidEnd: returnCode: contextInfo:)  contextInfo:nil];
+}
+
 #pragma mark Channel Scan Progress Display Protocol
 
 - (void) incrementChannelScanProgress
@@ -617,6 +628,18 @@ static Preferences *sSharedInstance = nil;
 - (void) cleanupComplete:(id)info
 {
   // Cleanup never happens for lineup downloads in the Preferences dialog.
+}
+
+#pragma mark Save Panel Delegate Methods
+
+- (void)exportChannelPanelDidEnd:(NSSavePanel *)sheet returnCode:(int)returnCode  contextInfo:(void  *)contextInfo
+{
+	if (returnCode == NSOKButton)
+	{
+		// Send the selected tuner an export message with the destination file
+		if ([[mHDHomeRunTunersArrayController selectedObjects] count] == 1)
+			[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] exportChannelMapTo:[sheet URL]];
+	}
 }
 
 #pragma mark - Notification callbacks

@@ -39,6 +39,7 @@
 - (void) startStreaming;
 - (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber;
 - (void) tuneToChannel:(HDHomeRunChannel*)inChannel;
+- (void) exportChannelMapTo:(NSURL *)inURL;
 
 - (void) releaseHDHRDevice;
 - (void) createHDHRDevice;
