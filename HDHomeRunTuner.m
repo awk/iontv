@@ -617,6 +617,17 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   return stations;
 }
 
+- (void) clearAllStations
+{
+  NSMutableSet *stations = [self mutableSetValueForKey:@"stations"];
+  while ([stations count] > 0)
+  {
+	HDHomeRunStation *aStation = [stations anyObject];
+	[stations removeObject:aStation];
+	[[self managedObjectContext] deleteObject:aStation];
+  }
+}
+
 - (void) addStation:(HDHomeRunStation*)inStation
 {
   NSMutableSet *stations = [self mutableSetValueForKey:@"stations"];

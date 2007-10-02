@@ -68,6 +68,7 @@
 - (void)setTuner:(HDHomeRunTuner*)value;
 
 - (NSMutableSet *)stations;
+- (void) clearAllStations;
 
 - (void) addStation:(HDHomeRunStation*)inStation;
 - (void) importStationsFrom:(NSArray*)inArrayOfStationDictionaries;
