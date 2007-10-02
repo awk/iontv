@@ -17,7 +17,18 @@
         }, 
         {CLASS = ScheduleHeaderView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
         {CLASS = ScheduleStationColumnView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
-        {CLASS = ScheduleView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            CLASS = ScheduleView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                mHeaderView = ScheduleHeaderView; 
+                mLineupArrayController = NSArrayController; 
+                mStationColumnView = ScheduleStationColumnView; 
+                mStationsScroller = NSScroller; 
+                mTimeScroller = NSScroller; 
+            }; 
+            SUPERCLASS = NSView; 
+        }, 
         {
             ACTIONS = {scrollerChanged = id; }; 
             CLASS = ScheduleViewController; 

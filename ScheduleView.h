@@ -8,9 +8,18 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class ScheduleHeaderView;
+@class ScheduleStationColumnView;
 
 @interface ScheduleView : NSView {
+  IBOutlet ScheduleHeaderView *mHeaderView;
+  IBOutlet ScheduleStationColumnView *mStationColumnView;
+  IBOutlet NSScroller *mTimeScroller;
+  IBOutlet NSScroller *mStationsScroller;
 
+  IBOutlet NSArrayController *mLineupArrayController;
+  NSArray *mSortedStationsArray;
+  CFAbsoluteTime mStartTime;
 }
 
 @end

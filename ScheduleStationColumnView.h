@@ -10,8 +10,6 @@
 
 @class Z2ITLineup;
 
-const int kScheduleStationColumnViewWidth = 95;
-
 @interface ScheduleStationColumnView : NSView {
   NSMutableArray *mStationLabelCellArray;
   NSArray *mSortedStationsArray;
@@ -19,6 +17,7 @@ const int kScheduleStationColumnViewWidth = 95;
   unsigned mStartStationIndex;
 }
 
++ (int) columnWidth;
 - (void) updateCellLabels;
 - (void) setSortedStationsArray:(NSArray*)inArray forLineup:(Z2ITLineup*)inLineup;
 - (unsigned) numberStationsDisplayed;

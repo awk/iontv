@@ -19,6 +19,7 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
   CFAbsoluteTime mStartTime;
 }
 
++ (int) headerHeight;
 - (void) updateCellLabels;
 - (void) setStartTime:(CFAbsoluteTime)inStartTime;
 @end

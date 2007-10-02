@@ -17,7 +17,17 @@
   [mSplitView addSubview:mDetailView];
   [mSplitView addSubview:mScheduleView];
   [mSplitView setIsPaneSplitter:NO];
+  [mSplitView setDelegate:self];
 }
+
+#pragma mark Splitview delegate methods
+
+- (float)splitView:(NSSplitView *)sender constrainMaxCoordinate:(float)proposedMax ofSubviewAt:(int)offset
+{
+  return proposedMax < 100.0f ? proposedMax : 100.0f;
+}
+
+#pragma mark Action and Callback Methods
 
 - (IBAction) getScheduleAction:(id)sender
 {

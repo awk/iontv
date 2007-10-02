@@ -12,6 +12,21 @@
 
 @implementation ScheduleHeaderView
 
++ (int) headerHeight
+{
+        float fontSize = [NSFont systemFontSizeForControlSize:NSSmallControlSize];
+        NSFont *theFont = [NSFont systemFontOfSize:fontSize];
+        
+        NSTextFieldCell *aStationCell = [[NSTextFieldCell alloc] initTextCell:@"Station"];
+        [aStationCell setBordered:YES];
+        [aStationCell setAlignment:NSCenterTextAlignment];
+        [aStationCell setFont:theFont];
+        [aStationCell setControlSize:NSSmallControlSize];
+        NSSize cellSize = [aStationCell cellSize];
+        [aStationCell release];
+        return cellSize.height;
+}
+
 - (id)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -56,13 +71,13 @@
     NSRect cellFrameRect;
     cellFrameRect.origin.x = cellFrameRect.origin.y = 0;
     cellFrameRect.size.height = [self bounds].size.height;
-    cellFrameRect.size.width = kScheduleStationColumnViewWidth;
+    cellFrameRect.size.width = [ScheduleStationColumnView columnWidth];
     [mStationCell drawWithFrame:cellFrameRect inView:self];
     // Subdivide the current bounds width into even spaced pieces (to number of cells in the array)
     int numberLabelCells = [mLabelCellArray count];
-    int aCellWidth = ([self bounds].size.width - kScheduleStationColumnViewWidth) / numberLabelCells;
+    int aCellWidth = ([self bounds].size.width - [ScheduleStationColumnView columnWidth]) / numberLabelCells;
     int i=0;
-    cellFrameRect = NSMakeRect(kScheduleStationColumnViewWidth, 0, aCellWidth, [self bounds].size.height);
+    cellFrameRect = NSMakeRect([ScheduleStationColumnView columnWidth], 0, aCellWidth, [self bounds].size.height);
     for (i=0; i < numberLabelCells; i++)
     {
       [[mLabelCellArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:self];

@@ -13,8 +13,14 @@
 
 const int kScheduleStationColumnViewCellHeight = 16;
 const int kScheduleStationColumnViewDefaultNumberOfCells = 200;
+const int kScheduleStationColumnViewWidth = 95;
 
 @implementation ScheduleStationColumnView
+
++ (int) columnWidth
+{
+  return kScheduleStationColumnViewWidth;
+}
 
 - (id)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
