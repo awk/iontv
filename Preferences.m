@@ -565,5 +565,9 @@ static Preferences *sSharedInstance = nil;
     return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
 }
 
+- (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
+{
+    return [NSArray arrayWithObjects:kZap2ItPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
+}
 
 @end
