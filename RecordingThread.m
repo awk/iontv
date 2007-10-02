@@ -9,7 +9,8 @@
 #import "RecordingThread.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
-//#import "HDHomeRunMO.h"
+#import "Z2ITStation.h"
+#import "HDHomeRunTuner.h"
 
 @implementation RecordingThreadController
 
@@ -46,23 +47,18 @@
 {
   NSLog(@"beginRecording - timer fired for schedule %@ program %@", mSchedule, mProgram);
   
-  // Create a HDHomeRunDevice to use
-//  mHDHRDevice = [[HDHomeRunDevice alloc] initWithDeviceID:0x10100B88 forTuner:0];
-//  if (mHDHRDevice == nil)
-//  {
-//    NSLog(@"beginRecording - failed to allocate and HDHomeRunDevice");
-//    return;
-//  }
+  Z2ITStation *aStation = [mSchedule station];
+  NSSet *hdhrStations = [aStation hdhrStations];
+  if ([hdhrStations count] == 0)
+  {
+	NSLog(@"beginRecording no mapped stations");
+	return;
+  }
   
-  // We need to set up the HDHomeRun to save the program to a file - we must
-  //   a) Set the correct QAM channel (71 contains WGBH)
-  //   b) Set the correct program (30104 is WGBH-SD)
-  //   c) Start saving a network stream to a file
+  HDHomeRunStation *anHDHRStation = [hdhrStations anyObject];
   
-//  [mHDHRDevice setChannelModType:@"qam256" channelNumber:71];
-//  [mHDHRDevice setProgramNumber:30104];
-//  [mHDHRDevice startStreaming];
-  
+  [anHDHRStation startStreaming];
+
   mFinishRecording = NO;
   
   FILE *fp = fopen("/Users/awk/Movies/recshed_movie.mpg", "wb");
@@ -71,14 +67,13 @@
           return ;
   }
 
-#if 0
   uint64_t next_progress = getcurrenttime() + 1000;
   while (!mFinishRecording)
   {
     usleep(64000);
 
     size_t actual_size;
-    UInt8* ptr = [mHDHRDevice receiveVideoData:&actual_size];
+    UInt8* ptr = [anHDHRStation receiveVideoData:&actual_size];
     if (!ptr) {
             continue;
     }
@@ -95,7 +90,8 @@
     if ([[mSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
       mFinishRecording = YES;
   }
-  #endif
+  [anHDHRStation stopStreaming];
+  fclose(fp);
 }
 
 - (void) endRecording
