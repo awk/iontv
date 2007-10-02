@@ -131,18 +131,21 @@
 			<string>com.apple.syncservices.RecordEntityName</string>
 			<string>relevance</string>
 			<string>genreClass</string>
+			<string>programs</string>
 		</array>
 
 		<key>org.awkward.recsched.GenreClass</key>
 		<array>
 			<string>com.apple.syncservices.RecordEntityName</string>
 			<string>name</string>
+			<string>genres</string>
 		</array>
 
 		<key>org.awkward.recsched.Advisory</key>
 		<array>
 			<string>com.apple.syncservices.RecordEntityName</string>
 			<string>name</string>
+			<string>programs</string>
 		</array>
 
 		<key>org.awkward.recsched.CrewMember</key>
@@ -150,12 +153,15 @@
 			<string>com.apple.syncservices.RecordEntityName</string>
 			<string>givenName</string>
 			<string>surname</string>
+			<string>program</string>
+			<string>role</string>
 		</array>
 
 		<key>org.awkward.recsched.CrewRole</key>
 		<array>
 			<string>com.apple.syncservices.RecordEntityName</string>
 			<string>name</string>
+			<string>crewMembers</string>
 		</array>
 	</dict>
 </dict>
