@@ -52,7 +52,7 @@
 
 // Accessor and mutator for the schedules relationship
 - (NSSet*)schedules;
-- (void)addSchedule:(Z2ITSchedule*)value;
+- (BOOL)addSchedule:(Z2ITSchedule*)value;
 
 // Accessor and mutator for the HDHomeRun Stations relationship
 - (NSSet*)hdhrStations;
