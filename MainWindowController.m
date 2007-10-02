@@ -14,7 +14,9 @@
 #import "Preferences.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
+#import "Z2ITStation.h"
 #import "recsched_AppDelegate.h"
+#import "HDHomeRunTuner.h"
 
 @implementation MainWindowController
 
@@ -117,6 +119,25 @@ const CGFloat kSourceListMinWidth = 150;
 - (IBAction) recordSeasonPass:(id)sender
 {
 	NSLog(@"Create a season pass");
+}
+
+- (IBAction) watchStation:(id)sender
+{
+	// Find the HDHRTuner for the station/lineup pair
+	Z2ITStation *aStation = [mCurrentStation content];
+	Z2ITLineup *aLineup = [mCurrentLineup content];
+
+	NSSet *hdhrStations = [aStation hdhrStations];
+	NSEnumerator *anEnumerator = [hdhrStations objectEnumerator];
+	HDHomeRunStation *aHDHRStation;
+	while ((aHDHRStation = [anEnumerator nextObject]) != nil)
+	{
+		if (([aHDHRStation Z2ITStation] == aStation) && ([[[aHDHRStation channel] tuner] lineup] == aLineup))
+		{
+			[[[NSApplication sharedApplication] delegate] launchVLCAction:sender withParentWindow:[self window] startStreaming:aHDHRStation];
+			break;
+		}
+	}
 }
 
 #pragma mark Callback Methods
@@ -235,6 +256,24 @@ const CGFloat kSourceListMinWidth = 150;
 	{
 		[self showViewForTableSelection:[mViewSelectionArrayController selectionIndex]];
     }
+}
+
+- (BOOL)validateUserInterfaceItem:(id < NSValidatedUserInterfaceItem >)anItem
+{
+	BOOL enableItem = NO;
+	
+	if ([anItem action] == @selector(watchStation:))
+	{
+		if ([mCurrentStation content] != nil)
+		{
+			enableItem = [[mCurrentStation content] hasValidTunerForLineup:[mCurrentLineup content]];
+		}
+	}
+	if (([anItem action] == @selector(recordShow:)) || ([anItem action] == @selector(recordSeasonPass:)))
+	{
+		enableItem = ([mCurrentSchedule content] != nil);
+	}
+	return enableItem;
 }
 
 #pragma mark Split View Delegate Methods

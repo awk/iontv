@@ -24,6 +24,8 @@
   IBOutlet NSView *mProgramSearchView;
   IBOutlet ScheduleView *mScheduleView;
   IBOutlet NSObjectController *mCurrentSchedule;
+  IBOutlet NSObjectController *mCurrentStation;
+  IBOutlet NSObjectController *mCurrentLineup;
   IBOutlet NSArrayController *mViewSelectionArrayController;
   
   // Cells used by the Source View selector 'table'
@@ -36,6 +38,7 @@
 - (IBAction) cleanupAction:(id)sender;
 - (IBAction) recordShow:(id)sender;
 - (IBAction) recordSeasonPass:(id)sender;
+- (IBAction) watchStation:(id)sender;
 
 - (void) showViewForTableSelection:(int) selectedRow;
 
