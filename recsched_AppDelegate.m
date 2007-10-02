@@ -17,6 +17,8 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 @implementation recsched_AppDelegate
 
+#pragma mark - Server Communication
+
 - (void) initializeServerConnection
 {
   // Connect to server
@@ -37,6 +39,13 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     [mServerMenuItem setTitle:@"Exit Server"];
   }
 }
+
+- (id) recServer
+{
+	return mRecServer;
+}
+
+#pragma mark - Initialization
 
 - (void) awakeFromNib
 {
@@ -216,10 +225,8 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 
 - (void)client:(ISyncClient *)client mightWantToSyncEntityNames:(NSArray *)entityNames
 {
-    NSLog(@"Saving for alert to sync...");
-	[self saveAction:self];
-
-	NSLog(@"syncing with client %@ for entityNames %@", client, entityNames);
+	// We don't need to save the store here - we save after each significant change so the on disk store is good enough to use as is...
+	NSLog(@"syncing with client %@", [client displayName]);
 	NSError *error;
 	[[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
 }
@@ -246,6 +253,26 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 {
 //    NSLog(@"pull %@", [change description]);
     return change;
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushChangesInSyncSession:(ISyncSession *)session
+{
+	NSLog(@"willPushChangesInSyncSession - session = %@", session);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didPushChangesInSyncSession:(ISyncSession *)session
+{
+	NSLog(@"didPushChangesInSyncSession - session = %@", session);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPullChangesInSyncSession:(ISyncSession *)session
+{
+	NSLog(@"willPullChangesInSyncSession - session = %@", session);
+}
+
+- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didPullChangesInSyncSession:(ISyncSession *)session
+{
+	NSLog(@"didPullChangesInSyncSession - session = %@", session);
 }
 
 - (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didCancelSyncSession:(ISyncSession *)session error:(NSError *)error

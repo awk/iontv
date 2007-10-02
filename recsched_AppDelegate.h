@@ -33,6 +33,7 @@
 - (NSManagedObjectContext *)managedObjectContext;
 
 - (ISyncClient *)syncClient;
+- (id) recServer;
 
 - (IBAction)saveAction:sender;
 - (void)syncAction:(id)sender;
