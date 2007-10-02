@@ -7,6 +7,7 @@
 //
 
 #import "HDHomeRunTuner.h"
+#import "HDHomeRunMO.h"
 #import "CoreData_Macros.h"
 
 @implementation HDHomeRunTuner
@@ -46,5 +47,53 @@ COREDATA_MUTATOR(Z2ITLineup*, @"lineup");
   NSString *name = [NSString stringWithFormat:@"%@ - %@ - %@", [[self device] name], [self index], [[self lineup] name]];
   return name;
 }
+
+#pragma Actions
+
+- (void) scanAction
+{
+  NSLog(@"HDHomeRunTuner - scanAction for %@", [self longName]);
+}
+
+#pragma Initialization
+
+- (void) createHDHRDevice
+{
+  uint32_t deviceID = [[[self device] deviceID] intValue];
+  if ((deviceID != 0) && (mHDHomeRunDevice == nil))
+  {
+    mHDHomeRunDevice = hdhomerun_device_create(deviceID, 0, 0);
+  }
+}
+
+- (void) awakeFromFetch
+{
+  [super awakeFromFetch];
+  [self createHDHRDevice];
+}
+
+- (void) awakeFromInsert
+{
+  [super awakeFromInsert];
+  [self createHDHRDevice];
+  NSLog(@"HDHomeRunMO - awakeFromInsert");
+}
+
+#pragma Uninitialization
+
+- (void) releaseHDHRDevice
+{
+  if (mHDHomeRunDevice)
+    hdhomerun_device_destroy(mHDHomeRunDevice);
+  mHDHomeRunDevice = nil;
+}
+
+- (void) didTurnIntoFault
+{
+  [self releaseHDHRDevice];
+  
+  [super didTurnIntoFault];
+}
+
 
 @end
