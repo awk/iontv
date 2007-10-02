@@ -9,7 +9,6 @@
 #import "ScheduleHeaderView.h"
 #import "ScheduleView.h"
 #import "ScheduleStationColumnView.h"
-#import "iTableColumnHeaderCell.h"
 
 const int kScheduleHeaderViewDefaultNumberOfCells = 6;
 
