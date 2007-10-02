@@ -197,7 +197,7 @@ static Preferences *sSharedInstance = nil;
 	
 	// Start with the Zap2It prefs
 	[toolbar setSelectedItemIdentifier:kZap2ItPreferencesToolbarIdentifier];
-	[self showZap2ItPrefs:self];
+	[self showPrefsView:mZap2ItPrefsView];
 	
     // install the toolbar.
     [mPanel setToolbar:toolbar];
@@ -300,12 +300,12 @@ static Preferences *sSharedInstance = nil;
 
 - (IBAction) okButtonAction:(id)sender
 {
-	NSLog(@"OK Button Clicked");
+	[mPanel orderOut:sender];
 }
 
 - (IBAction) cancelButtonAction:(id)sender
 {
-	NSLog(@"Cancel Button CLicked");
+	[mPanel orderOut:sender];
 }
 
 #pragma mark - Toolbar Delegates
