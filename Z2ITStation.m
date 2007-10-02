@@ -59,6 +59,40 @@ static NSMutableDictionary *sStationsDictionary = nil;
   }
 }
 
++ (Z2ITStation *) fetchStationWithCallSign:(NSString*)callSignString inLineup:(Z2ITLineup*)inLineup inManagedObjectContext:(NSManagedObjectContext*)inMOC
+{
+  Z2ITStation *aStation = nil;
+  
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:inMOC];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+   
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"callSign LIKE %@", callSignString];
+  [request setPredicate:predicate];
+   
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"stationID" ascending:YES];
+  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+  [sortDescriptor release];
+   
+  NSError *error = nil;
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
+  if (array == nil)
+  {
+      NSLog(@"Error executing fetch request to find station with callsign %@", callSignString);
+      return nil;
+  }
+  if ([array count] == 0)
+  {
+    NSLog(@"No Stations with callSign %@ found", callSignString);
+    return nil;
+  }
+  else
+  {
+    aStation = [array objectAtIndex:0];
+  }
+  return aStation;
+}
+
 #pragma mark
 #pragma mark Core Data accessors/mutators/validation methods
 #pragma mark
