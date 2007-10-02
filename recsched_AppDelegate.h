@@ -21,7 +21,8 @@
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;
     NSManagedObjectContext *managedObjectContext;
-    
+    NSPersistentStore *persistentStore;
+	
     NSTask      *mVLCTask;
     NSTimer     *mVLCTerminateTimer;
 
@@ -29,6 +30,7 @@
 }
 
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
+- (NSPersistentStore *)persistentStore;
 - (NSManagedObjectModel *)managedObjectModel;
 - (NSManagedObjectContext *)managedObjectContext;
 
@@ -42,4 +44,6 @@
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
 
 - (IBAction) quitServer:(id)sender;
+
+- (void) addSourceListNodes;
 @end

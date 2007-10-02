@@ -132,12 +132,16 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     
     url = [NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched.dat"]];
     persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
-	NSPersistentStore *store = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error];
-    if (store != nil)
+		
+	// Turn on Migration for the store
+	NSDictionary *optionsDictionary = nil; //[NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
+
+	persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:optionsDictionary error:&error];
+    if (persistentStore != nil)
 	{
 		NSURL *fastSyncDetailURL;
         fastSyncDetailURL = [NSURL fileURLWithPath:[applicationSupportFolder stringByAppendingPathComponent:@"org.awkward.recsched.fastsyncstore"]];
-        [persistentStoreCoordinator setStoresFastSyncDetailsAtURL:fastSyncDetailURL forPersistentStore:store];
+        [persistentStoreCoordinator setStoresFastSyncDetailsAtURL:fastSyncDetailURL forPersistentStore:persistentStore];
 	}
 	else
 	{
@@ -147,6 +151,19 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     return persistentStoreCoordinator;
 }
 
+- (NSPersistentStore*) persistentStore
+{
+	if (persistentStore != nil)
+	{
+		return persistentStore;
+	}
+	[self persistentStoreCoordinator];
+	if (persistentStore)
+		return persistentStore;
+	else
+		NSLog(@"ERROR - No Persistent Store after initializing coordinator !");
+	return nil;
+}
 
 /**
     Returns the managed object context for the application (which is already
@@ -224,6 +241,66 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 			[[self recServer] pushHDHomeRunChannelsAndStations:sortedArray onDeviceID:[[[aTuner device] deviceID] intValue] forTunerIndex:[[aTuner index] intValue]];
 		}
 	}
+}
+
+- (void) addSourceListNodes
+{
+	NSManagedObject *firstPriority, *secondPriority, *thirdPriority;
+	
+	firstPriority = [NSEntityDescription insertNewObjectForEntityForName:@"SourceListNodePriority" inManagedObjectContext:[self managedObjectContext]];
+	[firstPriority setValue:[NSNumber numberWithInt:1] forKey:@"value"];
+	secondPriority = [NSEntityDescription insertNewObjectForEntityForName:@"SourceListNodePriority" inManagedObjectContext:[self managedObjectContext]];
+	[secondPriority setValue:[NSNumber numberWithInt:2] forKey:@"value"];
+	thirdPriority = [NSEntityDescription insertNewObjectForEntityForName:@"SourceListNodePriority" inManagedObjectContext:[self managedObjectContext]];
+	[thirdPriority setValue:[NSNumber numberWithInt:3] forKey:@"value"];
+
+	NSManagedObject *aSourceListNode = [NSEntityDescription insertNewObjectForEntityForName:@"SourceListNode" inManagedObjectContext:[self managedObjectContext]];
+	[aSourceListNode setValue:@"PROGRAMS" forKey:@"label"];
+	[aSourceListNode setValue:[NSNumber numberWithBool:NO] forKey:@"expandable"];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:@"heading"];
+	[aSourceListNode setValue:firstPriority forKey:@"priority"];
+	[[firstPriority mutableSetValueForKey:@"nodes"] addObject:aSourceListNode];
+	
+	NSManagedObject *aChildSourceListNode = [NSEntityDescription insertNewObjectForEntityForName:@"SourceListNode" inManagedObjectContext:[self managedObjectContext]];
+	[aChildSourceListNode setValue:@"Schedule" forKey:@"label"];
+	[aChildSourceListNode setValue:aSourceListNode forKey:@"parent"];
+	[aChildSourceListNode setValue:@"showSchedule" forKey:@"actionMessageName"];
+	[aChildSourceListNode setValue:firstPriority forKey:@"priority"];
+	[[firstPriority mutableSetValueForKey:@"nodes"] addObject:aChildSourceListNode];
+	[[aSourceListNode mutableSetValueForKey:@"children"] addObject:aChildSourceListNode];
+
+	aChildSourceListNode = [NSEntityDescription insertNewObjectForEntityForName:@"SourceListNode" inManagedObjectContext:[self managedObjectContext]];
+	[aChildSourceListNode setValue:@"Search" forKey:@"label"];
+	[aChildSourceListNode setValue:aSourceListNode forKey:@"parent"];
+	[aChildSourceListNode setValue:@"showSearch" forKey:@"actionMessageName"];
+	[aChildSourceListNode setValue:secondPriority forKey:@"priority"];
+	[[secondPriority mutableSetValueForKey:@"nodes"] addObject:aChildSourceListNode];
+	[[aSourceListNode mutableSetValueForKey:@"children"] addObject:aChildSourceListNode];
+	
+	NSDictionary *currentStoreMetadata = [[self persistentStoreCoordinator] metadataForPersistentStore:[self persistentStore]];
+	NSMutableDictionary  *newStoreMetadata = [NSMutableDictionary dictionaryWithDictionary:currentStoreMetadata];
+	[newStoreMetadata setValue:[NSNumber numberWithBool:YES] forKey:@"SourceListNodesSetup"];
+	[[self persistentStoreCoordinator] setMetadata:newStoreMetadata forPersistentStore:[self persistentStore]];
+
+	aSourceListNode = [NSEntityDescription insertNewObjectForEntityForName:@"SourceListNode" inManagedObjectContext:[self managedObjectContext]];
+	[aSourceListNode setValue:@"FUTURE RECORDINGS" forKey:@"label"];
+	[aSourceListNode setValue:[NSNumber numberWithBool:NO] forKey:@"expandable"];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:@"heading"];
+	[aSourceListNode setValue:secondPriority forKey:@"priority"];
+	[[secondPriority mutableSetValueForKey:@"nodes"] addObject:aSourceListNode];
+
+	aSourceListNode = [NSEntityDescription insertNewObjectForEntityForName:@"SourceListNode" inManagedObjectContext:[self managedObjectContext]];
+	[aSourceListNode setValue:@"SEASON PASSES" forKey:@"label"];
+	[aSourceListNode setValue:[NSNumber numberWithBool:NO] forKey:@"expandable"];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:@"heading"];
+	[aSourceListNode setValue:thirdPriority forKey:@"priority"];
+	[[thirdPriority mutableSetValueForKey:@"nodes"] addObject:aSourceListNode];
+
+	// Save to make sure that the nodes are committed to disk
+    NSError *error = nil;
+    if (![[self managedObjectContext] save:&error]) {
+        [[NSApplication sharedApplication] presentError:error];
+    }
 }
 
 #pragma mark Sync
