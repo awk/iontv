@@ -239,12 +239,14 @@
           if (mapStation)
           {
             Z2ITLineupMap *aLineupMap = [aLineup fetchLineupMapWithStationID:stationIDNumber];
+			BOOL addLineup = NO;
             if (!aLineupMap)
             {
               aLineupMap = [NSEntityDescription
                   insertNewObjectForEntityForName:@"LineupMap"
                   inManagedObjectContext:inMOC];
               [aLineupMap retain];
+			  addLineup = YES;
             }
 
             [aLineupMap setStation:mapStation];
@@ -256,7 +258,8 @@
             if (toDate)
               [aLineupMap setTo:toDate];
               
-            [aLineup addLineupMap:aLineupMap];
+			if (addLineup)
+				[aLineup addLineupMap:aLineupMap];
 
             [aLineupMap release];
             aLineupMap = NULL;
@@ -350,17 +353,17 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
         if ((existingProgramIndex < existingProgramCount) && ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame))
         {
           aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
+		  // We should check and update the program details here - they may have changed.
           existingProgramIndex++;
         }
-        
-        if (!aProgram)
+		else
         {
           aProgram = [[NSEntityDescription insertNewObjectForEntityForName:@"Program"
                   inManagedObjectContext:inMOC] autorelease];
-        }
         
-        [aProgram setProgramID:programIDString];
-        [aProgram initializeWithXMLElement:childElement];
+			[aProgram setProgramID:programIDString];
+			[aProgram initializeWithXMLElement:childElement];
+		}
       }
     }
   [subPool release];
@@ -535,9 +538,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     [inProgressDisplay setParsingInfoString:@"Updating Schedules"];
   else
     NSLog(@"Updating Schedules");
-  // Start by clearing all the existing schedules - this collection replaces everything to date
-  [Z2ITSchedule clearAllSchedulesInManagedObjectContext:inMOC];
-  
+
   childNodes = [[inSchedulesNode children] sortedArrayUsingFunction:compareXMLNodeByProgramAttribute context:nil];
   count = [childNodes count];
   if (reportProgress)
@@ -647,6 +648,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   }
   [subPool release];
   
+#if 0
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//productionCrew" error:&err];
   if (([nodes count] > 0 ) && !inLineupsOnly)
@@ -666,6 +668,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         [self updateGenres:theGenres reportTo:inProgressDisplay inManagedObjectContext:inMOC];
   }
   [subPool release];
+#endif
   
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//schedules" error:&err];
