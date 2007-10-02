@@ -56,7 +56,8 @@
         subViewFrame.size.height -= [ScheduleHeaderView headerHeight];
         mStationColumnView = [[ScheduleStationColumnView alloc] initWithFrame:subViewFrame];
         [mStationColumnView setAutoresizingMask:NSViewHeightSizable];
-        
+        [mStationColumnView setDelegate:delegate];
+		
         subViewFrame  = NSMakeRect(0, 0, frame.size.width, frame.size.height);
         subViewFrame.size.height = [ScheduleHeaderView headerHeight];
         subViewFrame.size.width -= [NSScroller scrollerWidth];
@@ -71,7 +72,7 @@
         mGridView = [[ScheduleGridView alloc] initWithFrame:subViewFrame];
         [mGridView setAutoresizingMask:NSViewHeightSizable|NSViewWidthSizable];
         [mGridView setDelegate:delegate];
-        
+		
         [self addSubview:mStationsScroller];
         [self addSubview:mStationColumnView];
         [self addSubview:mHeaderView];
@@ -117,6 +118,10 @@
         // thread (during parsing) 'our' managed object context may not notify the NSObjectControllers that new data has been added
         // This notification is sent during the end of saving to notify everyone of new content
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateControllers) name:RSNotificationManagedObjectContextUpdated object:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+		
+		// Set the context menu on the subviews
+        [mGridView setMenu:[self menu]];
+		[mStationColumnView setMenu:[self menu]];
 }
 
 - (void)drawRect:(NSRect)rect {
@@ -142,6 +147,7 @@
   
   // Also set the delegate on our 'contained' subview that handles the grid
   [mGridView setDelegate:inDelegate];
+  [mStationColumnView setDelegate:inDelegate];
 }
 
 - (void) setStartTime:(CFAbsoluteTime)inTime
