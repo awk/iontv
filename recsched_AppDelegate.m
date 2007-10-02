@@ -188,6 +188,44 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
     [self syncAction:nil];
 }
 
+#pragma Leopard Bug Workarounds
+
+- (void) pushHDHomeRunStations
+{
+	if ([self recServer])
+	{
+		// Get all the tuners in the system
+		NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"HDHomeRunTuner" inManagedObjectContext:[self managedObjectContext]];
+		NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+		[request setEntity:entityDescription];
+
+		NSError *error = nil;
+		NSArray *array = [[self managedObjectContext] executeFetchRequest:request error:&error];
+		
+		// Iterate over each tuner
+		int tunerIndex = 0;
+		for ( ; tunerIndex < [array count]; tunerIndex++)
+		{
+			HDHomeRunTuner *aTuner = [array objectAtIndex:tunerIndex];
+			
+			// Start by adding all the channels on this tuner to an array
+			NSMutableSet *channelsSet = [aTuner mutableSetValueForKey:@"channels"];
+
+			// Create an array to hold the dictionaries of channel info
+			NSMutableArray *channelsOnTuner = [NSMutableArray arrayWithCapacity:[channelsSet count]];
+
+			// Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array
+			[channelsSet makeObjectsPerformSelector:@selector(addChannelInfoDictionaryTo:) withObject:channelsOnTuner];
+			
+			NSSortDescriptor *channelDescriptor =[[[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES] autorelease];
+			NSArray *sortDescriptors=[NSArray arrayWithObject:channelDescriptor];
+			NSArray *sortedArray=[channelsOnTuner sortedArrayUsingDescriptors:sortDescriptors];
+			
+			[[self recServer] pushHDHomeRunChannelsAndStations:sortedArray onDeviceID:[[[aTuner device] deviceID] intValue] forTunerIndex:[[aTuner index] intValue]];
+		}
+	}
+}
+
 #pragma mark Sync
 
 - (ISyncClient *)syncClient
@@ -282,6 +320,10 @@ NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 - (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didFinishSyncSession:(ISyncSession *)session
 {
 	NSLog(@"didFinishSyncSession");
+	
+	// Work around the issues with syncing HDHomeRunStations (missing channel relationship) in Leopard 9A499 by explicitly
+	// pushing the station details to the background app
+	[self pushHDHomeRunStations];
 }
 
 #pragma mark - Actions
