@@ -75,6 +75,7 @@
 		EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */; };
 		EA293B860C0E1A1E0053E2B8 /* libRBSplitView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA293B760C0E18BC0053E2B8 /* libRBSplitView.a */; };
 		EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = EA294B2E0C162D1D0053E2B8 /* RecSchedNotifications.m */; };
+		EA294E3C0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EA294E3B0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m */; };
 		EA2EE03F0C07D2300002420F /* hdhomerun_channelscan.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */; };
 		EA2EE0400C07D2320002420F /* hdhomerun_config.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02B0C07D2130002420F /* hdhomerun_config.c */; };
 		EA2EE0410C07D2340002420F /* hdhomerun_control.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02C0C07D2130002420F /* hdhomerun_control.c */; };
@@ -240,6 +241,8 @@
 		EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLParsingProgressDisplayProtocol.h; sourceTree = "<group>"; };
 		EA294B2B0C162CFC0053E2B8 /* RecSchedNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecSchedNotifications.h; sourceTree = "<group>"; };
 		EA294B2E0C162D1D0053E2B8 /* RecSchedNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecSchedNotifications.m; sourceTree = "<group>"; };
+		EA294E3A0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JKSourceTableColumnHeaderCell.h; sourceTree = "<group>"; };
+		EA294E3B0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JKSourceTableColumnHeaderCell.m; sourceTree = "<group>"; };
 		EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_channelscan.c; path = ../libhdhomerun/hdhomerun_channelscan.c; sourceTree = SOURCE_ROOT; };
 		EA2EE02A0C07D2130002420F /* hdhomerun_channelscan.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_channelscan.h; path = ../libhdhomerun/hdhomerun_channelscan.h; sourceTree = SOURCE_ROOT; };
 		EA2EE02B0C07D2130002420F /* hdhomerun_config.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_config.c; path = ../libhdhomerun/hdhomerun_config.c; sourceTree = SOURCE_ROOT; };
@@ -598,6 +601,8 @@
 				EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */,
 				EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */,
 				EA293E870C10A8040053E2B8 /* ChannelScanProgressDisplayProtocol.h */,
+				EA294E3A0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.h */,
+				EA294E3B0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -829,6 +834,7 @@
 				EA2939C50C0CD63E0053E2B8 /* JKVariableCellColumn.m in Sources */,
 				EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */,
 				EA294B2F0C162D1D0053E2B8 /* RecSchedNotifications.m in Sources */,
+				EA294E3C0C1884D40053E2B8 /* JKSourceTableColumnHeaderCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

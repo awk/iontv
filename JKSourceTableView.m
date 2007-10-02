@@ -25,13 +25,18 @@ http://joris.kluivers.nl
 */
 
 #import "JKSourceTableView.h"
+#import "JKSourceTableColumnHeaderCell.h"
+#import "RBSplitView.h"
 
 @implementation JKSourceTableView
+
 - (id) initWithFrame:(NSRect)frame {
 	self = [super initWithFrame:frame];
 	
 	if (self) {	
-		
+          NSRect headerFrame = frame;
+          headerFrame.size.height = 16;
+          [self setHeaderView:[[JKSourceTableHeaderView alloc] initWithFrame:headerFrame]];
 	}
 	
 	return self;
@@ -41,6 +46,10 @@ http://joris.kluivers.nl
 	[self setBackgroundColor:[NSColor colorWithDeviceRed:0.906 green:0.930 blue:0.965 alpha:1.0]];
 	[self setIntercellSpacing:NSMakeSize(0.0, 0.1)];
 	heightCache = [[NSMutableDictionary alloc] init];
+        
+        NSRect headerFrame = [self frame];
+        headerFrame.size.height = 16;
+        [self setHeaderView:[[JKSourceTableHeaderView alloc] initWithFrame:headerFrame]];
 }
 
 - (float) heightForRow:(int)row {
@@ -112,4 +121,57 @@ http://joris.kluivers.nl
 	
 	[super reloadData];
 }
+
+@end
+
+@implementation JKSourceTableHeaderView
+
+- (void) updateColumnHeaderCells
+{
+    NSArray *columns = [[self tableView] tableColumns];
+    NSEnumerator *cols = [columns objectEnumerator];
+    NSTableColumn *col = nil;
+    
+    JKSourceTableColumnHeaderCell *headerCell;
+    
+    while (col = [cols nextObject]) {
+        headerCell = [[JKSourceTableColumnHeaderCell alloc]  initTextCell:[[col headerCell] stringValue]];
+        [col setHeaderCell:headerCell];
+        [headerCell release];
+    }
+}
+
+- (NSRect) resizeThumbRect
+{
+  // The right hand 15 pixels should tigger the split view resize cursor
+  NSRect resizeThumbRect = NSMakeRect([self frame].origin.x + [self frame].size.width - 15, [self frame].origin.y, 15, [self frame].size.height);
+  return resizeThumbRect;
+}
+
+- (void) resetCursorRects
+{
+  NSCursor* cursor = [RBSplitView cursor:RBSVVerticalCursor];
+  NSRect resizeThumbRect = [self resizeThumbRect];
+  if (!NSIsEmptyRect(resizeThumbRect))
+  {
+    [self addCursorRect:resizeThumbRect cursor:cursor];
+  }
+}
+
+- (BOOL) acceptsFirstMouse:(NSEvent*)theEvent
+{
+  return YES;
+}
+
+- (void)mouseDown:(NSEvent *)theEvent 
+{
+  // Swallow mouse downs so that click in the header doesn't attempt to re-order the contents of the source list.
+}
+
+- (void) setTableView:(NSTableView*)inTableView
+{
+  [super setTableView:inTableView];
+  [self updateColumnHeaderCells];
+}
+
 @end

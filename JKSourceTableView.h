@@ -35,4 +35,11 @@ http://joris.kluivers.nl
 	BOOL shouldCacheCellHeight;
 	NSMutableDictionary *heightCache;
 }
+
+@end
+
+@interface JKSourceTableHeaderView : NSTableHeaderView
+{
+}
+
 @end
