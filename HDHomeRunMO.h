@@ -31,6 +31,7 @@ extern const int kDefaultPortNumber;
 
 - (HDHomeRunTuner*) tuner0;
 - (HDHomeRunTuner*) tuner1;
+- (HDHomeRunTuner*) tunerWithIndex:(int)index;
 @end
 
 // coalesce these into one @interface HDHomeRun (CoreDataGeneratedAccessors) section

@@ -43,9 +43,7 @@ const int kDefaultPortNumber = 1234;
   }
   if ([array count] == 1)
   {
-    HDHomeRun *aHDHomeRun = [array objectAtIndex:0];
-    [aHDHomeRun retain];
-    return aHDHomeRun;
+      return [array objectAtIndex:0];
   }
   else if ([array count] == 0)
   {
@@ -54,7 +52,7 @@ const int kDefaultPortNumber = 1234;
   else
   {
       NSLog(@"fetchHDHomeRunWithID - multiple (%d) HDHomeRuns with ID %@", [array count], inDeviceID);
-      return nil;
+      return [array objectAtIndex:0];
   }
 }
 
