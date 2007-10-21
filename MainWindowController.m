@@ -29,6 +29,7 @@ NSString *RSSourceListPBoardType = @"RSSourceListPasteboardType";
 
 NSString *RSSourceListNodeProgramsType = @"PROGRAMS";
 NSString *RSSourceListNodeFutureRecordingsType = @"FUTURE RECORDINGS";
+NSString *RSSourceListNodePastRecordingsType = @"PAST RECORDINGS";
 NSString *RSSourceListNodeSeasonPassesType = @"SEASON PASSES";
 
 NSString *RSSourceListExpandableKey = @"expandable";
@@ -45,55 +46,50 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 #pragma mark Source List Management
 
-- (void) updateSourceListForFutureRecordings
+// Merge the two arrays returning the resultant merged array
+- (NSArray*) mergeRecordingArray:(NSArray*)firstArray withArray:(NSArray*)secondArray
 {
-	NSMutableArray *schedulesToBeRecorded = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext]]];
+	NSMutableArray *mergedRecordingArray = nil;
+	NSMutableArray *myFirstArray = [firstArray mutableCopy];
+	NSMutableArray *mySecondArray = [secondArray mutableCopy];
 	
-	NSArray *treeNodes = [mViewSelectionTreeController content];
-	NSMutableDictionary *aSourceListNode = nil;
-	NSMutableArray *futureRecordingsArray  = nil;
-	for (aSourceListNode in treeNodes)
+	if (myFirstArray)
 	{
-		if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodeFutureRecordingsType)
-		{
-			futureRecordingsArray = [aSourceListNode valueForKey:RSSourceListChildrenKey];
-			break;
-		}
-	}
-	if (futureRecordingsArray)
-	{
-		NSMutableArray *futureRecordingsToDrop = [NSMutableArray arrayWithCapacity:[futureRecordingsArray count]];
+		NSMutableArray *futureRecordingsToDrop = [NSMutableArray arrayWithCapacity:[myFirstArray count]];
 		
-		// Walk the list of schedules to be recorded - if they're already in the future recordings array we can 'drop' them
-		for (NSMutableDictionary* aFutureRecordingNode in futureRecordingsArray)
+		// Walk the list of schedules to be recorded - if they're already in the first array we can 'drop' them
+		for (NSMutableDictionary* aFutureRecordingNode in myFirstArray)
 		{
 			// Get the Object ID for the schedule
 			NSManagedObjectID *anObjectID = [aFutureRecordingNode valueForKey:RSSourceListObjectIDKey];
 			RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
 			
-			// If the schedule isn't in the list of items to be recorded we should drop it from the futureRecordingsArray
-			if (![schedulesToBeRecorded containsObject:aRecording])
+			// If the schedule isn't in the list of items to be recorded we should drop it from the firstArray
+			if (![mySecondArray containsObject:aRecording])
 			{
-				// However we can't just remove it since we're in the middle of iterating over the futureRecordingsArray
+				// However we can't just remove it since we're in the middle of iterating over the firstArray
 				// so instead we'll add it to an array of recordings to be dropped en masse at the end of iterations.
 				[futureRecordingsToDrop addObject:aFutureRecordingNode];
 			}
 			else
 			{
-				// Lastly we should remove it from the list of schedulesToBeRecorded array 
+				// Lastly we should remove it from the list of secondArray array 
 				if (aRecording)
-					[schedulesToBeRecorded removeObject:aRecording];
+					[mySecondArray removeObject:aRecording];
 			}
 		}
-		[futureRecordingsArray removeObjectsInArray:futureRecordingsToDrop];
+		[myFirstArray removeObjectsInArray:futureRecordingsToDrop];
 	}
-	if (!futureRecordingsArray && ([schedulesToBeRecorded count] > 0))
+	// No future recordings array - create one
+	if (myFirstArray)
 	{
-		// No future recordings array - create one
-		futureRecordingsArray = [[NSMutableArray alloc] initWithCapacity:[schedulesToBeRecorded count]];
-	}	
+		mergedRecordingArray = [myFirstArray copy];
+	}
+	else
+		mergedRecordingArray = [[NSMutableArray alloc] initWithCapacity:[mySecondArray count]];
 
-	for (RSRecording *aRecording in schedulesToBeRecorded)
+
+	for (RSRecording *aRecording in mySecondArray)
 	{
 		NSMutableDictionary *aFutureRecordingNode = [[NSMutableDictionary alloc] init];
 		NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
@@ -106,9 +102,34 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 		[aFutureRecordingNode setValue:@"futureRecordingSelected:" forKey:RSSourceListActionMessageNameKey];
 		[aFutureRecordingNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListDeletableKey];
 		[aFutureRecordingNode setValue:@"deleteFutureRecording:" forKey:RSSourceListDeleteMessageNameKey];
-		[futureRecordingsArray addObject:aFutureRecordingNode];
+		[mergedRecordingArray addObject:aFutureRecordingNode];
 	}
-	[aSourceListNode setValue:futureRecordingsArray forKey:RSSourceListChildrenKey];
+	return [mergedRecordingArray autorelease];
+}
+
+- (void) updateSourceListForRecordings
+{
+	NSMutableArray *schedulesToBeRecorded = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] afterDate:[NSDate date]]];
+	
+	NSArray *treeNodes = [mViewSelectionTreeController content];
+	NSMutableDictionary *aSourceListNode = nil;
+	NSMutableArray *futureRecordingsArray  = nil;
+	for (aSourceListNode in treeNodes)
+	{
+		if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodeFutureRecordingsType)
+		{
+			futureRecordingsArray = [aSourceListNode valueForKey:RSSourceListChildrenKey];
+			NSArray *mergedFutureRecordingsArray = [self mergeRecordingArray:futureRecordingsArray withArray:schedulesToBeRecorded];
+			[aSourceListNode setValue:mergedFutureRecordingsArray forKey:RSSourceListChildrenKey];
+		}
+		else if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodePastRecordingsType)
+		{
+			NSMutableArray *pastRecordings = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] beforeDate:[NSDate date]]];
+			NSMutableArray *pastRecordingsArray  = [aSourceListNode valueForKey:RSSourceListChildrenKey];
+			NSArray *mergedPastRecordingsArray = [self mergeRecordingArray:pastRecordingsArray withArray:pastRecordings];
+			[aSourceListNode setValue:mergedPastRecordingsArray forKey:RSSourceListChildrenKey];
+		}
+	}
 }
 
 - (void) addSourceListNodes
@@ -152,10 +173,20 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	[aSourceListNode release];
 	
 	aSourceListNode = [[NSMutableDictionary alloc] init];
-	[aSourceListNode setValue:@"SEASON PASSES" forKey:RSSourceListLabelKey];
+	[aSourceListNode setValue:@"PAST RECORDINGS" forKey:RSSourceListLabelKey];
 	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListExpandableKey];
 	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListHeadingKey];
 	[aSourceListNode setValue:[NSNumber numberWithInt:3] forKey:RSSourceListPriorityKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:NO] forKey:RSSourceListCanAcceptDropKey];
+	[aSourceListNode setValue:RSSourceListNodePastRecordingsType forKey:RSSourceListTypeKey];
+	[treeNodes addObject:aSourceListNode];
+	[aSourceListNode release];
+
+	aSourceListNode = [[NSMutableDictionary alloc] init];
+	[aSourceListNode setValue:@"SEASON PASSES" forKey:RSSourceListLabelKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListExpandableKey];
+	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListHeadingKey];
+	[aSourceListNode setValue:[NSNumber numberWithInt:4] forKey:RSSourceListPriorityKey];
 	[aSourceListNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListCanAcceptDropKey];
 	[aSourceListNode setValue:RSSourceListNodeSeasonPassesType forKey:RSSourceListTypeKey];
 	[treeNodes addObject:aSourceListNode];
@@ -194,7 +225,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 	// Observe the arranged list of future recordings - changes to this mean that there are new recordings
 	// or some have been removed and we should update the UI.
-	[mFutureRecordingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
+	[mRecordingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
 
   mDetailViewMinHeight = [mDetailView frame].size.height;
   NSView *bottomContainerView = [[mScheduleSplitView subviews] objectAtIndex:1];
@@ -279,7 +310,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (IBAction) recordShow:(id)sender
 {
-  [RSRecording createRecordingOfSchedule:[mCurrentSchedule content] withServer:[[NSApp delegate] recServer]];
+	if ([[NSApp delegate] recServer])
+		[[[NSApp delegate] recServer] addRecordingOfSchedule:[[mCurrentSchedule content] objectID]];
 }
 
 - (IBAction) recordSeasonPass:(id)sender
@@ -388,10 +420,10 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 				[self performSelector:actionSelector withObject:[mViewSelectionTreeController selection]];
 		}
     }
-	if ((object == mFutureRecordingsArrayController) && ([keyPath isEqual:@"arrangedObjects"]))
+	if ((object == mRecordingsArrayController) && ([keyPath isEqual:@"arrangedObjects"]))
 	{
 		// The list of future recordings has changed - update the UI.
-		[self updateSourceListForFutureRecordings];
+		[self updateSourceListForRecordings];
 	}
 }
 
@@ -605,7 +637,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 				NSManagedObjectContext *MOC = [[NSApp delegate] managedObjectContext];
 				
 				Z2ITSchedule *aSchedule = (Z2ITSchedule*) [MOC objectWithID:[storeCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:[dragInfoDict valueForKey:@"scheduleObjectURI"]]]];
-				[RSRecording createRecordingOfSchedule:aSchedule withServer:[[NSApp delegate] recServer]];
+				[[[NSApp delegate] recServer] addRecordingOfSchedule:[aSchedule objectID]];
 				return YES;
 		}
 		else

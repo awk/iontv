@@ -289,14 +289,12 @@ const int kDefaultScheduleFetchDuration = 3;
 	NSLog(@"My Program title = %@, My Schedule start time = %@ channel = %@, recording = %@", mySchedule.program.title, mySchedule.time, mySchedule.station.callSign, [mySchedule recording]);
 	if ([mySchedule recording] == nil)
 	{
-		RSRecording *aRecording = [NSEntityDescription insertNewObjectForEntityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-		[mySchedule setRecording:aRecording];
-		[aRecording setSchedule:mySchedule];
-		[aRecording setStatus:[NSNumber numberWithInt:RSRecordingNoStatus]];
-		
-		[[RecordingThreadController alloc]initWithSchedule:mySchedule recordingServer:self];
-		
-		[[NSApp delegate] saveAction:self];
+		RSRecording *aRecording = [RSRecording insertRecordingOfSchedule:mySchedule];
+		if (aRecording)
+		{
+			[[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
+			[[NSApp delegate] saveAction:self];
+		}
 	}
     return YES;
   }

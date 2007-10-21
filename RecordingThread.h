@@ -9,20 +9,20 @@
 #import <Cocoa/Cocoa.h>
 
 @class Z2ITProgram;
-@class Z2ITSchedule;
+@class RSRecording;
 @class HDHomeRunDevice;
 @class RecSchedServer;
 
 @interface RecordingThreadController : NSObject {
-  Z2ITSchedule *mSchedule;
+  RSRecording *mRecording;
   bool mFinishRecording;
   HDHomeRunDevice *mHDHRDevice;
 
   NSManagedObjectContext *mThreadManagedObjectContext;
-  Z2ITSchedule *mThreadSchedule;
+  RSRecording *mThreadRecording;
   RecSchedServer *mRecSchedServer;
 }
 
-- (id) initWithSchedule:(Z2ITSchedule*)inSchedule recordingServer:(RecSchedServer*)inServer;
+- (id) initWithRecording:(RSRecording*)inRecording recordingServer:(RecSchedServer*)inServer;
 - (void) beginRecording;
 @end

@@ -16,23 +16,38 @@
 @dynamic status;
 @dynamic schedule;
 
-+ (void) createRecordingOfSchedule:(Z2ITSchedule*)aSchedule withServer:(id)recServer
++ (RSRecording*) insertRecordingOfSchedule:(Z2ITSchedule*)aSchedule
 {
 	RSRecording *aRecording = [NSEntityDescription insertNewObjectForEntityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 	[aRecording setSchedule:aSchedule];
 	[aSchedule setRecording:aRecording];
-	[aRecording setStatus:[NSNumber numberWithInt:RSRecordingNoStatus]];
-	
-	if (recServer)
-		[recServer addRecordingOfSchedule:[aSchedule objectID]];
+	[aRecording setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
+	return aRecording;
 }
 
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC
++ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)aDate
 {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.endTime > %@", [NSDate dateWithTimeIntervalSinceNow:0]];
+  [request setPredicate:predicate];
+  
+  NSError *error = nil;
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
+  return array;
+}
+
++ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC beforeDate:(NSDate*)aDate
+{
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:inMOC];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+   
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.time < %@", [NSDate dateWithTimeIntervalSinceNow:0]];
+  [request setPredicate:predicate];
+  
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
   return array;

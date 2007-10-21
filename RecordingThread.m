@@ -13,6 +13,7 @@
 #import "HDHomeRunTuner.h"
 #import "RecSchedServer.h"
 #import "RSActivityDisplayProtocol.h"
+#import "RSRecording.h"
 
 #define RECORDING_DISABLED 0
 
@@ -22,14 +23,14 @@
 {
 	// We need to create a new the managedObjectContext for this thread, we can use the mSchedule (which was given to us
 	// in a seperate thread context to retrieve the store co-ordinator and then work from there.
-	NSPersistentStoreCoordinator *psc = [[mSchedule managedObjectContext] persistentStoreCoordinator];
+	NSPersistentStoreCoordinator *psc = [[mRecording managedObjectContext] persistentStoreCoordinator];
 	if (psc != nil)
 	{
 		mThreadManagedObjectContext = [[NSManagedObjectContext alloc] init];
 		[mThreadManagedObjectContext setPersistentStoreCoordinator: psc];
 		
 		// We also need to create a thread local schedule object too.
-		mThreadSchedule = (Z2ITSchedule*) [mThreadManagedObjectContext objectWithID:[mSchedule objectID]];
+		mThreadRecording = (RSRecording*) [mThreadManagedObjectContext objectWithID:[mRecording objectID]];
 	}
 }
 
@@ -45,14 +46,14 @@
   [pool release];
 }
 
-- (id) initWithSchedule:(Z2ITSchedule*)inSchedule recordingServer:(RecSchedServer*)inServer
+- (id) initWithRecording:(RSRecording*)inRecording recordingServer:(RecSchedServer*)inServer
 {
   self = [super init];
   if (self != nil) {
-    mSchedule = [inSchedule retain];
+    mRecording = [inRecording retain];
     mRecSchedServer = [inServer retain];
 	
-    NSTimer *recordingStartTimer = [[NSTimer alloc] initWithFireDate:[mSchedule time] interval:0 target:self selector:@selector(startRecordingTimerFired:) userInfo:self repeats:NO];
+    NSTimer *recordingStartTimer = [[NSTimer alloc] initWithFireDate:mRecording.schedule.time interval:0 target:self selector:@selector(startRecordingTimerFired:) userInfo:self repeats:NO];
     [[NSRunLoop currentRunLoop] addTimer:recordingStartTimer forMode:NSDefaultRunLoopMode];
   }
   return self;
@@ -60,7 +61,7 @@
 
 - (void) dealloc
 {
-	[mSchedule release];
+	[mRecording release];
 	[mRecSchedServer release];
 	[super dealloc];
 }
@@ -114,9 +115,9 @@
 #else  
 - (void) beginRecording
 {
-  NSLog(@"beginRecording - timer fired for schedule %@ program title %@", mThreadSchedule, mThreadSchedule.program.title);
+  NSLog(@"beginRecording - timer fired for schedule %@ program title %@", mThreadRecording.schedule, mThreadRecording.schedule.program.title);
   
-  Z2ITStation *aStation = [mThreadSchedule station];
+  Z2ITStation *aStation = mThreadRecording.schedule.station;
   NSSet *hdhrStations = [aStation hdhrStations];
   if ([hdhrStations count] == 0)
   {
@@ -128,17 +129,15 @@
 
   size_t activityToken = [[mRecSchedServer uiActivity] createActivity];
   
-  [[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadSchedule.program.title, 
+  [[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
 		[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.tuner.lineup],
 		anHDHRStation.z2itStation.callSign]];
   
-  NSTimeInterval recordingDuration = [mThreadSchedule.endTime timeIntervalSinceDate:[NSDate date]];
+  NSTimeInterval recordingDuration = [mThreadRecording.schedule.endTime timeIntervalSinceDate:[NSDate date]];
   [[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
   
-  [anHDHRStation startStreaming];
-
   mFinishRecording = NO;
-  NSString *destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@", [self moviesFolder], mThreadSchedule.program.programID, mThreadSchedule.program.title, mThreadSchedule.program.subTitle];
+  NSString *destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.ts", [self moviesFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title, mThreadRecording.schedule.program.subTitle];
   [[NSFileManager defaultManager] createFileAtPath:destinationPath contents:nil attributes:nil];
   NSFileHandle* transportStreamFileHandle = [NSFileHandle fileHandleForWritingAtPath:destinationPath];
   if (!transportStreamFileHandle)
@@ -148,6 +147,10 @@
 	return;
   }
 
+  mThreadRecording.mediaFile  = [destinationPath copy];
+  mThreadRecording.status = [NSNumber numberWithInt:RSRecordingInProgressStatus];
+  
+  [anHDHRStation startStreaming];
   const NSTimeInterval kNotificationInterval = 5.0;
   NSDate *lastActivityNotification = [NSDate date];
   while (!mFinishRecording)
@@ -168,12 +171,17 @@
 		lastActivityNotification = [NSDate date];
 	}
 	
-    if ([[mThreadSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
+    if ([mThreadRecording.schedule.endTime compare:[NSDate date]] == NSOrderedAscending)
       mFinishRecording = YES;
   }
   [anHDHRStation stopStreaming];
   [transportStreamFileHandle closeFile];
   [[mRecSchedServer uiActivity] endActivity:activityToken];
+  
+  mThreadRecording.status = [NSNumber numberWithInt:RSRecordingFinishedStatus];
+  
+  // Save the MOC
+  [[NSApp delegate] performSelectorOnMainThread:@selector(saveAction:) withObject:self waitUntilDone:YES];
 }
 #endif
 

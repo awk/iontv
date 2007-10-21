@@ -20,18 +20,10 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 
 - (void) startTimersForRecordings
 {
-	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-	[request setEntity:entityDescription];
-   
-	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.endTime > %@", [NSDate dateWithTimeIntervalSinceNow:0]];
-	[request setPredicate:predicate];
-
-	NSError *error = nil;
-	NSArray *futureRecordings = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
+	NSArray *futureRecordings = [RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate] managedObjectContext] afterDate:[NSDate date]];
 	for (RSRecording *aRecording in futureRecordings)
 	{
-		[[RecordingThreadController alloc] initWithSchedule:aRecording.schedule recordingServer:mRecSchedServer];
+		[[RecordingThreadController alloc] initWithRecording:aRecording recordingServer:mRecSchedServer];
 	}
 }
 

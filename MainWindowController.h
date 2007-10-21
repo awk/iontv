@@ -30,7 +30,7 @@ extern NSString *RSSSchedulePBoardType;
   IBOutlet NSObjectController *mCurrentLineup;
   IBOutlet NSTreeController *mViewSelectionTreeController;
   
-  IBOutlet NSArrayController *mFutureRecordingsArrayController;
+  IBOutlet NSArrayController *mRecordingsArrayController;
   
   float mDetailViewMinHeight;
   NSArray *mDraggedNodes;		// Temporary copy of the nodes being dragged around

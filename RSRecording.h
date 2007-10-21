@@ -11,7 +11,9 @@
 @class Z2ITSchedule;
 
 enum {
-    RSRecordingNoStatus			=  0
+	RSRecordingNotYetStartedStatus = 0,
+	RSRecordingInProgressStatus = 1,
+	RSRecordingFinishedStatus = 2,
 };
 
 @interface RSRecording : NSManagedObject {
@@ -22,8 +24,9 @@ enum {
 @property (retain) NSNumber * status;
 @property (retain) Z2ITSchedule * schedule;
 
-+ (void) createRecordingOfSchedule:(Z2ITSchedule*)aSchedule withServer:(id)recServer;
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC;
++ (RSRecording*) insertRecordingOfSchedule:(Z2ITSchedule*)aSchedule;
++ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)date; 
++ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC beforeDate:(NSDate*)date; 
 
 @end
 
