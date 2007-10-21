@@ -16,5 +16,6 @@ extern NSString *kRecUIActivityConnectionName;
 - (void) setActivity:(size_t)activityToken progressIndeterminate:(BOOL)isIndeterminate;
 - (void) setActivity:(size_t)activityToken progressMaxValue:(double)inTotal;
 - (void) setActivity:(size_t)activityToken incrementBy:(double)delta;
+- (BOOL) shouldCancelActivity:(size_t)activityToken;
 @end
 

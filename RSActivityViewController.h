@@ -29,6 +29,7 @@
   IBOutlet NSView *mActivityAggregateView;
   
   NSDictionary *mActivityInfoDictionary;
+  BOOL mCancelClicked;
 }
 
 - (NSView*) aggregateView;
@@ -38,6 +39,7 @@
 - (void) setProgressMaxValue:(double)inTotal;
 - (void) setProgressDoubleValue:(double)inValue;
 - (void) incrementProgressBy:(double)delta;
+- (BOOL) shouldCancel;
 
 - (IBAction) cancelButtonAction:(id)sender;
 @end

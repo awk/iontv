@@ -135,6 +135,11 @@
 	[(RSActivityAggregateViewController*) activityToken incrementProgressBy:delta];
 }
 
+- (BOOL) shouldCancelActivity:(size_t)activityToken
+{
+	return [(RSActivityAggregateViewController*) activityToken shouldCancel];
+}
+
 @end
 
 @implementation RSActivityAggregateViewController
@@ -182,9 +187,14 @@
 	[mProgressIndicator incrementBy:delta];
 }
 
+- (BOOL) shouldCancel
+{
+	return mCancelClicked;
+}
+
 - (IBAction) cancelButtonAction:(id)sender
 {
-	NSLog(@"Cancel Button");
+	mCancelClicked = YES;
 }
 
 @end

@@ -12,6 +12,8 @@
 #import "RSActivityDisplayProtocol.h"
 #import "RSStoreUpdateProtocol.h"
 
+extern NSString *RSNotificationUIActivityAvailable;
+
 @interface RecSchedServer : NSObject <RecSchedServerProto, RSActivityDisplay, RSStoreUpdate> {
     BOOL mExitServer;
 	

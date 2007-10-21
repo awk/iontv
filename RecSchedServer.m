@@ -21,6 +21,7 @@
 #import "RSStoreUpdateProtocol.h"
 
 const int kDefaultScheduleFetchDuration = 3;
+NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailable";
 
 @implementation RecSchedServer
 
@@ -49,6 +50,9 @@ const int kDefaultScheduleFetchDuration = 3;
     // messaging server.
     [mUIActivity setProtocolForProxy:@protocol(RSActivityDisplay)];
   }
+  
+  // Post a notification that the activity connection is available
+  [[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationUIActivityAvailable object:self];
 }
 
 - (void) initializeStoreUpdateConnection
@@ -170,6 +174,11 @@ const int kDefaultScheduleFetchDuration = 3;
 
 - (void) setActivity:(size_t)activityToken incrementBy:(double)delta
 {
+}
+
+- (BOOL) shouldCancelActivity:(size_t)activityToken
+{
+	return NO;
 }
 
 - (void) parsingComplete:(id)info
