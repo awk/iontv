@@ -33,6 +33,7 @@
 - (BOOL)addScheduleIfNew:(Z2ITSchedule*)value;
 
 - (Z2ITLineupMap*)lineupMapForLineupID:(NSString*) inLineupID;
+- (NSString *)channelStringForLineup:(Z2ITLineup*) inLineup;
 
 @property (retain) NSString * affiliate;
 @property (retain) NSString * callSign;

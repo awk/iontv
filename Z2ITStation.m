@@ -170,6 +170,23 @@
   return aLineupMap;
 }
 
+- (NSString *)channelStringForLineup:(Z2ITLineup*) inLineup
+{
+	NSString *channelString = nil;
+	for (Z2ITLineupMap* aLineupMap in [self lineupMaps])
+	{
+		if ([aLineupMap.lineup.lineupID compare:inLineup.lineupID] == NSOrderedSame)
+		{
+			if ([aLineupMap.channelMinor intValue] > 0)
+				channelString = [NSString stringWithFormat:@"%@.%@", aLineupMap.channel, aLineupMap.channelMinor];
+			else
+				channelString = aLineupMap.channel;
+			break;
+		}
+	}
+	return channelString;
+}
+
 
 @dynamic affiliate;
 @dynamic callSign;
