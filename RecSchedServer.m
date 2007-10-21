@@ -294,7 +294,7 @@ const int kDefaultScheduleFetchDuration = 3;
 		[aRecording setSchedule:mySchedule];
 		[aRecording setStatus:[NSNumber numberWithInt:RSRecordingNoStatus]];
 		
-		[[RecordingThreadController alloc]initWithSchedule:mySchedule];
+		[[RecordingThreadController alloc]initWithSchedule:mySchedule recordingServer:self];
 		
 		[[NSApp delegate] saveAction:self];
 	}

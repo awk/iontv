@@ -11,6 +11,7 @@
 @class Z2ITProgram;
 @class Z2ITSchedule;
 @class HDHomeRunDevice;
+@class RecSchedServer;
 
 @interface RecordingThreadController : NSObject {
   Z2ITSchedule *mSchedule;
@@ -19,8 +20,9 @@
 
   NSManagedObjectContext *mThreadManagedObjectContext;
   Z2ITSchedule *mThreadSchedule;
+  RecSchedServer *mRecSchedServer;
 }
 
-- (id) initWithSchedule:(Z2ITSchedule*)inSchedule;
+- (id) initWithSchedule:(Z2ITSchedule*)inSchedule recordingServer:(RecSchedServer*)inServer;
 - (void) beginRecording;
 @end

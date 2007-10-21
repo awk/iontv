@@ -11,6 +11,8 @@
 #import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
 #import "HDHomeRunTuner.h"
+#import "RecSchedServer.h"
+#import "RSActivityDisplayProtocol.h"
 
 #define RECORDING_DISABLED 0
 
@@ -43,21 +45,34 @@
   [pool release];
 }
 
-- (id) initWithSchedule:(Z2ITSchedule*)inSchedule
+- (id) initWithSchedule:(Z2ITSchedule*)inSchedule recordingServer:(RecSchedServer*)inServer
 {
   self = [super init];
   if (self != nil) {
     mSchedule = [inSchedule retain];
-    
+    mRecSchedServer = [inServer retain];
+	
     NSTimer *recordingStartTimer = [[NSTimer alloc] initWithFireDate:[mSchedule time] interval:0 target:self selector:@selector(startRecordingTimerFired:) userInfo:self repeats:NO];
     [[NSRunLoop currentRunLoop] addTimer:recordingStartTimer forMode:NSDefaultRunLoopMode];
   }
   return self;
 }
 
+- (void) dealloc
+{
+	[mSchedule release];
+	[mRecSchedServer release];
+	[super dealloc];
+}
+
 - (void) startRecordingTimerFired:(NSTimer*)inTimer
 {
   [NSThread detachNewThreadSelector:@selector(recordingThreadStarted:) toTarget:[RecordingThreadController class] withObject:self];
+}
+
+- (NSString *)moviesFolder {
+	NSString *homeDirectory = NSHomeDirectory();
+    return [homeDirectory stringByAppendingPathComponent:@"Movies"];
 }
 
 #if RECORDING_DISABLED
@@ -111,42 +126,54 @@
   
   HDHomeRunStation *anHDHRStation = [hdhrStations anyObject];
 
-  NSLog(@"Recording on HDHRStation %@", anHDHRStation);
+  size_t activityToken = [[mRecSchedServer uiActivity] createActivity];
+  
+  [[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadSchedule.program.title, 
+		[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.tuner.lineup],
+		anHDHRStation.z2itStation.callSign]];
+  
+  NSTimeInterval recordingDuration = [mThreadSchedule.endTime timeIntervalSinceDate:[NSDate date]];
+  [[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
+  
   [anHDHRStation startStreaming];
 
   mFinishRecording = NO;
-  
-  FILE *fp = fopen("/Users/awk/Movies/recshed_movie.mpg", "wb");
-  if (!fp) {
-          NSLog(@"beginRecording - unable to create file");
-          return ;
+  NSString *destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@", [self moviesFolder], mThreadSchedule.program.programID, mThreadSchedule.program.title, mThreadSchedule.program.subTitle];
+  [[NSFileManager defaultManager] createFileAtPath:destinationPath contents:nil attributes:nil];
+  NSFileHandle* transportStreamFileHandle = [NSFileHandle fileHandleForWritingAtPath:destinationPath];
+  if (!transportStreamFileHandle)
+  {
+	NSLog(@"beginRecording - unable to create recording at %@", destinationPath);
+	[[mRecSchedServer uiActivity] endActivity:activityToken];
+	return;
   }
 
-  uint64_t next_progress = getcurrenttime() + 1000;
+  const NSTimeInterval kNotificationInterval = 5.0;
+  NSDate *lastActivityNotification = [NSDate date];
   while (!mFinishRecording)
   {
     usleep(64000);
 
-    size_t actual_size;
-    UInt8* ptr = [anHDHRStation receiveVideoData:&actual_size];
-    if (!ptr) {
-            continue;
-    }
+	NSData *videoData = [anHDHRStation receiveVideoData];
+	if (videoData)
+	{
+		[transportStreamFileHandle writeData:videoData];
+		[videoData release];
+	}
 
-    fwrite(ptr, 1, actual_size, fp);
 
-    uint64_t current_time = getcurrenttime();
-    if (current_time >= next_progress) {
-            next_progress = current_time + 1000;
-            printf(".");
-            fflush(stdout);
-    }
-
+	if ([[NSDate date] timeIntervalSinceDate:lastActivityNotification] > kNotificationInterval)
+	{
+		[[mRecSchedServer uiActivity] setActivity:activityToken incrementBy:[[NSDate date] timeIntervalSinceDate:lastActivityNotification]];
+		lastActivityNotification = [NSDate date];
+	}
+	
     if ([[mThreadSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
       mFinishRecording = YES;
   }
   [anHDHRStation stopStreaming];
-  fclose(fp);
+  [transportStreamFileHandle closeFile];
+  [[mRecSchedServer uiActivity] endActivity:activityToken];
 }
 #endif
 

@@ -31,7 +31,7 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 	NSArray *futureRecordings = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
 	for (RSRecording *aRecording in futureRecordings)
 	{
-		[[RecordingThreadController alloc] initWithSchedule:aRecording.schedule];
+		[[RecordingThreadController alloc] initWithSchedule:aRecording.schedule recordingServer:mRecSchedServer];
 	}
 }
 
