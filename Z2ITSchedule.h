@@ -11,6 +11,7 @@
 @class Z2ITProgram;
 @class Z2ITStation;
 @class RSRecording;
+@class RSTranscoding;
 
 @interface Z2ITSchedule : NSManagedObject {
 
@@ -36,6 +37,7 @@
 @property (retain) Z2ITProgram * program;
 @property (retain) Z2ITStation * station;
 @property (retain) RSRecording * recording;
+@property (retain) RSTranscoding * transcoding;
 
 - (NSString *) programDetailsStr;
 - (NSString *) tvRatingImageName;

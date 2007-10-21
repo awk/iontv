@@ -92,6 +92,7 @@
 @dynamic program;
 @dynamic station;
 @dynamic recording;
+@dynamic transcoding;
 
 - (NSString *) tvRatingImageName
 {
