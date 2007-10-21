@@ -6,14 +6,6 @@
 	<array>
 		<dict>
 			<key>CLASS</key>
-			<string>FirstResponder</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
 			<string>NSObject</string>
 			<key>LANGUAGE</key>
 			<string>ObjC</string>
@@ -30,6 +22,22 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSSlider</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>HexNumberFormatter</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSNumberFormatter</string>
+		</dict>
+		<dict>
+			<key>CLASS</key>
+			<string>FirstResponder</string>
+			<key>LANGUAGE</key>
+			<string>ObjC</string>
+			<key>SUPERCLASS</key>
+			<string>NSObject</string>
 		</dict>
 		<dict>
 			<key>ACTIONS</key>
@@ -51,6 +59,8 @@
 				<key>scanChannelsButtonAction</key>
 				<string>id</string>
 				<key>scanDevicesButtonAction</key>
+				<string>id</string>
+				<key>setPathAction</key>
 				<string>id</string>
 				<key>showPanel</key>
 				<string>id</string>
@@ -107,6 +117,8 @@
 				<string>NSButton</string>
 				<key>mStationsArrayController</key>
 				<string>NSArrayController</string>
+				<key>mStorageTranscodingPrefsView</key>
+				<string>NSView</string>
 				<key>mTunerPrefsView</key>
 				<string>NSView</string>
 				<key>mTunerScanProgressIndicator</key>
@@ -122,14 +134,6 @@
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
-		</dict>
-		<dict>
-			<key>CLASS</key>
-			<string>HexNumberFormatter</string>
-			<key>LANGUAGE</key>
-			<string>ObjC</string>
-			<key>SUPERCLASS</key>
-			<string>NSNumberFormatter</string>
 		</dict>
 	</array>
 	<key>IBVersion</key>

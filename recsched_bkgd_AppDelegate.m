@@ -12,10 +12,10 @@
 #import "RecordingThread.h"
 #import "RSTranscodeController.h"
 
+#import "PreferenceKeys.h"		// For the key values in the shared preferences
+
 NSString *kRecSchedUIAppBundleID = @"org.awkward.recsched";
 NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
-
-NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we don't link Preferences.m into the server
 
 @implementation recsched_bkgd_AppDelegate
 
@@ -35,10 +35,34 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 	[[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
 #endif // USE_SYNCSERVICES
 
-	mTranscodeController = [[RSTranscodeController alloc] init];
+	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kTranscodeProgramsKey] boolValue] == YES)
+		mTranscodeController = [[RSTranscodeController alloc] init];
 	
 	[mRecSchedServer updateSchedule];
 	[self startTimersForRecordings];
+}
+
+- (void) setupPreferences
+{
+	// Setup the preferences - we share our prefs with those of the main app.
+	NSUserDefaults *stdUserDefaults = [NSUserDefaults standardUserDefaults];
+	[stdUserDefaults addSuiteNamed:@"org.awkward.iontv"];
+
+	// load the default values for the user defaults
+	NSString *userDefaultsValuesPath=[[NSBundle mainBundle] pathForResource:@"UserDefaults" 
+							   ofType:@"plist"];
+	NSDictionary *userDefaultsValuesDict=[NSDictionary dictionaryWithContentsOfFile:userDefaultsValuesPath];
+
+	// Set up the default location for the recorded (and transcoded) programs location.
+	NSString *homeDir = NSHomeDirectory();
+	NSString *moviesDir = [homeDir stringByAppendingPathComponent:@"Movies"];
+	NSURL *moviesFolderURL = [[NSURL alloc] initFileURLWithPath:moviesDir isDirectory:YES];
+	NSString *moviesFolder = [moviesFolderURL absoluteString];
+	[userDefaultsValuesDict setValue:moviesFolder forKey:kRecordedProgramsLocationKey];
+	[userDefaultsValuesDict setValue:moviesFolder forKey:kTranscodedProgramsLocationKey];
+
+	// set them in the standard user defaults
+	[stdUserDefaults registerDefaults:userDefaultsValuesDict];
 }
 
 - (id) init {
@@ -57,6 +81,8 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
             NSLog(@"Error registering connection");
             return nil;
     }
+	// Set up the preferences
+	[self setupPreferences];
   }
   return self;
 }

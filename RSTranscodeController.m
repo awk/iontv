@@ -13,6 +13,8 @@
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 #import "iTunes_ScriptingBridge.h"
+#import "PreferenceKeys.h"
+#import "RecordingThread.h"
 
 @implementation RSTranscodeController
 
@@ -44,21 +46,23 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 {
 	for (RSRecording *aRecording in inArray)
 	{
-		NSLog(@"Recording ID = %@ title = %@ \n  transcoding =\n %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.schedule.transcoding);
+		NSLog(@"Recording ID = %@ title = %@ status = %@\ntranscoding =\n %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding);
 		if (aRecording.schedule.transcoding == NULL)
 		{
 			// Create a new transcoding entity
+#if 0
 			RSTranscoding *aTranscoding = [NSEntityDescription insertNewObjectForEntityForName:@"Transcoding" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 			[aTranscoding setSchedule:aRecording.schedule];
 			[aTranscoding setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
+#endif
 		}
 	}
 	[[[NSApp delegate] managedObjectContext] processPendingChanges];
 }
 
-- (NSString *)moviesFolder {
-	NSString *homeDirectory = NSHomeDirectory();
-    return [homeDirectory stringByAppendingPathComponent:@"Movies"];
+- (NSString *)transcodedProgramsFolder {
+	NSURL *folderURL = [NSURL URLWithString:[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kTranscodedProgramsLocationKey]];
+    return [folderURL path];
 }
 
 #pragma mark Transcoding Operations
@@ -180,7 +184,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	if (hb_list_count(titleList) > 0)
 	{
 		// Have a valid title create a transcoding job
-		NSString *transcodingPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.mp4", [self moviesFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title, mCurrentTranscoding.schedule.program.subTitle];
+		NSString *transcodingPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.mp4", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title, mCurrentTranscoding.schedule.program.subTitle];
 		[mCurrentTranscoding setMediaFile:transcodingPath];
 		hb_title_t * title = (hb_title_t *) hb_list_item( titleList, 0 );
 		
@@ -243,14 +247,29 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 {
 	// Transcoding has finished - push the completed file to iTunes
 	RSTranscodingImp *aTranscodingImp = [aNotification object];
-	[self addToiTunes:aTranscodingImp.transcoding];
 	
+	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kAddTranscodingsToiTunesKey] boolValue] == YES)
+		[self addToiTunes:aTranscodingImp.transcoding];
+	
+	NSError *error;
+	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kDeleteTranscodingsAfterAddKey] boolValue] == YES)
+		[[NSFileManager defaultManager] removeItemAtPath:[aTranscodingImp.transcoding mediaFile] error:&error];
+		
 	[mCurrentTranscoding release];
 	mCurrentTranscoding = nil;
 	// Check to see if there's another candidate to transcode
 	[self updateForNewTranscodings:[mTranscodingsArrayController arrangedObjects]];
 }
 
+- (void) recordingFinishedNotification:(NSNotification*)aNotification
+{
+	// Recording has finished - begin the transcode process
+	NSManagedObjectID *recordingObjectID = [aNotification object];
+	RSRecording *aRecording = (RSRecording*)[[[NSApp delegate] managedObjectContext] objectWithID:recordingObjectID];
+	
+	NSLog(@"recordingFinishedNotification - %@ just finished", aRecording);
+}
+	
 #pragma mark init and dealloc
 
 - (id) init
@@ -274,7 +293,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		mRecordingsArrayController = [[NSArrayController alloc] initWithContent:nil];
 		[mRecordingsArrayController setManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 		[mRecordingsArrayController setEntityName:@"Recording"];
-		[mRecordingsArrayController setFetchPredicate:[NSPredicate predicateWithFormat:@"status == %@", [NSNumber numberWithInt:RSRecordingFinishedStatus]]];
+//		[mRecordingsArrayController setFetchPredicate:[NSPredicate predicateWithFormat:@"status == %@", [NSNumber numberWithInt:RSRecordingFinishedStatus]]];
 		[mRecordingsArrayController setAutomaticallyPreparesContent:YES];
 		[mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:YES error:nil];
 		[mRecordingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
@@ -285,7 +304,10 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		// Register for notifications when transcoding completes
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transcodingFinishedNotification:) name:RSNotificationTranscodingFinished object:nil];
 		
-		[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(updateRecordings:) userInfo:nil repeats:NO];
+		// Register for notifications when recording completes
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingFinishedNotification:) name:RSNotificationRecordingFinished object:nil];
+
+//		[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(updateRecordings:) userInfo:nil repeats:NO];
 	}
 	return self;
 }
@@ -308,6 +330,8 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	if (aRecording)
 	{
 		aRecording.status = [NSNumber numberWithInt:RSRecordingFinishedStatus];
+		if (aRecording.schedule.transcoding)
+			[[[NSApp delegate] managedObjectContext] deleteObject:aRecording.schedule.transcoding];
 		aRecording.schedule.transcoding = nil;
 	}
 	[[[NSApp delegate] managedObjectContext] processPendingChanges];

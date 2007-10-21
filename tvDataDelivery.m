@@ -120,29 +120,12 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                   CFRelease(theURL);
                   
                   // Fetch the account name from the prefs file, and the password from the keychain
-                  NSString *accountName = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernamePrefStr];
-				  if (accountName == nil)
-				  {
-					NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-					NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
-					NSString *path = [NSString stringWithFormat:@"%@/Preferences/org.awkward.iontv.plist", basePath];
-					NSData *plistData;
-					NSString *error;
-					NSPropertyListFormat format;
-					id plist;
-					plistData = [NSData dataWithContentsOfFile:path];
-					 
-					plist = [NSPropertyListSerialization propertyListFromData:plistData
-                                mutabilityOption:NSPropertyListImmutable
-                                format:&format
-                                errorDescription:&error];
-					accountName = [plist valueForKey:kWebServicesSDUsernamePrefStr];
+                  NSString *accountName = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernameKey];
 					if (accountName == nil)
 					{
 						NSLog(@"No SchedulesDirect username in the application prefs !");
 						return nil;
 					}
-				  }
                   NSString *password;
                   const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
                   const char *accountNameUTF8 = [accountName UTF8String];

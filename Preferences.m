@@ -35,11 +35,8 @@ NSString *kSDPreferencesToolbarIdentifier = @"SD";
 NSString *kTunersPreferencesToolbarIdentifier = @"Tuners";
 NSString *kChannelsPreferencesToolbarIdentifier = @"Channels";
 NSString *kColorsPreferencesToolbarIdentifier = @"Colors";
+NSString *kStorageTranscodingToolbarIdentifier = @"StorageTranscoding";
 NSString *kSchedulesDirectURL = @"http://schedulesdirect.org/signup";
-
-NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";
-
-NSString *kScheduleDownloadDurationPrefStr = @"scheduleDownloadDuration";
 
 struct discreteSliderMarks
 {
@@ -80,11 +77,11 @@ static void addToolbarItem(NSMutableDictionary *theDict,NSString *identifier,NSS
     // so we create a dummy NSMenuItem that has our real menu as a submenu.
     if (menu!=NULL)
     {
-	// we actually need an NSMenuItem here, so we construct one
-	mItem=[[[NSMenuItem alloc] init] autorelease];
-	[mItem setSubmenu: menu];
-	[mItem setTitle: [menu title]];
-	[item setMenuFormRepresentation:mItem];
+		// we actually need an NSMenuItem here, so we construct one
+		mItem=[[[NSMenuItem alloc] init] autorelease];
+		[mItem setSubmenu: menu];
+		[mItem setTitle: [menu title]];
+		[item setMenuFormRepresentation:mItem];
     }
     // Now that we've setup all the settings for this new toolbar item, we add it to the dictionary.
     // The dictionary retains the toolbar item for us, which is why we could autorelease it when we created
@@ -94,6 +91,10 @@ static void addToolbarItem(NSMutableDictionary *theDict,NSString *identifier,NSS
 
 
 @implementation Preferences
+
+@synthesize recordedProgramsLocation;
+@synthesize transcodedProgramsLocation;
+@synthesize handbrakePresetsArrayController;
 
 static Preferences *sSharedInstance = nil;
 
@@ -113,13 +114,21 @@ static Preferences *sSharedInstance = nil;
                                ofType:@"plist"];
     userDefaultsValuesDict=[NSDictionary dictionaryWithContentsOfFile:userDefaultsValuesPath];
     
+	// Set up the default location for the recorded (and transcoded) programs location.
+	NSString *homeDir = NSHomeDirectory();
+	NSString *moviesDir = [homeDir stringByAppendingPathComponent:@"Movies"];
+	NSURL *moviesFolderURL = [[NSURL alloc] initFileURLWithPath:moviesDir isDirectory:YES];
+	NSString *moviesFolder = [moviesFolderURL absoluteString];
+	[userDefaultsValuesDict setValue:moviesFolder forKey:kRecordedProgramsLocationKey];
+	[userDefaultsValuesDict setValue:moviesFolder forKey:kTranscodedProgramsLocationKey];
+
     // set them in the standard user defaults
     [[NSUserDefaults standardUserDefaults] registerDefaults:userDefaultsValuesDict];
     
     // if your application supports resetting a subset of the defaults to 
     // factory values, you should set those values 
     // in the shared user defaults controller
-    resettableUserDefaultsKeys=[NSArray arrayWithObjects:kScheduleDownloadDurationPrefStr, kWebServicesSDUsernamePrefStr, nil];
+    resettableUserDefaultsKeys=[NSArray arrayWithObjects:kScheduleDownloadDurationKey, kWebServicesSDUsernameKey, nil];
     initialValuesDict=[userDefaultsValuesDict dictionaryWithValuesForKeys:resettableUserDefaultsKeys];
     
     // Set the initial values in the shared user defaults controller 
@@ -134,9 +143,18 @@ static Preferences *sSharedInstance = nil;
     }
     else if (self = [super init])
     {
+		[Preferences setupDefaults];
         sSharedInstance = self;
         [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:@"values.scheduleDownloadDuration" options:NSKeyValueObservingOptionNew context:nil];
         [[NSUserDefaultsController sharedUserDefaultsController] setAppliesImmediately:NO];
+		
+		// Build the list of handbrake presets
+		NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+		NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
+		NSString *presetsPath = [basePath stringByAppendingPathComponent:@"HandBrake/UserPresets.plist"];
+		
+		handbrakePresetsArrayController = [[NSArrayController alloc] initWithContent:[NSArray arrayWithContentsOfFile:presetsPath]];
+		[handbrakePresetsArrayController setObjectClass:[NSMutableDictionary class]];
     }
     return sSharedInstance;
 }
@@ -146,6 +164,9 @@ static Preferences *sSharedInstance = nil;
     if (self != sSharedInstance)
     {
       [super dealloc];	// Don't free the shared instance
+	  [recordedProgramsLocation release];
+	  [transcodedProgramsLocation release];
+	  [handbrakePresetsArrayController release];
     }
 }
 
@@ -156,18 +177,9 @@ static Preferences *sSharedInstance = nil;
 
 - (void) showPrefsView:(NSView*)inViewToBeShown
 {
-	// Remove the current subivews of the container
-	NSArray *prefsSubviews = [mPrefsContainerView subviews];
-	int i=0;
-	for (i=0; i < [prefsSubviews count]; i++)
-	{
-		// If we're already showing the selected view we're done here
-		if ([prefsSubviews objectAtIndex:i] == inViewToBeShown)
-			return;
-		NSView *viewToBeRemoved = [prefsSubviews objectAtIndex:i];
-		[viewToBeRemoved removeFromSuperview];
-	}
-	
+	if (mCurrentPrefsView == inViewToBeShown)
+		return;	// Nothing to do - we're already showing the right view
+		
 	// Get the containers current size
 	NSSize sizeChange;
 	sizeChange.width = [inViewToBeShown frame].size.width - [mPrefsContainerView frame].size.width ;
@@ -179,13 +191,20 @@ static Preferences *sSharedInstance = nil;
 	newFrame.size.height += sizeChange.height;
 	newFrame.size.width += sizeChange.width;
 	newFrame.origin.y -= sizeChange.height;
+
 	[mPanel setFrame:newFrame display:YES animate:YES];
 
-	[mPrefsContainerView addSubview:inViewToBeShown];
+	if (mCurrentPrefsView)
+	{
+		[mPrefsContainerView replaceSubview:mCurrentPrefsView with:inViewToBeShown];
+	}
+	else
+		[mPrefsContainerView addSubview:inViewToBeShown];
+	
+	mCurrentPrefsView = inViewToBeShown;
 	[inViewToBeShown setFrameOrigin:NSMakePoint(0,0)];
 	[inViewToBeShown setNeedsDisplay:YES];
 	[mPrefsContainerView setFrameSize:[inViewToBeShown frame].size];
-	[mPrefsContainerView setNeedsDisplay:YES];
 }
 
 // When we launch, we have to get our NSToolbar set up.  This involves creating a new one, adding the NSToolbarItems,
@@ -200,10 +219,11 @@ static Preferences *sSharedInstance = nil;
 
     // often using an image will be your standard case.  You'll notice that a selector is passed
     // for the action (blueText:), which will be called when the image-containing toolbar item is clicked.
-    addToolbarItem(mToolbarItems,kSDPreferencesToolbarIdentifier,@"SchedulesDirect",@"SchedulesDirect",@"SchedulesDirect User ID & Schedule",self,@selector(setImage:), nil /* image */,@selector(showSDPrefs:),NULL);
+    addToolbarItem(mToolbarItems,kSDPreferencesToolbarIdentifier,@"SchedulesDirect",@"SchedulesDirect",@"SchedulesDirect User ID & Schedule",self,@selector(setImage:), [NSImage imageNamed:NSImageNameUserAccounts],@selector(showSDPrefs:),NULL);
     addToolbarItem(mToolbarItems,kTunersPreferencesToolbarIdentifier,@"Tuner",@"Tuner",@"Tuner Selection",self,@selector(setImage:), nil /* image */,@selector(showTunerPrefs:),NULL);
     addToolbarItem(mToolbarItems,kChannelsPreferencesToolbarIdentifier,@"Channels",@"Channels",@"Customize Channels you recieve",self,@selector(setImage:), nil /* image */,@selector(showChannelPrefs:),NULL);
-    addToolbarItem(mToolbarItems,kColorsPreferencesToolbarIdentifier,@"Colors",@"Colors",@"Colors for program genres",self,@selector(setImage:), nil /* image */,@selector(showColorPrefs:),NULL);
+    addToolbarItem(mToolbarItems,kColorsPreferencesToolbarIdentifier,@"Colors",@"Colors",@"Colors for program genres",self,@selector(setImage:), [NSImage imageNamed:NSImageNameColorPanel], @selector(showColorPrefs:),NULL);
+    addToolbarItem(mToolbarItems,kStorageTranscodingToolbarIdentifier,@"Storage and Conversion",@"Storage and Conversion",@"Customize where programs are stored and how they are converted.",self,@selector(setImage:), [NSImage imageNamed:@"HardDrive.tiff"],@selector(showStorageTranscodingPrefs:),NULL);
      
     // the toolbar wants to know who is going to handle processing of NSToolbarItems for it.  This controller will.
     [toolbar setDelegate:self];
@@ -265,7 +285,7 @@ static Preferences *sSharedInstance = nil;
   [mDurationTextField setHidden:YES];
         
         // Now update the slider position for the default value
-        float currDuration = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationPrefStr] floatValue];
+        float currDuration = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationKey] floatValue];
         float newSliderValue = 0.0;
         int i=0;
         for (i=1; i < kNumberDurationSliderTicks; i++)
@@ -284,7 +304,7 @@ static Preferences *sSharedInstance = nil;
           
           
     // Attempt to retrieve the Username and password fields for the SchedulesDirect site
-    NSString* SDUsernameString = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernamePrefStr];
+    NSString* SDUsernameString = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernameKey];
     if (SDUsernameString)
     {
       [mSDUsernameField setStringValue:SDUsernameString];
@@ -303,11 +323,14 @@ static Preferences *sSharedInstance = nil;
         SecKeychainItemFreeContent(NULL, passwordData);
       }
     }
+	
+	self.recordedProgramsLocation = [[NSURL alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:kRecordedProgramsLocationKey]];
+	self.transcodedProgramsLocation = [[NSURL alloc] initWithString:[[NSUserDefaults standardUserDefaults] valueForKey:kTranscodedProgramsLocationKey]];
 }
 
 - (void) updateDurationLabel
 {
-  float newDuration = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationPrefStr] floatValue];
+  float newDuration = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationKey] floatValue];
   if (newDuration < 24.0)
     [mDurationTextField setStringValue:[NSString stringWithFormat:@"%d Hours", (int)(newDuration + 0.5f)]];
   else if (newDuration < 169)
@@ -333,7 +356,7 @@ static Preferences *sSharedInstance = nil;
   }
   
   NSUserDefaultsController *theController = [NSUserDefaultsController sharedUserDefaultsController];
-  [[theController values] setValue:[NSNumber numberWithFloat:newDuration] forKey:kScheduleDownloadDurationPrefStr];
+  [[theController values] setValue:[NSNumber numberWithFloat:newDuration] forKey:kScheduleDownloadDurationKey];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -350,7 +373,7 @@ static Preferences *sSharedInstance = nil;
   if ([mSDUsernameField stringValue])
   {
 	NSUserDefaultsController *theDefaultsController  = [NSUserDefaultsController sharedUserDefaultsController];
-	[[theDefaultsController values] setValue:[mSDUsernameField stringValue] forKey:kWebServicesSDUsernamePrefStr];
+	[[theDefaultsController values] setValue:[mSDUsernameField stringValue] forKey:kWebServicesSDUsernameKey];
     const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
     const char *accountNameUTF8 = [[mSDUsernameField stringValue] UTF8String];
     const char *pathUTF8 = [kWebServicesSDPath UTF8String];
@@ -385,6 +408,9 @@ static Preferences *sSharedInstance = nil;
       free(accountNameAttributeData);
 	}
   }
+  
+  [[theDefaultsController values] setValue:[recordedProgramsLocation absoluteString] forKey:kRecordedProgramsLocationKey];
+  [[theDefaultsController values] setValue:[transcodedProgramsLocation absoluteString] forKey:kTranscodedProgramsLocationKey];
   [theDefaultsController save:sender];
 }
 
@@ -437,6 +463,11 @@ static Preferences *sSharedInstance = nil;
 - (void) showColorPrefs:(id)sender
 {
 	[self showPrefsView:mColorPrefsView];
+}
+
+- (void) showStorageTranscodingPrefs:(id)sender
+{
+	[self showPrefsView:mStorageTranscodingPrefsView];
 }
 
 - (IBAction) okButtonAction:(id)sender
@@ -645,6 +676,28 @@ static Preferences *sSharedInstance = nil;
 	[[[mGenreArrayController selectedObjects] objectAtIndex: 0] setValue:[NSArchiver archivedDataWithRootObject:[sender color]] forKeyPath:@"genreClass.color"];
 }
 
+- (IBAction)setPathAction:(id)sender
+{
+	NSURL *startingDirectory = nil;
+	if ([sender tag] == 1)
+		startingDirectory = [self recordedProgramsLocation];
+	else if ([sender tag] == 2)
+		startingDirectory = [self transcodedProgramsLocation];
+		
+	NSOpenPanel* panel = [NSOpenPanel openPanel];
+	[panel setAllowsMultipleSelection:NO];
+	[panel setCanChooseDirectories:YES];
+	[panel setCanChooseFiles:NO];
+	[panel setResolvesAliases:YES];
+	[panel setTitle:@"Choose an output location"];
+	[panel setPrompt:@"Choose"];
+	
+	[panel beginSheetForDirectory:[startingDirectory path] file:nil types:nil modalForWindow:mPanel
+		   modalDelegate:self
+		   didEndSelector:@selector(setPathPanelDidEnd:returnCode:contextInfo:)
+		   contextInfo:sender];
+}
+
 #pragma mark Channel Scan Progress Display Protocol
 
 - (void) incrementChannelScanProgress
@@ -775,6 +828,24 @@ static Preferences *sSharedInstance = nil;
 	[importURL release];	// Copied in the file open panel did end delegate
 }
 
+- (void)setPathPanelDidEnd:(NSOpenPanel*)panel returnCode:(int)returnCode contextInfo:(void *)contextInfo
+{
+	// hide the open panel
+	[panel orderOut:self];
+	
+	// if the return code wasn't ok, don't do anything.
+	if (returnCode != NSOKButton)
+		return;
+	
+	// get the single URL
+	NSArray* paths = [panel URLs];
+	NSURL* url = [paths objectAtIndex: 0];
+	if ([(id)contextInfo tag] == 1)
+		self.recordedProgramsLocation = url;
+	else if ([(id)contextInfo tag] == 2)
+		self.transcodedProgramsLocation = url;
+}
+
 #pragma mark - Toolbar Delegates
 
 // This method is required of NSToolbar delegates.  It takes an identifier, and returns the matching NSToolbarItem.
@@ -816,19 +887,19 @@ static Preferences *sSharedInstance = nil;
 // set of toolbar items.  It can also be called by the customization palette to display the default toolbar.    
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, nil];
 }
 
 // This method is required of NSToolbar delegates.  It returns an array holding identifiers for all allowed
 // toolbar items in this toolbar.  Any not listed here will not be available in the customization palette.
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier,nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, nil];
 }
 
 @end

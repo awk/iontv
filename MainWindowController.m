@@ -279,7 +279,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   // Retrieve 'n' hours of data
   CFGregorianUnits retrieveRange;
   memset(&retrieveRange, 0, sizeof(retrieveRange));
-  float hours = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationPrefStr] floatValue];
+  float hours = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationKey] floatValue];
   retrieveRange.hours = (int) hours;
     
   CFAbsoluteTime endTime = CFAbsoluteTimeAddGregorianUnits(currentTime, NULL, retrieveRange);

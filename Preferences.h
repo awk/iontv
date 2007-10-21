@@ -9,9 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "ChannelScanProgressDisplayProtocol.h"
 #import "XMLParsingProgressDisplayProtocol.h"
-
-extern NSString *kScheduleDownloadDurationPrefStr;
-extern NSString *kWebServicesSDUsernamePrefStr;
+#import "PreferenceKeys.h"
 
 @class DiscreteDurationSlider;
 
@@ -25,6 +23,7 @@ extern NSString *kWebServicesSDUsernamePrefStr;
     IBOutlet NSView* mTunerPrefsView;
     IBOutlet NSView* mChannelPrefsView;
 	IBOutlet NSView* mColorPrefsView;
+	IBOutlet NSView* mStorageTranscodingPrefsView;
     IBOutlet NSTextField *mSDUsernameField;
     IBOutlet NSTextField *mSDPasswordField;
     IBOutlet NSProgressIndicator *mParsingProgressIndicator;
@@ -43,12 +42,22 @@ extern NSString *kWebServicesSDUsernamePrefStr;
     
 	IBOutlet NSView *mExportChannelTunerSelectionView;
 	
+	NSView* mCurrentPrefsView;			// Currently display preferences subview
+	
     NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
     SecKeychainItemRef mSDKeychainItemRef;
 
+	NSURL *recordedProgramsLocation;
+	NSURL *transcodedProgramsLocation;
+	NSArrayController *handbrakePresetsArrayController;
+	
     BOOL mAbortChannelScan;
     BOOL mChannelScanInProgress;
 }
+
+@property (retain) NSURL *recordedProgramsLocation;
+@property (retain) NSURL *transcodedProgramsLocation;
+@property (retain) NSArrayController *handbrakePresetsArrayController;
 
 + (Preferences *)sharedInstance;
 + (void)setupDefaults;
@@ -75,4 +84,5 @@ extern NSString *kWebServicesSDUsernamePrefStr;
 - (IBAction) viewHDHRStation:(id)sender;
 - (IBAction) exportHDHomeRunChannelMap:(id)sender;
 - (IBAction) importHDHomeRunChannelMap:(id)sender;
+- (IBAction)setPathAction:(id)sender;
 @end

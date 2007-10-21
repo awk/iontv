@@ -4,7 +4,21 @@
 <dict>
 	<key>scheduleDownloadDuration</key>
 	<real>3</real>
-        <key>SDUsername</key>
-        <string></string>
+	<key>SDUsername</key>
+	<string></string>
+	<key>recordedProgramsLocation</key>
+	<string></string>
+	<key>transcodedProgramsLocation</key>
+	<string></string>
+	<key>transcodePrograms</key>
+	<true/>
+	<key>transcodePreset</key>
+	<string>iPod Low-Rez</string>
+	<key>deleteRecordingsAfterTranscode</key>
+	<true/>
+	<key>addTranscodingsToiTunes</key>
+	<true/>
+	<key>deleteTranscodingsAfterAdd</key>
+	<true/>
 </dict>
 </plist>

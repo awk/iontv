@@ -112,6 +112,10 @@
 		EA70E7210CC0164600C3B295 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */; };
 		EA70E7220CC0164600C3B295 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */; };
 		EA70E8970CC06ED500C3B295 /* RSTranscodingImp.m in Sources */ = {isa = PBXBuildFile; fileRef = EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */; };
+		EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */; };
+		EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
+		EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
+		EA8E1C580CC9408800DD109F /* HardDrive.tiff in Resources */ = {isa = PBXBuildFile; fileRef = EA8E1C570CC9408800DD109F /* HardDrive.tiff */; };
 		EA93F3990C922E53004788CF /* iOnTV.icns in Resources */ = {isa = PBXBuildFile; fileRef = EA93F3980C922E53004788CF /* iOnTV.icns */; };
 		EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
@@ -318,6 +322,9 @@
 		EA70E8950CC06ED500C3B295 /* RSTranscodingImp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTranscodingImp.h; sourceTree = "<group>"; };
 		EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSTranscodingImp.m; sourceTree = "<group>"; };
 		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
+		EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferenceKeys.m; sourceTree = "<group>"; };
+		EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferenceKeys.h; sourceTree = "<group>"; };
+		EA8E1C570CC9408800DD109F /* HardDrive.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HardDrive.tiff; path = Images/HardDrive.tiff; sourceTree = "<group>"; };
 		EA93F3980C922E53004788CF /* iOnTV.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = iOnTV.icns; path = Images/iOnTV.icns; sourceTree = SOURCE_ROOT; };
 		EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 3.xcdatamodel"; sourceTree = "<group>"; };
 		EA93F8170C9C4A6E004788CF /* RSRecording.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRecording.h; sourceTree = "<group>"; };
@@ -436,6 +443,8 @@
 				EA3090C30C6AB59E0005E89B /* RSWishlistController.m */,
 				EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */,
 				EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */,
+				EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */,
+				EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -538,6 +547,7 @@
 		EA2939860C0CC89E0053E2B8 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EA8E1C570CC9408800DD109F /* HardDrive.tiff */,
 				EA490BB30CAEDB8100A1DE02 /* Activity_Stop.tif */,
 				EA490BB40CAEDB8100A1DE02 /* Activity_StopPressed.tif */,
 				EA93F3980C922E53004788CF /* iOnTV.icns */,
@@ -843,6 +853,7 @@
 				EA490BB50CAEDB8100A1DE02 /* Activity_Stop.tif in Resources */,
 				EA490BB60CAEDB8100A1DE02 /* Activity_StopPressed.tif in Resources */,
 				EA490DBA0CAF376E00A1DE02 /* ActivityAggregateView.xib in Resources */,
+				EA8E1C580CC9408800DD109F /* HardDrive.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -850,6 +861,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -901,6 +913,7 @@
 				EA490BD90CAEE61E00A1DE02 /* RSActivityListView.m in Sources */,
 				EA70E7140CC012C100C3B295 /* RSTranscoding.m in Sources */,
 				EA70E7210CC0164600C3B295 /* recsched.xcmappingmodel in Sources */,
+				EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -946,6 +959,7 @@
 				EA70E7130CC012C100C3B295 /* RSTranscoding.m in Sources */,
 				EA70E7220CC0164600C3B295 /* recsched.xcmappingmodel in Sources */,
 				EA70E8970CC06ED500C3B295 /* RSTranscodingImp.m in Sources */,
+				EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

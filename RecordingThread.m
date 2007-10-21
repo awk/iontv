@@ -14,8 +14,11 @@
 #import "RecSchedServer.h"
 #import "RSActivityDisplayProtocol.h"
 #import "RSRecording.h"
+#import "PreferenceKeys.h"
 
 #define RECORDING_DISABLED 0
+
+NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 
 @implementation RecordingThreadController
 
@@ -71,9 +74,9 @@
   [NSThread detachNewThreadSelector:@selector(recordingThreadStarted:) toTarget:[RecordingThreadController class] withObject:self];
 }
 
-- (NSString *)moviesFolder {
-	NSString *homeDirectory = NSHomeDirectory();
-    return [homeDirectory stringByAppendingPathComponent:@"Movies"];
+- (NSString *)recordedProgramsFolder {
+	NSURL *folderURL = [NSURL URLWithString:[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kRecordedProgramsLocationKey]];
+    return [folderURL path];
 }
 
 #if RECORDING_DISABLED
@@ -142,7 +145,7 @@
 	[[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
   
   mFinishRecording = NO;
-  NSString *destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.ts", [self moviesFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title, mThreadRecording.schedule.program.subTitle];
+  NSString *destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.ts", [self recordedProgramsFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title, mThreadRecording.schedule.program.subTitle];
   [[NSFileManager defaultManager] createFileAtPath:destinationPath contents:nil attributes:nil];
   NSFileHandle* transportStreamFileHandle = [NSFileHandle fileHandleForWritingAtPath:destinationPath];
   if (!transportStreamFileHandle)
@@ -201,9 +204,13 @@
   [[mRecSchedServer uiActivity] endActivity:activityToken];
   
   mThreadRecording.status = [NSNumber numberWithInt:RSRecordingFinishedStatus];
+  [mThreadManagedObjectContext processPendingChanges];
   
   // Save the MOC
   [[NSApp delegate] performSelectorOnMainThread:@selector(saveAction:) withObject:self waitUntilDone:YES];
+
+	// Notify everyone that this recording has finished
+	[[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationRecordingFinished object:[mThreadRecording objectID]];
 }
 #endif
 
