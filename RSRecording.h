@@ -14,6 +14,7 @@ enum {
 	RSRecordingNotYetStartedStatus = 0,
 	RSRecordingInProgressStatus = 1,
 	RSRecordingFinishedStatus = 2,
+	RSRecordingErrorStatus = 3,
 };
 
 @interface RSRecording : NSManagedObject {
