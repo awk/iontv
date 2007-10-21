@@ -130,6 +130,11 @@
 	[(RSActivityAggregateViewController*) activityToken setProgressMaxValue:inTotal];
 }
 
+- (void) setActivity:(size_t)activityToken progressDoubleValue:(double)inValue
+{
+	[(RSActivityAggregateViewController*) activityToken setProgressDoubleValue:inValue];
+}
+
 - (void) setActivity:(size_t)activityToken incrementBy:(double)delta
 {
 	[(RSActivityAggregateViewController*) activityToken incrementProgressBy:delta];
