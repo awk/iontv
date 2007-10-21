@@ -105,9 +105,21 @@
  }
 }
 
-- (UInt8*) receiveVideoData:(size_t*)outBytesReceived
+// Note that this method allocates and initializes a new NSData object. It's the callers responsiblity to release
+// the object when the caller has finished with it in order to avoid leaks.
+- (NSData *) receiveVideoData
 {
-	return hdhomerun_device_stream_recv(mHDHomeRunDevice, VIDEO_DATA_BUFFER_SIZE_1S, outBytesReceived);
+	size_t numBytesReceived;
+	uint8* bytesReceived = NULL;
+	bytesReceived = hdhomerun_device_stream_recv(mHDHomeRunDevice, VIDEO_DATA_BUFFER_SIZE_1S, &numBytesReceived);
+	
+	NSData *dataReceived = NULL;
+	if (bytesReceived && (numBytesReceived > 0))
+	{
+		// Create a data object 
+		dataReceived = [[NSData alloc] initWithBytesNoCopy:bytesReceived length:numBytesReceived freeWhenDone:NO];
+	}
+	return dataReceived;
 }
 
 - (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber
@@ -643,9 +655,9 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 	[[[self channel] tuner] stopStreaming];
 }
 
-- (UInt8*) receiveVideoData:(size_t*)outBytesReceived
+- (NSData*) receiveVideoData
 {
-	return [[[self channel] tuner] receiveVideoData:outBytesReceived];
+	return [[[self channel] tuner] receiveVideoData];
 }
 
 - (void) addStationInfoDictionaryTo:(NSMutableArray*)inOutputArray

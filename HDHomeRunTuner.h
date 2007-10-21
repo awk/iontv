@@ -37,7 +37,7 @@
 - (void) startStreaming;
 - (void) setFilterForProgramNumber:(NSNumber*)inProgramNumber;
 - (void) tuneToChannel:(HDHomeRunChannel*)inChannel;
-- (UInt8*) receiveVideoData:(size_t*)outBytesReceived;
+- (NSData*) receiveVideoData;
 
 - (void) releaseHDHRDevice;
 - (void) createHDHRDevice;
@@ -96,7 +96,7 @@
 
 - (void) startStreaming;
 - (void) stopStreaming;
-- (UInt8*) receiveVideoData:(size_t*)outBytesReceived;
+- (NSData *) receiveVideoData;
 
 @end
 
