@@ -9,13 +9,16 @@
 #import "RSCommonAppDelegate.h"
 
 @class RecSchedServer;
+@class RSTranscodeController;
 
 @interface recsched_bkgd_AppDelegate : RSCommonAppDelegate
 {
 	RecSchedServer *mRecSchedServer;
+	RSTranscodeController *mTranscodeController;
 }
 
 - (NSURL *)urlForPersistentStore;
+- (RecSchedServer*) recServer;
 
 #if USE_SYNCSERVICES
 - (ISyncClient *)syncClient;

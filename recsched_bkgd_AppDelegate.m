@@ -10,6 +10,7 @@
 #import "RecSchedServer.h"
 #import "RSRecording.h"
 #import "RecordingThread.h"
+#import "RSTranscodeController.h"
 
 NSString *kRecSchedUIAppBundleID = @"org.awkward.recsched";
 NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
@@ -33,6 +34,8 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 #if USE_SYNCSERVICES
 	[[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
 #endif // USE_SYNCSERVICES
+
+	mTranscodeController = [[RSTranscodeController alloc] init];
 	
 	[mRecSchedServer updateSchedule];
 	[self startTimersForRecordings];
@@ -60,6 +63,11 @@ NSString *kWebServicesSDUsernamePrefStr = @"SDUsername";			// Here because we do
 
 - (NSURL *)urlForPersistentStore {
 	return [NSURL fileURLWithPath: [[self applicationSupportFolder] stringByAppendingPathComponent: @"recsched_bkgd.dat"]];
+}
+
+- (RecSchedServer*) recServer
+{
+	return mRecSchedServer;
 }
 
 #if USE_SYNCSERVICES
