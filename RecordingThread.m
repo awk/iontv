@@ -127,14 +127,19 @@
   
   HDHomeRunStation *anHDHRStation = [hdhrStations anyObject];
 
-  size_t activityToken = [[mRecSchedServer uiActivity] createActivity];
+  size_t activityToken = 0;
+  if ([mRecSchedServer uiActivity])
+  {
+	activityToken = [[mRecSchedServer uiActivity] createActivity];
   
-  [[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
+	[[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
 		[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.tuner.lineup],
 		anHDHRStation.z2itStation.callSign]];
+  }
   
   NSTimeInterval recordingDuration = [mThreadRecording.schedule.endTime timeIntervalSinceDate:[NSDate date]];
-  [[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
+  if (activityToken)
+	[[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
   
   mFinishRecording = NO;
   NSString *destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.ts", [self moviesFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title, mThreadRecording.schedule.program.subTitle];
@@ -167,7 +172,24 @@
 
 	if ([[NSDate date] timeIntervalSinceDate:lastActivityNotification] > kNotificationInterval)
 	{
-		[[mRecSchedServer uiActivity] setActivity:activityToken incrementBy:[[NSDate date] timeIntervalSinceDate:lastActivityNotification]];
+		if (!activityToken)
+		{
+			// No token - probably because the UIActivity connection wasn't available last time, try again now
+			if ([mRecSchedServer uiActivity])
+			{
+				activityToken = [[mRecSchedServer uiActivity] createActivity];
+
+				[[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
+					[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.tuner.lineup],
+					anHDHRStation.z2itStation.callSign]];
+			}
+
+			if (activityToken)
+				[[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
+		}
+		
+		if (activityToken)
+			[[mRecSchedServer uiActivity] setActivity:activityToken incrementBy:[[NSDate date] timeIntervalSinceDate:lastActivityNotification]];
 		lastActivityNotification = [NSDate date];
 	}
 	
