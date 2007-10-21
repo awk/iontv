@@ -10,6 +10,8 @@
 
 #include "hb.h"
 
+extern NSString *RSNotificationTranscodingFinished;
+
 @class RSTranscoding;
 
 @interface RSTranscodeController : NSObject {

@@ -12,8 +12,11 @@
 #import "RSTranscodingImp.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
+#import "iTunes_ScriptingBridge.h"
 
 @implementation RSTranscodeController
+
+NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinished";
 
 #pragma mark Changes in Recordings and Transcodings
 
@@ -25,7 +28,7 @@
 		RSTranscoding *candidateTranscoding = [inArray objectAtIndex:index++];
 		if ([candidateTranscoding.status intValue] == RSRecordingNotYetStartedStatus)
 		{
-			mCurrentTranscoding = [inArray objectAtIndex:0];
+			mCurrentTranscoding = [candidateTranscoding retain];
 		
 			// Scan the recording for a title - this is a thread operation we need to wait for it to complete (or have a callback
 			// preferably) before we can continue on with creating the real transcode job ?
@@ -50,6 +53,7 @@
 			[aTranscoding setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
 		}
 	}
+	[[[NSApp delegate] managedObjectContext] processPendingChanges];
 }
 
 - (NSString *)moviesFolder {
@@ -59,11 +63,112 @@
 
 #pragma mark Transcoding Operations
 
+- (NSDictionary *)createIpodLowPreset
+{
+    NSMutableDictionary *preset = [[NSMutableDictionary alloc] init];
+	/* Get the New Preset Name from the field in the AddPresetPanel */
+    [preset setObject:@"iPod Low-Rez" forKey:@"PresetName"];
+	/*Set whether or not this is a user preset or factory 0 is factory, 1 is user*/
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"Type"];
+	/*Set whether or not this is default, at creation set to 0*/
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"Default"];
+	/*Get the whether or not to apply pic settings in the AddPresetPanel*/
+	[preset setObject:[NSNumber numberWithInt:1] forKey:@"UsesPictureSettings"];
+	/* Get the New Preset Description from the field in the AddPresetPanel */
+    [preset setObject:@"HandBrake's low resolution settings for the iPod. Optimized for great playback on the iPod screen, with smaller file size." forKey:@"PresetDescription"];
+	/* File Format */
+    [preset setObject:@"MP4 file" forKey:@"FileFormat"];
+	/* Chapter Markers*/
+	 [preset setObject:[NSNumber numberWithInt:1] forKey:@"ChapterMarkers"];
+    /* Codecs */
+	[preset setObject:@"AVC/H.264 Video / AAC Audio" forKey:@"FileCodecs"];
+	/* Video encoder */
+	[preset setObject:@"x264 (h.264 iPod)" forKey:@"VideoEncoder"];
+	/* x264 Option String */
+	[preset setObject:@"keyint=300:keyint-min=30:bframes=0:cabac=0:ref=1:vbv-maxrate=768:vbv-bufsize=2000:analyse=all:me=umh:subme=6:no-fast-pskip=1" forKey:@"x264Option"];
+	/* Video quality */
+	[preset setObject:[NSNumber numberWithInt:1] forKey:@"VideoQualityType"];
+	[preset setObject:@"" forKey:@"VideoTargetSize"];
+	[preset setObject:@"700" forKey:@"VideoAvgBitrate"];
+	[preset setObject:[NSNumber numberWithFloat:0.5] forKey:@"VideoQualitySlider"];
+	
+	/* Video framerate */
+	[preset setObject:@"Same as source" forKey:@"VideoFramerate"];
+	/* GrayScale */
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"VideoGrayScale"];
+	/* 2 Pass Encoding */
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"VideoTwoPass"];
+	
+	/*Picture Settings*/
+	//hb_job_t * job = fTitle->job;
+	/* Basic Picture Settings */
+	/* Use Max Picture settings for whatever the dvd is.*/
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"UsesMaxPictureSettings"];
+	[preset setObject:[NSNumber numberWithInt:1] forKey:@"PictureAutoCrop"];
+	[preset setObject:[NSNumber numberWithInt:320] forKey:@"PictureWidth"];
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"PictureHeight"];
+	[preset setObject:[NSNumber numberWithInt:1] forKey:@"PictureKeepRatio"];
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"PictureDeinterlace"];
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"PicturePAR"];
+	/* Set crop settings here */
+	/* The Auto Crop Matrix in the Picture Window autodetects differences in crop settings */
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"PictureTopCrop"];
+    [preset setObject:[NSNumber numberWithInt:0] forKey:@"PictureBottomCrop"];
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"PictureLeftCrop"];
+	[preset setObject:[NSNumber numberWithInt:0] forKey:@"PictureRightCrop"];
+	
+	/*Audio*/
+	/* Audio Sample Rate*/
+	[preset setObject:@"48" forKey:@"AudioSampleRate"];
+	/* Audio Bitrate Rate*/
+	[preset setObject:@"160" forKey:@"AudioBitRate"];
+	/* Subtitles*/
+	[preset setObject:@"None" forKey:@"Subtitles"];
+	
+
+    [preset autorelease];
+    return preset;
+
+}
+
+- (NSDictionary *)chosenPreset
+{
+	// We use the same presets as Handbrake and just read their plist
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
+	NSString *presetsPath = [basePath stringByAppendingPathComponent:@"HandBrake/UserPresets.plist"];
+	
+	NSMutableArray *presetsArray = [[NSMutableArray alloc] initWithContentsOfFile:presetsPath];
+	if (nil == presetsArray) 
+	{
+		// No presets found - just return a default iPod preset
+		return [self createIpodLowPreset];
+	}
+	else
+	{
+		// Search the array for a preset with a name matching the set preferences
+		NSString *presetName = @"iPhone / iPod Touch";
+		NSDictionary *chosenPreset = nil;
+		for (NSDictionary *aPreset in presetsArray)
+		{
+			NSString *plistPresetName = [aPreset valueForKey:@"PresetName"];
+			if ([plistPresetName compare:presetName] == NSOrderedSame)
+			{
+				chosenPreset = aPreset;
+				break;		// Got a match
+			}
+		}
+		if (chosenPreset == nil)
+			return [self createIpodLowPreset];		// Didn't get a match
+		else
+			return chosenPreset;
+	}
+}
+
 - (void) beginTranscoding
 {
-	[mCurrentTranscoding.transcodingImp setupJob];
-	[mCurrentTranscoding.transcodingImp beginTranscodeWithHandle:mHandbrakeHandle toDestinationPath:mCurrentTranscoding.mediaFile];
-	
+	[mCurrentTranscoding.transcodingImp setupJobWithPreset:[self chosenPreset]];
+	[mCurrentTranscoding.transcodingImp beginTranscodeWithHandle:mHandbrakeHandle toDestinationPath:mCurrentTranscoding.mediaFile usingPreset:[self chosenPreset]];
 }
 
 - (void) titleScanFinished
@@ -92,12 +197,59 @@
 	{
 		// No valid title found - ignore this transcoding entry.
 		mCurrentTranscoding.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
+		[mCurrentTranscoding release];
 		mCurrentTranscoding = nil;
 		// See if there's another candidate ?
 		[self updateForNewTranscodings:[mTranscodingsArrayController arrangedObjects]];
 	}
 }
 
+- (void) addToiTunes:(RSTranscoding *) aTranscoding
+{
+	iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+	[iTunes setDelegate:self];
+	
+	NSArray *filesArray = [NSArray arrayWithObject:[NSURL fileURLWithPath:aTranscoding.mediaFile]];
+	iTunesTrack *theTrack = [iTunes add:filesArray to:nil];
+	if (![aTranscoding.schedule.program isMovie])		// Additions to the iTunes library are movies by default
+		theTrack.videoKind = iTunesEVdKTVShow;
+	theTrack.show = aTranscoding.schedule.program.title;
+	theTrack.albumArtist = aTranscoding.schedule.program.title;
+	theTrack.artist = aTranscoding.schedule.program.title;
+	// In theory the Episode ID/syndicatedEpisodeNumber is usually a 3 digit number of the form 104, 307 etc. This can be parsed as
+	// Season 1 Episode 4, Season 3 Episode 7. In practice however the ScheduleDirect data doesn't seem to uniformly follow
+	// this scheme - so we'll take the syndicated episode number and if it's between 1 and 99999 use it to generate  the season
+	// and epsidoe number - if not we'll just skip that part
+	theTrack.episodeID = aTranscoding.schedule.program.syndicatedEpisodeNumber;
+	int episodeID = [theTrack.episodeID intValue];
+	if ((episodeID >= 100) && (episodeID < 99999))
+	{
+		theTrack.seasonNumber = episodeID / 100;
+		theTrack.episodeNumber = episodeID % 100;
+		theTrack.album = [NSString stringWithFormat:@"%@, Season %d", theTrack.artist, theTrack.seasonNumber];
+	}
+	NSCalendarDate *originalAirDate = [aTranscoding.schedule.program.originalAirDate dateWithCalendarFormat:nil timeZone:nil];
+	theTrack.year = [originalAirDate yearOfCommonEra];
+	theTrack.name = aTranscoding.schedule.program.subTitle;
+	theTrack.objectDescription = aTranscoding.schedule.program.descriptionStr;
+}
+
+- (void)eventDidFail:(const AppleEvent *)event withError:(NSError *)error
+{
+	NSLog(@"ScriptingBridge eventDidFail error = %@", error);
+}
+
+- (void) transcodingFinishedNotification:(NSNotification*)aNotification
+{
+	// Transcoding has finished - push the completed file to iTunes
+	RSTranscodingImp *aTranscodingImp = [aNotification object];
+	[self addToiTunes:aTranscodingImp.transcoding];
+	
+	[mCurrentTranscoding release];
+	mCurrentTranscoding = nil;
+	// Check to see if there's another candidate to transcode
+	[self updateForNewTranscodings:[mTranscodingsArrayController arrangedObjects]];
+}
 
 #pragma mark init and dealloc
 
@@ -130,16 +282,12 @@
 		// Set up any initial transcodings
 		[self updateForCompletedRecordings:[mRecordingsArrayController arrangedObjects]];
 
-//		[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(updateRecordings:) userInfo:nil repeats:NO];
+		// Register for notifications when transcoding completes
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transcodingFinishedNotification:) name:RSNotificationTranscodingFinished object:nil];
+		
+		[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(updateRecordings:) userInfo:nil repeats:NO];
 	}
 	return self;
-}
-
-- (void) awakeFromNib
-{
-//	[mRecordingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
-
-//	[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(updateRecordings:) userInfo:nil repeats:NO];
 }
 
 - (void) updateRecordings:(NSTimer*)aTimer
@@ -160,8 +308,10 @@
 	if (aRecording)
 	{
 		aRecording.status = [NSNumber numberWithInt:RSRecordingFinishedStatus];
+		aRecording.schedule.transcoding = nil;
 	}
 	[[[NSApp delegate] managedObjectContext] processPendingChanges];
+	[self updateForCompletedRecordings:[mRecordingsArrayController arrangedObjects]];
 }
 
 - (void) dealloc

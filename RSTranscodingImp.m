@@ -12,6 +12,7 @@
 #import "Z2ITProgram.h"
 #import "recsched_bkgd_AppDelegate.h"
 #import "RecSchedServer.h"
+#import "RSTranscodeController.h"
 
 static int FormatSettings[4][10] =
   { { HB_MUX_MP4 | HB_VCODEC_FFMPEG | HB_ACODEC_FAAC,
@@ -37,9 +38,23 @@ static int FormatSettings[4][10] =
 	  0,
 	  0 } };
 
-NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fast-pskip=1:trellis=1";
+@interface RSTranscodingImp(Private)
+- (int) audioSampleRateIndexForString:(NSString*) aString;
+- (int) formatIndexForString:(NSString*)aString;
+- (int) codecIndexForString:(NSString*)aString;
+- (int) videoEncoderIndexForString:(NSString*)aString;
+- (int) videoFrameRateIndexForString:(NSString*)aString;
+- (int) subtitleIndexForString:(NSString*)aString;
+- (int) audioBitRateTagForString:(NSString*)aString;
+@end
 
 @implementation RSTranscodingImp
+
+#pragma mark Properties
+
+@synthesize mTranscoding;
+
+#pragma mark Initialization & Setup
 
 - (id) initWithTranscoding:(RSTranscoding *)aTranscoding
 {
@@ -69,22 +84,60 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
 	mHandbrakeTitle = aTitle;
 }
 
-- (void) setupJob
+- (void) setupPictureDimensionsForJob:(hb_job_t*)aJob withPreset:(NSDictionary *)aPreset
+{
+	if ([[aPreset objectForKey:@"UsesPictureSettings"]  intValue] == 2 || [[aPreset objectForKey:@"UsesMaxPictureSettings"]  intValue] == 1)
+	{
+		aJob->keep_ratio = [[aPreset objectForKey:@"PictureKeepRatio"]  intValue];
+		if (aJob->keep_ratio == 1)
+		{
+			hb_fix_aspect( aJob, HB_KEEP_WIDTH );
+			if( aJob->height > mHandbrakeTitle->height )
+			{
+				aJob->height = mHandbrakeTitle->height;
+				hb_fix_aspect( aJob, HB_KEEP_HEIGHT );
+			}
+		}
+		aJob->pixel_ratio = [[aPreset objectForKey:@"PicturePAR"]  intValue];
+	}
+	else // Apply picture settings that were in effect at the time the preset was saved
+	{
+		aJob->width = [[aPreset objectForKey:@"PictureWidth"]  intValue];
+		aJob->height = [[aPreset objectForKey:@"PictureHeight"]  intValue];
+		aJob->keep_ratio = [[aPreset objectForKey:@"PictureKeepRatio"]  intValue];
+		if (aJob->keep_ratio == 1)
+		{
+			hb_fix_aspect( aJob, HB_KEEP_WIDTH );
+			if( aJob->height > mHandbrakeTitle->height )
+			{
+				aJob->height = mHandbrakeTitle->height;
+				hb_fix_aspect( aJob, HB_KEEP_HEIGHT );
+			}
+		}
+		aJob->pixel_ratio = [[aPreset objectForKey:@"PicturePAR"]  intValue];
+	}
+}
+
+- (void) setupJobWithPreset:(NSDictionary*)aPreset
 {
 	mHandbrakeJob = mHandbrakeTitle->job;
+	
+	[self setupPictureDimensionsForJob:mHandbrakeJob withPreset:aPreset];
 	
     /* Chapter selection  - transport streams have no chapters, just use 1 & 1 here */
     mHandbrakeJob->chapter_start = 1;
     mHandbrakeJob->chapter_end   = 1;
 	
     /* Format and codecs */
-    int format = 0; //[fDstFormatPopUp indexOfSelectedItem];
-    int codecs = 1; //[fDstCodecsPopUp indexOfSelectedItem];
+	
+	// We need to convert the presets text label into an index (that matches the popup menu in Handbrake !)
+    int format = [self formatIndexForString:[aPreset valueForKey:@"FileFormat"]];
+    int codecs = [self codecIndexForString:[aPreset valueForKey:@"FileCodecs"]];//1; //[fDstCodecsPopUp indexOfSelectedItem];
     mHandbrakeJob->mux    = FormatSettings[format][codecs] & HB_MUX_MASK;
     mHandbrakeJob->vcodec = FormatSettings[format][codecs] & HB_VCODEC_MASK;
     mHandbrakeJob->acodec = FormatSettings[format][codecs] & HB_ACODEC_MASK;
     /* If mpeg-4, then set mpeg-4 specific options like chapters and > 4gb file sizes */
-	if (1)		// Format popup MP4, MKV, AVI, OGM ([fDstFormatPopUp indexOfSelectedItem] == 0)
+	if (format == 0) 
 	{
         /* We set the largeFileSize (64 bit formatting) variable here to allow for > 4gb files based on the format being
 		mpeg4 and the checkbox being checked 
@@ -98,11 +151,11 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
 			mHandbrakeJob->largeFileSize = 0;
 		}
 	}
-	if (1)	// See earlier fDstFormatPopup comment ([fDstFormatPopUp indexOfSelectedItem] == 0 || [fDstFormatPopUp indexOfSelectedItem] == 3)
+	if ((format == 0) || (format == 3))
 	{
 	  /* We set the chapter marker extraction here based on the format being
 		mpeg4 or mkv and the checkbox being checked */
-		if (0)	// No chapters in TS streams ([fCreateChapterMarkers state] == NSOnState)
+		if ([[aPreset valueForKey:@"ChapterMarkers"] intValue] == 1)
 		{
 			mHandbrakeJob->chapter_markers = 1;
 		}
@@ -111,14 +164,16 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
 			mHandbrakeJob->chapter_markers = 0;
 		}
 	}
-	if( ( mHandbrakeJob->vcodec & HB_VCODEC_FFMPEG ) &&
-         1 /* main, ipod [fVidEncoderPopUp indexOfSelectedItem] > 0 */ )
+	int videoEncoderIndex = [self videoEncoderIndexForString:[aPreset valueForKey:@"VideoEncoder"]];
+	int videoQualityType = [[aPreset objectForKey:@"VideoQualityType"] intValue];
+	if( ( mHandbrakeJob->vcodec & HB_VCODEC_FFMPEG ) && (videoEncoderIndex > 0 ))
     {
         mHandbrakeJob->vcodec = HB_VCODEC_XVID;
     }
+
     if( mHandbrakeJob->vcodec & HB_VCODEC_X264 )
     {
-		if (1) // main, ipod in popup ([fVidEncoderPopUp indexOfSelectedItem] > 0 )
+		if ( videoEncoderIndex > 0 )
 	    {
 			/* Just use new Baseline Level 3.0 
 			Lets Deprecate Baseline Level 1.3h264_level*/
@@ -132,7 +187,7 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
 #if 0		// AWK - FIXME
 		/* Set this flag to switch from Constant Quantizer(default) to Constant Rate Factor Thanks jbrjake
 		Currently only used with Constant Quality setting*/
-		if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DefaultCrf"] > 0 && [fVidQualityMatrix selectedRow] == 2)
+		if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DefaultCrf"] > 0 && [vidQuality == 2)
 		{
 	        mHandbrakeJob->crf = 1;
 		}
@@ -143,30 +198,29 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
 		mHandbrakeJob->x264opts = (char *)calloc(1024, 1); /* Fixme, this just leaks */
 		/* Turbo first pass if two pass and Turbo First pass is selected */
 
-		if (0)	// AWK - no two pass in iPhone preset
-// AWK		if( [fVidTwoPassCheck state] == NSOnState && [fVidTurboPassCheck state] == NSOnState )
+		if( [[aPreset objectForKey:@"VideoTwoPass"] intValue] == 1 && [[aPreset objectForKey:@"VideoTurboTwoPass"] intValue] == 1 )
 		{
 			/* pass the "Turbo" string to be appended to the existing x264 opts string into a variable for the first pass */
 			NSString *firstPassOptStringTurbo = @":ref=1:subme=1:me=dia:analyse=none:trellis=0:no-fast-pskip=0:8x8dct=0";
 			/* append the "Turbo" string variable to the existing opts string.
 			Note: the "Turbo" string must be appended, not prepended to work properly*/
-			NSString *firstPassOptStringCombined = [defaultOptionsString stringByAppendingString:firstPassOptStringTurbo];
+			NSString *firstPassOptStringCombined = [[aPreset valueForKey:@"x264Option"] stringByAppendingString:firstPassOptStringTurbo];
 			strcpy(mHandbrakeJob->x264opts, [firstPassOptStringCombined UTF8String]);
 		}
 		else
 		{
-			strcpy(mHandbrakeJob->x264opts, [defaultOptionsString UTF8String]);
+			strcpy(mHandbrakeJob->x264opts, [[aPreset valueForKey:@"x264Option"] UTF8String]);
 		}
 		
-        mHandbrakeJob->h264_13 = 1; // AWK main, iPod in popup [fVidEncoderPopUp indexOfSelectedItem];
+        mHandbrakeJob->h264_13 = videoEncoderIndex;
     }
 
     /* Video settings */
-	int defaultVidRatePopup = 0;
-    if  ( defaultVidRatePopup > 0 )
+	int defaultVidRateIndex = [self videoFrameRateIndexForString:[aPreset valueForKey:@"VideoFramerate"]];
+    if  (defaultVidRateIndex > 0 )
     {
         mHandbrakeJob->vrate      = 27000000;
-        mHandbrakeJob->vrate_base = hb_video_rates[defaultVidRatePopup-1].rate;
+        mHandbrakeJob->vrate_base = hb_video_rates[defaultVidRateIndex-1].rate;
     }
     else
     {
@@ -174,10 +228,7 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
         mHandbrakeJob->vrate_base = mHandbrakeTitle->rate_base;
     }
 
-	int iPhonePresetQualityMatrixRow = 1;
-	int iPhonePresetVidBitrate = 960;
-	float defaultQualitySlider = 0.5f;
-    switch( iPhonePresetQualityMatrixRow )
+    switch( videoQualityType )
     {
         case 0:
             /* Target size.
@@ -185,23 +236,24 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
                in fVidBitrateField, so let's just use it */
         case 1:
             mHandbrakeJob->vquality = -1.0;
-            mHandbrakeJob->vbitrate = iPhonePresetVidBitrate;
+            mHandbrakeJob->vbitrate = [[aPreset valueForKey:@"VideoAvgBitrate"] intValue];
             break;
         case 2:
-            mHandbrakeJob->vquality = defaultQualitySlider;
+            mHandbrakeJob->vquality = [[aPreset valueForKey:@"VideoQualitySlider"] floatValue];
             mHandbrakeJob->vbitrate = 0;
             break;
     }
 
-    mHandbrakeJob->grayscale = false; // ( [fVidGrayscaleCheck state] == NSOnState );
+    mHandbrakeJob->grayscale = [[aPreset objectForKey:@"VideoGrayScale"] intValue];
 
     /* Subtitle settings */
-    mHandbrakeJob->subtitle = -2; //[fSubPopUp indexOfSelectedItem] - 2;
+    mHandbrakeJob->subtitle = [self subtitleIndexForString:[aPreset valueForKey:@"Subtitles"]] - 2;
 
     /* Audio tracks and mixdowns */
     /* check for the condition where track 2 has an audio selected, but track 1 does not */
     /* we will use track 2 as track 1 in this scenario */
 	
+	// AWK FIXME
 	int defaultAudio1Language = 1;		// second (first audio track) item in popup selected
 	int defaultAudio2Language = 0;		// first item (no audio) in popup selected
     if (defaultAudio1Language > 0)
@@ -224,20 +276,19 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
     }
 
     /* Audio settings */
-	int defaultAudioSampleRateIndex = 4;
-    mHandbrakeJob->arate = hb_audio_rates[defaultAudioSampleRateIndex].rate;
-    mHandbrakeJob->abitrate = 128; //[[fAudBitratePopUp selectedItem] tag];
+    mHandbrakeJob->arate = hb_audio_rates[[self audioSampleRateIndexForString:[aPreset valueForKey:@"AudioSampleRate"]]].rate;
+    mHandbrakeJob->abitrate = [self audioBitRateTagForString:[aPreset valueForKey:@"AudioBitRate"]];
     
     mHandbrakeJob->filters = hb_list_init();
    
 	/* Detelecine */
-    if (false) //[fPictureController detelecine])
+    if ([[aPreset objectForKey:@"PictureDetelecine"] intValue] > 0)
     {
         hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
     }
    
     /* Deinterlace */
-	int defaultDeinterlace = 0;
+	int defaultDeinterlace = [[aPreset objectForKey:@"PictureDeinterlace"] intValue];
     if (defaultDeinterlace == 1)
     {
         /* Run old deinterlacer by default */
@@ -264,7 +315,7 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
     }
 	
 	/* Denoise */
-	int defaultDenoise = 0;
+	int defaultDenoise = [[aPreset objectForKey:@"PictureDenoise"] intValue];
 	if (defaultDenoise == 1) // Weak in popup
 	{
 		hb_filter_denoise.settings = "2:1:2:3"; 
@@ -282,7 +333,7 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
 	}
 }
 
-- (void) beginTranscodeWithHandle:(hb_handle_t*)handbrakeHandle toDestinationPath:(NSString*)destinationPath
+- (void) beginTranscodeWithHandle:(hb_handle_t*)handbrakeHandle toDestinationPath:(NSString*)destinationPath usingPreset:(NSDictionary*)aPreset
 {
 	// Hold on to the Handbrake handle
 	mHandbrakeHandle = handbrakeHandle;
@@ -335,7 +386,7 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
     if( mHandbrakeJob->subtitle == -2 )
         mHandbrakeJob->subtitle = -1;
 
-    if (0) // ( [fVidTwoPassCheck state] == NSOnState )
+    if ([[aPreset objectForKey:@"VideoTwoPass"] intValue] > 0)
     {
         hb_subtitle_t **subtitle_tmp = mHandbrakeJob->select_subtitle;
         mHandbrakeJob->indepth_scan = 0;
@@ -353,7 +404,7 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
         mHandbrakeJob->sequence_id++; // for job grouping
 
         mHandbrakeJob->x264opts = (char *)calloc(1024, 1); /* Fixme, this just leaks */  
-        strcpy(mHandbrakeJob->x264opts, [defaultOptionsString UTF8String]);
+        strcpy(mHandbrakeJob->x264opts, [[aPreset valueForKey:@"x264Option"] UTF8String]);
 
         mHandbrakeJob->select_subtitle = subtitle_tmp;
 
@@ -384,9 +435,10 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
 {
 	[mUIActivity endActivity:mActivityToken];
 	[mTranscoding finishedTranscode];
+	[[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationTranscodingFinished object:self];
 }
 
-#pragma mark Timers, Callbacks etc.
+#pragma mark Timers Callbacks etc
 
 - (void) transcodingProgressTimer:(NSTimer*)aTimer
 {
@@ -465,9 +517,107 @@ NSString *defaultOptionsString = @"cabac=0:ref=1:analyse=all:me=umh:subq=6:no-fa
 	// Since the connection just became available we'll create an activity now
 	mActivityToken = [mUIActivity createActivity];
 	[mUIActivity setActivity:mActivityToken progressMaxValue:100.0];
+	[mUIActivity setActivity:mActivityToken progressDoubleValue:mLastProgressValue];
 	
 	// For a timer call now - it'll update the status on the activity display etc.
 	[self transcodingProgressTimer:nil];
+}
+
+#pragma mark Handbrake Preset Strings to Int values
+
+// This collection of routines is responsible for translating between a string value in a preset and
+// the index value of the associated item in the Handbrake UI. Handbrake uses this approach to link
+// popup menu item choices in the UI to discrete values from tables etc.
+
+- (int) audioSampleRateIndexForString:(NSString*) aString
+{
+	if ([aString compare:@"22.05"] == NSOrderedSame)
+		return 0;
+	else if ([aString compare:@"24"] == NSOrderedSame)
+		return 1;
+	else if ([aString compare:@"32"] == NSOrderedSame)
+		return 2;
+	else if ([aString compare:@"44.1"] == NSOrderedSame)
+		return 3;
+	else if ([aString compare:@"48"] == NSOrderedSame)
+		return 4;
+	else
+		return -1;		// Force a crash ! This is bad !
+}
+
+- (int) formatIndexForString:(NSString*)aString
+{
+	if ([aString compare:@"MP4 file"] == NSOrderedSame)
+		return 0;
+	else if ([aString compare:@"MKV file"] == NSOrderedSame)
+		return 1;
+	else if ([aString compare:@"AVI file"] == NSOrderedSame)
+		return 2;
+	else if ([aString compare:@"OGM file"] == NSOrderedSame)
+		return 3;
+	else
+		return -1;
+}
+
+- (int) codecIndexForString:(NSString*)aString
+{
+	if ([aString compare:@"MPEG-4 Video / AAC Audio"] == NSOrderedSame)
+		return 0;
+	else if ([aString compare:@"AVC/H.264 Video / AAC Audio"] == NSOrderedSame)
+		return 1;
+	else
+		return -1;
+}
+
+- (int) videoEncoderIndexForString:(NSString*)aString
+{
+	if ([aString compare:@"x264 (h.264 Main)"] == NSOrderedSame)
+		return 0;
+	else if ([aString compare:@"x264 (h.264 iPod)"] == NSOrderedSame)
+		return 1;
+	else
+		return -1;
+}
+
+- (int) videoFrameRateIndexForString:(NSString*)aString
+{
+	if ([aString compare:@"Same as source"] == NSOrderedSame)
+		return 0;
+	else if ([aString compare:@"5"] == NSOrderedSame)
+		return 1;
+	else if ([aString compare:@"10"] == NSOrderedSame)
+		return 2;
+	else if ([aString compare:@"12"] == NSOrderedSame)
+		return 3;
+	else if ([aString compare:@"15"] == NSOrderedSame)
+		return 4;
+	else if ([aString compare:@"23.976 (NTSC Film)"] == NSOrderedSame)
+		return 5;
+	else if ([aString compare:@"24"] == NSOrderedSame)
+		return 6;
+	else if ([aString compare:@"25 (PAL Film/Video)"] == NSOrderedSame)
+		return 7;
+	else if ([aString compare:@"29.97 (NTSC Video)"] == NSOrderedSame)
+		return 8;
+	else
+		return -1;
+}
+
+- (int) subtitleIndexForString:(NSString*)aString
+{
+	if ([aString compare:@"None"] == NSOrderedSame)
+		return 0;
+	else if ([aString compare:@"Autoselect"] == NSOrderedSame)
+		return 1;
+	else
+		return -1;
+}
+
+- (int) audioBitRateTagForString:(NSString*)aString
+{
+	// Although handbrake uses a tag to encode the audio bitrate (ie 128 for 128Kbps) we can
+	// just do a straight conversion on the string value - it should be fine.
+	return [aString intValue];
 }
 
 @end

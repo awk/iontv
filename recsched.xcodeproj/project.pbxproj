@@ -106,6 +106,7 @@
 		EA6AB7110CBD928E003C3CB6 /* libxvidcore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6FE0CBD928E003C3CB6 /* libxvidcore.a */; };
 		EA6AB71A0CBD93AB003C3CB6 /* EmptyCPlusPlus.mm in Sources */ = {isa = PBXBuildFile; fileRef = EA6AB7190CBD93AB003C3CB6 /* EmptyCPlusPlus.mm */; };
 		EA6AB7220CBDA2E2003C3CB6 /* RSTranscodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */; };
+		EA7002880CC4288500DA9542 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA7002870CC4288500DA9542 /* ScriptingBridge.framework */; };
 		EA70E7130CC012C100C3B295 /* RSTranscoding.m in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7120CC012C100C3B295 /* RSTranscoding.m */; };
 		EA70E7140CC012C100C3B295 /* RSTranscoding.m in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7120CC012C100C3B295 /* RSTranscoding.m */; };
 		EA70E7210CC0164600C3B295 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */; };
@@ -308,6 +309,8 @@
 		EA6AB7190CBD93AB003C3CB6 /* EmptyCPlusPlus.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EmptyCPlusPlus.mm; sourceTree = "<group>"; };
 		EA6AB7200CBDA2E2003C3CB6 /* RSTranscodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTranscodeController.h; sourceTree = "<group>"; };
 		EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSTranscodeController.m; sourceTree = "<group>"; };
+		EA7002860CC4285D00DA9542 /* iTunes_ScriptingBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes_ScriptingBridge.h; sourceTree = "<group>"; };
+		EA7002870CC4288500DA9542 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = /System/Library/Frameworks/ScriptingBridge.framework; sourceTree = "<absolute>"; };
 		EA70E70F0CC0112200C3B295 /* recsched_DataModel 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 4.xcdatamodel"; sourceTree = "<group>"; };
 		EA70E7110CC012C100C3B295 /* RSTranscoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTranscoding.h; sourceTree = "<group>"; };
 		EA70E7120CC012C100C3B295 /* RSTranscoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSTranscoding.m; sourceTree = "<group>"; };
@@ -408,6 +411,7 @@
 				EA6AB70F0CBD928E003C3CB6 /* libvorbisenc.a in Frameworks */,
 				EA6AB7100CBD928E003C3CB6 /* libx264.a in Frameworks */,
 				EA6AB7110CBD928E003C3CB6 /* libxvidcore.a in Frameworks */,
+				EA7002880CC4288500DA9542 /* ScriptingBridge.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -513,6 +517,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EA7002870CC4288500DA9542 /* ScriptingBridge.framework */,
 				EA20AE2D0C23612800A9BDBD /* SyncServices.framework */,
 				EA20ADB90C2330AC00A9BDBD /* Security.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
@@ -625,6 +630,7 @@
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
 			isa = PBXGroup;
 			children = (
+				EA7002860CC4285D00DA9542 /* iTunes_ScriptingBridge.h */,
 				EA20AF000C25CCA200A9BDBD /* RecordingThread.h */,
 				EA20AF010C25CCA200A9BDBD /* RecordingThread.m */,
 				EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */,

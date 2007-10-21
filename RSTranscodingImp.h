@@ -27,7 +27,9 @@
 - (id) initWithTranscoding:(RSTranscoding *)mTranscoding;
 
 - (void) setTitle:(hb_title_t*)aTitle;
-- (void) setupJob;
-- (void) beginTranscodeWithHandle:(hb_handle_t*)handbrakeHandle toDestinationPath:(NSString*)destinationPath;
+- (void) setupJobWithPreset:(NSDictionary*)aPreset;
+- (void) beginTranscodeWithHandle:(hb_handle_t*)handbrakeHandle toDestinationPath:(NSString*)destinationPath usingPreset:(NSDictionary*)aPreset;
+
+@property (retain,getter=transcoding) id mTranscoding;
 
 @end
