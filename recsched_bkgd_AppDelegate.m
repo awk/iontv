@@ -21,7 +21,7 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 
 - (void) startTimersForRecordings
 {
-	NSArray *futureRecordings = [RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate] managedObjectContext] afterDate:[NSDate date]];
+	NSArray *futureRecordings = [RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate] managedObjectContext] afterDate:[NSDate date] withStatus:RSRecordingNotYetStartedStatus];
 	for (RSRecording *aRecording in futureRecordings)
 	{
 		[[RecordingThreadController alloc] initWithRecording:aRecording recordingServer:mRecSchedServer];
@@ -144,7 +144,7 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 
     NSError *error = nil;
     if (![[self managedObjectContext] save:&error]) {
-        [[NSApplication sharedApplication] presentError:error];
+        [[NSApp delegate] presentError:error];
     }
 }
 
@@ -161,5 +161,12 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
     }
 }
 #endif // USE_SYNCSERVICES
+
+#pragma Callbacks and Notifications
+
+- (void) updateForSavedContext:(NSNotification *)notification
+{
+	[[self managedObjectContext] mergeChangesFromContextDidSaveNotification:notification];
+}
 
 @end
