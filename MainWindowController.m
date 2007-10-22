@@ -109,7 +109,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (void) updateSourceListForRecordings
 {
-	NSMutableArray *schedulesToBeRecorded = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] afterDate:[NSDate date]]];
+	NSMutableArray *schedulesToBeRecorded = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] afterDate:[NSDate date] withStatus:RSRecordingNotYetStartedStatus]];
 	
 	NSArray *treeNodes = [mViewSelectionTreeController content];
 	NSMutableDictionary *aSourceListNode = nil;
