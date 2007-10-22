@@ -25,13 +25,13 @@
 	return aRecording;
 }
 
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)aDate
++ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)aDate withStatus:(int)status
 {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.endTime > %@", [NSDate dateWithTimeIntervalSinceNow:0]];
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.endTime > %@ and status == %@", aDate, [NSNumber numberWithInt:status]];
   [request setPredicate:predicate];
   
   NSError *error = nil;

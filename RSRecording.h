@@ -26,7 +26,7 @@ enum {
 @property (retain) Z2ITSchedule * schedule;
 
 + (RSRecording*) insertRecordingOfSchedule:(Z2ITSchedule*)aSchedule;
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)date; 
++ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)date withStatus:(int)status; 
 + (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC beforeDate:(NSDate*)date; 
 
 @end
