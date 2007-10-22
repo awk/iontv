@@ -26,11 +26,10 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 {
 	// We need to create a new the managedObjectContext for this thread, we can use the mSchedule (which was given to us
 	// in a seperate thread context to retrieve the store co-ordinator and then work from there.
-	NSPersistentStoreCoordinator *psc = [[mRecording managedObjectContext] persistentStoreCoordinator];
-	if (psc != nil)
+	if (mPersistentStoreCoordinator != nil)
 	{
 		mThreadManagedObjectContext = [[NSManagedObjectContext alloc] init];
-		[mThreadManagedObjectContext setPersistentStoreCoordinator: psc];
+		[mThreadManagedObjectContext setPersistentStoreCoordinator:mPersistentStoreCoordinator];
 		
 		// We also need to create a thread local schedule object too.
 		mThreadRecording = (RSRecording*) [mThreadManagedObjectContext objectWithID:[mRecording objectID]];
@@ -55,7 +54,7 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
   if (self != nil) {
     mRecording = [inRecording retain];
     mRecSchedServer = [inServer retain];
-	
+	mPersistentStoreCoordinator = [[NSApp delegate] persistentStoreCoordinator];
     NSTimer *recordingStartTimer = [[NSTimer alloc] initWithFireDate:mRecording.schedule.time interval:0 target:self selector:@selector(startRecordingTimerFired:) userInfo:self repeats:NO];
     [[NSRunLoop currentRunLoop] addTimer:recordingStartTimer forMode:NSDefaultRunLoopMode];
   }
@@ -194,29 +193,57 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 		if (activityToken)
 			[[mRecSchedServer uiActivity] setActivity:activityToken incrementBy:[[NSDate date] timeIntervalSinceDate:lastActivityNotification]];
 		lastActivityNotification = [NSDate date];
+		
+		if (activityToken && ([[mRecSchedServer uiActivity] shouldCancelActivity:activityToken] == YES))
+			mFinishRecording = YES;
 	}
 	
     if ([mThreadRecording.schedule.endTime compare:[NSDate date]] == NSOrderedAscending)
       mFinishRecording = YES;
   }
   [anHDHRStation stopStreaming];
-  [transportStreamFileHandle closeFile];
   [[mRecSchedServer uiActivity] endActivity:activityToken];
   
   mThreadRecording.status = [NSNumber numberWithInt:RSRecordingFinishedStatus];
-  [mThreadManagedObjectContext processPendingChanges];
   
   // Save the MOC
-  [[NSApp delegate] performSelectorOnMainThread:@selector(saveAction:) withObject:self waitUntilDone:YES];
-
-	// Notify everyone that this recording has finished
-	[[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationRecordingFinished object:[mThreadRecording objectID]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
+        name:NSManagedObjectContextDidSaveNotification object:mThreadManagedObjectContext];
+    
+  [mThreadManagedObjectContext processPendingChanges];
+  NSError *error = nil;
+  [mThreadManagedObjectContext save:&error];
+  if (error)
+	NSLog(@"Error saving after record completed - %@", error);
+	
+	// Notify everyone that this recording has finished - since we're in a seperate thread, and notifications are
+	// delivered in the thread context which triggers them we'll send a message to the server object on the main thread
+	// to send further notificaitons
+	[mRecSchedServer performSelectorOnMainThread:@selector(recordingComplete:) withObject:[mThreadRecording objectID] waitUntilDone:YES];
+	
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mThreadManagedObjectContext];
 }
 #endif
 
 - (void) endRecording
 {
 }
+
+#pragma mark - Notifications
+
+/**
+    Notification sent out when the threads own managedObjectContext has been.  This method
+    ensures updates from the thread (which has its own managed object
+    context) are merged into the application managed object content, so the 
+    user always sees the most current information.
+*/
+
+- (void)threadContextDidSave:(NSNotification *)notification
+{
+	if ([[NSApp delegate] respondsToSelector:@selector(updateForSavedContext:)])
+		[[NSApp delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
+}
+
 
 @end
 

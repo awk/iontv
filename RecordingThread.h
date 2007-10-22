@@ -19,7 +19,8 @@ extern NSString *RSNotificationRecordingFinished;
   RSRecording *mRecording;
   bool mFinishRecording;
   HDHomeRunDevice *mHDHRDevice;
-
+  NSPersistentStoreCoordinator *mPersistentStoreCoordinator;
+  
   NSManagedObjectContext *mThreadManagedObjectContext;
   RSRecording *mThreadRecording;
   RecSchedServer *mRecSchedServer;
