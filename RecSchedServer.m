@@ -132,7 +132,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
         notificationProxy, @"reportProgressTo", 
         completionProxy, @"reportCompletionTo", 
-        [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator",
+        [[NSApp  delegate] persistentStoreCoordinator], @"persistentStoreCoordinator",
         nil];
     
     // Start our local parsing
@@ -188,7 +188,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 #if 0
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo", [[NSApp  delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
 
   [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
 #else
@@ -204,6 +204,11 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 #if USE_SYNCSERVICES
 	[[NSApp delegate] syncAction:nil];
 #endif // USE_SYNCSERVICES
+}
+
+- (void) recordingComplete:(NSManagedObjectID *)aRecordingObjectID
+{
+	[[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationRecordingFinished object:aRecordingObjectID];
 }
 
 #pragma mark - Server Methods
@@ -237,7 +242,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 - (void) findStations
 {
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:[[NSApp  delegate] managedObjectContext]];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
@@ -245,7 +250,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   [request setPredicate:predicate];
   
   NSError *error = nil;
-  NSArray *array = [[[[NSApplication sharedApplication] delegate] managedObjectContext] executeFetchRequest:request error:&error];
+  NSArray *array = [[[NSApp  delegate] managedObjectContext] executeFetchRequest:request error:&error];
   if (array == nil)
   {
       NSLog(@"Error executing fetch request to find latest schedule");
@@ -302,7 +307,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		if (aRecording)
 		{
 			[[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
-			[[NSApp delegate] saveAction:self];
+			NSError *error = nil;
+			[[[NSApp delegate] managedObjectContext] save:&error];
+			if (error)
+				NSLog(@"addRecordingOfSchedule - error occured during save %@", error);
 		}
 	}
     return YES;
@@ -386,7 +394,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 			if (channelIdx > 0) 
 			{ 
 				// processed some stations - save the MOC 
-				[[NSApp delegate] saveAction:self]; 
+				NSError *error;
+				[[[NSApp delegate] managedObjectContext] save:&error];
+				if (error)
+					NSLog(@"addRecordingOfSchedule - error occured during save %@", error);
 			} 
 		} 
 	} 
@@ -394,8 +405,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 - (void) quitServer:(id)sender
 {
-	[[NSApplication sharedApplication] terminate:self];
-//  if ([self applicationShouldTerminate:[NSApplication sharedApplication]])
+	[NSApp  terminate:self];
+//  if ([self applicationShouldTerminate:NSApp ])
   {
     NSLog(@"Server shutting down");
     mExitServer = YES;
