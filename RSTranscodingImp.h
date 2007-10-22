@@ -30,6 +30,6 @@
 - (void) setupJobWithPreset:(NSDictionary*)aPreset;
 - (void) beginTranscodeWithHandle:(hb_handle_t*)handbrakeHandle toDestinationPath:(NSString*)destinationPath usingPreset:(NSDictionary*)aPreset;
 
-@property (retain,getter=transcoding) id mTranscoding;
+@property (retain,getter=transcoding) RSTranscoding * mTranscoding;
 
 @end
