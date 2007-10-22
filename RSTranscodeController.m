@@ -15,6 +15,7 @@
 #import "iTunes_ScriptingBridge.h"
 #import "PreferenceKeys.h"
 #import "RecordingThread.h"
+#import "recsched_bkgd_AppDelegate.h"
 
 @implementation RSTranscodeController
 
@@ -50,11 +51,9 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		if (aRecording.schedule.transcoding == NULL)
 		{
 			// Create a new transcoding entity
-#if 0
 			RSTranscoding *aTranscoding = [NSEntityDescription insertNewObjectForEntityForName:@"Transcoding" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 			[aTranscoding setSchedule:aRecording.schedule];
 			[aTranscoding setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
-#endif
 		}
 	}
 	[[[NSApp delegate] managedObjectContext] processPendingChanges];
@@ -199,13 +198,19 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	}
 	else
 	{
-		// No valid title found - ignore this transcoding entry.
+		// No valid title found - mark the associated recording as 'bad'
+		mCurrentTranscoding.schedule.recording.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
+		
+		// and ignore this transcoding entry.
 		mCurrentTranscoding.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
 		[mCurrentTranscoding release];
 		mCurrentTranscoding = nil;
+		
 		// See if there's another candidate ?
 		[self updateForNewTranscodings:[mTranscodingsArrayController arrangedObjects]];
 	}
+	
+	[[NSApp delegate] saveAction:nil];
 }
 
 - (void) addToiTunes:(RSTranscoding *) aTranscoding
@@ -248,10 +253,12 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	// Transcoding has finished - push the completed file to iTunes
 	RSTranscodingImp *aTranscodingImp = [aNotification object];
 	
+	NSError *error;
+	if ([[[NSUserDefaults standardUserDefaults] valueForKey:kDeleteRecordingsAfterTranscodeKey] boolValue] == YES)
+		[[NSFileManager defaultManager] removeItemAtPath:aTranscodingImp.transcoding.schedule.recording.mediaFile error:&error];
 	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kAddTranscodingsToiTunesKey] boolValue] == YES)
 		[self addToiTunes:aTranscodingImp.transcoding];
 	
-	NSError *error;
 	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kDeleteTranscodingsAfterAddKey] boolValue] == YES)
 		[[NSFileManager defaultManager] removeItemAtPath:[aTranscodingImp.transcoding mediaFile] error:&error];
 		
@@ -265,9 +272,11 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 {
 	// Recording has finished - begin the transcode process
 	NSManagedObjectID *recordingObjectID = [aNotification object];
-	RSRecording *aRecording = (RSRecording*)[[[NSApp delegate] managedObjectContext] objectWithID:recordingObjectID];
+	RSRecording *aRecording = (RSRecording*)[[[NSApp delegate] managedObjectContext] objectRegisteredForID:recordingObjectID];
 	
-	NSLog(@"recordingFinishedNotification - %@ just finished", aRecording);
+	NSLog(@"recordingFinishedNotification - %@ just finished, status = %@", aRecording, aRecording.status);
+	
+	[self updateForCompletedRecordings:[NSArray arrayWithObject:aRecording]];
 }
 	
 #pragma mark init and dealloc
@@ -293,7 +302,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		mRecordingsArrayController = [[NSArrayController alloc] initWithContent:nil];
 		[mRecordingsArrayController setManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 		[mRecordingsArrayController setEntityName:@"Recording"];
-//		[mRecordingsArrayController setFetchPredicate:[NSPredicate predicateWithFormat:@"status == %@", [NSNumber numberWithInt:RSRecordingFinishedStatus]]];
+		[mRecordingsArrayController setFetchPredicate:[NSPredicate predicateWithFormat:@"status == %@", [NSNumber numberWithInt:RSRecordingFinishedStatus]]];
 		[mRecordingsArrayController setAutomaticallyPreparesContent:YES];
 		[mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:YES error:nil];
 		[mRecordingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
