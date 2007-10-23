@@ -99,7 +99,7 @@
   if ([self tvRating] == nil)
     return nil;
   else
-    return [NSString stringWithFormat:@"%@.tif", [self tvRating]];
+    return [NSString stringWithFormat:@"%@.png", [self tvRating]];
 }
 
 - (NSString *) tvRatingImagePath

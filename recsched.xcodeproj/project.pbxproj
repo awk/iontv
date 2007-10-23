@@ -33,13 +33,6 @@
 		EA083E480BA77D47003C27FA /* Z2ITScheduleExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */; };
 		EA08881E0B86B16D00809664 /* CC.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888150B86B16C00809664 /* CC.tif */; };
 		EA08881F0B86B16D00809664 /* HD.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888160B86B16C00809664 /* HD.tif */; };
-		EA0888200B86B16D00809664 /* TV-14.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888170B86B16C00809664 /* TV-14.tif */; };
-		EA0888210B86B16D00809664 /* TV-G.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888180B86B16C00809664 /* TV-G.tif */; };
-		EA0888220B86B16D00809664 /* TV-MA.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA0888190B86B16C00809664 /* TV-MA.tif */; };
-		EA0888230B86B16D00809664 /* TV-PG.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881A0B86B16C00809664 /* TV-PG.tif */; };
-		EA0888240B86B16D00809664 /* TV-Y.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881B0B86B16C00809664 /* TV-Y.tif */; };
-		EA0888250B86B16D00809664 /* TV-Y7.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881C0B86B16C00809664 /* TV-Y7.tif */; };
-		EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA08881D0B86B16C00809664 /* TV-Y7FV.tif */; };
 		EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
 		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
 		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
@@ -152,6 +145,13 @@
 		EAF8919C0B66F2D300373CEF /* iTableColumnHeaderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8919B0B66F2D200373CEF /* iTableColumnHeaderCell.m */; };
 		EAF8956C0B69023D00373CEF /* ScheduleStationColumnView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8956B0B69023D00373CEF /* ScheduleStationColumnView.m */; };
 		EAF89D8E0B6A8CFD00373CEF /* ScheduleView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF89D8D0B6A8CFD00373CEF /* ScheduleView.m */; };
+		EAF923A70CCEA08400CEBD73 /* TV-14.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923A00CCEA08400CEBD73 /* TV-14.png */; };
+		EAF923A80CCEA08400CEBD73 /* TV-G.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923A10CCEA08400CEBD73 /* TV-G.png */; };
+		EAF923A90CCEA08400CEBD73 /* TV-MA.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923A20CCEA08400CEBD73 /* TV-MA.png */; };
+		EAF923AA0CCEA08400CEBD73 /* TV-PG.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923A30CCEA08400CEBD73 /* TV-PG.png */; };
+		EAF923AB0CCEA08400CEBD73 /* TV-Y.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923A40CCEA08400CEBD73 /* TV-Y.png */; };
+		EAF923AC0CCEA08400CEBD73 /* TV-Y7.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923A50CCEA08400CEBD73 /* TV-Y7.png */; };
+		EAF923AD0CCEA08400CEBD73 /* TV-Y7FV.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923A60CCEA08400CEBD73 /* TV-Y7FV.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -210,13 +210,6 @@
 		EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Z2ITScheduleExtras.m; sourceTree = SOURCE_ROOT; };
 		EA0888150B86B16C00809664 /* CC.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = CC.tif; path = Images/CC.tif; sourceTree = "<group>"; };
 		EA0888160B86B16C00809664 /* HD.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HD.tif; path = Images/HD.tif; sourceTree = "<group>"; };
-		EA0888170B86B16C00809664 /* TV-14.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-14.tif"; path = "Images/TV-14.tif"; sourceTree = "<group>"; };
-		EA0888180B86B16C00809664 /* TV-G.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-G.tif"; path = "Images/TV-G.tif"; sourceTree = "<group>"; };
-		EA0888190B86B16C00809664 /* TV-MA.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-MA.tif"; path = "Images/TV-MA.tif"; sourceTree = "<group>"; };
-		EA08881A0B86B16C00809664 /* TV-PG.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-PG.tif"; path = "Images/TV-PG.tif"; sourceTree = "<group>"; };
-		EA08881B0B86B16C00809664 /* TV-Y.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y.tif"; path = "Images/TV-Y.tif"; sourceTree = "<group>"; };
-		EA08881C0B86B16C00809664 /* TV-Y7.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7.tif"; path = "Images/TV-Y7.tif"; sourceTree = "<group>"; };
-		EA08881D0B86B16C00809664 /* TV-Y7FV.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = "TV-Y7FV.tif"; path = "Images/TV-Y7FV.tif"; sourceTree = "<group>"; };
 		EA20ADB90C2330AC00A9BDBD /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		EA20AE010C23589700A9BDBD /* recsched.syncschema */ = {isa = PBXFileReference; lastKnownFileType = folder; path = recsched.syncschema; sourceTree = SOURCE_ROOT; };
 		EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription_Server.plist; sourceTree = "<group>"; };
@@ -367,6 +360,13 @@
 		EAF8956B0B69023D00373CEF /* ScheduleStationColumnView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleStationColumnView.m; sourceTree = "<group>"; };
 		EAF89D8C0B6A8CFD00373CEF /* ScheduleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleView.h; sourceTree = "<group>"; };
 		EAF89D8D0B6A8CFD00373CEF /* ScheduleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleView.m; sourceTree = "<group>"; };
+		EAF923A00CCEA08400CEBD73 /* TV-14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-14.png"; path = "Images/TV-14.png"; sourceTree = "<group>"; };
+		EAF923A10CCEA08400CEBD73 /* TV-G.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-G.png"; path = "Images/TV-G.png"; sourceTree = "<group>"; };
+		EAF923A20CCEA08400CEBD73 /* TV-MA.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-MA.png"; path = "Images/TV-MA.png"; sourceTree = "<group>"; };
+		EAF923A30CCEA08400CEBD73 /* TV-PG.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-PG.png"; path = "Images/TV-PG.png"; sourceTree = "<group>"; };
+		EAF923A40CCEA08400CEBD73 /* TV-Y.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-Y.png"; path = "Images/TV-Y.png"; sourceTree = "<group>"; };
+		EAF923A50CCEA08400CEBD73 /* TV-Y7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-Y7.png"; path = "Images/TV-Y7.png"; sourceTree = "<group>"; };
+		EAF923A60CCEA08400CEBD73 /* TV-Y7FV.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-Y7FV.png"; path = "Images/TV-Y7FV.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -547,6 +547,13 @@
 		EA2939860C0CC89E0053E2B8 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EAF923A00CCEA08400CEBD73 /* TV-14.png */,
+				EAF923A10CCEA08400CEBD73 /* TV-G.png */,
+				EAF923A20CCEA08400CEBD73 /* TV-MA.png */,
+				EAF923A30CCEA08400CEBD73 /* TV-PG.png */,
+				EAF923A40CCEA08400CEBD73 /* TV-Y.png */,
+				EAF923A50CCEA08400CEBD73 /* TV-Y7.png */,
+				EAF923A60CCEA08400CEBD73 /* TV-Y7FV.png */,
 				EA8E1C570CC9408800DD109F /* HardDrive.tiff */,
 				EA490BB30CAEDB8100A1DE02 /* Activity_Stop.tif */,
 				EA490BB40CAEDB8100A1DE02 /* Activity_StopPressed.tif */,
@@ -556,13 +563,6 @@
 				EAD4C5AB0B8CEBD10017FF69 /* headphone.tif */,
 				EA0888150B86B16C00809664 /* CC.tif */,
 				EA0888160B86B16C00809664 /* HD.tif */,
-				EA0888170B86B16C00809664 /* TV-14.tif */,
-				EA0888180B86B16C00809664 /* TV-G.tif */,
-				EA0888190B86B16C00809664 /* TV-MA.tif */,
-				EA08881A0B86B16C00809664 /* TV-PG.tif */,
-				EA08881B0B86B16C00809664 /* TV-Y.tif */,
-				EA08881C0B86B16C00809664 /* TV-Y7.tif */,
-				EA08881D0B86B16C00809664 /* TV-Y7FV.tif */,
 				EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */,
 				EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */,
 			);
@@ -838,13 +838,6 @@
 				EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */,
 				EA08881E0B86B16D00809664 /* CC.tif in Resources */,
 				EA08881F0B86B16D00809664 /* HD.tif in Resources */,
-				EA0888200B86B16D00809664 /* TV-14.tif in Resources */,
-				EA0888210B86B16D00809664 /* TV-G.tif in Resources */,
-				EA0888220B86B16D00809664 /* TV-MA.tif in Resources */,
-				EA0888230B86B16D00809664 /* TV-PG.tif in Resources */,
-				EA0888240B86B16D00809664 /* TV-Y.tif in Resources */,
-				EA0888250B86B16D00809664 /* TV-Y7.tif in Resources */,
-				EA0888260B86B16D00809664 /* TV-Y7FV.tif in Resources */,
 				EAD4C5AC0B8CEBD10017FF69 /* headphone.tif in Resources */,
 				EA3B40570C8C7AEE0042C793 /* closebox.png in Resources */,
 				EA3B40580C8C7AEE0042C793 /* closebox_pressed.png in Resources */,
@@ -854,6 +847,13 @@
 				EA490BB60CAEDB8100A1DE02 /* Activity_StopPressed.tif in Resources */,
 				EA490DBA0CAF376E00A1DE02 /* ActivityAggregateView.xib in Resources */,
 				EA8E1C580CC9408800DD109F /* HardDrive.tiff in Resources */,
+				EAF923A70CCEA08400CEBD73 /* TV-14.png in Resources */,
+				EAF923A80CCEA08400CEBD73 /* TV-G.png in Resources */,
+				EAF923A90CCEA08400CEBD73 /* TV-MA.png in Resources */,
+				EAF923AA0CCEA08400CEBD73 /* TV-PG.png in Resources */,
+				EAF923AB0CCEA08400CEBD73 /* TV-Y.png in Resources */,
+				EAF923AC0CCEA08400CEBD73 /* TV-Y7.png in Resources */,
+				EAF923AD0CCEA08400CEBD73 /* TV-Y7FV.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
