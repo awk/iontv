@@ -1,0 +1,78 @@
+/* No comment provided by engineer. */
+"%.0lfk of %.0lfk" = "%1$.0lfk of %2$.0lfk";
+
+/* No comment provided by engineer. */
+"%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?" = "%1$@ %2$@ er blevet installeret og vil kunne bruges næste gang du starter %3$@ Vil du genstarte nu?";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ er lige nu den sidste nye tilgængelige udgave.";
+
+/* No comment provided by engineer. */
+"%@ %@ is now available (you have %@). Would you like to download it now?" = "%1$@ %2$@ er nu tilgængelig (du har %3$@). Vil du downloade det nu?";
+
+/* No comment provided by engineer. */
+"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "%@ har ikke tilladelser til at skrive til programmet! Kører programmet fra et diskbillede? Er dette ikke tilfældet, spørg venligst systemets administrator om hjælp.";
+
+/* No comment provided by engineer. */
+"A new version of %@ has been installed!" = "En ny version af %@ er blevet installeret!";
+
+/* No comment provided by engineer. */
+"A new version of %@ is available!" = "En ny version af %@ er tilgængelig!";
+
+/* No comment provided by engineer. */
+"An error occurred during installation. Please try again later." = "Der skete en fejl under installationen. Prøv venligst igen senere.";
+
+/* No comment provided by engineer. */
+"An error occurred in retrieving update information. Please try again later." = "Der skete en fejl under indhentning af opdaterings information.";
+
+/* No comment provided by engineer. */
+"An error occurred while extracting the archive. Please try again later." = "Der skete en fejl under udpakning af arkiv. Prøv venligst igen senere.";
+
+/* No comment provided by engineer. */
+"An error occurred while trying to download the file. Please try again later." = "Der skete en fejl under forsøget på at downloade filen. Prøv venligst igen senere.";
+
+/* No comment provided by engineer. */
+"An update is already in progress!" = "En opdatering er allerede igang!";
+
+/* No comment provided by engineer. */
+"Cancel" = "Fortryd";
+
+/* No comment provided by engineer. */
+"Check for updates on startup?" = "Check for opdateringer ved start?";
+
+/* No comment provided by engineer. */
+"Downloading update..." = "Downloader opdatering...";
+
+/* No comment provided by engineer. */
+"Extracting update..." = "Pakker opdateringen ud...";
+
+/* No comment provided by engineer. */
+"Install and Relaunch" = "Installér og genstart";
+
+/* No comment provided by engineer. */
+"Installing update..." = "Installerer opdatering...";
+
+/* No comment provided by engineer. */
+"No" = "Nej";
+
+/* No comment provided by engineer. */
+"OK" = "OK";
+
+/* No comment provided by engineer. */
+"Ready to install!" = "Klar til at installere!";
+
+/* No comment provided by engineer. */
+"Update Error!" = "Opdaterings fejl!";
+
+/* No comment provided by engineer. */
+"Updating %@" = "Opdaterer %@";
+
+/* No comment provided by engineer. */
+"Would you like %@ to check for updates on startup? If not, you can initiate the check manually from the application menu." = "Skal %@ chekke for opdateringer ved start? Hvis ikke kan du manuelt søge for opdateringer via programmets menu.";
+
+/* No comment provided by engineer. */
+"Yes" = "Ja";
+
+/* No comment provided by engineer. */
+"You're up to date!" = "Du er opdateret!";
+

@@ -1,0 +1,77 @@
+/* No comment provided by engineer. */
+"%.0lfk of %.0lfk" = "%2$.0lfk'nın %1$.0lfk'sı";
+
+/* No comment provided by engineer. */
+"%@ %@ has been installed and will be ready to use next time %@ starts! Would you like to relaunch now?" = "%1$@ %2$@ yüklendi %3$@'ın bir sonraki açılışında kullanıma hazır olacak! Şimdi yeniden çalıştırmak ister misiniz?";
+
+/* No comment provided by engineer. */
+"%@ %@ is currently the newest version available." = "%1$@ %2$@ şu anda en güncel sürüm.";
+
+/* No comment provided by engineer. */
+"%@ %@ is now available (you have %@). Would you like to download it now?" = "%1$@'ın %2$@ sürümü mevcut (sizinki %3$@). Güncellemeyi şimdi yüklemek ister misiniz?";
+
+/* No comment provided by engineer. */
+"%@ does not have permission to write to the application's directory! Are you running off a disk image? If not, ask your system administrator for help." = "%@'ın Uygulamalar dizinine yazma yetkisi bulunmuyor! Disk imajı mı kopyalıyorsunuz? Eğer öyle değilse, sistem yöneticinizden yardım isteyin.";
+
+/* No comment provided by engineer. */
+"A new version of %@ has been installed!" = "%@'ın yeni sürümü yüklendi!";
+
+/* No comment provided by engineer. */
+"A new version of %@ is available!" = "%@'ın yeni bir sürümü mevcut!";
+
+/* No comment provided by engineer. */
+"An error occurred during installation. Please try again later." = "Yükleme sırasında hata oluştu. Lütfen daha sonra tekrar deneyin.";
+
+/* No comment provided by engineer. */
+"An error occurred in retrieving update information. Please try again later." = "Güncelleme bilgisi alınırken hata oluştu. Lütfen daha sonra tekrar deneyin.";
+
+/* No comment provided by engineer. */
+"An error occurred while extracting the archive. Please try again later." = "Arşiv genişletilirken hata oluştu. Lütfen daha sonra tekrar deneyin.";
+
+/* No comment provided by engineer. */
+"An error occurred while trying to download the file. Please try again later." = "Dosya indirilirken hata oluştu. Lütfen daha sonra tekrar deneyin.";
+
+/* No comment provided by engineer. */
+"An update is already in progress!" = "Devam eden bir güncelleme var!";
+
+/* No comment provided by engineer. */
+"Cancel" = "İptal";
+
+/* No comment provided by engineer. */
+"Check for updates on startup?" = "Açılışta güncellemeler denetlensin mi?";
+
+/* No comment provided by engineer. */
+"Downloading update..." = "Güncelleme indiriliyor...";
+
+/* No comment provided by engineer. */
+"Extracting update..." = "Güncelleme dosyaları genişletiliyor...";
+
+/* No comment provided by engineer. */
+"Install and Relaunch" = "Yükle ve Yeniden Aç";
+
+/* No comment provided by engineer. */
+"Installing update..." = "Güncelleme yükleniyor...";
+
+/* No comment provided by engineer. */
+"No" = "Hayır";
+
+/* No comment provided by engineer. */
+"OK" = "Tamam";
+
+/* No comment provided by engineer. */
+"Ready to install!" = "Yüklemeye hazır!";
+
+/* No comment provided by engineer. */
+"Update Error!" = "Güncelleme Hatası!";
+
+/* No comment provided by engineer. */
+"Updating %@" = "%@ güncelleniyor";
+
+/* No comment provided by engineer. */
+"Would you like %@ to check for updates on startup? If not, you can initiate the check manually from the application menu." = "%1$@'ın başlangıçta güncellemeleri denetlemesini ister misiniz? Eğer istemiyorsanız, %2$@ menüsünden kendiniz denetleyebilirsiniz.";
+
+/* No comment provided by engineer. */
+"Yes" = "Evet";
+
+/* No comment provided by engineer. */
+"You're up to date!" = "Sürümünüz güncel!";
