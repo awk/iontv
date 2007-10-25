@@ -8,6 +8,9 @@
 #import "tvDataDelivery.h"
 #import "Preferences.h"
 #import "RSActivityDisplayProtocol.h"
+#import "RSStoreUpdateProtocol.h"
+#import "recsched_bkgd_AppDelegate.h"
+#import "RecSchedServer.h"
 
 #import <Security/Security.h>
 
@@ -118,7 +121,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                   
                   // Fetch the account name from the prefs file, and the password from the keychain
                   NSString *accountName = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernameKey];
-					if (accountName == nil)
+					if ((accountName == nil) || ([accountName length] == 0))
 					{
 						NSLog(@"No SchedulesDirect username in the application prefs !");
 						return nil;
@@ -290,6 +293,19 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 	
   NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:@"startDateStr"] in_endTime:[xtvdDownloadData valueForKey:@"endDateStr"]];
 
+  if ((downloadResult == nil) || ([downloadResult valueForKey:@"xtvd"] == nil))
+  {
+	// Error during the download - notify the other side and return
+	[[[[NSApp delegate] recServer] storeUpdate] downloadError:downloadResult];
+	[pool release];
+	if (reportProgress)
+	{
+		[reportProgressTo setActivity:activityToken progressIndeterminate:NO];
+		[reportProgressTo endActivity:activityToken];
+	}
+	return;
+  }
+  
   NSMutableDictionary *parserCallData = [[NSMutableDictionary alloc] initWithDictionary:downloadResult];
   if ([xtvdDownloadData valueForKey:@"lineupsOnly"] != nil)
   {

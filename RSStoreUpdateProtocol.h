@@ -12,6 +12,7 @@ extern NSString *kRSStoreUpdateConnectionName;
 
 - (void) parsingComplete:(id)info;
 - (void) cleanupComplete:(id)info;
+- (void) downloadError:(id)info;
 
 @end
 

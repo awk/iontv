@@ -14,6 +14,35 @@
 #import "MainWindowController.h"
 #import "Sparkle/Sparkle.h"
 
+NSString *RSParsingCompleteNotification = @"RSParsingCompleteNotification";
+NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
+
+@interface RSIsOneOrLessNumberValueTransformer : NSValueTransformer
+{
+
+}
+
+@end
+
+@implementation RSIsOneOrLessNumberValueTransformer
+
++ (Class)transformedValueClass;
+{
+    return [NSNumber class];
+}
+
+- (id)transformedValue:(id)value {
+
+	if ([value count] <= 1) {
+		return [NSNumber numberWithBool:YES];
+	} 
+	
+	return[NSNumber numberWithBool:NO];
+
+}
+
+@end
+
 @implementation recsched_AppDelegate
 
 #pragma mark - Server Communication
@@ -59,6 +88,13 @@
   
 }
 
++ (void) initialize
+{
+	// Register our positive number to bool transformer
+	RSIsOneOrLessNumberValueTransformer *numberTransformer = [[[RSIsOneOrLessNumberValueTransformer alloc] init] autorelease];
+	[NSValueTransformer setValueTransformer:numberTransformer forName:@"RSIsOneOrLessNumberValueTransformer"];
+}
+
 - (id) init {
   self = [super init];
   if (self != nil) {
@@ -97,24 +133,50 @@
 }
 #endif // USE_SYNCSERVICES
 
-- (NSPersistentStore*) persistentStore
-{
-	if (persistentStore != nil)
+/**
+    Returns the persistent store coordinator for the application.  This 
+    implementation will create and return a coordinator, having added the 
+    store for the application to it.  (The folder for the store is created, 
+    if necessary.)
+ */
+
+- (NSPersistentStoreCoordinator *) persistentStoreCoordinator {
+
+    if (persistentStoreCoordinator != nil) {
+        return persistentStoreCoordinator;
+    }
+
+    NSFileManager *fileManager;
+    NSString *applicationSupportFolder = nil;
+    NSURL *url;
+    NSError *error;
+    
+    fileManager = [NSFileManager defaultManager];
+    applicationSupportFolder = [self applicationSupportFolder];
+    if ( ![fileManager fileExistsAtPath:applicationSupportFolder isDirectory:NULL] ) {
+        [fileManager createDirectoryAtPath:applicationSupportFolder attributes:nil];
+    }
+    
+    url = [self urlForPersistentStore]; //[NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched_bkgd.dat"]];
+    persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
+	// Open the store read only
+	NSDictionary *optionsDictionary = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:NSReadOnlyPersistentStoreOption];
+
+	persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:optionsDictionary error:&error];
+    if (persistentStore != nil)
 	{
-		return persistentStore;
-	}
-	[self persistentStoreCoordinator];
-	if (persistentStore)
-	{
-#if !USE_SYNCSERVICES
-		if ([persistentStore isReadOnly] == NO)
-			[persistentStore setReadOnly:YES];
+#if USE_SYNCSERVICES
+		NSURL *fastSyncDetailURL;
+        fastSyncDetailURL = [self urlForFastSyncStore]; //[NSURL fileURLWithPath:[applicationSupportFolder stringByAppendingPathComponent:@"org.awkward.recsched-server.fastsyncstore"]];
+        [persistentStoreCoordinator setStoresFastSyncDetailsAtURL:fastSyncDetailURL forPersistentStore:persistentStore];
 #endif // USE_SYNCSERVICES
-		return persistentStore;
 	}
 	else
-		NSLog(@"ERROR - No Persistent Store after initializing coordinator !");
-	return nil;
+	{
+        [[NSApplication sharedApplication] presentError:error];
+    }    
+
+    return persistentStoreCoordinator;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
@@ -420,6 +482,15 @@
 
 - (void) parsingComplete:(id)info
 {
+	// Refresh our managed object context with the new data
+	[[self managedObjectContext] reset];
+	
+	NSDictionary *infoDict = nil;
+	if (info)
+		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"parsingCompleteInfo"];
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:RSParsingCompleteNotification object:self userInfo:infoDict];
+
 	[[window delegate] setGetScheduleButtonEnabled:YES];
 	NSLog(@"Parsing Complete");
 }
@@ -427,6 +498,15 @@
 - (void) cleanupComplete:(id)info
 {
 	NSLog(@"Cleanup Complete");
+}
+
+- (void) downloadError:(id)info
+{
+	NSDictionary *infoDict = nil;
+	if (info)
+		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"downloadErrorInfo"];
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:self userInfo:infoDict];
 }
 
 @synthesize mRecServer;

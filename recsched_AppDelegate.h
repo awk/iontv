@@ -10,6 +10,7 @@
 #import "RSStoreUpdateProtocol.h"
 
 extern NSString *RSParsingCompleteNotification;
+extern NSString *RSDownloadErrorNotification;
 
 @class HDHomeRunStation;
 

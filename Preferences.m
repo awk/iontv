@@ -413,6 +413,9 @@ static Preferences *sSharedInstance = nil;
   [[theDefaultsController values] setValue:[recordedProgramsLocation absoluteString] forKey:kRecordedProgramsLocationKey];
   [[theDefaultsController values] setValue:[transcodedProgramsLocation absoluteString] forKey:kTranscodedProgramsLocationKey];
   [theDefaultsController save:sender];
+  
+  // Tell the background server to reload it's preferences
+  [[[NSApp delegate] recServer] reloadPreferences:self];
 }
 
 - (NSArray *) z2itStationSortDescriptors
@@ -545,6 +548,9 @@ static Preferences *sSharedInstance = nil;
   
 	// Register for the complete notification
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(parsingCompleteNotification:) name:RSParsingCompleteNotification object:[NSApp delegate]];
+	
+	// Register for the error notification
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadErrorNotification:) name:RSDownloadErrorNotification object:[NSApp delegate]];
 	
  	// Send the message to the background server
 	NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", [NSNumber numberWithBool:YES], @"lineupsOnly", nil /* really needs to be a DO port or similar */, @"dataRecipient", nil];
@@ -734,6 +740,16 @@ static Preferences *sSharedInstance = nil;
   [mRetrieveLineupsButton setEnabled:YES];
   
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:[NSApp delegate]];
+}
+
+- (void) downloadErrorNotification:(NSNotification *)aNotification
+{
+  [mParsingProgressIndicator setHidden:YES];
+  [mRetrieveLineupsButton setEnabled:YES];
+  
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:[NSApp delegate]];
 }
 
 #pragma mark Open/Save Panel Delegate Methods
