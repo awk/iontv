@@ -27,8 +27,6 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		EA0674310B58084D009B0E27 /* MainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674300B58084D009B0E27 /* MainWindowController.m */; };
-		EA0674410B580B4D009B0E27 /* tvDataDelivery.m in Sources */ = {isa = PBXBuildFile; fileRef = EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */; };
-		EA0674420B580B4D009B0E27 /* WSGeneratedObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */; };
 		EA083E480BA77D47003C27FA /* Z2ITScheduleExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */; };
 		EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
 		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
@@ -50,7 +48,6 @@
 		EA2EE0680C07D4890002420F /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
 		EA2EE0780C07D57A0002420F /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
-		EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3090C30C6AB59E0005E89B /* RSWishlistController.m */; };
 		EA3B40500C8C79470042C793 /* ScheduleDetailsPopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */; };
@@ -130,7 +127,6 @@
 		EAEC0A290C283C8200C40D5A /* Z2ITSchedule.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8867C0B61740300373CEF /* Z2ITSchedule.m */; };
 		EAF4EA220C5EB0AB003EC697 /* AKColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */; };
 		EAF4EACF0C5F90B1003EC697 /* AKColorExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */; };
-		EAF882700B5DC0BD00373CEF /* XTVDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */; };
 		EAF883100B5DCE4900373CEF /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
 		EAF883DE0B5ECB5B00373CEF /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
 		EAF8850F0B6024A800373CEF /* Z2ITLineupMap.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */; };
@@ -155,6 +151,7 @@
 		EAF923F40CCEE15000CEBD73 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = EAF923F20CCEE15000CEBD73 /* Credits.html */; };
 		EAF924280CCF9D3900CEBD73 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAF923FB0CCF6BC400CEBD73 /* Sparkle.framework */; };
 		EAF9246D0CD02BE100CEBD73 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = EAF923FB0CCF6BC400CEBD73 /* Sparkle.framework */; };
+		EAF9247D0CD030D100CEBD73 /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -676,6 +673,12 @@
 				EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */,
 				EA70E8950CC06ED500C3B295 /* RSTranscodingImp.h */,
 				EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */,
+				EA06743D0B580B4D009B0E27 /* tvDataDelivery.h */,
+				EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */,
+				EA06743F0B580B4D009B0E27 /* WSGeneratedObj.h */,
+				EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */,
+				EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */,
+				EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */,
 			);
 			name = "Background App";
 			sourceTree = "<group>";
@@ -690,12 +693,6 @@
 				EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */,
 				EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */,
 				EAF886900B6293B200373CEF /* CoreData_Macros.h */,
-				EA06743D0B580B4D009B0E27 /* tvDataDelivery.h */,
-				EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */,
-				EA06743F0B580B4D009B0E27 /* WSGeneratedObj.h */,
-				EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */,
-				EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */,
-				EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */,
 				EAF8850D0B6024A800373CEF /* Z2ITLineupMap.h */,
 				EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */,
 				EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */,
@@ -899,9 +896,6 @@
 				77C8280E06725ACE000B614F /* recsched_AppDelegate.m in Sources */,
 				EAE3FB290C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */,
 				EA0674310B58084D009B0E27 /* MainWindowController.m in Sources */,
-				EA0674410B580B4D009B0E27 /* tvDataDelivery.m in Sources */,
-				EA0674420B580B4D009B0E27 /* WSGeneratedObj.m in Sources */,
-				EAF882700B5DC0BD00373CEF /* XTVDParser.m in Sources */,
 				EAF883100B5DCE4900373CEF /* Z2ITStation.m in Sources */,
 				EAF883DE0B5ECB5B00373CEF /* Z2ITLineup.m in Sources */,
 				EAF8850F0B6024A800373CEF /* Z2ITLineupMap.m in Sources */,
@@ -926,7 +920,6 @@
 				EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */,
 				EAF4EA220C5EB0AB003EC697 /* AKColorCell.m in Sources */,
 				EAF4EACF0C5F90B1003EC697 /* AKColorExtensions.m in Sources */,
-				EA308FB70C66A7470005E89B /* RSColorDictionary.m in Sources */,
 				EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */,
 				EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */,
 				EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */,
@@ -937,6 +930,7 @@
 				EA70E7140CC012C100C3B295 /* RSTranscoding.m in Sources */,
 				EA70E7210CC0164600C3B295 /* recsched.xcmappingmodel in Sources */,
 				EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */,
+				EAF9247D0CD030D100CEBD73 /* RSColorDictionary.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
