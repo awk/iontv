@@ -18,3 +18,6 @@ extern NSString	*kDeleteRecordingsAfterTranscodeKey;
 extern NSString	*kAddTranscodingsToiTunesKey;
 extern NSString *kDeleteTranscodingsAfterAddKey;
 
+// Not really a key - just a string that's shared between the preferences, preferences UI and the download thread
+extern NSString *kWebServicesSDHostname;
+extern NSString *kWebServicesSDPath;

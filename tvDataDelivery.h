@@ -11,8 +11,8 @@
 #import <CoreServices/CoreServices.h>
 #import <Foundation/Foundation.h>
 #import "WSGeneratedObj.h"
+#import "PreferenceKeys.h"
 
-extern NSString *kWebServicesSDHostname;
 extern NSString *kWebServicesSDPath;
 
 @interface tvDataDelivery : WSGeneratedObj

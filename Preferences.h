@@ -13,7 +13,7 @@
 
 @class DiscreteDurationSlider;
 
-@interface Preferences : NSObject <XMLParsingProgressDisplay, ChannelScanProgressDisplay> {
+@interface Preferences : NSObject <ChannelScanProgressDisplay> {
 
     IBOutlet NSTextField *mDurationTextField;
     IBOutlet DiscreteDurationSlider *mDurationSlider;
@@ -28,7 +28,6 @@
     IBOutlet NSTextField *mSDUsernameField;
     IBOutlet NSTextField *mSDPasswordField;
     IBOutlet NSProgressIndicator *mParsingProgressIndicator;
-    IBOutlet NSTextField *mParsingProgressInfoField;
     IBOutlet NSButton *mRetrieveLineupsButton;
     IBOutlet NSProgressIndicator *mTunerScanProgressIndicator;
     IBOutlet NSButton *mScanTunersButton;

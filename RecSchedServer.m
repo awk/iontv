@@ -129,12 +129,15 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	id completionProxy = [self storeUpdate];
 	if (completionProxy == nil)
 		completionProxy = self;
-    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
+    NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
         notificationProxy, @"reportProgressTo", 
         completionProxy, @"reportCompletionTo", 
         [[NSApp  delegate] persistentStoreCoordinator], @"persistentStoreCoordinator",
         nil];
-    
+
+	if ([downloadResult valueForKey:@"lineupsOnly"] != nil)
+		[callData setValue:[downloadResult valueForKey:@"lineupsOnly"] forKey:@"lineupsOnly"];
+		
     // Start our local parsing
     xtvdParseThread *aParseThread = [[xtvdParseThread alloc] init];
     

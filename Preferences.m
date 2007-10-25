@@ -8,8 +8,7 @@
 
 #import "AKColorCell.h"
 #import "Preferences.h"
-#import "tvDataDelivery.h"
-#import "XTVDParser.h"
+#import "PreferenceKeys.h"
 #import "hdhomerun.h"
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
@@ -521,11 +520,9 @@ static Preferences *sSharedInstance = nil;
 {
   [self savePrefs:sender];
   
+  [mParsingProgressIndicator setIndeterminate:YES];
   [mParsingProgressIndicator startAnimation:self];
   [mParsingProgressIndicator setHidden:NO];
-  [mParsingProgressIndicator setIndeterminate:YES];
-  [mParsingProgressInfoField setStringValue:@"Downloading Lineup Data"];
-  [mParsingProgressInfoField setHidden:NO];
   [mRetrieveLineupsButton setEnabled:NO];
 
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
@@ -546,9 +543,12 @@ static Preferences *sSharedInstance = nil;
   NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
   NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
   
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", self, @"dataRecipient", nil];
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
-  [callData release];
+	// Register for the complete notification
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(parsingCompleteNotification:) name:RSParsingCompleteNotification object:[NSApp delegate]];
+	
+ 	// Send the message to the background server
+	NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", [NSNumber numberWithBool:YES], @"lineupsOnly", nil /* really needs to be a DO port or similar */, @"dataRecipient", nil];
+	[[[NSApp delegate] recServer] performDownload:callData];
 }
 
 - (IBAction) scanDevicesButtonAction:(id)sender
@@ -726,74 +726,14 @@ static Preferences *sSharedInstance = nil;
 	[self pushHDHomeRunStationsOnTuner:inTuner];
 }
 
-#pragma mark Callback Methods
+#pragma mark Callback & Notification Methods
 
-- (void) handleDownloadData:(id)inDownloadResult
-{
-
-  [mParsingProgressIndicator stopAnimation:self];
-  [mParsingProgressIndicator setHidden:YES];
-  [mParsingProgressIndicator setIndeterminate:NO];
-  [mParsingProgressInfoField setHidden:YES];
-
-  NSDictionary *downloadResult = (NSDictionary*)inDownloadResult;
-  NSDictionary *messages = [downloadResult valueForKey:@"messages"];
-  NSDictionary *xtvd = [downloadResult valueForKey:@"xtvd"];
-  NSLog(@"getScheduleAction downloadResult messages = %@", messages);
-  NSLog(@"getScheduleAction downloadResult xtvd = %@", xtvd);
-  [downloadResult release];
-
-  if (xtvd != nil)
-  {
-    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath", [NSNumber numberWithBool:YES], @"lineupsOnly", self, @"reportProgressTo", self, @"reportCompletionTo", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
-    
-    // Start our local parsing
-    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:[[xtvdParseThread alloc] init] withObject:callData];
-    
-    [callData release];
-  }
-  else
-  {
-	// Error occrred - renable the controls
-	[mParsingProgressIndicator setHidden:YES];
-	[mParsingProgressInfoField setHidden:YES];
-	[mRetrieveLineupsButton setEnabled:YES];
-  }
-}
-
-- (void) setParsingInfoString:(NSString*)inInfoString
-{
-  [mParsingProgressInfoField setStringValue:inInfoString];
-  [mParsingProgressInfoField setHidden:NO];
-}
-
-- (void) setParsingProgressMaxValue:(double)inTotal
-{
-  [mParsingProgressIndicator setMaxValue:inTotal];
-  [mParsingProgressIndicator setHidden:NO];
-}
-
-- (void) setParsingProgressDoubleValue:(double)inValue
-{
-  [mParsingProgressIndicator setDoubleValue:inValue];
-}
-
-- (void) parsingComplete:(id)info
+- (void) parsingCompleteNotification:(NSNotification *)aNotification
 {
   [mParsingProgressIndicator setHidden:YES];
-  [mParsingProgressInfoField setHidden:YES];
   [mRetrieveLineupsButton setEnabled:YES];
- 
-//  [mParsingProgressIndicator startAnimation:self];
-//  [mParsingProgressIndicator setHidden:NO];
-//  [mParsingProgressIndicator setIndeterminate:YES];
-//  [mParsingProgressInfoField setStringValue:@"Cleanup Old Schedule Data"];
-//  [mParsingProgressInfoField setHidden:NO];
-}
-
-- (void) cleanupComplete:(id)info
-{
-  // Cleanup never happens for lineup downloads in the Preferences dialog.
+  
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
 }
 
 #pragma mark Open/Save Panel Delegate Methods

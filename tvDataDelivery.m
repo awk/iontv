@@ -13,9 +13,6 @@
 
 // URL for SOAP services used to retrieve the listings
 // @"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService
-NSString *kWebServicesSDHostname = @"webservices.schedulesdirect.tmsdatadirect.com";
-NSString *kWebServicesSDPath = @"/schedulesdirect/tvlistings/xtvdService";
-
 
 @implementation tvDataDelivery
 
@@ -292,14 +289,20 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   }
 	
   NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:@"startDateStr"] in_endTime:[xtvdDownloadData valueForKey:@"endDateStr"]];
- 
+
+  NSMutableDictionary *parserCallData = [[NSMutableDictionary alloc] initWithDictionary:downloadResult];
+  if ([xtvdDownloadData valueForKey:@"lineupsOnly"] != nil)
+  {
+	[parserCallData setValue:[xtvdDownloadData valueForKey:@"lineupsOnly"] forKey:@"lineupsOnly"];
+  }
+  
   if (reportProgress)
   {
 	[reportProgressTo setActivity:activityToken progressIndeterminate:NO];
 	[reportProgressTo endActivity:activityToken];
   }
   if ([[xtvdDownloadData valueForKey:@"dataRecipient"] respondsToSelector:@selector(handleDownloadData:)])
-    [[xtvdDownloadData valueForKey:@"dataRecipient"] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:downloadResult waitUntilDone:NO];
+    [[xtvdDownloadData valueForKey:@"dataRecipient"] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:parserCallData waitUntilDone:NO];
   [pool release];
 }
 

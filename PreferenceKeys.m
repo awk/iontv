@@ -19,3 +19,7 @@ NSString *kDeleteRecordingsAfterTranscodeKey = @"deleteRecordingsAfterTranscode"
 NSString *kAddTranscodingsToiTunesKey = @"addTranscodingsToiTunes";
 NSString *kDeleteTranscodingsAfterAddKey = @"deleteTranscodingsAfterAdd";
 
+// URL for SOAP services used to retrieve the listings
+// @"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService
+NSString *kWebServicesSDHostname = @"webservices.schedulesdirect.tmsdatadirect.com";
+NSString *kWebServicesSDPath = @"/schedulesdirect/tvlistings/xtvdService";

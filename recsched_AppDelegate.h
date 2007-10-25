@@ -9,6 +9,8 @@
 #import "RSCommonAppDelegate.h"
 #import "RSStoreUpdateProtocol.h"
 
+extern NSString *RSParsingCompleteNotification;
+
 @class HDHomeRunStation;
 
 @interface recsched_AppDelegate : RSCommonAppDelegate <RSStoreUpdate>
