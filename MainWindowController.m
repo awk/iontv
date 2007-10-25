@@ -16,6 +16,7 @@
 #import "recsched_AppDelegate.h"
 #import "HDHomeRunTuner.h"
 #import "RecSchedProtocol.h"
+#import "ScheduleViewController.h"
 
 @implementation MainWindowController
 
@@ -256,6 +257,15 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   
   [mCurrentSchedule setContent:nil];
 
+  // Watch for the RSParsingCompleteNotification to reset our object controllers
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(parsingCompleteNotification:) name:RSParsingCompleteNotification object:[NSApp delegate]];
+}
+
+- (void) dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
+	
+	[super dealloc];
 }
 
 #pragma mark Action Methods
@@ -471,6 +481,28 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 //	{
 //		[aSchedule setToBeRecorded:[NSNumber numberWithBool:NO]];
 //	}
+}
+
+- (void) parsingCompleteNotification:(NSNotification*)aNotification
+{
+	// Store the current lineup selection (if there is one)
+	Z2ITLineup *currentLineup = [mCurrentLineup content];
+	NSError *error = nil;
+	[mLineupsArrayController fetchWithRequest:[mLineupsArrayController defaultFetchRequest] merge:NO error:&error];
+	
+	if (error)
+	{
+		NSLog(@"parsingCompleteNotification - fetchWithRequest got error %@", error);
+	}
+	if (!currentLineup)
+	{
+		currentLineup = [[mLineupsArrayController arrangedObjects] objectAtIndex:0];
+	}
+
+	[mCurrentLineup setContent:currentLineup];
+	
+	// Trigger the schedule view to redraw
+	[[mScheduleView delegate] setStartTime:[[mScheduleView delegate] startTime]];
 }
 
 #pragma mark Window Delegate Methods
