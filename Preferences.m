@@ -36,6 +36,7 @@ NSString *kTunersPreferencesToolbarIdentifier = @"Tuners";
 NSString *kChannelsPreferencesToolbarIdentifier = @"Channels";
 NSString *kColorsPreferencesToolbarIdentifier = @"Colors";
 NSString *kStorageTranscodingToolbarIdentifier = @"StorageTranscoding";
+NSString *kAdvancedIdentifier = @"Advanced";
 NSString *kSchedulesDirectURL = @"http://schedulesdirect.org/signup";
 
 struct discreteSliderMarks
@@ -224,6 +225,7 @@ static Preferences *sSharedInstance = nil;
     addToolbarItem(mToolbarItems,kChannelsPreferencesToolbarIdentifier,@"Channels",@"Channels",@"Customize Channels you recieve",self,@selector(setImage:), nil /* image */,@selector(showChannelPrefs:),NULL);
     addToolbarItem(mToolbarItems,kColorsPreferencesToolbarIdentifier,@"Colors",@"Colors",@"Colors for program genres",self,@selector(setImage:), [NSImage imageNamed:NSImageNameColorPanel], @selector(showColorPrefs:),NULL);
     addToolbarItem(mToolbarItems,kStorageTranscodingToolbarIdentifier,@"Storage and Conversion",@"Storage and Conversion",@"Customize where programs are stored and how they are converted.",self,@selector(setImage:), [NSImage imageNamed:@"HardDrive.tiff"],@selector(showStorageTranscodingPrefs:),NULL);
+    addToolbarItem(mToolbarItems,kAdvancedIdentifier,@"Advanced",@"Advanced",@"Advanced Preferences.",self,@selector(setImage:), [NSImage imageNamed:NSImageNameAdvanced],@selector(showAdvancedPrefs:),NULL);
      
     // the toolbar wants to know who is going to handle processing of NSToolbarItems for it.  This controller will.
     [toolbar setDelegate:self];
@@ -468,6 +470,11 @@ static Preferences *sSharedInstance = nil;
 - (void) showStorageTranscodingPrefs:(id)sender
 {
 	[self showPrefsView:mStorageTranscodingPrefsView];
+}
+
+- (void) showAdvancedPrefs:(id)sender
+{
+	[self showPrefsView:mAdvancedPrefsView];
 }
 
 - (IBAction) okButtonAction:(id)sender
@@ -887,19 +894,19 @@ static Preferences *sSharedInstance = nil;
 // set of toolbar items.  It can also be called by the customization palette to display the default toolbar.    
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, kAdvancedIdentifier, nil];
 }
 
 // This method is required of NSToolbar delegates.  It returns an array holding identifiers for all allowed
 // toolbar items in this toolbar.  Any not listed here will not be available in the customization palette.
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar
 {
-    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, kAdvancedIdentifier, NSToolbarSeparatorItemIdentifier, NSToolbarSpaceItemIdentifier,NSToolbarFlexibleSpaceItemIdentifier,nil];
 }
 
 - (NSArray *)toolbarSelectableItemIdentifiers:(NSToolbar *)toolbar
 {
-    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, nil];
+    return [NSArray arrayWithObjects:kSDPreferencesToolbarIdentifier, kColorsPreferencesToolbarIdentifier, kTunersPreferencesToolbarIdentifier, kChannelsPreferencesToolbarIdentifier, kStorageTranscodingToolbarIdentifier, kAdvancedIdentifier, nil];
 }
 
 @end

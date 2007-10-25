@@ -24,6 +24,7 @@
     IBOutlet NSView* mChannelPrefsView;
 	IBOutlet NSView* mColorPrefsView;
 	IBOutlet NSView* mStorageTranscodingPrefsView;
+	IBOutlet NSView* mAdvancedPrefsView;
     IBOutlet NSTextField *mSDUsernameField;
     IBOutlet NSTextField *mSDPasswordField;
     IBOutlet NSProgressIndicator *mParsingProgressIndicator;

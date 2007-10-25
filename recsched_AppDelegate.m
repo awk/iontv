@@ -12,6 +12,7 @@
 #import "HDHomeRunTuner.h"
 #import "RecSchedProtocol.h"
 #import "MainWindowController.h"
+#import "Sparkle/Sparkle.h"
 
 @implementation recsched_AppDelegate
 
@@ -122,6 +123,10 @@
     [[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
     [self syncAction:nil];
 #endif
+
+	// Register to be notified when an update through sparkle completes - we use this to restart the background
+	// server which may also have just been updated.
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sparkleWillRestart:) name:SUUpdaterWillRestartNotification object:nil];
 }
 
 #if USE_SYNCSERVICES
@@ -401,14 +406,14 @@
   }
 }
 
-
-/**
-    Implementation of dealloc, to release the retained variables.
- */
- 
-- (void) dealloc {
-
-    [super dealloc];
+- (void) sparkleWillRestart:(NSNotification*)notification
+{
+	// Sparkle is restarting us after an update - if we have a connection to the server we should restart
+	// it too.
+	if (mRecServer != nil)
+	{
+		[mRecServer quitServer:self];
+	}
 }
 
 #pragma mark - Store Update Protocol

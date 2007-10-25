@@ -153,6 +153,7 @@
 		EAF923CA0CCECAEB00CEBD73 /* HD.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923C80CCECAEB00CEBD73 /* HD.png */; };
 		EAF923CF0CCED90100CEBD73 /* ST.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923CE0CCED90100CEBD73 /* ST.png */; };
 		EAF923F40CCEE15000CEBD73 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = EAF923F20CCEE15000CEBD73 /* Credits.html */; };
+		EAF924280CCF9D3900CEBD73 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAF923FB0CCF6BC400CEBD73 /* Sparkle.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -185,6 +186,18 @@
 			remoteInfo = recsched_bkgd;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		EAF9241C0CCF930100CEBD73 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -369,6 +382,7 @@
 		EAF923C80CCECAEB00CEBD73 /* HD.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = HD.png; path = Images/HD.png; sourceTree = "<group>"; };
 		EAF923CE0CCED90100CEBD73 /* ST.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = ST.png; path = Images/ST.png; sourceTree = "<group>"; };
 		EAF923F30CCEE15000CEBD73 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = English; path = English.lproj/Credits.html; sourceTree = "<group>"; };
+		EAF923FB0CCF6BC400CEBD73 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -381,6 +395,7 @@
 				EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */,
 				EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */,
 				EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */,
+				EAF924280CCF9D3900CEBD73 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -454,6 +469,7 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EAF923FB0CCF6BC400CEBD73 /* Sparkle.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -761,6 +777,7 @@
 				8D1107290486CEB800E47090 /* Resources */,
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
+				EAF9241C0CCF930100CEBD73 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -1048,6 +1065,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -1079,6 +1100,10 @@
 				ARCHS = (
 					ppc,
 					i386,
+				);
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;

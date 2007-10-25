@@ -21,10 +21,12 @@
 	<key>CFBundleSignature</key>
 	<string>iotv</string>
 	<key>CFBundleVersion</key>
-	<string>1a1</string>
+	<string>200</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>SUFeedURL</key>
+	<string>http://iontv-app.com/appcast/iOnTV.xml</string>
 </dict>
 </plist>
