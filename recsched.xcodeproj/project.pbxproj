@@ -154,6 +154,7 @@
 		EAF923CF0CCED90100CEBD73 /* ST.png in Resources */ = {isa = PBXBuildFile; fileRef = EAF923CE0CCED90100CEBD73 /* ST.png */; };
 		EAF923F40CCEE15000CEBD73 /* Credits.html in Resources */ = {isa = PBXBuildFile; fileRef = EAF923F20CCEE15000CEBD73 /* Credits.html */; };
 		EAF924280CCF9D3900CEBD73 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAF923FB0CCF6BC400CEBD73 /* Sparkle.framework */; };
+		EAF9246D0CD02BE100CEBD73 /* Sparkle.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = EAF923FB0CCF6BC400CEBD73 /* Sparkle.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -194,6 +195,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				EAF9246D0CD02BE100CEBD73 /* Sparkle.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1076,17 +1078,13 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = recsched_Prefix.pch;
-				HEADER_SEARCH_PATHS = (
-					RBSplitView/Source,
-					../libhdhomerun,
-				);
+				HEADER_SEARCH_PATHS = ../libhdhomerun;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Debug\"";
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = iOnTV;
 				WRAPPER_EXTENSION = app;
@@ -1110,18 +1108,15 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = recsched_Prefix.pch;
-				HEADER_SEARCH_PATHS = (
-					RBSplitView/Source,
-					../libhdhomerun,
-				);
+				HEADER_SEARCH_PATHS = ../libhdhomerun;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_1)",
 				);
-				LIBRARY_SEARCH_PATHS_QUOTED_1 = "\"$(SRCROOT)/build/Release\"";
-				PRODUCT_NAME = recsched;
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				PRODUCT_NAME = iOnTV;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -1220,7 +1215,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					build/Debug,
 					../HandBrake/libhb,
-					"\"$(SRCROOT)/../HandBrake/contrib/lib\"",
+					../HandBrake/contrib/lib,
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
@@ -1238,19 +1233,19 @@
 		EAEC09300C272E1600C40D5A /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/recsched.app/Contents/Support";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/iOnTV.app/Contents/Support";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				HEADER_SEARCH_PATHS = ../HandBrake/libhb;
 				INFOPLIST_FILE = "recsched_bkgd-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../HandBrake/libhb\"",
-					"\"$(SRCROOT)/../HandBrake/contrib/lib\"",
+					build/Debug,
+					../HandBrake/libhb,
+					../HandBrake/contrib/lib,
 				);
 				OTHER_LDFLAGS = (
 					"-framework",
