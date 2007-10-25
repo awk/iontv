@@ -209,6 +209,11 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 #endif // USE_SYNCSERVICES
 }
 
+- (void) downloadError:(id)info
+{
+	NSLog(@"downloadError %@", info);
+}
+
 - (void) recordingComplete:(NSManagedObjectID *)aRecordingObjectID
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationRecordingFinished object:aRecordingObjectID];
@@ -414,6 +419,12 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     NSLog(@"Server shutting down");
     mExitServer = YES;
   }
+}
+
+- (void) reloadPreferences:(id)sender
+{
+	[NSUserDefaults resetStandardUserDefaults];
+	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"org.awkward.iontv"];
 }
 
 @synthesize mStoreUpdate;

@@ -20,6 +20,8 @@ extern NSString *kRecServerConnectionName;
 
 - (BOOL) addRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID;
 
+- (void) reloadPreferences:(id)sender;
+
 - (oneway void) quitServer:(id)sender;
 
 // Schedule Retrieval
