@@ -8,8 +8,6 @@
 
 #import "MainWindowController.h"
 #import "ScheduleView.h"
-#import "tvDataDelivery.h"
-#import "XTVDParser.h"
 #import "Preferences.h"
 #import "RSRecording.h"
 #import "Z2ITSchedule.h"
@@ -301,11 +299,13 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (IBAction) cleanupAction:(id)sender
 {
+#if 0
   CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
   NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
   NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
   [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
   [callData release];
+#endif
 }
 
 - (IBAction) recordShow:(id)sender
@@ -347,6 +347,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 #pragma mark Callback Methods
 
+#if USE_SYNCSERVICES
 - (void) handleDownloadData:(id)inDownloadResult
 {
   NSDictionary *downloadResult = (NSDictionary*)inDownloadResult;
@@ -374,6 +375,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   else
     [mGetScheduleButton setEnabled:YES];
 }
+#endif // USE_SYNCSERVICES
 
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule
 {
