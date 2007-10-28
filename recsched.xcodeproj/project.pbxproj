@@ -70,26 +70,6 @@
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
 		EA686CEA0CA95F5600185188 /* RSActivityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA686CE90CA95F5600185188 /* RSActivityViewController.m */; };
-		EA6AB6A40CBD7ABC003C3CB6 /* libhb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6A30CBD7ABB003C3CB6 /* libhb.a */; };
-		EA6AB6FF0CBD928E003C3CB6 /* liba52.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6EC0CBD928E003C3CB6 /* liba52.a */; };
-		EA6AB7000CBD928E003C3CB6 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6ED0CBD928E003C3CB6 /* libavcodec.a */; };
-		EA6AB7010CBD928E003C3CB6 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6EE0CBD928E003C3CB6 /* libavformat.a */; };
-		EA6AB7020CBD928E003C3CB6 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6EF0CBD928E003C3CB6 /* libavutil.a */; };
-		EA6AB7030CBD928E003C3CB6 /* libdca.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F00CBD928E003C3CB6 /* libdca.a */; };
-		EA6AB7040CBD928E003C3CB6 /* libdvdcss.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F10CBD928E003C3CB6 /* libdvdcss.a */; };
-		EA6AB7050CBD928E003C3CB6 /* libdvdread.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F20CBD928E003C3CB6 /* libdvdread.a */; };
-		EA6AB7060CBD928E003C3CB6 /* libfaac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F30CBD928E003C3CB6 /* libfaac.a */; };
-		EA6AB7070CBD928E003C3CB6 /* libmkv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F40CBD928E003C3CB6 /* libmkv.a */; };
-		EA6AB7080CBD928E003C3CB6 /* libmp3lame.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F50CBD928E003C3CB6 /* libmp3lame.a */; };
-		EA6AB7090CBD928E003C3CB6 /* libmp4v2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F60CBD928E003C3CB6 /* libmp4v2.a */; };
-		EA6AB70A0CBD928E003C3CB6 /* libmpeg2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F70CBD928E003C3CB6 /* libmpeg2.a */; };
-		EA6AB70B0CBD928E003C3CB6 /* libogg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F80CBD928E003C3CB6 /* libogg.a */; };
-		EA6AB70C0CBD928E003C3CB6 /* libsamplerate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6F90CBD928E003C3CB6 /* libsamplerate.a */; };
-		EA6AB70D0CBD928E003C3CB6 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6FA0CBD928E003C3CB6 /* libswscale.a */; };
-		EA6AB70E0CBD928E003C3CB6 /* libvorbis.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6FB0CBD928E003C3CB6 /* libvorbis.a */; };
-		EA6AB70F0CBD928E003C3CB6 /* libvorbisenc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6FC0CBD928E003C3CB6 /* libvorbisenc.a */; };
-		EA6AB7100CBD928E003C3CB6 /* libx264.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6FD0CBD928E003C3CB6 /* libx264.a */; };
-		EA6AB7110CBD928E003C3CB6 /* libxvidcore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA6AB6FE0CBD928E003C3CB6 /* libxvidcore.a */; };
 		EA6AB71A0CBD93AB003C3CB6 /* EmptyCPlusPlus.mm in Sources */ = {isa = PBXBuildFile; fileRef = EA6AB7190CBD93AB003C3CB6 /* EmptyCPlusPlus.mm */; };
 		EA6AB7220CBDA2E2003C3CB6 /* RSTranscodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */; };
 		EA7002880CC4288500DA9542 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA7002870CC4288500DA9542 /* ScriptingBridge.framework */; };
@@ -292,26 +272,6 @@
 		EA686CE90CA95F5600185188 /* RSActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSActivityViewController.m; sourceTree = "<group>"; };
 		EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSActivityDisplayProtocol.h; sourceTree = "<group>"; };
 		EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSStoreUpdateProtocol.h; sourceTree = "<group>"; };
-		EA6AB6A30CBD7ABB003C3CB6 /* libhb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libhb.a; path = ../HandBrake/libhb/libhb.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6EC0CBD928E003C3CB6 /* liba52.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liba52.a; path = ../HandBrake/contrib/lib/liba52.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6ED0CBD928E003C3CB6 /* libavcodec.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavcodec.a; path = ../HandBrake/contrib/lib/libavcodec.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6EE0CBD928E003C3CB6 /* libavformat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavformat.a; path = ../HandBrake/contrib/lib/libavformat.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6EF0CBD928E003C3CB6 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libavutil.a; path = ../HandBrake/contrib/lib/libavutil.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F00CBD928E003C3CB6 /* libdca.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdca.a; path = ../HandBrake/contrib/lib/libdca.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F10CBD928E003C3CB6 /* libdvdcss.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdvdcss.a; path = ../HandBrake/contrib/lib/libdvdcss.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F20CBD928E003C3CB6 /* libdvdread.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdvdread.a; path = ../HandBrake/contrib/lib/libdvdread.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F30CBD928E003C3CB6 /* libfaac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfaac.a; path = ../HandBrake/contrib/lib/libfaac.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F40CBD928E003C3CB6 /* libmkv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmkv.a; path = ../HandBrake/contrib/lib/libmkv.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F50CBD928E003C3CB6 /* libmp3lame.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmp3lame.a; path = ../HandBrake/contrib/lib/libmp3lame.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F60CBD928E003C3CB6 /* libmp4v2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmp4v2.a; path = ../HandBrake/contrib/lib/libmp4v2.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F70CBD928E003C3CB6 /* libmpeg2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmpeg2.a; path = ../HandBrake/contrib/lib/libmpeg2.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F80CBD928E003C3CB6 /* libogg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libogg.a; path = ../HandBrake/contrib/lib/libogg.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6F90CBD928E003C3CB6 /* libsamplerate.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsamplerate.a; path = ../HandBrake/contrib/lib/libsamplerate.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6FA0CBD928E003C3CB6 /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libswscale.a; path = ../HandBrake/contrib/lib/libswscale.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6FB0CBD928E003C3CB6 /* libvorbis.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbis.a; path = ../HandBrake/contrib/lib/libvorbis.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6FC0CBD928E003C3CB6 /* libvorbisenc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libvorbisenc.a; path = ../HandBrake/contrib/lib/libvorbisenc.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6FD0CBD928E003C3CB6 /* libx264.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libx264.a; path = ../HandBrake/contrib/lib/libx264.a; sourceTree = SOURCE_ROOT; };
-		EA6AB6FE0CBD928E003C3CB6 /* libxvidcore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libxvidcore.a; path = ../HandBrake/contrib/lib/libxvidcore.a; sourceTree = SOURCE_ROOT; };
 		EA6AB7190CBD93AB003C3CB6 /* EmptyCPlusPlus.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EmptyCPlusPlus.mm; sourceTree = "<group>"; };
 		EA6AB7200CBDA2E2003C3CB6 /* RSTranscodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTranscodeController.h; sourceTree = "<group>"; };
 		EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSTranscodeController.m; sourceTree = "<group>"; };
@@ -414,26 +374,6 @@
 				EAEC09650C27453200C40D5A /* Cocoa.framework in Frameworks */,
 				EAEC09D80C275BC500C40D5A /* Security.framework in Frameworks */,
 				EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */,
-				EA6AB6A40CBD7ABC003C3CB6 /* libhb.a in Frameworks */,
-				EA6AB6FF0CBD928E003C3CB6 /* liba52.a in Frameworks */,
-				EA6AB7000CBD928E003C3CB6 /* libavcodec.a in Frameworks */,
-				EA6AB7010CBD928E003C3CB6 /* libavformat.a in Frameworks */,
-				EA6AB7020CBD928E003C3CB6 /* libavutil.a in Frameworks */,
-				EA6AB7030CBD928E003C3CB6 /* libdca.a in Frameworks */,
-				EA6AB7040CBD928E003C3CB6 /* libdvdcss.a in Frameworks */,
-				EA6AB7050CBD928E003C3CB6 /* libdvdread.a in Frameworks */,
-				EA6AB7060CBD928E003C3CB6 /* libfaac.a in Frameworks */,
-				EA6AB7070CBD928E003C3CB6 /* libmkv.a in Frameworks */,
-				EA6AB7080CBD928E003C3CB6 /* libmp3lame.a in Frameworks */,
-				EA6AB7090CBD928E003C3CB6 /* libmp4v2.a in Frameworks */,
-				EA6AB70A0CBD928E003C3CB6 /* libmpeg2.a in Frameworks */,
-				EA6AB70B0CBD928E003C3CB6 /* libogg.a in Frameworks */,
-				EA6AB70C0CBD928E003C3CB6 /* libsamplerate.a in Frameworks */,
-				EA6AB70D0CBD928E003C3CB6 /* libswscale.a in Frameworks */,
-				EA6AB70E0CBD928E003C3CB6 /* libvorbis.a in Frameworks */,
-				EA6AB70F0CBD928E003C3CB6 /* libvorbisenc.a in Frameworks */,
-				EA6AB7100CBD928E003C3CB6 /* libx264.a in Frameworks */,
-				EA6AB7110CBD928E003C3CB6 /* libxvidcore.a in Frameworks */,
 				EA7002880CC4288500DA9542 /* ScriptingBridge.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -497,7 +437,6 @@
 		29B97314FDCFA39411CA2CEA /* recsched */ = {
 			isa = PBXGroup;
 			children = (
-				EA6AB6A20CBD7A94003C3CB6 /* libhb */,
 				EA2EE0280C07D1EA0002420F /* libhdhomerun */,
 				EAE655370B9D0A3100CDB279 /* Background App */,
 				7756732906782D8800D1FEB8 /* Models */,
@@ -618,41 +557,6 @@
 				EA308FB60C66A7470005E89B /* RSColorDictionary.m */,
 			);
 			name = "Support Classes";
-			sourceTree = "<group>";
-		};
-		EA6AB6A20CBD7A94003C3CB6 /* libhb */ = {
-			isa = PBXGroup;
-			children = (
-				EA6AB7120CBD9294003C3CB6 /* contrib */,
-				EA6AB6A30CBD7ABB003C3CB6 /* libhb.a */,
-			);
-			name = libhb;
-			sourceTree = "<group>";
-		};
-		EA6AB7120CBD9294003C3CB6 /* contrib */ = {
-			isa = PBXGroup;
-			children = (
-				EA6AB6EC0CBD928E003C3CB6 /* liba52.a */,
-				EA6AB6ED0CBD928E003C3CB6 /* libavcodec.a */,
-				EA6AB6EE0CBD928E003C3CB6 /* libavformat.a */,
-				EA6AB6EF0CBD928E003C3CB6 /* libavutil.a */,
-				EA6AB6F00CBD928E003C3CB6 /* libdca.a */,
-				EA6AB6F10CBD928E003C3CB6 /* libdvdcss.a */,
-				EA6AB6F20CBD928E003C3CB6 /* libdvdread.a */,
-				EA6AB6F30CBD928E003C3CB6 /* libfaac.a */,
-				EA6AB6F40CBD928E003C3CB6 /* libmkv.a */,
-				EA6AB6F50CBD928E003C3CB6 /* libmp3lame.a */,
-				EA6AB6F60CBD928E003C3CB6 /* libmp4v2.a */,
-				EA6AB6F70CBD928E003C3CB6 /* libmpeg2.a */,
-				EA6AB6F80CBD928E003C3CB6 /* libogg.a */,
-				EA6AB6F90CBD928E003C3CB6 /* libsamplerate.a */,
-				EA6AB6FA0CBD928E003C3CB6 /* libswscale.a */,
-				EA6AB6FB0CBD928E003C3CB6 /* libvorbis.a */,
-				EA6AB6FC0CBD928E003C3CB6 /* libvorbisenc.a */,
-				EA6AB6FD0CBD928E003C3CB6 /* libx264.a */,
-				EA6AB6FE0CBD928E003C3CB6 /* libxvidcore.a */,
-			);
-			name = contrib;
 			sourceTree = "<group>";
 		};
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
@@ -1216,6 +1120,26 @@
 					Foundation,
 					"-framework",
 					AppKit,
+					../HandBrake/libhb/libhb.a,
+					../HandBrake/contrib/lib/libmp4v2.a,
+					../HandBrake/contrib/lib/liba52.a,
+					../HandBrake/contrib/lib/libavformat.a,
+					../HandBrake/contrib/lib/libavcodec.a,
+					../HandBrake/contrib/lib/libavutil.a,
+					../HandBrake/contrib/lib/libdvdread.a,
+					../HandBrake/contrib/lib/libdvdcss.a,
+					../HandBrake/contrib/lib/libfaac.a,
+					../HandBrake/contrib/lib/libmp3lame.a,
+					../HandBrake/contrib/lib/libmpeg2.a,
+					../HandBrake/contrib/lib/libvorbis.a,
+					../HandBrake/contrib/lib/libvorbisenc.a,
+					../HandBrake/contrib/lib/libogg.a,
+					../HandBrake/contrib/lib/libsamplerate.a,
+					../HandBrake/contrib/lib/libx264.a,
+					../HandBrake/contrib/lib/libxvidcore.a,
+					../HandBrake/contrib/lib/libdca.a,
+					../HandBrake/contrib/lib/libmkv.a,
+					../HandBrake/contrib/lib/libswscale.a,
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = recsched_bkgd;
@@ -1246,6 +1170,26 @@
 					Foundation,
 					"-framework",
 					AppKit,
+					../HandBrake/libhb/libhb.a,
+					../HandBrake/contrib/lib/libmp4v2.a,
+					../HandBrake/contrib/lib/liba52.a,
+					../HandBrake/contrib/lib/libavformat.a,
+					../HandBrake/contrib/lib/libavcodec.a,
+					../HandBrake/contrib/lib/libavutil.a,
+					../HandBrake/contrib/lib/libdvdread.a,
+					../HandBrake/contrib/lib/libdvdcss.a,
+					../HandBrake/contrib/lib/libfaac.a,
+					../HandBrake/contrib/lib/libmp3lame.a,
+					../HandBrake/contrib/lib/libmpeg2.a,
+					../HandBrake/contrib/lib/libvorbis.a,
+					../HandBrake/contrib/lib/libvorbisenc.a,
+					../HandBrake/contrib/lib/libogg.a,
+					../HandBrake/contrib/lib/libsamplerate.a,
+					../HandBrake/contrib/lib/libx264.a,
+					../HandBrake/contrib/lib/libxvidcore.a,
+					../HandBrake/contrib/lib/libdca.a,
+					../HandBrake/contrib/lib/libmkv.a,
+					../HandBrake/contrib/lib/libswscale.a,
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = recsched_bkgd;
