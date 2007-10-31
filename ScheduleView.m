@@ -15,6 +15,10 @@
 #import "Z2ITLineupMap.h"
 #import "Z2ITSchedule.h"
 
+@interface ScheduleView(Private)
+- (void) updateForCurrentSchedule;
+@end
+
 @implementation ScheduleView
 
 - (float) timeSpan
@@ -105,14 +109,21 @@
 
 - (void) awakeFromNib
 {
-        // Setup KVO for selected stations
-        mSortedStationsArray = nil;
-        [mCurrentLineup addObserver:self forKeyPath:@"content" options:NSKeyValueObservingOptionNew context:nil];
-        [mCurrentSchedule addObserver:self forKeyPath:@"content" options:NSKeyValueObservingOptionNew context:nil];
-        
-		// Set the context menu on the subviews
-        [mGridView setMenu:[self menu]];
-		[mStationColumnView setMenu:[self menu]];
+  // Setup KVO for selected stations
+  mSortedStationsArray = nil;
+  [mCurrentLineup addObserver:self forKeyPath:@"content" options:NSKeyValueObservingOptionNew context:nil];
+  [mCurrentSchedule addObserver:self forKeyPath:@"content" options:NSKeyValueObservingOptionNew context:nil];
+
+  // Set the context menu on the subviews
+  [mGridView setMenu:[self menu]];
+  [mStationColumnView setMenu:[self menu]];
+
+  // Update the stations list
+  [self sortStationsArray];
+  [self updateStationsScroller];
+
+  // Make sure the current schedule item is visible
+  [self updateForCurrentSchedule];
 }
 
 - (void)drawRect:(NSRect)rect {

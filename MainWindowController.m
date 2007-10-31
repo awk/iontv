@@ -17,6 +17,7 @@
 #import "HDHomeRunTuner.h"
 #import "RecSchedProtocol.h"
 #import "ScheduleViewController.h"
+#import "ProgramSearchViewController.h"
 
 @implementation MainWindowController
 
@@ -229,17 +230,17 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   mDetailViewMinHeight = [mDetailView frame].size.height;
   NSView *bottomContainerView = [[mScheduleSplitView subviews] objectAtIndex:1];
   [bottomContainerView addSubview:mScheduleContainerView];
-  [bottomContainerView addSubview:mProgramSearchView];
+  [bottomContainerView addSubview:[mProgramSearchViewController view]];
   
   NSSize scheduleSize = [bottomContainerView frame].size;
   NSRect newFrame = [mScheduleContainerView frame];
   newFrame.size = scheduleSize;
   [mScheduleContainerView setFrame:newFrame];
   [mScheduleContainerView setHidden:NO];
-  newFrame = [mProgramSearchView frame];
+  newFrame = [[mProgramSearchViewController view] frame];
   newFrame.size = scheduleSize;
-  [mProgramSearchView setFrame:newFrame];
-  [mProgramSearchView setHidden:YES];
+  [[mProgramSearchViewController view] setFrame:newFrame];
+  mProgramSearchViewController.searchViewHidden=YES;
   
   [mTopLevelSplitView setDividerStyle:NSSplitViewDividerStyleThin];
   [mTopLevelSplitView setPosition:kSourceListMinWidth + ((kSourceListMaxWidth - kSourceListMinWidth) / 2) ofDividerAtIndex:0];
@@ -259,13 +260,37 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
   // Watch for the RSParsingCompleteNotification to reset our object controllers
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(parsingCompleteNotification:) name:RSParsingCompleteNotification object:[NSApp delegate]];
+  
+  
+  // Restore our previous lineup choice
+  NSURL *lineupObjectURI = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] stringForKey:kCurrentLineupURIKey]];
+  NSManagedObjectID *lineupObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:lineupObjectURI];
+  Z2ITLineup *aLineup = (Z2ITLineup*) [[[NSApp delegate] managedObjectContext] objectWithID:lineupObjectID];
+  [mCurrentLineup setContent:aLineup];
+
+  // Restore our previous schedule choice
+  NSURL *scheduleObjectURI = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] stringForKey:kCurrentScheduleURIKey]];
+  NSManagedObjectID *scheduleObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:scheduleObjectURI];
+  Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
+  [mCurrentSchedule setContent:aSchedule];
+
 }
 
 - (void) dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
-	
-	[super dealloc];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
+
+  // Store the current schedule into the preferences
+  [[NSUserDefaults standardUserDefaults] setObject:[[[[mCurrentSchedule content] objectID] URIRepresentation] absoluteString] forKey:kCurrentScheduleURIKey];
+  [[NSUserDefaults standardUserDefaults] synchronize];  
+  
+  // Store the current lineup into the preferences
+  NSManagedObjectID *lineupObjectID = [[mCurrentLineup content] objectID];
+  NSURL* lineupObjectURI = [lineupObjectID URIRepresentation];
+
+  [[NSUserDefaults standardUserDefaults] setObject:[lineupObjectURI absoluteString] forKey:kCurrentLineupURIKey];
+  [[NSUserDefaults standardUserDefaults] synchronize];  
+  [super dealloc];
 }
 
 #pragma mark Action Methods
@@ -400,13 +425,13 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 - (void) showSchedule:(id)anArgument
 {
 	[mScheduleContainerView setHidden:NO];
-	[mProgramSearchView setHidden:YES];
+	[mProgramSearchViewController setSearchViewHidden:YES];
 }
 
 - (void) showSearch:(id)anArgument
 {
 	[mScheduleContainerView setHidden:YES];
-	[mProgramSearchView setHidden:NO];
+	[mProgramSearchViewController setSearchViewHidden:NO];
 }
 
 - (void) futureRecordingSelected:(id)anArgument
@@ -516,6 +541,10 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
     return [[[NSApp delegate] managedObjectContext] undoManager];
 }
 
+- (void) windowWillClose:(NSNotification*)aNotification
+{
+  [self autorelease];
+}
 
 #pragma mark Split View Delegate Methods
 

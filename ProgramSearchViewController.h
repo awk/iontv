@@ -12,6 +12,13 @@
 @interface ProgramSearchViewController : NSObject {
   IBOutlet NSObjectController *mCurrentSchedule;
   IBOutlet NSArrayController *mProgramsArrayController;
+  IBOutlet NSView *mProgramSearchView;
+  
+  BOOL searchViewHidden;
 }
+
+@property BOOL searchViewHidden;
+
+- (NSView*) view;
 
 @end

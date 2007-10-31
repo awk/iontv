@@ -18,6 +18,8 @@ NSString *kTranscodeProgramsKey = @"transcodePrograms";
 NSString *kDeleteRecordingsAfterTranscodeKey = @"deleteRecordingsAfterTranscode";
 NSString *kAddTranscodingsToiTunesKey = @"addTranscodingsToiTunes";
 NSString *kDeleteTranscodingsAfterAddKey = @"deleteTranscodingsAfterAdd";
+NSString *kCurrentLineupURIKey = @"currentLineupURI";
+NSString *kCurrentScheduleURIKey = @"currentScheduleURI";
 
 // URL for SOAP services used to retrieve the listings
 // @"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService

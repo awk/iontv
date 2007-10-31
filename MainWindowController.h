@@ -11,6 +11,7 @@
 @class Z2ITSchedule;
 @class ScheduleView;
 @class RSWishlistController;
+@class ProgramSearchViewController;
 
 extern NSString *RSSSchedulePBoardType;
 
@@ -21,7 +22,6 @@ extern NSString *RSSSchedulePBoardType;
   IBOutlet NSOutlineView *mViewSelectionOutlineView;
   IBOutlet NSView *mDetailView;
   IBOutlet NSView *mScheduleContainerView;
-  IBOutlet NSView *mProgramSearchView;
   IBOutlet ScheduleView *mScheduleView;
   IBOutlet NSPanel *mPredicatePanel;
   IBOutlet RSWishlistController *mWishlistController;
@@ -33,6 +33,8 @@ extern NSString *RSSSchedulePBoardType;
   IBOutlet NSArrayController *mRecordingsArrayController;
   
   IBOutlet NSArrayController *mLineupsArrayController;
+  
+  IBOutlet ProgramSearchViewController *mProgramSearchViewController;
   
   float mDetailViewMinHeight;
   NSArray *mDraggedNodes;		// Temporary copy of the nodes being dragged around

@@ -32,7 +32,10 @@
 			change:(NSDictionary *)change
 			context:(void *)context
 {
-    if ((object == mProgramsArrayController) && ([keyPath isEqual:@"selectedObjects"]))
+    // Changing the current selection here must be combined with a test of the 
+    // visiblity of the search view - otherwise we'll update the selection during startup with the 
+    // first program in the list of all programs.
+    if ((object == mProgramsArrayController) && ([keyPath isEqual:@"selectedObjects"]) && (self.searchViewHidden == NO) )
 	{
 		if ([[mProgramsArrayController selectedObjects] count] == 1)
 		{
@@ -44,5 +47,21 @@
 			[mCurrentSchedule setContent:aSchedule];
 		}
     }
+}
+
+- (NSView*) view
+{
+  return mProgramSearchView;
+}
+
+- (BOOL) searchViewHidden
+{
+  return searchViewHidden;
+}
+
+- (void) setSearchViewHidden:(BOOL)isHidden
+{
+  [mProgramSearchView setHidden:isHidden];
+  searchViewHidden = isHidden;
 }
 @end
