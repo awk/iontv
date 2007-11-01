@@ -183,7 +183,12 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	if (hb_list_count(titleList) > 0)
 	{
 		// Have a valid title create a transcoding job
-		NSString *transcodingPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.mp4", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title, mCurrentTranscoding.schedule.program.subTitle];
+		NSString *transcodingPath;
+                if (mCurrentTranscoding.schedule.program.subTitle != nil)
+                  transcodingPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.mp4", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title, mCurrentTranscoding.schedule.program.subTitle];
+                else
+                  transcodingPath = [NSString stringWithFormat:@"%@/%@ %@.mp4", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title];
+                
 		[mCurrentTranscoding setMediaFile:transcodingPath];
 		hb_title_t * title = (hb_title_t *) hb_list_item( titleList, 0 );
 		
@@ -239,7 +244,8 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	}
 	NSCalendarDate *originalAirDate = [aTranscoding.schedule.program.originalAirDate dateWithCalendarFormat:nil timeZone:nil];
 	theTrack.year = [originalAirDate yearOfCommonEra];
-	theTrack.name = aTranscoding.schedule.program.subTitle;
+        if (aTranscoding.schedule.program.subTitle != nil)
+          theTrack.name = aTranscoding.schedule.program.subTitle;
 	theTrack.objectDescription = aTranscoding.schedule.program.descriptionStr;
 }
 

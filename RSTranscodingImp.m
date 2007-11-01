@@ -462,8 +462,11 @@ static int FormatSettings[4][10] =
             NSMutableString * string;
 
 			/* Update text field */
-			string = [NSMutableString stringWithFormat: @"Encoding: %@ - %@", mTranscoding.schedule.program.title, mTranscoding.schedule.program.subTitle];
-            
+                        if (mTranscoding.schedule.program.subTitle != nil)
+                          string = [NSMutableString stringWithFormat: @"Encoding: %@ - %@", mTranscoding.schedule.program.title, mTranscoding.schedule.program.subTitle];
+                        else
+                          string = [NSMutableString stringWithFormat: @"Encoding: %@", mTranscoding.schedule.program.title];
+                        
 			if( s.param.working.seconds > -1 )
             {
                 [string appendFormat:
@@ -481,8 +484,11 @@ static int FormatSettings[4][10] =
         case HB_STATE_MUXING:
         {
             /* Update text field */
-			[mUIActivity setActivity:mActivityToken infoString:[NSString stringWithFormat:@"Muxing: %@ - %@", mTranscoding.schedule.program.title, mTranscoding.schedule.program.subTitle]];
-			
+            if (mTranscoding.schedule.program.subTitle != nil)
+              [mUIActivity setActivity:mActivityToken infoString:[NSString stringWithFormat:@"Muxing: %@ - %@", mTranscoding.schedule.program.title, mTranscoding.schedule.program.subTitle]];
+            else
+              [mUIActivity setActivity:mActivityToken infoString:[NSString stringWithFormat:@"Muxing: %@", mTranscoding.schedule.program.title]];
+            
             /* Update slider */
 			[mUIActivity setActivity:mActivityToken progressIndeterminate:YES];
             break;
