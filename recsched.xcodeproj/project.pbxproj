@@ -319,7 +319,6 @@
 		EAF8863A0B61598700373CEF /* Z2ITProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Z2ITProgram.m; sourceTree = "<group>"; };
 		EAF8867B0B61740300373CEF /* Z2ITSchedule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITSchedule.h; sourceTree = "<group>"; };
 		EAF8867C0B61740300373CEF /* Z2ITSchedule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Z2ITSchedule.m; sourceTree = "<group>"; };
-		EAF886900B6293B200373CEF /* CoreData_Macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreData_Macros.h; sourceTree = "<group>"; };
 		EAF890150B66DC8400373CEF /* ScheduleHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleHeaderView.h; sourceTree = "<group>"; };
 		EAF890160B66DC8400373CEF /* ScheduleHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleHeaderView.m; sourceTree = "<group>"; };
 		EAF8919A0B66F2D200373CEF /* iTableColumnHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iTableColumnHeaderCell.h; sourceTree = SOURCE_ROOT; };
@@ -596,7 +595,6 @@
 				EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */,
 				EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */,
 				EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */,
-				EAF886900B6293B200373CEF /* CoreData_Macros.h */,
 				EAF8850D0B6024A800373CEF /* Z2ITLineupMap.h */,
 				EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */,
 				EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */,
