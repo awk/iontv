@@ -214,10 +214,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 - (void) cleanupComplete:(id)info
 {
 	NSLog(@"cleanupComplete");
-	
-#if USE_SYNCSERVICES
-	[[NSApp delegate] syncAction:nil];
-#endif // USE_SYNCSERVICES
 }
 
 - (void) downloadError:(id)info

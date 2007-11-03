@@ -459,13 +459,6 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
       name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   
-#if USE_SYNCSERVICES
-  if (![managedObjectContext save:&error])
-  {
-    NSLog(@"Channel scan - save returned an error %@", error);
-  }
-#endif // USE_SYNCSERVICES
-  
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   
   [psc unlock];

@@ -23,18 +23,9 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#define USE_SYNCSERVICES 0
-
 #import <Cocoa/Cocoa.h>
-#if USE_SYNCSERVICES
-#import <SyncServices/SyncServices.h>
-#endif // USE_SYNCSERVICES
 
-#if USE_SYNCSERVICES
-@interface RSCommonAppDelegate : NSObject <NSPersistentStoreCoordinatorSyncing>
-#else
 @interface RSCommonAppDelegate : NSObject
-#endif // USE_SYNCSERVICES
 {
     NSPersistentStoreCoordinator *persistentStoreCoordinator;
     NSManagedObjectModel *managedObjectModel;

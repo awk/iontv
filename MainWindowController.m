@@ -338,14 +338,9 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
   NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
   
-#if USE_SYNCSERVICES
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", self, @"dataRecipient", nil];
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
-#else
-	// Send the message to the background server
-	NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", nil /* really needs to be a DO port or similar */, @"dataRecipient", nil];
-	[[[NSApp delegate] recServer] performDownload:callData];
-#endif // USE_SYNCSERVICES
+  // Send the message to the background server
+  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", nil /* really needs to be a DO port or similar */, @"dataRecipient", nil];
+  [[[NSApp delegate] recServer] performDownload:callData];
   [callData release];
 }
 
@@ -398,36 +393,6 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 }
 
 #pragma mark Callback Methods
-
-#if USE_SYNCSERVICES
-- (void) handleDownloadData:(id)inDownloadResult
-{
-  NSDictionary *downloadResult = (NSDictionary*)inDownloadResult;
-  NSDictionary *messages = [downloadResult valueForKey:@"messages"];
-  NSDictionary *xtvd = [downloadResult valueForKey:@"xtvd"];
-  NSLog(@"getScheduleAction downloadResult messages = %@", messages);
-  NSLog(@"getScheduleAction downloadResult xtvd = %@", xtvd);
-  [downloadResult release];
-
-  if (xtvd != nil)
-  {
-    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
-        self, @"reportProgressTo", 
-        self, @"reportCompletionTo", 
-        [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator",
-        nil];
-    
-    // Start our local parsing
-    xtvdParseThread *aParseThread = [[xtvdParseThread alloc] init];
-    
-    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:aParseThread withObject:callData];
-    
-    [callData release];
-  }
-  else
-    [mGetScheduleButton setEnabled:YES];
-}
-#endif // USE_SYNCSERVICES
 
 - (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule
 {

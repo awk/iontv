@@ -108,18 +108,10 @@ NSString *kRSStoreUpdateConnectionName = @"resched_store_update";
 	NSDictionary *optionsDictionary = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
 
 	persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:optionsDictionary error:&error];
-    if (persistentStore != nil)
-	{
-#if USE_SYNCSERVICES
-		NSURL *fastSyncDetailURL;
-        fastSyncDetailURL = [self urlForFastSyncStore]; //[NSURL fileURLWithPath:[applicationSupportFolder stringByAppendingPathComponent:@"org.awkward.recsched-server.fastsyncstore"]];
-        [persistentStoreCoordinator setStoresFastSyncDetailsAtURL:fastSyncDetailURL forPersistentStore:persistentStore];
-#endif // USE_SYNCSERVICES
-	}
-	else
-	{
-        [[NSApplication sharedApplication] presentError:error];
-    }    
+        if (persistentStore == nil)
+        {
+            [[NSApplication sharedApplication] presentError:error];
+        }    
 
     return persistentStoreCoordinator;
 }
@@ -220,91 +212,5 @@ NSString *kRSStoreUpdateConnectionName = @"resched_store_update";
     [managedObjectModel release], managedObjectModel = nil;
     [super dealloc];
 }
-
-#if USE_SYNCSERVICES
-
-#pragma mark Syncing
-
-- (void)client:(ISyncClient *)client mightWantToSyncEntityNames:(NSArray *)entityNames
-{
-	// Since we save the store after each significant update (after downloading new schedule data for example)
-	// the store on disk is always as up to date as we can make it and there's no need to sync it here.
-	NSLog(@"syncing with client %@", [client displayName]);
-	NSError *error;
-	[[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:NO handler:self error:&error];
-    if (nil != error) {
-        NSLog(@"client: mightWantToSyncEntityNames: - error occured - %@", error);
-    }
-}
-
-- (NSArray *)managedObjectContextsToMonitorWhenSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
-{
-	NSManagedObjectContext *aContext = [self managedObjectContext];
-    return [NSArray arrayWithObject:aContext];
-}
-
-- (NSArray *)managedObjectContextsToReloadAfterSyncingPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator
-{
-	NSManagedObjectContext *aContext = [self managedObjectContext];
-    return [NSArray arrayWithObject:aContext];
-}
-
-- (NSDictionary *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushRecord:(NSDictionary *)record forManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
-{
-//		NSLog(@"push %@ = %@", [managedObject objectID], [record description]);
-    return record;
-}
-
-- (ISyncChange *)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willApplyChange:(ISyncChange *)change toManagedObject:(NSManagedObject *)managedObject inSyncSession:(ISyncSession *)session
-{
-//		NSLog(@"pull %@", [change description]);
-    return change;
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPushChangesInSyncSession:(ISyncSession *)session
-{
-	NSLog(@"willPushChangesInSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didPushChangesInSyncSession:(ISyncSession *)session
-{
-	NSLog(@"didPushChangesInSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator willPullChangesInSyncSession:(ISyncSession *)session
-{
-	NSLog(@"willPullChangesInSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didPullChangesInSyncSession:(ISyncSession *)session
-{
-	NSLog(@"didPullChangesInSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didCancelSyncSession:(ISyncSession *)session error:(NSError *)error
-{
-	NSLog(@"didCancelSyncSession - error = %@", error);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didFinishSyncSession:(ISyncSession *)session
-{
-	NSLog(@"didFinishSyncSession - session = %@", session);
-}
-
-- (void)persistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator didCommitChanges:(NSDictionary *)changes inSyncSession:(ISyncSession *)session
-{
-	NSLog(@"didCommitChanges - session = %@", session);
-}
-
-#pragma mark Notifications
-
-- (void) updateForSavedContext:(NSNotification *)notification
-{
-	[[self managedObjectContext] mergeChangesFromContextDidSaveNotification:notification];
-
-//	[self syncAction:self];
-}
-
-#endif
 
 @end

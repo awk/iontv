@@ -137,18 +137,8 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 }
 
 - (NSURL *)urlForPersistentStore {
-#if USE_SYNCSERVICES
-	return [NSURL fileURLWithPath: [[self applicationSupportFolder] stringByAppendingPathComponent: @"recsched.dat"]];
-#else
 	return [NSURL fileURLWithPath: [[self applicationSupportFolder] stringByAppendingPathComponent: @"recsched_bkgd.dat"]];
-#endif
 }
-
-#if USE_SYNCSERVICES
-- (NSURL*)urlForFastSyncStore {
-	return [NSURL fileURLWithPath:[[self applicationSupportFolder] stringByAppendingPathComponent:@"org.awkward.recsched.fastsyncstore"]];
-}
-#endif // USE_SYNCSERVICES
 
 /**
     Returns the persistent store coordinator for the application.  This 
@@ -180,101 +170,20 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 	NSDictionary *optionsDictionary = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:NSReadOnlyPersistentStoreOption];
 
 	persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:optionsDictionary error:&error];
-    if (persistentStore != nil)
+        if (persistentStore == nil)
 	{
-#if USE_SYNCSERVICES
-		NSURL *fastSyncDetailURL;
-        fastSyncDetailURL = [self urlForFastSyncStore]; //[NSURL fileURLWithPath:[applicationSupportFolder stringByAppendingPathComponent:@"org.awkward.recsched-server.fastsyncstore"]];
-        [persistentStoreCoordinator setStoresFastSyncDetailsAtURL:fastSyncDetailURL forPersistentStore:persistentStore];
-#endif // USE_SYNCSERVICES
-	}
-	else
-	{
-        [[NSApplication sharedApplication] presentError:error];
-    }    
+          [[NSApplication sharedApplication] presentError:error];
+        }    
 
     return persistentStoreCoordinator;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
 {
-#if USE_SYNCSERVICES
-    [[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
-    [self syncAction:nil];
-#endif
-
 	// Register to be notified when an update through sparkle completes - we use this to restart the background
 	// server which may also have just been updated.
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sparkleWillRestart:) name:SUUpdaterWillRestartNotification object:nil];
 }
-
-#if USE_SYNCSERVICES
-#pragma mark Sync
-
-- (ISyncClient *)syncClient
-{
-    NSString *clientIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-    NSString *reason = @"unknown error";
-    ISyncClient *client;
-
-    @try {
-        client = [[ISyncManager sharedManager] clientWithIdentifier:clientIdentifier];
-        if (nil == client) {
-            if (![[ISyncManager sharedManager] registerSchemaWithBundlePath:[[NSBundle mainBundle] pathForResource:@"recsched" ofType:@"syncschema"]]) {
-                reason = @"error registering the recsched sync schema";
-            } else {
-                client = [[ISyncManager sharedManager] registerClientWithIdentifier:clientIdentifier descriptionFilePath:[[NSBundle mainBundle] pathForResource:@"ClientDescription" ofType:@"plist"]];
-                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeApplication];
-                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeDevice];
-                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeServer];
-                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypePeer];
-            }
-        }
-    }
-    @catch (id exception) {
-        client = nil;
-        reason = [exception reason];
-    }
-
-    if (nil == client) {
-        NSRunAlertPanel(@"You can not sync your recsched data.", [NSString stringWithFormat:@"Failed to register the sync client: %@", reason], @"OK", nil, nil);
-    }
-    
-    return client;
-}
-
-#pragma mark - Actions
-
-/**
-    Performs the save action for the application, which is to send the save:
-    message to the application's managed object context.  Any encountered errors
-    are presented to the user.
- */
- 
-- (IBAction) saveAction:(id)sender {
-
-    NSError *error = nil;
-    if (![[self managedObjectContext] save:&error]) {
-        [[NSApplication sharedApplication] presentError:error];
-    }
-	else
-	{
-        [self syncAction:sender];
-    }
-}
-
-- (void)syncAction:(id)sender
-{
-    NSError *error = nil;
-    ISyncClient *client = [self syncClient];
-    if (nil != client) {
-        [[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
-    }
-    if (nil != error) {
-        [[NSApplication sharedApplication] presentError:error];
-    }
-}
-#endif // USE_SYNCSERVICES
 
 - (IBAction)showCoreDataProgramWindow:(id)sender
 {
@@ -408,47 +317,8 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
 
     int reply = NSTerminateNow;
-    
-#if USE_SYNCSERVICES
-    NSError *error;
 
-    if (managedObjectContext != nil) {
-        if ([managedObjectContext commitEditing]) {
-            if ([managedObjectContext hasChanges] && ![managedObjectContext save:&error]) {
-				
-                // This error handling simply presents error information in a panel with an 
-                // "Ok" button, which does not include any attempt at error recovery (meaning, 
-                // attempting to fix the error.)  As a result, this implementation will 
-                // present the information to the user and then follow up with a panel asking 
-                // if the user wishes to "Quit Anyway", without saving the changes.
-
-                // Typically, this process should be altered to include application-specific 
-                // recovery steps.  
-//                NSArray *detailedErrors = [[error userInfo] valueForKey:@"NSDetailedErrors"];
-                BOOL errorResult = [[NSApplication sharedApplication] presentError:error];
-				
-                if (errorResult == YES) {
-                    reply = NSTerminateCancel;
-                } 
-
-                else {
-					
-                    int alertReturn = NSRunAlertPanel(nil, @"Could not save changes while quitting. Quit anyway?" , @"Quit anyway", @"Cancel", nil);
-                    if (alertReturn == NSAlertAlternateReturn) {
-                        reply = NSTerminateCancel;	
-                    }
-                }
-            }
-        } 
-        
-        else {
-            reply = NSTerminateCancel;
-        }
-    }
-#endif // USE_SYNCSERVICES
-    
-	if (reply == NSTerminateNow)
-		[[self recServer] storeUpdateUnavailable];
+    [[self recServer] storeUpdateUnavailable];
     return reply;
 }
 

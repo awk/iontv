@@ -201,8 +201,6 @@
 		EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Z2ITScheduleExtras.h; sourceTree = SOURCE_ROOT; };
 		EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Z2ITScheduleExtras.m; sourceTree = SOURCE_ROOT; };
 		EA20ADB90C2330AC00A9BDBD /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
-		EA20AE010C23589700A9BDBD /* recsched.syncschema */ = {isa = PBXFileReference; lastKnownFileType = folder; path = recsched.syncschema; sourceTree = SOURCE_ROOT; };
-		EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription_Server.plist; sourceTree = "<group>"; };
 		EA20AE2D0C23612800A9BDBD /* SyncServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SyncServices.framework; path = /System/Library/Frameworks/SyncServices.framework; sourceTree = "<absolute>"; };
 		EA20AF000C25CCA200A9BDBD /* RecordingThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RecordingThread.h; sourceTree = SOURCE_ROOT; };
 		EA20AF010C25CCA200A9BDBD /* RecordingThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = RecordingThread.m; sourceTree = SOURCE_ROOT; };
@@ -283,7 +281,6 @@
 		EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched.xcmappingmodel; sourceTree = "<group>"; };
 		EA70E8950CC06ED500C3B295 /* RSTranscodingImp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTranscodingImp.h; sourceTree = "<group>"; };
 		EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSTranscodingImp.m; sourceTree = "<group>"; };
-		EA72A7A90C260D79009C63E5 /* ClientDescription.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; path = ClientDescription.plist; sourceTree = "<group>"; };
 		EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferenceKeys.m; sourceTree = "<group>"; };
 		EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferenceKeys.h; sourceTree = "<group>"; };
 		EA8E1C570CC9408800DD109F /* HardDrive.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HardDrive.tiff; path = Images/HardDrive.tiff; sourceTree = "<group>"; };
@@ -467,9 +464,6 @@
 				EAF923BF0CCEC33600CEBD73 /* Preferences.xib */,
 				EAF923BA0CCEC21900CEBD73 /* MainMenu.xib */,
 				EA490DB80CAF376E00A1DE02 /* ActivityAggregateView.xib */,
-				EA72A7A90C260D79009C63E5 /* ClientDescription.plist */,
-				EA20AE280C23608C00A9BDBD /* ClientDescription_Server.plist */,
-				EA20AE010C23589700A9BDBD /* recsched.syncschema */,
 				EA2939860C0CC89E0053E2B8 /* Images */,
 				EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */,
 				8D1107310486CEB800E47090 /* Info.plist */,

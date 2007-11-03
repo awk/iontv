@@ -42,9 +42,6 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
 {
 	NSLog(@"recsched_bkgd_AppDelegate - applicationDidFinishLaunching");
-#if USE_SYNCSERVICES
-	[[self syncClient] setSyncAlertHandler:self selector:@selector(client:mightWantToSyncEntityNames:)];
-#endif // USE_SYNCSERVICES
 
 	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kTranscodeProgramsKey] boolValue] == YES)
 		mTranscodeController = [[RSTranscodeController alloc] init];
@@ -107,48 +104,6 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 	return mRecSchedServer;
 }
 
-#if USE_SYNCSERVICES
-- (NSURL*)urlForFastSyncStore {
-	return [NSURL fileURLWithPath:[[self applicationSupportFolder] stringByAppendingPathComponent:@"org.awkward.recsched-server.fastsyncstore"]];
-}
-
-#pragma mark Sync
-
-- (ISyncClient *)syncClient
-{
-    NSString *clientIdentifier = kRecSchedServerBundleID;
-    NSString *reason = @"unknown error";
-    ISyncClient *client;
-
-    @try {
-        client = [[ISyncManager sharedManager] clientWithIdentifier:clientIdentifier];
-        if (nil == client) {
-//            if (![[ISyncManager sharedManager] registerSchemaWithBundlePath:[[NSBundle mainBundle] pathForResource:@"recsched" ofType:@"syncschema"]]) {
-//                reason = @"error registering the recsched sync schema";
-//            } 
-//			else 
-			{
-                client = [[ISyncManager sharedManager] registerClientWithIdentifier:clientIdentifier descriptionFilePath:[[NSBundle mainBundle] pathForResource:@"ClientDescription_Server" ofType:@"plist"]];
-                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeApplication];
-                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeDevice];
-                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypeServer];
-                [client setShouldSynchronize:YES withClientsOfType:ISyncClientTypePeer];
-            }
-        }
-    }
-    @catch (id exception) {
-        client = nil;
-        reason = [exception reason];
-    }
-
-    if (nil == client) {
-        NSRunAlertPanel(@"You can not sync your recsched data.", [NSString stringWithFormat:@"Failed to register the sync client: %@", reason], @"OK", nil, nil);
-    }
-    
-    return client;
-}
-#endif // USE_SYNCSERVICES
-
 #pragma mark Actions
 
 - (IBAction) saveAction:(id)sender {
@@ -158,20 +113,6 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
         [[NSApp delegate] presentError:error];
     }
 }
-
-#if USE_SYNCSERVICES
-- (void)syncAction:(id)sender
-{
-    NSError *error = nil;
-    ISyncClient *client = [self syncClient];
-    if (nil != client) {
-        [[[self managedObjectContext] persistentStoreCoordinator] syncWithClient:client inBackground:YES handler:self error:&error];
-    }
-    if (nil != error) {
-        NSLog(@"syncAction - error occured - %@", error);
-    }
-}
-#endif // USE_SYNCSERVICES
 
 #pragma Callbacks and Notifications
 

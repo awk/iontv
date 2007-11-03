@@ -46,15 +46,8 @@ extern NSString *RSDownloadErrorNotification;
 	NSWindowController *mActivityWindowController;
 }
 
-#if USE_SYNCSERVICES
-- (ISyncClient *)syncClient;
-#endif // USE_SYNCSERVICES
 - (id) recServer;
 
-#if USE_SYNCSERVICES
-- (IBAction)saveAction:sender;
-- (void)syncAction:(id)sender;
-#endif // USE_SYNCSERVICES
 - (IBAction)showCoreDataProgramWindow:(id)sender;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;

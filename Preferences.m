@@ -504,12 +504,6 @@ static Preferences *sSharedInstance = nil;
   [self savePrefs:sender];
   [mPanel orderOut:sender];
   
-#if USE_SYNCSERVICES
-  // The CoreData store might have changes because of editting the tuner settings and channel map.
-  if ([[[[NSApplication sharedApplication] delegate] managedObjectContext] hasChanges])
-	[[[NSApplication sharedApplication] delegate] saveAction:nil];
-#else
-	
 	// Walk the list of HDHomeRunDevices and send the details to the server
 	NSArray *hdhomerunDevices = [mHDHomeRunDevicesArrayController arrangedObjects];
 	for (HDHomeRun *anHDHomeRunDevice in hdhomerunDevices)
@@ -519,7 +513,6 @@ static Preferences *sSharedInstance = nil;
 			tuner0LineupIDTo:[[[anHDHomeRunDevice tuner0] lineup] lineupID]
 			tuner1LineupIDTo:[[[anHDHomeRunDevice tuner1] lineup] lineupID]];
 	}
-#endif // USE_SYNCSERVICES
 }
 
 - (IBAction) cancelButtonAction:(id)sender
