@@ -183,38 +183,37 @@
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = UIApp/main.m; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
-		32CA4F630368D1EE00C91783 /* recsched_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_Prefix.pch; sourceTree = "<group>"; };
+		32CA4F630368D1EE00C91783 /* recsched_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_Prefix.pch; path = UIApp/recsched_Prefix.pch; sourceTree = "<group>"; };
 		770B37EC0679A11B001EADE2 /* recsched_DataModel.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = recsched_DataModel.xcdatamodel; sourceTree = "<group>"; };
 		77C82804067257F0000B614F /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
-		77C8280B06725ACE000B614F /* recsched_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_AppDelegate.h; sourceTree = "<group>"; };
-		77C8280C06725ACE000B614F /* recsched_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_AppDelegate.m; sourceTree = "<group>"; };
-		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		77C8280B06725ACE000B614F /* recsched_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_AppDelegate.h; path = UIApp/recsched_AppDelegate.h; sourceTree = "<group>"; };
+		77C8280C06725ACE000B614F /* recsched_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = recsched_AppDelegate.m; path = UIApp/recsched_AppDelegate.m; sourceTree = "<group>"; };
+		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = UIApp/Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* iOnTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOnTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		EA06742F0B58084D009B0E27 /* MainWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainWindowController.h; sourceTree = "<group>"; };
-		EA0674300B58084D009B0E27 /* MainWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainWindowController.m; sourceTree = "<group>"; };
-		EA06743D0B580B4D009B0E27 /* tvDataDelivery.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = tvDataDelivery.h; sourceTree = "<group>"; };
-		EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = tvDataDelivery.m; sourceTree = "<group>"; };
-		EA06743F0B580B4D009B0E27 /* WSGeneratedObj.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = WSGeneratedObj.h; sourceTree = "<group>"; };
-		EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = WSGeneratedObj.m; sourceTree = "<group>"; };
-		EA083DF50BA62A5F003C27FA /* recsched_bkgd-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "recsched_bkgd-Info.plist"; sourceTree = "<group>"; };
-		EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Z2ITScheduleExtras.h; sourceTree = SOURCE_ROOT; };
-		EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Z2ITScheduleExtras.m; sourceTree = SOURCE_ROOT; };
+		EA06742F0B58084D009B0E27 /* MainWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainWindowController.h; path = UIApp/controllers/MainWindowController.h; sourceTree = "<group>"; };
+		EA0674300B58084D009B0E27 /* MainWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MainWindowController.m; path = UIApp/controllers/MainWindowController.m; sourceTree = "<group>"; };
+		EA06743D0B580B4D009B0E27 /* tvDataDelivery.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = tvDataDelivery.h; path = BkgdServer/tvDataDelivery.h; sourceTree = "<group>"; };
+		EA06743E0B580B4D009B0E27 /* tvDataDelivery.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = tvDataDelivery.m; path = BkgdServer/tvDataDelivery.m; sourceTree = "<group>"; };
+		EA06743F0B580B4D009B0E27 /* WSGeneratedObj.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = WSGeneratedObj.h; path = BkgdServer/WSGeneratedObj.h; sourceTree = "<group>"; };
+		EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = WSGeneratedObj.m; path = BkgdServer/WSGeneratedObj.m; sourceTree = "<group>"; };
+		EA083DF50BA62A5F003C27FA /* recsched_bkgd-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "recsched_bkgd-Info.plist"; path = "BkgdServer/recsched_bkgd-Info.plist"; sourceTree = "<group>"; };
+		EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Z2ITScheduleExtras.h; path = common/Z2ITScheduleExtras.h; sourceTree = "<group>"; };
+		EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = Z2ITScheduleExtras.m; path = common/Z2ITScheduleExtras.m; sourceTree = "<group>"; };
 		EA0F2ECD0CD3D812003E6954 /* InstallBkgdServer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = InstallBkgdServer; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA0F2ED30CD3D860003E6954 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = InstallBkgdServer/main.m; sourceTree = "<group>"; };
 		EA20ADB90C2330AC00A9BDBD /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		EA20AE2D0C23612800A9BDBD /* SyncServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SyncServices.framework; path = /System/Library/Frameworks/SyncServices.framework; sourceTree = "<absolute>"; };
-		EA20AF000C25CCA200A9BDBD /* RecordingThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RecordingThread.h; sourceTree = SOURCE_ROOT; };
-		EA20AF010C25CCA200A9BDBD /* RecordingThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = RecordingThread.m; sourceTree = SOURCE_ROOT; };
-		EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgramSearchViewController.h; sourceTree = "<group>"; };
-		EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProgramSearchViewController.m; sourceTree = "<group>"; };
-		EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HexNumberFormatter.h; sourceTree = "<group>"; };
-		EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HexNumberFormatter.m; sourceTree = "<group>"; };
-		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolishedBackgroundView.h; sourceTree = "<group>"; };
-		EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PolishedBackgroundView.m; sourceTree = "<group>"; };
-		EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLParsingProgressDisplayProtocol.h; sourceTree = "<group>"; };
+		EA20AF000C25CCA200A9BDBD /* RecordingThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = RecordingThread.h; path = BkgdServer/RecordingThread.h; sourceTree = "<group>"; };
+		EA20AF010C25CCA200A9BDBD /* RecordingThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = RecordingThread.m; path = BkgdServer/RecordingThread.m; sourceTree = "<group>"; };
+		EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProgramSearchViewController.h; path = UIApp/controllers/ProgramSearchViewController.h; sourceTree = "<group>"; };
+		EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProgramSearchViewController.m; path = UIApp/controllers/ProgramSearchViewController.m; sourceTree = "<group>"; };
+		EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HexNumberFormatter.h; path = UIApp/HexNumberFormatter.h; sourceTree = "<group>"; };
+		EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HexNumberFormatter.m; path = UIApp/HexNumberFormatter.m; sourceTree = "<group>"; };
+		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolishedBackgroundView.h; path = UIApp/views/PolishedBackgroundView.h; sourceTree = "<group>"; };
+		EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PolishedBackgroundView.m; path = UIApp/views/PolishedBackgroundView.m; sourceTree = "<group>"; };
 		EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_channelscan.c; path = ../libhdhomerun/hdhomerun_channelscan.c; sourceTree = SOURCE_ROOT; };
 		EA2EE02A0C07D2130002420F /* hdhomerun_channelscan.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_channelscan.h; path = ../libhdhomerun/hdhomerun_channelscan.h; sourceTree = SOURCE_ROOT; };
 		EA2EE02B0C07D2130002420F /* hdhomerun_config.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_config.c; path = ../libhdhomerun/hdhomerun_config.c; sourceTree = SOURCE_ROOT; };
@@ -233,100 +232,100 @@
 		EA2EE0380C07D2130002420F /* hdhomerun_video.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_video.h; path = ../libhdhomerun/hdhomerun_video.h; sourceTree = SOURCE_ROOT; };
 		EA2EE0390C07D2130002420F /* hdhomerun.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun.h; path = ../libhdhomerun/hdhomerun.h; sourceTree = SOURCE_ROOT; };
 		EA2EE03E0C07D2250002420F /* libhdhomerun.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhdhomerun.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		EA2EE0760C07D57A0002420F /* HDHomeRunMO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunMO.h; sourceTree = "<group>"; };
-		EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunMO.m; sourceTree = "<group>"; };
-		EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDHomeRunTuner.h; sourceTree = "<group>"; };
-		EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDHomeRunTuner.m; sourceTree = "<group>"; };
-		EA308FB50C66A7470005E89B /* RSColorDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSColorDictionary.h; sourceTree = "<group>"; };
-		EA308FB60C66A7470005E89B /* RSColorDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSColorDictionary.m; sourceTree = "<group>"; };
-		EA3090C20C6AB59E0005E89B /* RSWishlistController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSWishlistController.h; sourceTree = "<group>"; };
-		EA3090C30C6AB59E0005E89B /* RSWishlistController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSWishlistController.m; sourceTree = "<group>"; };
-		EA3B404E0C8C79470042C793 /* ScheduleDetailsPopupView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleDetailsPopupView.h; sourceTree = "<group>"; };
-		EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleDetailsPopupView.m; sourceTree = "<group>"; };
+		EA2EE0760C07D57A0002420F /* HDHomeRunMO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HDHomeRunMO.h; path = common/HDHomeRunMO.h; sourceTree = "<group>"; };
+		EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HDHomeRunMO.m; path = common/HDHomeRunMO.m; sourceTree = "<group>"; };
+		EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HDHomeRunTuner.h; path = common/HDHomeRunTuner.h; sourceTree = "<group>"; };
+		EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HDHomeRunTuner.m; path = common/HDHomeRunTuner.m; sourceTree = "<group>"; };
+		EA308FB50C66A7470005E89B /* RSColorDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSColorDictionary.h; path = common/RSColorDictionary.h; sourceTree = "<group>"; };
+		EA308FB60C66A7470005E89B /* RSColorDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSColorDictionary.m; path = common/RSColorDictionary.m; sourceTree = "<group>"; };
+		EA3090C20C6AB59E0005E89B /* RSWishlistController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSWishlistController.h; path = UIApp/controllers/RSWishlistController.h; sourceTree = "<group>"; };
+		EA3090C30C6AB59E0005E89B /* RSWishlistController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSWishlistController.m; path = UIApp/controllers/RSWishlistController.m; sourceTree = "<group>"; };
+		EA3B404E0C8C79470042C793 /* ScheduleDetailsPopupView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleDetailsPopupView.h; path = UIApp/views/ScheduleDetailsPopupView.h; sourceTree = "<group>"; };
+		EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleDetailsPopupView.m; path = UIApp/views/ScheduleDetailsPopupView.m; sourceTree = "<group>"; };
 		EA3B40550C8C7AEE0042C793 /* closebox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = closebox.png; path = Images/closebox.png; sourceTree = "<group>"; };
 		EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = closebox_pressed.png; path = Images/closebox_pressed.png; sourceTree = "<group>"; };
 		EA4909E30CADD0E600A1DE02 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/Activity.xib; sourceTree = "<group>"; };
 		EA490BB30CAEDB8100A1DE02 /* Activity_Stop.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Activity_Stop.tif; path = Images/Activity_Stop.tif; sourceTree = "<group>"; };
 		EA490BB40CAEDB8100A1DE02 /* Activity_StopPressed.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Activity_StopPressed.tif; path = Images/Activity_StopPressed.tif; sourceTree = "<group>"; };
-		EA490BD70CAEE61E00A1DE02 /* RSActivityListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSActivityListView.h; sourceTree = "<group>"; };
-		EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSActivityListView.m; sourceTree = "<group>"; };
+		EA490BD70CAEE61E00A1DE02 /* RSActivityListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSActivityListView.h; path = UIApp/views/RSActivityListView.h; sourceTree = "<group>"; };
+		EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSActivityListView.m; path = UIApp/views/RSActivityListView.m; sourceTree = "<group>"; };
 		EA490DB90CAF376E00A1DE02 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ActivityAggregateView.xib; sourceTree = "<group>"; };
 		EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 2.xcdatamodel"; sourceTree = "<group>"; };
-		EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSCommonAppDelegate.h; sourceTree = "<group>"; };
-		EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSCommonAppDelegate.m; sourceTree = "<group>"; };
-		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Preferences.h; sourceTree = "<group>"; };
-		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Preferences.m; sourceTree = "<group>"; };
-		EA5FAFC10B6FB49400CCD5D5 /* FixedNSControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = FixedNSControl.h; sourceTree = SOURCE_ROOT; };
-		EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = FixedNSControl.m; sourceTree = SOURCE_ROOT; };
-		EA5FAFC80B6FB50D00CCD5D5 /* DiscreteDurationSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscreteDurationSlider.h; sourceTree = "<group>"; };
-		EA5FAFC90B6FB50D00CCD5D5 /* DiscreteDurationSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiscreteDurationSlider.m; sourceTree = "<group>"; };
-		EA5FAFD60B6FB58900CCD5D5 /* DiscreteDurationSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiscreteDurationSliderCell.h; sourceTree = "<group>"; };
-		EA5FAFD70B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiscreteDurationSliderCell.m; sourceTree = "<group>"; };
-		EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; path = UserDefaults.plist; sourceTree = SOURCE_ROOT; };
-		EA5FBEAD0B724DB300CCD5D5 /* ScheduleGridView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleGridView.h; sourceTree = "<group>"; };
-		EA5FBEAE0B724DB400CCD5D5 /* ScheduleGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleGridView.m; sourceTree = "<group>"; };
-		EA5FC2A30B73E20C00CCD5D5 /* ScheduleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleViewController.h; sourceTree = "<group>"; };
-		EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleViewController.m; sourceTree = "<group>"; };
+		EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSCommonAppDelegate.h; path = common/RSCommonAppDelegate.h; sourceTree = "<group>"; };
+		EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSCommonAppDelegate.m; path = common/RSCommonAppDelegate.m; sourceTree = "<group>"; };
+		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Preferences.h; path = UIApp/controllers/Preferences.h; sourceTree = "<group>"; };
+		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Preferences.m; path = UIApp/controllers/Preferences.m; sourceTree = "<group>"; };
+		EA5FAFC10B6FB49400CCD5D5 /* FixedNSControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FixedNSControl.h; path = UIApp/views/FixedNSControl.h; sourceTree = "<group>"; };
+		EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = FixedNSControl.m; path = UIApp/views/FixedNSControl.m; sourceTree = "<group>"; };
+		EA5FAFC80B6FB50D00CCD5D5 /* DiscreteDurationSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DiscreteDurationSlider.h; path = UIApp/views/DiscreteDurationSlider.h; sourceTree = "<group>"; };
+		EA5FAFC90B6FB50D00CCD5D5 /* DiscreteDurationSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DiscreteDurationSlider.m; path = UIApp/views/DiscreteDurationSlider.m; sourceTree = "<group>"; };
+		EA5FAFD60B6FB58900CCD5D5 /* DiscreteDurationSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DiscreteDurationSliderCell.h; path = UIApp/views/DiscreteDurationSliderCell.h; sourceTree = "<group>"; };
+		EA5FAFD70B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DiscreteDurationSliderCell.m; path = UIApp/views/DiscreteDurationSliderCell.m; sourceTree = "<group>"; };
+		EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = UserDefaults.plist; path = UIApp/UserDefaults.plist; sourceTree = "<group>"; };
+		EA5FBEAD0B724DB300CCD5D5 /* ScheduleGridView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleGridView.h; path = UIApp/views/ScheduleGridView.h; sourceTree = "<group>"; };
+		EA5FBEAE0B724DB400CCD5D5 /* ScheduleGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleGridView.m; path = UIApp/views/ScheduleGridView.m; sourceTree = "<group>"; };
+		EA5FC2A30B73E20C00CCD5D5 /* ScheduleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleViewController.h; path = UIApp/controllers/ScheduleViewController.h; sourceTree = "<group>"; };
+		EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleViewController.m; path = UIApp/controllers/ScheduleViewController.m; sourceTree = "<group>"; };
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
-		EA686CE80CA95F5600185188 /* RSActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSActivityViewController.h; sourceTree = "<group>"; };
-		EA686CE90CA95F5600185188 /* RSActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSActivityViewController.m; sourceTree = "<group>"; };
-		EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSActivityDisplayProtocol.h; sourceTree = "<group>"; };
-		EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSStoreUpdateProtocol.h; sourceTree = "<group>"; };
-		EA6AB7190CBD93AB003C3CB6 /* EmptyCPlusPlus.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EmptyCPlusPlus.mm; sourceTree = "<group>"; };
-		EA6AB7200CBDA2E2003C3CB6 /* RSTranscodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTranscodeController.h; sourceTree = "<group>"; };
-		EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSTranscodeController.m; sourceTree = "<group>"; };
-		EA7002860CC4285D00DA9542 /* iTunes_ScriptingBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes_ScriptingBridge.h; sourceTree = "<group>"; };
+		EA686CE80CA95F5600185188 /* RSActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSActivityViewController.h; path = UIApp/controllers/RSActivityViewController.h; sourceTree = "<group>"; };
+		EA686CE90CA95F5600185188 /* RSActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSActivityViewController.m; path = UIApp/controllers/RSActivityViewController.m; sourceTree = "<group>"; };
+		EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSActivityDisplayProtocol.h; path = common/RSActivityDisplayProtocol.h; sourceTree = "<group>"; };
+		EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSStoreUpdateProtocol.h; path = common/RSStoreUpdateProtocol.h; sourceTree = "<group>"; };
+		EA6AB7190CBD93AB003C3CB6 /* EmptyCPlusPlus.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = EmptyCPlusPlus.mm; path = BkgdServer/EmptyCPlusPlus.mm; sourceTree = "<group>"; };
+		EA6AB7200CBDA2E2003C3CB6 /* RSTranscodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSTranscodeController.h; path = BkgdServer/RSTranscodeController.h; sourceTree = "<group>"; };
+		EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSTranscodeController.m; path = BkgdServer/RSTranscodeController.m; sourceTree = "<group>"; };
+		EA7002860CC4285D00DA9542 /* iTunes_ScriptingBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iTunes_ScriptingBridge.h; path = BkgdServer/iTunes_ScriptingBridge.h; sourceTree = "<group>"; };
 		EA7002870CC4288500DA9542 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = /System/Library/Frameworks/ScriptingBridge.framework; sourceTree = "<absolute>"; };
 		EA70E70F0CC0112200C3B295 /* recsched_DataModel 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 4.xcdatamodel"; sourceTree = "<group>"; };
-		EA70E7110CC012C100C3B295 /* RSTranscoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTranscoding.h; sourceTree = "<group>"; };
-		EA70E7120CC012C100C3B295 /* RSTranscoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSTranscoding.m; sourceTree = "<group>"; };
+		EA70E7110CC012C100C3B295 /* RSTranscoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSTranscoding.h; path = common/RSTranscoding.h; sourceTree = "<group>"; };
+		EA70E7120CC012C100C3B295 /* RSTranscoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSTranscoding.m; path = common/RSTranscoding.m; sourceTree = "<group>"; };
 		EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched.xcmappingmodel; sourceTree = "<group>"; };
-		EA70E8950CC06ED500C3B295 /* RSTranscodingImp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSTranscodingImp.h; sourceTree = "<group>"; };
-		EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSTranscodingImp.m; sourceTree = "<group>"; };
-		EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferenceKeys.m; sourceTree = "<group>"; };
-		EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferenceKeys.h; sourceTree = "<group>"; };
+		EA70E8950CC06ED500C3B295 /* RSTranscodingImp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSTranscodingImp.h; path = BkgdServer/RSTranscodingImp.h; sourceTree = "<group>"; };
+		EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSTranscodingImp.m; path = BkgdServer/RSTranscodingImp.m; sourceTree = "<group>"; };
+		EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreferenceKeys.m; path = common/PreferenceKeys.m; sourceTree = "<group>"; };
+		EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferenceKeys.h; path = common/PreferenceKeys.h; sourceTree = "<group>"; };
 		EA8E1C570CC9408800DD109F /* HardDrive.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HardDrive.tiff; path = Images/HardDrive.tiff; sourceTree = "<group>"; };
 		EA93F3980C922E53004788CF /* iOnTV.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = iOnTV.icns; path = Images/iOnTV.icns; sourceTree = SOURCE_ROOT; };
 		EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 3.xcdatamodel"; sourceTree = "<group>"; };
-		EA93F8170C9C4A6E004788CF /* RSRecording.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSRecording.h; sourceTree = "<group>"; };
-		EA93F8180C9C4A6E004788CF /* RSRecording.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSRecording.m; sourceTree = "<group>"; };
-		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSOutlineView.h; sourceTree = "<group>"; };
-		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSOutlineView.m; sourceTree = "<group>"; };
-		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKSourceTableClasses.h; sourceTree = "<group>"; };
-		EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKSourceTableClasses.m; sourceTree = "<group>"; };
-		EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_bkgd_prefix.pch; sourceTree = "<group>"; };
-		EAE655580B9D1A8300CDB279 /* RecSchedServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecSchedServer.h; sourceTree = "<group>"; };
-		EAE655590B9D1A8300CDB279 /* RecSchedServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecSchedServer.m; sourceTree = "<group>"; };
-		EAE655730B9E691000CDB279 /* RecSchedProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecSchedProtocol.h; sourceTree = "<group>"; };
+		EA93F8170C9C4A6E004788CF /* RSRecording.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecording.h; path = common/RSRecording.h; sourceTree = "<group>"; };
+		EA93F8180C9C4A6E004788CF /* RSRecording.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecording.m; path = common/RSRecording.m; sourceTree = "<group>"; };
+		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSOutlineView.h; path = UIApp/views/RSOutlineView.h; sourceTree = "<group>"; };
+		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
+		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKSourceTableClasses.h; path = UIApp/views/AKSourceTableClasses.h; sourceTree = "<group>"; };
+		EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AKSourceTableClasses.m; path = UIApp/views/AKSourceTableClasses.m; sourceTree = "<group>"; };
+		EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_bkgd_prefix.pch; path = BkgdServer/recsched_bkgd_prefix.pch; sourceTree = "<group>"; };
+		EAE655580B9D1A8300CDB279 /* RecSchedServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RecSchedServer.h; path = BkgdServer/RecSchedServer.h; sourceTree = "<group>"; };
+		EAE655590B9D1A8300CDB279 /* RecSchedServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RecSchedServer.m; path = BkgdServer/RecSchedServer.m; sourceTree = "<group>"; };
+		EAE655730B9E691000CDB279 /* RecSchedProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RecSchedProtocol.h; path = common/RecSchedProtocol.h; sourceTree = "<group>"; };
 		EAEC092D0C272E1300C40D5A /* recsched_bkgd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recsched_bkgd.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd_main.m; sourceTree = "<group>"; };
-		EAEC09560C27422800C40D5A /* recsched_bkgd_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched_bkgd_AppDelegate.h; sourceTree = "<group>"; };
-		EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched_bkgd_AppDelegate.m; sourceTree = "<group>"; };
-		EAF4EA0D0C5CC686003EC697 /* AKColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKColorCell.h; sourceTree = "<group>"; };
-		EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKColorCell.m; sourceTree = "<group>"; };
-		EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKColorExtensions.h; sourceTree = "<group>"; };
-		EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKColorExtensions.m; sourceTree = "<group>"; };
-		EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XTVDParser.h; sourceTree = "<group>"; };
-		EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XTVDParser.m; sourceTree = "<group>"; };
-		EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITStation.h; sourceTree = "<group>"; };
-		EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Z2ITStation.m; sourceTree = "<group>"; };
-		EAF883DC0B5ECB5B00373CEF /* Z2ITLineup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITLineup.h; sourceTree = "<group>"; };
-		EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Z2ITLineup.m; sourceTree = "<group>"; };
-		EAF8850D0B6024A800373CEF /* Z2ITLineupMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITLineupMap.h; sourceTree = "<group>"; };
-		EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Z2ITLineupMap.m; sourceTree = "<group>"; };
-		EAF886390B61598700373CEF /* Z2ITProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITProgram.h; sourceTree = "<group>"; };
-		EAF8863A0B61598700373CEF /* Z2ITProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Z2ITProgram.m; sourceTree = "<group>"; };
-		EAF8867B0B61740300373CEF /* Z2ITSchedule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Z2ITSchedule.h; sourceTree = "<group>"; };
-		EAF8867C0B61740300373CEF /* Z2ITSchedule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Z2ITSchedule.m; sourceTree = "<group>"; };
-		EAF890150B66DC8400373CEF /* ScheduleHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleHeaderView.h; sourceTree = "<group>"; };
-		EAF890160B66DC8400373CEF /* ScheduleHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleHeaderView.m; sourceTree = "<group>"; };
-		EAF8919A0B66F2D200373CEF /* iTableColumnHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = iTableColumnHeaderCell.h; sourceTree = SOURCE_ROOT; };
-		EAF8919B0B66F2D200373CEF /* iTableColumnHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = iTableColumnHeaderCell.m; sourceTree = SOURCE_ROOT; };
-		EAF8956A0B69023D00373CEF /* ScheduleStationColumnView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleStationColumnView.h; sourceTree = "<group>"; };
-		EAF8956B0B69023D00373CEF /* ScheduleStationColumnView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleStationColumnView.m; sourceTree = "<group>"; };
-		EAF89D8C0B6A8CFD00373CEF /* ScheduleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScheduleView.h; sourceTree = "<group>"; };
-		EAF89D8D0B6A8CFD00373CEF /* ScheduleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScheduleView.m; sourceTree = "<group>"; };
+		EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = recsched_bkgd_main.m; path = BkgdServer/recsched_bkgd_main.m; sourceTree = "<group>"; };
+		EAEC09560C27422800C40D5A /* recsched_bkgd_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_bkgd_AppDelegate.h; path = BkgdServer/recsched_bkgd_AppDelegate.h; sourceTree = "<group>"; };
+		EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = recsched_bkgd_AppDelegate.m; path = BkgdServer/recsched_bkgd_AppDelegate.m; sourceTree = "<group>"; };
+		EAF4EA0D0C5CC686003EC697 /* AKColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKColorCell.h; path = UIApp/views/AKColorCell.h; sourceTree = "<group>"; };
+		EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AKColorCell.m; path = UIApp/views/AKColorCell.m; sourceTree = "<group>"; };
+		EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKColorExtensions.h; path = UIApp/AKColorExtensions.h; sourceTree = "<group>"; };
+		EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AKColorExtensions.m; path = UIApp/AKColorExtensions.m; sourceTree = "<group>"; };
+		EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XTVDParser.h; path = BkgdServer/XTVDParser.h; sourceTree = "<group>"; };
+		EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XTVDParser.m; path = BkgdServer/XTVDParser.m; sourceTree = "<group>"; };
+		EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Z2ITStation.h; path = common/Z2ITStation.h; sourceTree = "<group>"; };
+		EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Z2ITStation.m; path = common/Z2ITStation.m; sourceTree = "<group>"; };
+		EAF883DC0B5ECB5B00373CEF /* Z2ITLineup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Z2ITLineup.h; path = common/Z2ITLineup.h; sourceTree = "<group>"; };
+		EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Z2ITLineup.m; path = common/Z2ITLineup.m; sourceTree = "<group>"; };
+		EAF8850D0B6024A800373CEF /* Z2ITLineupMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Z2ITLineupMap.h; path = common/Z2ITLineupMap.h; sourceTree = "<group>"; };
+		EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Z2ITLineupMap.m; path = common/Z2ITLineupMap.m; sourceTree = "<group>"; };
+		EAF886390B61598700373CEF /* Z2ITProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Z2ITProgram.h; path = common/Z2ITProgram.h; sourceTree = "<group>"; };
+		EAF8863A0B61598700373CEF /* Z2ITProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Z2ITProgram.m; path = common/Z2ITProgram.m; sourceTree = "<group>"; };
+		EAF8867B0B61740300373CEF /* Z2ITSchedule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Z2ITSchedule.h; path = common/Z2ITSchedule.h; sourceTree = "<group>"; };
+		EAF8867C0B61740300373CEF /* Z2ITSchedule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Z2ITSchedule.m; path = common/Z2ITSchedule.m; sourceTree = "<group>"; };
+		EAF890150B66DC8400373CEF /* ScheduleHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleHeaderView.h; path = UIApp/views/ScheduleHeaderView.h; sourceTree = "<group>"; };
+		EAF890160B66DC8400373CEF /* ScheduleHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleHeaderView.m; path = UIApp/views/ScheduleHeaderView.m; sourceTree = "<group>"; };
+		EAF8919A0B66F2D200373CEF /* iTableColumnHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = iTableColumnHeaderCell.h; path = UIApp/views/iTableColumnHeaderCell.h; sourceTree = "<group>"; };
+		EAF8919B0B66F2D200373CEF /* iTableColumnHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = iTableColumnHeaderCell.m; path = UIApp/views/iTableColumnHeaderCell.m; sourceTree = "<group>"; };
+		EAF8956A0B69023D00373CEF /* ScheduleStationColumnView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleStationColumnView.h; path = UIApp/views/ScheduleStationColumnView.h; sourceTree = "<group>"; };
+		EAF8956B0B69023D00373CEF /* ScheduleStationColumnView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleStationColumnView.m; path = UIApp/views/ScheduleStationColumnView.m; sourceTree = "<group>"; };
+		EAF89D8C0B6A8CFD00373CEF /* ScheduleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleView.h; path = UIApp/views/ScheduleView.h; sourceTree = "<group>"; };
+		EAF89D8D0B6A8CFD00373CEF /* ScheduleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleView.m; path = UIApp/views/ScheduleView.m; sourceTree = "<group>"; };
 		EAF923A00CCEA08400CEBD73 /* TV-14.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-14.png"; path = "Images/TV-14.png"; sourceTree = "<group>"; };
 		EAF923A10CCEA08400CEBD73 /* TV-G.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-G.png"; path = "Images/TV-G.png"; sourceTree = "<group>"; };
 		EAF923A20CCEA08400CEBD73 /* TV-MA.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TV-MA.png"; path = "Images/TV-MA.png"; sourceTree = "<group>"; };
@@ -388,28 +387,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		080E96DDFE201D6D7F000001 /* Classes */ = {
+		080E96DDFE201D6D7F000001 /* UI App */ = {
 			isa = PBXGroup;
 			children = (
-				EA308FB40C66A70D0005E89B /* Support Classes */,
+				EABF0EC20CDE85D600DFFA0F /* Controllers */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+				32CA4F630368D1EE00C91783 /* recsched_Prefix.pch */,
 				EAF890120B66DC6400373CEF /* View & UI Classes */,
-				EAF890110B66DC2E00373CEF /* Data & XML Classes */,
 				77C8280B06725ACE000B614F /* recsched_AppDelegate.h */,
 				77C8280C06725ACE000B614F /* recsched_AppDelegate.m */,
-				EA06742F0B58084D009B0E27 /* MainWindowController.h */,
-				EA0674300B58084D009B0E27 /* MainWindowController.m */,
-				EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */,
-				EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */,
-				EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */,
-				EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */,
-				EA3090C20C6AB59E0005E89B /* RSWishlistController.h */,
-				EA3090C30C6AB59E0005E89B /* RSWishlistController.m */,
-				EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */,
-				EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */,
-				EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */,
-				EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */,
+				EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */,
+				EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */,
+				EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */,
+				EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */,
 			);
-			name = Classes;
+			name = "UI App";
 			sourceTree = "<group>";
 		};
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
@@ -445,29 +437,17 @@
 		29B97314FDCFA39411CA2CEA /* recsched */ = {
 			isa = PBXGroup;
 			children = (
+				EABF0EAC0CDE7DAC00DFFA0F /* common */,
 				EA0F2ED20CD3D824003E6954 /* InstallBkgdServer */,
 				EA2EE0280C07D1EA0002420F /* libhdhomerun */,
 				EAE655370B9D0A3100CDB279 /* Background App */,
 				7756732906782D8800D1FEB8 /* Models */,
-				080E96DDFE201D6D7F000001 /* Classes */,
-				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				080E96DDFE201D6D7F000001 /* UI App */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
 			name = recsched;
-			sourceTree = "<group>";
-		};
-		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
-			isa = PBXGroup;
-			children = (
-				32CA4F630368D1EE00C91783 /* recsched_Prefix.pch */,
-				29B97316FDCFA39411CA2CEA /* main.m */,
-				EAE655730B9E691000CDB279 /* RecSchedProtocol.h */,
-				EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */,
-				EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */,
-			);
-			name = "Other Sources";
 			sourceTree = "<group>";
 		};
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
@@ -564,13 +544,75 @@
 			name = libhdhomerun;
 			sourceTree = "<group>";
 		};
-		EA308FB40C66A70D0005E89B /* Support Classes */ = {
+		EABF0EAC0CDE7DAC00DFFA0F /* common */ = {
 			isa = PBXGroup;
 			children = (
 				EA308FB50C66A7470005E89B /* RSColorDictionary.h */,
 				EA308FB60C66A7470005E89B /* RSColorDictionary.m */,
+				EABF0EB90CDE7FD500DFFA0F /* Managed Objects */,
+				EABF0EB80CDE7FBC00DFFA0F /* Protocols */,
+				EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */,
+				EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */,
+				EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */,
+				EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */,
 			);
-			name = "Support Classes";
+			name = common;
+			sourceTree = "<group>";
+		};
+		EABF0EB80CDE7FBC00DFFA0F /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				EAE655730B9E691000CDB279 /* RecSchedProtocol.h */,
+				EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */,
+				EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */,
+			);
+			name = Protocols;
+			sourceTree = "<group>";
+		};
+		EABF0EB90CDE7FD500DFFA0F /* Managed Objects */ = {
+			isa = PBXGroup;
+			children = (
+				EA93F8170C9C4A6E004788CF /* RSRecording.h */,
+				EA93F8180C9C4A6E004788CF /* RSRecording.m */,
+				EA70E7110CC012C100C3B295 /* RSTranscoding.h */,
+				EA70E7120CC012C100C3B295 /* RSTranscoding.m */,
+				EA2EE0760C07D57A0002420F /* HDHomeRunMO.h */,
+				EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */,
+				EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */,
+				EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */,
+				EAF883DC0B5ECB5B00373CEF /* Z2ITLineup.h */,
+				EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */,
+				EAF8850D0B6024A800373CEF /* Z2ITLineupMap.h */,
+				EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */,
+				EAF886390B61598700373CEF /* Z2ITProgram.h */,
+				EAF8863A0B61598700373CEF /* Z2ITProgram.m */,
+				EAF8867B0B61740300373CEF /* Z2ITSchedule.h */,
+				EAF8867C0B61740300373CEF /* Z2ITSchedule.m */,
+				EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */,
+				EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */,
+				EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */,
+				EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */,
+			);
+			name = "Managed Objects";
+			sourceTree = "<group>";
+		};
+		EABF0EC20CDE85D600DFFA0F /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				EA5FC2A30B73E20C00CCD5D5 /* ScheduleViewController.h */,
+				EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */,
+				EA686CE80CA95F5600185188 /* RSActivityViewController.h */,
+				EA686CE90CA95F5600185188 /* RSActivityViewController.m */,
+				EA06742F0B58084D009B0E27 /* MainWindowController.h */,
+				EA0674300B58084D009B0E27 /* MainWindowController.m */,
+				EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */,
+				EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */,
+				EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */,
+				EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */,
+				EA3090C20C6AB59E0005E89B /* RSWishlistController.h */,
+				EA3090C30C6AB59E0005E89B /* RSWishlistController.m */,
+			);
+			name = Controllers;
 			sourceTree = "<group>";
 		};
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
@@ -601,37 +643,9 @@
 			name = "Background App";
 			sourceTree = "<group>";
 		};
-		EAF890110B66DC2E00373CEF /* Data & XML Classes */ = {
-			isa = PBXGroup;
-			children = (
-				EA2EE0760C07D57A0002420F /* HDHomeRunMO.h */,
-				EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */,
-				EA2EE1040C07DCC70002420F /* HDHomeRunTuner.h */,
-				EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */,
-				EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */,
-				EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */,
-				EAF8850D0B6024A800373CEF /* Z2ITLineupMap.h */,
-				EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */,
-				EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */,
-				EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */,
-				EAF883DC0B5ECB5B00373CEF /* Z2ITLineup.h */,
-				EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */,
-				EAF886390B61598700373CEF /* Z2ITProgram.h */,
-				EAF8863A0B61598700373CEF /* Z2ITProgram.m */,
-				EAF8867B0B61740300373CEF /* Z2ITSchedule.h */,
-				EAF8867C0B61740300373CEF /* Z2ITSchedule.m */,
-				EA93F8170C9C4A6E004788CF /* RSRecording.h */,
-				EA93F8180C9C4A6E004788CF /* RSRecording.m */,
-				EA70E7110CC012C100C3B295 /* RSTranscoding.h */,
-				EA70E7120CC012C100C3B295 /* RSTranscoding.m */,
-			);
-			name = "Data & XML Classes";
-			sourceTree = "<group>";
-		};
 		EAF890120B66DC6400373CEF /* View & UI Classes */ = {
 			isa = PBXGroup;
 			children = (
-				EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */,
 				EA5FAFC10B6FB49400CCD5D5 /* FixedNSControl.h */,
 				EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */,
 				EAF8919A0B66F2D200373CEF /* iTableColumnHeaderCell.h */,
@@ -648,24 +662,16 @@
 				EA5FAFD70B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m */,
 				EA5FBEAD0B724DB300CCD5D5 /* ScheduleGridView.h */,
 				EA5FBEAE0B724DB400CCD5D5 /* ScheduleGridView.m */,
-				EA5FC2A30B73E20C00CCD5D5 /* ScheduleViewController.h */,
-				EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */,
-				EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */,
-				EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */,
 				EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */,
 				EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */,
 				EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */,
 				EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */,
 				EAF4EA0D0C5CC686003EC697 /* AKColorCell.h */,
 				EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */,
-				EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */,
-				EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */,
 				EA977F5B0C8992CF0043B79E /* RSOutlineView.h */,
 				EA977F5C0C8992CF0043B79E /* RSOutlineView.m */,
 				EA3B404E0C8C79470042C793 /* ScheduleDetailsPopupView.h */,
 				EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */,
-				EA686CE80CA95F5600185188 /* RSActivityViewController.h */,
-				EA686CE90CA95F5600185188 /* RSActivityViewController.m */,
 				EA490BD70CAEE61E00A1DE02 /* RSActivityListView.h */,
 				EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */,
 			);
@@ -1012,9 +1018,9 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = recsched_Prefix.pch;
+				GCC_PREFIX_HEADER = UIApp/recsched_Prefix.pch;
 				HEADER_SEARCH_PATHS = ../libhdhomerun;
-				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_FILE = UIApp/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1023,7 +1029,6 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				PRODUCT_NAME = iOnTV;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
 			};
 			name = Debug;
 		};
@@ -1042,9 +1047,9 @@
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = recsched_Prefix.pch;
+				GCC_PREFIX_HEADER = UIApp/recsched_Prefix.pch;
 				HEADER_SEARCH_PATHS = ../libhdhomerun;
-				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_FILE = UIApp/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1192,7 +1197,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				HEADER_SEARCH_PATHS = ../HandBrake/libhb;
-				INFOPLIST_FILE = "recsched_bkgd-Info.plist";
+				INFOPLIST_FILE = "BkgdServer/recsched_bkgd-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					build/Debug,
@@ -1228,7 +1233,6 @@
 				PREBINDING = NO;
 				PRODUCT_NAME = recsched_bkgd;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
 			};
 			name = Debug;
 		};
@@ -1242,7 +1246,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
 				HEADER_SEARCH_PATHS = ../HandBrake/libhb;
-				INFOPLIST_FILE = "recsched_bkgd-Info.plist";
+				INFOPLIST_FILE = "BkgdServer/recsched_bkgd-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
 					build/Debug,
