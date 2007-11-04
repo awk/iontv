@@ -28,6 +28,8 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		EA0674310B58084D009B0E27 /* MainWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674300B58084D009B0E27 /* MainWindowController.m */; };
 		EA083E480BA77D47003C27FA /* Z2ITScheduleExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */; };
+		EA0F2ED40CD3D860003E6954 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0F2ED30CD3D860003E6954 /* main.m */; };
+		EA0F2F1D0CD3E6FF003E6954 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
 		EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
 		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
 		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
@@ -200,6 +202,8 @@
 		EA083DF50BA62A5F003C27FA /* recsched_bkgd-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "recsched_bkgd-Info.plist"; sourceTree = "<group>"; };
 		EA083E460BA77D47003C27FA /* Z2ITScheduleExtras.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Z2ITScheduleExtras.h; sourceTree = SOURCE_ROOT; };
 		EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Z2ITScheduleExtras.m; sourceTree = SOURCE_ROOT; };
+		EA0F2ECD0CD3D812003E6954 /* InstallBkgdServer */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = InstallBkgdServer; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA0F2ED30CD3D860003E6954 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = InstallBkgdServer/main.m; sourceTree = "<group>"; };
 		EA20ADB90C2330AC00A9BDBD /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		EA20AE2D0C23612800A9BDBD /* SyncServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SyncServices.framework; path = /System/Library/Frameworks/SyncServices.framework; sourceTree = "<absolute>"; };
 		EA20AF000C25CCA200A9BDBD /* RecordingThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RecordingThread.h; sourceTree = SOURCE_ROOT; };
@@ -210,7 +214,6 @@
 		EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HexNumberFormatter.m; sourceTree = "<group>"; };
 		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolishedBackgroundView.h; sourceTree = "<group>"; };
 		EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PolishedBackgroundView.m; sourceTree = "<group>"; };
-		EA293E870C10A8040053E2B8 /* ChannelScanProgressDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelScanProgressDisplayProtocol.h; sourceTree = "<group>"; };
 		EA293F650C10BA950053E2B8 /* XMLParsingProgressDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLParsingProgressDisplayProtocol.h; sourceTree = "<group>"; };
 		EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_channelscan.c; path = ../libhdhomerun/hdhomerun_channelscan.c; sourceTree = SOURCE_ROOT; };
 		EA2EE02A0C07D2130002420F /* hdhomerun_channelscan.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_channelscan.h; path = ../libhdhomerun/hdhomerun_channelscan.h; sourceTree = SOURCE_ROOT; };
@@ -354,6 +357,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EA0F2ECB0CD3D812003E6954 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA0F2F1D0CD3E6FF003E6954 /* Security.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EA2EE03C0C07D2250002420F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -426,6 +437,7 @@
 				8D1107320486CEB800E47090 /* iOnTV.app */,
 				EA2EE03E0C07D2250002420F /* libhdhomerun.a */,
 				EAEC092D0C272E1300C40D5A /* recsched_bkgd.app */,
+				EA0F2ECD0CD3D812003E6954 /* InstallBkgdServer */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -433,6 +445,7 @@
 		29B97314FDCFA39411CA2CEA /* recsched */ = {
 			isa = PBXGroup;
 			children = (
+				EA0F2ED20CD3D824003E6954 /* InstallBkgdServer */,
 				EA2EE0280C07D1EA0002420F /* libhdhomerun */,
 				EAE655370B9D0A3100CDB279 /* Background App */,
 				7756732906782D8800D1FEB8 /* Models */,
@@ -492,6 +505,14 @@
 				EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */,
 			);
 			name = Models;
+			sourceTree = "<group>";
+		};
+		EA0F2ED20CD3D824003E6954 /* InstallBkgdServer */ = {
+			isa = PBXGroup;
+			children = (
+				EA0F2ED30CD3D860003E6954 /* main.m */,
+			);
+			name = InstallBkgdServer;
 			sourceTree = "<group>";
 		};
 		EA2939860C0CC89E0053E2B8 /* Images */ = {
@@ -633,7 +654,6 @@
 				EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */,
 				EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */,
 				EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */,
-				EA293E870C10A8040053E2B8 /* ChannelScanProgressDisplayProtocol.h */,
 				EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */,
 				EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */,
 				EAF4EA0D0C5CC686003EC697 /* AKColorCell.h */,
@@ -684,6 +704,22 @@
 			productName = recsched;
 			productReference = 8D1107320486CEB800E47090 /* iOnTV.app */;
 			productType = "com.apple.product-type.application";
+		};
+		EA0F2ECC0CD3D812003E6954 /* InstallBkgdServer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EA0F2EED0CD3DAB2003E6954 /* Build configuration list for PBXNativeTarget "InstallBkgdServer" */;
+			buildPhases = (
+				EA0F2ECA0CD3D812003E6954 /* Sources */,
+				EA0F2ECB0CD3D812003E6954 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = InstallBkgdServer;
+			productName = InstallBkgdServer;
+			productReference = EA0F2ECD0CD3D812003E6954 /* InstallBkgdServer */;
+			productType = "com.apple.product-type.tool";
 		};
 		EA2EE03D0C07D2250002420F /* libhdhomerun */ = {
 			isa = PBXNativeTarget;
@@ -736,6 +772,7 @@
 				EA083F720BADD1F7003C27FA /* All recsched */,
 				EA2EE03D0C07D2250002420F /* libhdhomerun */,
 				EAEC092C0C272E1200C40D5A /* recsched_bkgd */,
+				EA0F2ECC0CD3D812003E6954 /* InstallBkgdServer */,
 			);
 		};
 /* End PBXProject section */
@@ -827,6 +864,14 @@
 				EA70E7210CC0164600C3B295 /* recsched.xcmappingmodel in Sources */,
 				EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */,
 				EAF9247D0CD030D100CEBD73 /* RSColorDictionary.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EA0F2ECA0CD3D812003E6954 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EA0F2ED40CD3D860003E6954 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1053,6 +1098,53 @@
 			};
 			name = Release;
 		};
+		EA0F2ECF0CD3D812003E6954 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/iOnTV.app/Contents/MacOS";
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = InstallBkgdServer;
+				ZERO_LINK = YES;
+			};
+			name = Debug;
+		};
+		EA0F2ED00CD3D812003E6954 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/iOnTV.app/Contents/MacOS";
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				INSTALL_PATH = /usr/local/bin;
+				OTHER_LDFLAGS = (
+					"-framework",
+					Foundation,
+					"-framework",
+					AppKit,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = InstallBkgdServer;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		EA2EE04B0C07D26E0002420F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1216,6 +1308,15 @@
 			buildConfigurations = (
 				EA083FC80BAF827B003C27FA /* Debug */,
 				EA083FC90BAF827B003C27FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EA0F2EED0CD3DAB2003E6954 /* Build configuration list for PBXNativeTarget "InstallBkgdServer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EA0F2ECF0CD3D812003E6954 /* Debug */,
+				EA0F2ED00CD3D812003E6954 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
