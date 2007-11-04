@@ -223,8 +223,7 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
     
   [mThreadManagedObjectContext processPendingChanges];
   NSError *error = nil;
-  [mThreadManagedObjectContext save:&error];
-  if (error)
+  if (![mThreadManagedObjectContext save:&error])
 	NSLog(@"Error saving after record completed - %@", error);
 	
 	// Notify everyone that this recording has finished - since we're in a seperate thread, and notifications are
