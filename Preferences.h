@@ -24,12 +24,11 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import <Cocoa/Cocoa.h>
-#import "ChannelScanProgressDisplayProtocol.h"
 #import "PreferenceKeys.h"
 
 @class DiscreteDurationSlider;
 
-@interface Preferences : NSObject <ChannelScanProgressDisplay> {
+@interface Preferences : NSObject {
 
     IBOutlet NSTextField *mDurationTextField;
     IBOutlet DiscreteDurationSlider *mDurationSlider;
@@ -45,17 +44,16 @@
     IBOutlet NSTextField *mSDPasswordField;
     IBOutlet NSProgressIndicator *mParsingProgressIndicator;
     IBOutlet NSButton *mRetrieveLineupsButton;
-    IBOutlet NSProgressIndicator *mTunerScanProgressIndicator;
     IBOutlet NSButton *mScanTunersButton;
-    IBOutlet NSProgressIndicator *mChannelScanProgressIndicator;
     IBOutlet NSButton *mScanChannelsButton;
     IBOutlet NSTableView *mColorsTable;
 	
     IBOutlet NSArrayController *mHDHomeRunDevicesArrayController;
     IBOutlet NSArrayController *mHDHomeRunTunersArrayController;
+	IBOutlet NSArrayController *mLineupsArrayController;
     IBOutlet NSArrayController *mGenreArrayController;
     IBOutlet NSArrayController *mVisibleStationsArrayController;    // This is the subset of station entities that correspond to the selected HDHR Device/Tuner combo.
-    
+	
 	IBOutlet NSView *mExportChannelTunerSelectionView;
 	
 	NSView* mCurrentPrefsView;			// Currently display preferences subview
@@ -67,7 +65,6 @@
 	NSURL *transcodedProgramsLocation;
 	NSArrayController *handbrakePresetsArrayController;
 	
-    BOOL mAbortChannelScan;
     BOOL mChannelScanInProgress;
 }
 

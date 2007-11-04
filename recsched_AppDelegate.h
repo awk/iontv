@@ -28,6 +28,8 @@
 
 extern NSString *RSParsingCompleteNotification;
 extern NSString *RSDownloadErrorNotification;
+extern NSString *RSDeviceScanCompleteNotification;
+extern NSString *RSChannelScanCompleteNotification;
 
 @class HDHomeRunStation;
 

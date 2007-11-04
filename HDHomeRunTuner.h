@@ -25,10 +25,12 @@
 @class HDHomeRunStation;
 @class Z2ITLineup;
 @class Z2ITStation;
+@protocol RSActivityDisplay;
 
 @interface HDHomeRunTuner : NSManagedObject {
   struct hdhomerun_device_t *mHDHomeRunDevice;
-  id mCurrentProgressDisplay;
+  id<RSActivityDisplay> mCurrentProgressDisplay;
+  size_t mCurrentActivityToken;
   HDHomeRunChannel *mCurrentHDHomeRunChannel;
 }
 

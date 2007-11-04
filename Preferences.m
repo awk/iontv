@@ -32,7 +32,6 @@
 #import "recsched_AppDelegate.h"
 #import "RecSchedProtocol.h"
 #import "RSColorDictionary.h"
-#import "HDHomeRunMO.h"
 #import "Z2ITLineup.h"
 #import <Security/Security.h>
 
@@ -498,9 +497,6 @@ static Preferences *sSharedInstance = nil;
 
 - (IBAction) okButtonAction:(id)sender
 {
-  if (mChannelScanInProgress)
-    mAbortChannelScan = YES;
-    
   [self savePrefs:sender];
   [mPanel orderOut:sender];
   
@@ -517,9 +513,6 @@ static Preferences *sSharedInstance = nil;
 
 - (IBAction) cancelButtonAction:(id)sender
 {
-  if (mChannelScanInProgress)
-    mAbortChannelScan = YES;
-
   [[NSUserDefaultsController sharedUserDefaultsController] revert:sender];
 	[mPanel orderOut:sender];
 }
@@ -570,40 +563,9 @@ static Preferences *sSharedInstance = nil;
 - (IBAction) scanDevicesButtonAction:(id)sender
 {
 	[mScanTunersButton setEnabled:NO];
-	[mTunerScanProgressIndicator setHidden:NO];
-	[mTunerScanProgressIndicator startAnimation:sender];
 	
-#if SCAN_DISABLED
-	int count = 1;
-	struct hdhomerun_discover_device_t result_list[1];
-	result_list[0].device_id = 0x10100B88;
-#else
-	struct hdhomerun_discover_device_t result_list[64];
-	int count = hdhomerun_discover_find_devices(HDHOMERUN_DEVICE_TYPE_TUNER, result_list, 64);
-#endif
-	
-	[mTunerScanProgressIndicator stopAnimation:sender];
-	[mTunerScanProgressIndicator setHidden:YES];
-
-	if (count > 0)
-	{
-		int i=0;
-		BOOL devicesAdded = NO;
-		for (i=0; i < count; i++)
-		{
-			// Send a message to the background server to get it to create a matching Device
-			if ([[[NSApp delegate] recServer] addHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id]])
-				devicesAdded = YES;
-
-			// See if an entry already exists
-			HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-			if (!anHDHomeRun)
-			{
-			  // Otherwise we just create a new one
-			  [HDHomeRun createHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
-			}
-		}
-	}
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceScanCompleteNotification:) name:RSDeviceScanCompleteNotification object:[NSApp delegate]];
+	[[[NSApp delegate] recServer] scanForHDHomeRunDevices:self];
 	
 	[mScanTunersButton setEnabled:YES];
 }
@@ -616,16 +578,12 @@ static Preferences *sSharedInstance = nil;
   
   if (returnCode == NSAlertFirstButtonReturn)
   {
-
-      mAbortChannelScan = NO;
       mChannelScanInProgress = YES;
-      
-      [mScanChannelsButton setTitle:@"Stop"];
+      [mScanChannelsButton setEnabled:NO];
 
-      [mChannelScanProgressIndicator setHidden:NO];
-      [mChannelScanProgressIndicator setDoubleValue:0];
-	
-      [aTuner scanActionReportingProgressTo:self];
+	  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(channelScanCompleteNotification:) name:RSChannelScanCompleteNotification object:[NSApp delegate]];
+  
+	  [[[NSApp delegate] recServer] scanForChannelsOnHDHomeRunDeviceID:[[aTuner device] deviceID] tunerIndex:[aTuner index]];
   }
 }
 
@@ -635,7 +593,7 @@ static Preferences *sSharedInstance = nil;
 
   if (mChannelScanInProgress)
   {
-    mAbortChannelScan = YES;
+		// Already scanning nothing to do
   }
   else if (aTuner)
   {
@@ -721,34 +679,14 @@ static Preferences *sSharedInstance = nil;
 		   contextInfo:sender];
 }
 
-#pragma mark Channel Scan Progress Display Protocol
-
-- (void) incrementChannelScanProgress
-{
-  [mChannelScanProgressIndicator incrementBy:1.0];
-}
-
-- (BOOL) abortChannelScan
-{
-  return mAbortChannelScan;
-}
-
-- (void) scanCompletedOnTuner:(HDHomeRunTuner*)inTuner
-{
-	mChannelScanInProgress = NO;
-	[mScanChannelsButton setTitle:@"Scan"];
-	[mChannelScanProgressIndicator setHidden:YES];
-
-	[self pushHDHomeRunStationsOnTuner:inTuner];
-}
-
 #pragma mark Callback & Notification Methods
 
 - (void) parsingCompleteNotification:(NSNotification *)aNotification
 {
   [mParsingProgressIndicator setHidden:YES];
   [mRetrieveLineupsButton setEnabled:YES];
-  
+  NSError *error = nil;
+  [mLineupsArrayController fetchWithRequest:[mLineupsArrayController defaultFetchRequest] merge:NO error:&error];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:[NSApp delegate]];
 }
@@ -760,6 +698,22 @@ static Preferences *sSharedInstance = nil;
   
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:[NSApp delegate]];
+}
+
+- (void) channelScanCompleteNotification:(NSNotification*)aNotification
+{
+	NSError *error = nil;
+	[mVisibleStationsArrayController fetchWithRequest:[mVisibleStationsArrayController defaultFetchRequest] merge:NO error:&error];
+	mChannelScanInProgress = NO;
+	[mScanChannelsButton setEnabled:YES];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:RSChannelScanCompleteNotification object:[NSApp delegate]];
+}
+
+- (void) deviceScanCompleteNotification:(NSNotification*)aNotification
+{
+	NSError *error = nil;
+	[mHDHomeRunDevicesArrayController fetchWithRequest:[mHDHomeRunDevicesArrayController defaultFetchRequest] merge:NO error:&error];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:[NSApp delegate]];
 }
 
 #pragma mark Open/Save Panel Delegate Methods

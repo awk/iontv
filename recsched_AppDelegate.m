@@ -33,6 +33,14 @@
 
 NSString *RSParsingCompleteNotification = @"RSParsingCompleteNotification";
 NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
+NSString *RSDeviceScanCompleteNotification = @"RSDeviceScanCompleteNotification";
+NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotification";
+
+@interface recsched_AppDelegate(private)
+
+- (void) installBackgroundServer;
+
+@end
 
 @interface RSIsOneOrLessNumberValueTransformer : NSValueTransformer
 {
@@ -64,6 +72,48 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 
 #pragma mark - Server Communication
 
+- (void) installBackgroundServer
+{
+#if 0
+	OSStatus status;
+	AuthorizationRef adminAuthRef;
+	
+	status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &adminAuthRef);
+	if (status != noErr)
+		return;
+		
+	AuthorizationItem adminAuthRightItem = {kAuthorizationRightExecute, 0, NULL, 0};
+	AuthorizationRights adminRights = {1, &adminAuthRightItem};
+
+	const char *utf8String = [[NSString stringWithString:@"iOnTV needs administrator privileges to install the background recording server. "] UTF8String];
+	AuthorizationItem adminAuthEnvItem = {kAuthorizationEnvironmentPrompt, strlen(utf8String), (void*) utf8String, 0};
+	AuthorizationEnvironment authEnvironment = {1, &adminAuthEnvItem};
+	AuthorizationFlags authFlags = kAuthorizationFlagDefaults |
+			kAuthorizationFlagInteractionAllowed |
+			kAuthorizationFlagPreAuthorize |
+			kAuthorizationFlagExtendRights;
+			
+	status = AuthorizationCopyRights (adminAuthRef, &adminRights, &authEnvironment, authFlags, NULL );
+	if (status != noErr)
+		return;
+		
+	NSString *installBkgdServerAppPath = [[NSBundle mainBundle] pathForAuxiliaryExecutable:@"InstallBkgdServer"];
+	
+	// Launch the installation tool with the appropriate privileges
+	status = AuthorizationExecuteWithPrivileges(adminAuthRef, [installBkgdServerAppPath cStringUsingEncoding:NSASCIIStringEncoding], kAuthorizationFlagDefaults, NULL /*args*/, NULL);
+	
+	// Free the authorization reference
+	//AuthorizationFree(adminAuthRef, kAuthorizationFlagDefaults);
+#endif
+
+	// LaunchAgents seem unreliable - if we need a connection to the User Interface then we probably need to create login item, for now we'll just start it manually here using
+	// NSTask
+	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
+	NSString *backgroundServerPath = [bundlePath stringByAppendingPathComponent:@"Contents/Support/recsched_bkgd.app/Contents/MacOS/recsched_bkgd"];
+	[NSTask launchedTaskWithLaunchPath:backgroundServerPath arguments:[NSArray array]];
+	
+}
+
 - (void) initializeServerConnection
 {
   // Connect to server
@@ -74,6 +124,9 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
   {
     NSLog(@"couldn't connect with server\n");
     [mServerMenuItem setTitle:@"Connect to Server"];
+	
+	// Attempt to install the background server as a launch agent
+	[self installBackgroundServer];
   }
   else
   {
@@ -122,7 +175,7 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 	// Register ourselves for the display/feedback methods called by the server
     NSConnection *theConnection;
 
-    theConnection = [NSConnection defaultConnection];
+    theConnection = [[NSConnection alloc] init];
     [theConnection setRootObject:self];
     if ([theConnection registerName:kRSStoreUpdateConnectionName] == NO) 
     {
@@ -130,8 +183,9 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
             NSLog(@"Error registering connection");
     }
 	else
+	{
 		[[self recServer] storeUpdateAvailable];
-	
+	}
   }
   return self;
 }
@@ -369,9 +423,6 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 
 - (void) parsingComplete:(id)info
 {
-	// Refresh our managed object context with the new data
-	[[self managedObjectContext] reset];
-	
 	NSDictionary *infoDict = nil;
 	if (info)
 		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"parsingCompleteInfo"];
@@ -394,6 +445,28 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"downloadErrorInfo"];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:self userInfo:infoDict];
+}
+
+- (void) deviceScanComplete:(id)info
+{
+	NSDictionary *infoDict = nil;
+	if (info)
+		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"deviceScanCompleteInfo"];
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:RSDeviceScanCompleteNotification object:self userInfo:infoDict];
+
+	NSLog(@"Device Scan Complete");
+}
+
+- (void) channelScanComplete:(id)info
+{
+	NSDictionary *infoDict = nil;
+	if (info)
+		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"channelScanCompleteInfo"];
+
+	[[NSNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:self userInfo:infoDict];
+
+	NSLog(@"Channel Scan Complete");
 }
 
 @synthesize mRecServer;

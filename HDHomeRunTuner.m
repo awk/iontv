@@ -19,16 +19,32 @@
 #import "HDHomeRunMO.h"
 #import "hdhomerun_channelscan.h"
 #import "hdhomerun_video.h"
-#import "ChannelScanProgressDisplayProtocol.h"
+#import "RSActivityDisplayProtocol.h"
 #import "Z2ITLineupMap.h"
 #import "Z2ITLineup.h"
 #import "Z2ITStation.h"
+#import "recsched_bkgd_AppDelegate.h"
+#import "RecSchedServer.h"
+#import "RSStoreUpdateProtocol.h"
 
 @interface HDHomeRunTunerChannelScanThread : NSObject
 
 + (void) performScan:(HDHomeRunTuner*)aTuner;
 
 @end;
+
+// coalesce these into one @interface HDHomeRunTuner (CoreDataGeneratedPrimitiveAccessors) section
+@interface HDHomeRunTuner (CoreDataGeneratedPrimitiveAccessors)
+
+- (HDHomeRun*)primitiveDevice;
+- (void)setPrimitiveDevice:(HDHomeRun*)value;
+
+@end
+
+@interface HDHomeRunTuner (Private)
+- (void) createHDHRDevice;
+- (void) releaseHDHRDevice;
+@end
 
 @implementation HDHomeRunTuner
 
@@ -51,23 +67,60 @@
 
 - (void) deleteAllChannelsInMOC:(NSManagedObjectContext *)inMOC
 {
-  NSMutableSet *channels = [self mutableSetValueForKey:@"channels"];
-  while ([channels count] > 0)
+  NSArray *channelsArray = [self.channels allObjects];
+  for (HDHomeRunChannel *aChannel in channelsArray)
   {
-    HDHomeRunChannel *aChannel = [channels anyObject];
-    [inMOC deleteObject:aChannel];
-    [channels removeObject:aChannel];
+	// We need to be careful here since the MOC that 'self' is in may not be the same as the MOC
+	// we're using - the data will lineup but pointers to objects in relationships will be different.
+	// So use objectWithID: to retrieve the relevant channel object from the other MOC.
+	HDHomeRunChannel *channelInMOC = (HDHomeRunChannel*) [inMOC objectWithID:[aChannel objectID]];
+    [inMOC deleteObject:channelInMOC];
   }
+}
+
+@dynamic device;
+
+
+- (HDHomeRun *)device 
+{
+    id tmpObject;
+    
+    [self willAccessValueForKey:@"device"];
+    tmpObject = [self primitiveDevice];
+    [self didAccessValueForKey:@"device"];
+    
+    return tmpObject;
+}
+
+- (void)setDevice:(HDHomeRun *)value 
+{
+    [self willChangeValueForKey:@"device"];
+	if (self.device)
+	{
+		[self.device removeObserver:self forKeyPath:@"name"];
+		[self releaseHDHRDevice];
+	}
+    [self setPrimitiveDevice:value];
+	if (value)
+	{
+		[self createHDHRDevice];
+		[self.device addObserver:self forKeyPath:@"name" options:0 context:nil];
+	}
+    [self didChangeValueForKey:@"device"];
+}
+
+
+- (BOOL)validateDevice:(id *)valueRef error:(NSError **)outError 
+{
+    // Insert custom validation logic here.
+    return YES;
 }
 
 #pragma mark - Actions
 
 - (void) scanActionReportingProgressTo:(id)progressDisplay
 {
-      // Delete any channels we might currently have - they're going to get replaced in the scan
-      [self deleteAllChannelsInMOC:[self managedObjectContext]];
-      
-  mCurrentProgressDisplay = [progressDisplay retain];
+  mCurrentProgressDisplay = progressDisplay;
     [NSThread detachNewThreadSelector:@selector(performScan:) toTarget:[HDHomeRunTunerChannelScanThread class] withObject:self];
 }
 
@@ -280,134 +333,132 @@
   
   NSLog(@"%@ %@", type, data);
   
-  if (mCurrentProgressDisplay && [mCurrentProgressDisplay conformsToProtocol:@protocol(ChannelScanProgressDisplay)])
+  if ([type compare:@"SCANNING"] == NSOrderedSame)
   {
-      if ([type compare:@"SCANNING"] == NSOrderedSame)
-      {
-        [mCurrentProgressDisplay incrementChannelScanProgress];
-        
-        if (mCurrentHDHomeRunChannel)
-        {
-          // We have a current channel - does it have any stations ?
-          if ([[mCurrentHDHomeRunChannel stations] count] == 0)
-          {
-            // No - so delete it
-            [inMOC deleteObject:mCurrentHDHomeRunChannel];
-            mCurrentHDHomeRunChannel = nil;
-          }
-        }
-        
-        // Parse the channel type and number details from the data string
-        NSString *channelTypeStr;
-        NSNumber *channelNumber;
-        
-        // Channel scanning data has the form : 489000000 (us-cable:68, us-irc:68)  -OR- 485000000 (us-bcast:16)
-        // We need to take the data after the opening bracket and use it to create the channel type and number
-        NSRange openingBracket = [data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"("]];
-        NSString *typeNumberStr = [data substringFromIndex:openingBracket.location+1];
-        NSRange colon = [typeNumberStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]];
-        channelTypeStr = [typeNumberStr substringToIndex:colon.location];
-        NSString *channelNumberStr = [typeNumberStr substringFromIndex:colon.location+1];
-        NSRange endOfNumber = [channelNumberStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@",)"]];
-        channelNumber = [NSNumber numberWithInt:[[channelNumberStr substringToIndex:endOfNumber.location] intValue]];
-        
-        // Create a HDHomeRunChannel to match
-        HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:channelTypeStr andNumber:channelNumber inManagedObjectContext:inMOC];
-        
-        // Set the 'current' scanning channel to the one we just created - if there's no lock or programs on this channel we'll delete
-        // it later.
-        mCurrentHDHomeRunChannel = aChannel;
-      }
+	[mCurrentProgressDisplay setActivity:mCurrentActivityToken infoString:[NSString stringWithFormat:@"Scanning on Device %@ Tuner:%d %@", self.device.name, [self.index intValue]+1, data]];
+	[mCurrentProgressDisplay setActivity:mCurrentActivityToken incrementBy:1.0];
+	
+	if (mCurrentHDHomeRunChannel)
+	{
+	  // We have a current channel - does it have any stations ?
+	  if ([[mCurrentHDHomeRunChannel stations] count] == 0)
+	  {
+		// No - so delete it
+		[inMOC deleteObject:mCurrentHDHomeRunChannel];
+		mCurrentHDHomeRunChannel = nil;
+	  }
+	}
+	
+	// Parse the channel type and number details from the data string
+	NSString *channelTypeStr;
+	NSNumber *channelNumber;
+	
+	// Channel scanning data has the form : 489000000 (us-cable:68, us-irc:68)  -OR- 485000000 (us-bcast:16)
+	// We need to take the data after the opening bracket and use it to create the channel type and number
+	NSRange openingBracket = [data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"("]];
+	NSString *typeNumberStr = [data substringFromIndex:openingBracket.location+1];
+	NSRange colon = [typeNumberStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]];
+	channelTypeStr = [typeNumberStr substringToIndex:colon.location];
+	NSString *channelNumberStr = [typeNumberStr substringFromIndex:colon.location+1];
+	NSRange endOfNumber = [channelNumberStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@",)"]];
+	channelNumber = [NSNumber numberWithInt:[[channelNumberStr substringToIndex:endOfNumber.location] intValue]];
+	
+	// Create a HDHomeRunChannel to match
+	HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:channelTypeStr andNumber:channelNumber inManagedObjectContext:inMOC];
+	
+	// Set the 'current' scanning channel to the one we just created - if there's no lock or programs on this channel we'll delete
+	// it later.
+	mCurrentHDHomeRunChannel = aChannel;
+  }
 
-      if ([type compare:@"LOCK"] == NSOrderedSame)
-      {
-        // We have some type of lock (perhaps none though).
-        if ([data rangeOfString:@"none"].location != NSNotFound)
-        {
-          // No Lock - delete and reset the current channel
-          [inMOC deleteObject:mCurrentHDHomeRunChannel];
-          mCurrentHDHomeRunChannel = nil;
-        }
-        else if ([data rangeOfString:@"(ntsc)"].location != NSNotFound)
-        {
-          // Lock, but on an ntsc channel, nothing we can do here - delete and reset the current channel
-          [inMOC deleteObject:mCurrentHDHomeRunChannel];
-          mCurrentHDHomeRunChannel = nil;
-        }
-        else
-        {
-          // Extract the tuningType (qam256, qam64, 8vsb etc.)
-          NSString *tuningTypeStr = [data substringToIndex:[data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@" "]].location];
-          
-          // Set the tuningType on the current Channel object
-          [mCurrentHDHomeRunChannel setTuningType:tuningTypeStr];
-          
-          // And add it to this tuners list of channels - however we can't just use 'self' here since that object
-		  // may be in a different managed object context. Instead we'll use objectForID to find the matching Tuner in
-		  // the inMoc context
-		  HDHomeRunTuner *tunerInThreadMOC = (HDHomeRunTuner*) [inMOC objectWithID:[self objectID]];
-		  [tunerInThreadMOC addChannelsObject:mCurrentHDHomeRunChannel];
-        }
-      }
-      
-      if ([type compare:@"PROGRAM"] == NSOrderedSame)
-      {
-        // We have a program - is it encrypted ?
-        if (([data rangeOfString:@"(encrypted)"].location == NSNotFound)
-              && ([data rangeOfString:@"(no data)"].location == NSNotFound)
-              && ([data rangeOfString:@"internet"].location == NSNotFound)
-              && ([data rangeOfString:@"none"].location == NSNotFound))
-        {
-          // The data line will look like :
-          //    30103: 2.2 WGBH-HD
-          // or
-          //    13668: 0.0
-          // if there's no encoded FCC Channel details or callsign. We need to break up the details add build an HDHomeRunStation object
-          NSRange colonRange = [data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]];
-          NSString *programNumberString = [data substringToIndex:colonRange.location];
-          NSString *channelNumberAndCallsignString = [data substringFromIndex:colonRange.location+2];
-          NSString *channelNumberString;
-          NSString *callSignString = nil;
-          
-          NSRange spaceRange = [channelNumberAndCallsignString rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@" "]];
-          if (spaceRange.location != NSNotFound)
-          {
-            channelNumberString = [channelNumberAndCallsignString substringToIndex:spaceRange.location];
-            callSignString = [channelNumberAndCallsignString substringFromIndex:spaceRange.location+1];
-          }
-          else
-          {
-            // No Callsign
-            channelNumberString = channelNumberAndCallsignString;
-          }
-          
-          // SchedulesDirect listings use a number for minor part of the channel details, and a string for the major part
-          NSNumber *channelMinor;
-          NSString *channelMajor;
-          
-          NSRange sepRange = [channelNumberString rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"."]];
-          channelMajor = [channelNumberString substringToIndex:sepRange.location];
-          channelMinor = [NSNumber numberWithInt:[[channelNumberString substringFromIndex:sepRange.location+1] intValue]];
+  if ([type compare:@"LOCK"] == NSOrderedSame)
+  {
+	// We have some type of lock (perhaps none though).
+	if ([data rangeOfString:@"none"].location != NSNotFound)
+	{
+	  // No Lock - delete and reset the current channel
+	  [inMOC deleteObject:mCurrentHDHomeRunChannel];
+	  mCurrentHDHomeRunChannel = nil;
+	}
+	else if ([data rangeOfString:@"(ntsc)"].location != NSNotFound)
+	{
+	  // Lock, but on an ntsc channel, nothing we can do here - delete and reset the current channel
+	  [inMOC deleteObject:mCurrentHDHomeRunChannel];
+	  mCurrentHDHomeRunChannel = nil;
+	}
+	else
+	{
+	  // Extract the tuningType (qam256, qam64, 8vsb etc.)
+	  NSString *tuningTypeStr = [data substringToIndex:[data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@" "]].location];
+	  
+	  // Set the tuningType on the current Channel object
+	  [mCurrentHDHomeRunChannel setTuningType:tuningTypeStr];
+	  
+	  // And add it to this tuners list of channels - however we can't just use 'self' here since that object
+	  // may be in a different managed object context. Instead we'll use objectForID to find the matching Tuner in
+	  // the inMoc context
+	  HDHomeRunTuner *tunerInThreadMOC = (HDHomeRunTuner*) [inMOC objectWithID:[self objectID]];
+	  [tunerInThreadMOC addChannelsObject:mCurrentHDHomeRunChannel];
+	}
+  }
+  
+  if ([type compare:@"PROGRAM"] == NSOrderedSame)
+  {
+	// We have a program - is it encrypted ?
+	if (([data rangeOfString:@"(encrypted)"].location == NSNotFound)
+		  && ([data rangeOfString:@"(no data)"].location == NSNotFound)
+		  && ([data rangeOfString:@"internet"].location == NSNotFound)
+		  && ([data rangeOfString:@"none"].location == NSNotFound))
+	{
+	  // The data line will look like :
+	  //    30103: 2.2 WGBH-HD
+	  // or
+	  //    13668: 0.0
+	  // if there's no encoded FCC Channel details or callsign. We need to break up the details add build an HDHomeRunStation object
+	  NSRange colonRange = [data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]];
+	  NSString *programNumberString = [data substringToIndex:colonRange.location];
+	  NSString *channelNumberAndCallsignString = [data substringFromIndex:colonRange.location+2];
+	  NSString *channelNumberString;
+	  NSString *callSignString = nil;
+	  
+	  NSRange spaceRange = [channelNumberAndCallsignString rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@" "]];
+	  if (spaceRange.location != NSNotFound)
+	  {
+		channelNumberString = [channelNumberAndCallsignString substringToIndex:spaceRange.location];
+		callSignString = [channelNumberAndCallsignString substringFromIndex:spaceRange.location+1];
+	  }
+	  else
+	  {
+		// No Callsign
+		channelNumberString = channelNumberAndCallsignString;
+	  }
+	  
+	  // SchedulesDirect listings use a number for minor part of the channel details, and a string for the major part
+	  NSNumber *channelMinor;
+	  NSString *channelMajor;
+	  
+	  NSRange sepRange = [channelNumberString rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"."]];
+	  channelMajor = [channelNumberString substringToIndex:sepRange.location];
+	  channelMinor = [NSNumber numberWithInt:[[channelNumberString substringFromIndex:sepRange.location+1] intValue]];
 
-          NSNumber *programNumber = [NSNumber numberWithInt:[programNumberString intValue]];
-          HDHomeRunStation *aStation = [HDHomeRunStation createStationWithProgramNumber:programNumber forChannel:mCurrentHDHomeRunChannel inManagedObjectContext:inMOC];
+	  NSNumber *programNumber = [NSNumber numberWithInt:[programNumberString intValue]];
+	  HDHomeRunStation *aStation = [HDHomeRunStation createStationWithProgramNumber:programNumber forChannel:mCurrentHDHomeRunChannel inManagedObjectContext:inMOC];
 
-          if (callSignString)
-          {
-            [aStation setCallSign:callSignString];
-			Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[inMOC objectWithID:[[self lineup] objectID]];
-            Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:callSignString inLineup:lineupInThreadMOC inManagedObjectContext:inMOC];
-            if (aZ2ITStation)
-              [aStation setZ2itStation:aZ2ITStation];
-          }
-        }
-      }
-      
-      if ([mCurrentProgressDisplay abortChannelScan])
-      {
-        NSLog(@"Abort Channel Scan");
-        continueScan = 0;
-      }
+	  if (callSignString)
+	  {
+		[aStation setCallSign:callSignString];
+		Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[inMOC objectWithID:[[self lineup] objectID]];
+		Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:callSignString inLineup:lineupInThreadMOC inManagedObjectContext:inMOC];
+		if (aZ2ITStation)
+		  [aStation setZ2itStation:aZ2ITStation];
+	  }
+	}
+  }
+  
+  if ([mCurrentProgressDisplay shouldCancelActivity:mCurrentActivityToken])
+  {
+	NSLog(@"Abort Channel Scan");
+	continueScan = 0;
   }
   return continueScan;
 }
@@ -426,7 +477,17 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
     NSPersistentStoreCoordinator *psc = [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator];
     NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
     [managedObjectContext setPersistentStoreCoordinator: psc];
-
+	
+      // Delete any channels we might currently have - they're going to get replaced in the scan
+      [self deleteAllChannelsInMOC:managedObjectContext];
+      
+	mCurrentActivityToken = 0;
+	if (mCurrentProgressDisplay)
+	{
+		mCurrentActivityToken = [mCurrentProgressDisplay createActivity];
+		[mCurrentProgressDisplay setActivity:mCurrentActivityToken progressMaxValue:390.0f];		// There are a maximum of 390 channels to scan per tuner !
+	}
+	
     mCurrentHDHomeRunChannel = nil;
     
     [psc lock];
@@ -444,7 +505,9 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   {
     NSLog(@"Exception during scan = %@, reason: %@", [anException name], [anException reason]); 
   }
-  [mCurrentProgressDisplay scanCompletedOnTuner:self];
+  
+  if (mCurrentActivityToken)
+	[mCurrentProgressDisplay endActivity:mCurrentActivityToken];
   
   if (mCurrentHDHomeRunChannel && [[mCurrentHDHomeRunChannel stations] count] == 0)
   {
@@ -459,11 +522,17 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
       name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   
+  NSError *error = nil;
+  if (![managedObjectContext save:&error])
+  {
+    NSLog(@"Channel scan - save returned an error %@", error);
+  }
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   
   [psc unlock];
   
-  [mCurrentProgressDisplay release];
+  [[[[NSApp delegate] recServer] storeUpdate] channelScanComplete:nil];
+  
   mCurrentProgressDisplay = nil;
 }
 
@@ -597,6 +666,14 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 
 @end
 
+// coalesce these into one @interface HDHomeRunStation (CoreDataGeneratedPrimitiveAccessors) section
+@interface HDHomeRunStation (CoreDataGeneratedPrimitiveAccessors)
+
+- (HDHomeRunChannel*)primitiveChannel;
+- (void)setPrimitiveChannel:(HDHomeRunChannel*)value;
+
+@end
+
 @implementation HDHomeRunStation
 
 + (HDHomeRunStation*) createStationWithProgramNumber:(NSNumber*)inProgramNumber forChannel:(HDHomeRunChannel*)inChannel inManagedObjectContext:(NSManagedObjectContext*)inMOC
@@ -625,6 +702,40 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 {
 	if ([self channel])
 		[[self channel] removeObserver:self forKeyPath:@"channelNumber"];
+}
+@dynamic channel;
+
+- (HDHomeRunChannel *)channel 
+{
+    id tmpObject;
+    
+    [self willAccessValueForKey:@"channel"];
+    tmpObject = [self primitiveChannel];
+    [self didAccessValueForKey:@"channel"];
+    
+    return tmpObject;
+}
+
+- (void)setChannel:(HDHomeRunChannel *)value 
+{
+	if (self.channel)
+	{
+		[self.channel removeObserver:self forKeyPath:@"channelNumber"];
+	}
+    [self willChangeValueForKey:@"channel"];
+    [self setPrimitiveChannel:value];
+    [self didChangeValueForKey:@"channel"];
+	if (self.channel)
+	{
+		[self.channel addObserver:self forKeyPath:@"channelNumber" options:0 context:nil];
+	}
+}
+
+
+- (BOOL)validateChannel:(id *)valueRef error:(NSError **)outError 
+{
+    // Insert custom validation logic here.
+    return YES;
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -681,7 +792,6 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 
 @dynamic callSign;
 @dynamic programNumber;
-@dynamic channel;
 @dynamic z2itStation;
 
 - (NSString*) channelAndProgramNumber

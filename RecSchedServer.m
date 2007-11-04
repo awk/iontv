@@ -20,6 +20,7 @@
 #import "RecSchedServer.h"
 #import "recsched_bkgd_AppDelegate.h"
 #import "HDHomeRunMO.h"
+#import "hdhomerun.h"
 #import "tvDataDelivery.h"
 #import "Z2ITLineup.h"
 #import "Z2ITProgram.h"
@@ -158,6 +159,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   }
 }
 
+#pragma mark Activity Protocol Methods
+
 - (size_t) createActivity
 {
 	NSDictionary *anActivity = [[NSMutableDictionary alloc] initWithCapacity:3]; 
@@ -195,6 +198,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	return NO;
 }
 
+#pragma mark Store Update Protocol Methods
+
 - (void) parsingComplete:(id)info
 {
 	NSLog(@"parsingComplete");
@@ -219,6 +224,16 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 - (void) downloadError:(id)info
 {
 	NSLog(@"downloadError %@", info);
+}
+
+- (void) deviceScanComplete:(id)info
+{
+	NSLog(@"deviceScanComplete %@", info);
+}
+
+- (void) channelScanComplete:(id)info
+{
+	NSLog(@"channelScanComplete %@", info);
 }
 
 - (void) recordingComplete:(NSManagedObjectID *)aRecordingObjectID
@@ -323,8 +338,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		{
 			[[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
 			NSError *error = nil;
-			[[[NSApp delegate] managedObjectContext] save:&error];
-			if (error)
+			if (![[[NSApp delegate] managedObjectContext] save:&error])
 				NSLog(@"addRecordingOfSchedule - error occured during save %@", error);
 		}
 	}
@@ -343,6 +357,64 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   [updatedCallData setValue:self forKey:@"dataRecipient"];
   [updatedCallData setValue:[self uiActivity] forKey:@"reportProgressTo"];
   [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:updatedCallData];
+}
+
+- (void) scanForHDHomeRunDevices:(id)sender
+{
+	struct hdhomerun_discover_device_t result_list[64];
+	NSMutableArray *newHDHomeRuns = [NSMutableArray arrayWithCapacity:5];
+	NSMutableArray *existingHDHomeRuns = [NSMutableArray arrayWithCapacity:5];
+	size_t activityToken = [[self uiActivity] createActivity];
+  
+	[[self uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Looking for HDHomeRun Devices"]]; 
+	[[self uiActivity] setActivity:activityToken progressIndeterminate:YES];
+	
+	int count = hdhomerun_discover_find_devices(HDHOMERUN_DEVICE_TYPE_TUNER, result_list, 64);
+	
+	if (count > 0)
+	{
+		int i=0;
+		for (i=0; i < count; i++)
+		{
+			// See if an entry already exists
+			HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+			if (!anHDHomeRun)
+			{
+			  // Otherwise we just create a new one
+			  anHDHomeRun = [HDHomeRun createHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+			  [newHDHomeRuns addObject:anHDHomeRun];
+			  [anHDHomeRun setName:[NSString stringWithFormat:@"Tuner 0x%x", result_list[i].device_id]];
+			}
+			else
+				[existingHDHomeRuns addObject:anHDHomeRun];
+		}
+	}
+	[[self uiActivity] endActivity:activityToken];
+	NSError *error = nil;
+	if (![[[NSApp delegate] managedObjectContext] save:&error])
+	{
+		NSLog(@"scanForHDHomeRunDevices - saving context reported error %@", error);
+	}
+	NSDictionary *scanInfo = [NSDictionary dictionaryWithObjectsAndKeys:existingHDHomeRuns, @"existingHDHomeRuns", newHDHomeRuns, @"newHDHomeRuns", nil];
+	[[self storeUpdate] deviceScanComplete:scanInfo];
+}
+
+
+- (void) scanForChannelsOnHDHomeRunDeviceID:(NSNumber*)deviceID tunerIndex:(NSNumber*)tunerIndex
+{
+	HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:deviceID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	if (!anHDHomeRun)
+	{
+		NSLog(@"scanForChannelsOnHDHomeRunDeviceID:%@ - No Device Found !", deviceID);
+		return;
+	}
+	HDHomeRunTuner *aTuner = [anHDHomeRun tunerWithIndex:[tunerIndex intValue]];
+	if (!aTuner)
+	{
+		NSLog(@"scanForChannelsOnHDHomeRunDeviceID:%@ tunerIndex:%@ - No Tuner Found !", deviceID, tunerIndex);
+		return;
+	}
+	[aTuner scanActionReportingProgressTo:[self uiActivity]];
 }
 
 // Add an HDHomeRun device with the specified ID - return YES if a new device was created and added.
@@ -368,9 +440,15 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		[anHDHomeRun setName:name];
 		
 		Z2ITLineup *aLineup = [Z2ITLineup fetchLineupWithID:tuner0LineupID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-		[[anHDHomeRun tuner0] setLineup:aLineup];
+		anHDHomeRun.tuner0.lineup = aLineup;
 		aLineup = [Z2ITLineup fetchLineupWithID:tuner1LineupID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-		[[anHDHomeRun tuner1] setLineup:aLineup];
+		anHDHomeRun.tuner1.lineup = aLineup;
+
+		NSError *error = nil;
+		if (![[[NSApp delegate] managedObjectContext] save:&error])
+		{
+			NSLog(@"setHDHomeRunDeviceWithID - saving context reported error %@, info = %@", error, [error userInfo]);
+		}
 	}
 	else
 	{
@@ -409,10 +487,9 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 			if (channelIdx > 0) 
 			{ 
 				// processed some stations - save the MOC 
-				NSError *error;
-				[[[NSApp delegate] managedObjectContext] save:&error];
-				if (error)
-					NSLog(@"addRecordingOfSchedule - error occured during save %@", error);
+				NSError *error = nil;
+				if (![[[NSApp delegate] managedObjectContext] save:&error])
+					NSLog(@"setHDHomeRunChannelsAndStations - error occured during save %@", error);
 			} 
 		} 
 	} 
