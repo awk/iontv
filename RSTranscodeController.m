@@ -313,7 +313,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		[mTranscodingsArrayController setManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 		[mTranscodingsArrayController setEntityName:@"Transcoding"];
 		[mTranscodingsArrayController setAutomaticallyPreparesContent:YES];
-		[mTranscodingsArrayController fetchWithRequest:[mTranscodingsArrayController defaultFetchRequest] merge:YES error:nil];
+		[mTranscodingsArrayController fetchWithRequest:[mTranscodingsArrayController defaultFetchRequest] merge:NO error:nil];
 		[mTranscodingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
 
 		mRecordingsArrayController = [[NSArrayController alloc] initWithContent:nil];
@@ -321,7 +321,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		[mRecordingsArrayController setEntityName:@"Recording"];
 		[mRecordingsArrayController setFetchPredicate:[NSPredicate predicateWithFormat:@"status == %@", [NSNumber numberWithInt:RSRecordingFinishedStatus]]];
 		[mRecordingsArrayController setAutomaticallyPreparesContent:YES];
-		[mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:YES error:nil];
+		[mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:NO error:nil];
 		[mRecordingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
 
 		// Set up any initial transcodings
