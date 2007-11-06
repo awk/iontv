@@ -1249,7 +1249,7 @@
 				INFOPLIST_FILE = "BkgdServer/recsched_bkgd-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = (
-					build/Debug,
+					build/Release,
 					../HandBrake/libhb,
 					../HandBrake/contrib/lib,
 				);
