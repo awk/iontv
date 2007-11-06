@@ -280,17 +280,33 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   
   
   // Restore our previous lineup choice
-  NSURL *lineupObjectURI = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] stringForKey:kCurrentLineupURIKey]];
-  NSManagedObjectID *lineupObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:lineupObjectURI];
-  Z2ITLineup *aLineup = (Z2ITLineup*) [[[NSApp delegate] managedObjectContext] objectWithID:lineupObjectID];
-  [mCurrentLineup setContent:aLineup];
-
+  NSString *lineupObjectURIString = [[NSUserDefaults standardUserDefaults] stringForKey:kCurrentLineupURIKey];
+  NSURL *lineupObjectURI = nil;
+  if (lineupObjectURIString)
+  {
+	lineupObjectURI = [NSURL URLWithString:lineupObjectURIString];
+	NSManagedObjectID *lineupObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:lineupObjectURI];
+	Z2ITLineup *aLineup = (Z2ITLineup*) [[[NSApp delegate] managedObjectContext] objectWithID:lineupObjectID];
+	[mCurrentLineup setContent:aLineup];
+  }
+  else
+  {
+	NSError *error = nil;
+	[mLineupsArrayController fetchWithRequest:[mLineupsArrayController defaultFetchRequest] merge:NO error:&error];
+	if (error == nil)
+		[mCurrentLineup setContent:[[mLineupsArrayController arrangedObjects] objectAtIndex:0]];
+  }
+  
   // Restore our previous schedule choice
-  NSURL *scheduleObjectURI = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] stringForKey:kCurrentScheduleURIKey]];
-  NSManagedObjectID *scheduleObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:scheduleObjectURI];
-  Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
-  [mCurrentSchedule setContent:aSchedule];
-
+  NSString *scheduleObjectURIString = [[NSUserDefaults standardUserDefaults] stringForKey:kCurrentScheduleURIKey];
+  NSURL *scheduleObjectURI = nil;
+  if (scheduleObjectURIString)
+  {
+	scheduleObjectURI = [NSURL URLWithString:scheduleObjectURIString];
+	NSManagedObjectID *scheduleObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:scheduleObjectURI];
+	Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
+	[mCurrentSchedule setContent:aSchedule];
+  }
 }
 
 - (void) dealloc
