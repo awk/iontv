@@ -334,7 +334,7 @@ NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotificatio
   [self launchVLCAction:sender withParentWindow:inParentWindow];
   
   if (mVLCTask)
-    [inStation startStreaming];
+    [inStation startStreamingToPort:1234];		// VLC Listens on Port 1234 by default
 }
 
 - (IBAction) quitServer:(id)sender
@@ -385,7 +385,7 @@ NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotificatio
   if (mVLCTask == nil)
   {
     [self launchVLCAction:self withParentWindow:nil];
-    [theStation startStreaming];
+    [theStation startStreamingToPort:1234];
   }
   
   [theStation release];

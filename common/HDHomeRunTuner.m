@@ -150,6 +150,39 @@
   }
 }
 
+- (void) startStreamingToPort:(int)portNumber
+{
+  int ret = 0;
+
+  @try
+  {
+    @synchronized(self)
+    {
+		/* Set target. */
+		char target[64];
+		uint32_t local_ip = hdhomerun_device_get_local_machine_addr(mHDHomeRunDevice);
+		sprintf(target, "%u.%u.%u.%u:%u",
+			(unsigned int)(local_ip >> 24) & 0xFF, (unsigned int)(local_ip >> 16) & 0xFF,
+			(unsigned int)(local_ip >> 8) & 0xFF, (unsigned int)(local_ip >> 0) & 0xFF,
+			(unsigned int)portNumber);
+
+		ret = hdhomerun_device_set_tuner_target(mHDHomeRunDevice, target);
+    }
+  }
+  @catch (NSException *exception)
+  {
+    NSLog(@"startStreaming Exception name: name: %@ reason: %@", [exception name], [exception reason]);
+  }
+  @finally 
+  {
+    if (ret < 1)
+    {
+      NSLog(@"startStreaming - communication error sending request to hdhomerun device - stream start (error = %d)", ret);
+      return;
+    }
+  }
+}
+
 - (void) stopStreaming
 {
  @try
@@ -760,6 +793,21 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   
   // Set our tuner to start streaming
   [[[self channel] tuner] startStreaming];
+}
+
+- (void) startStreamingToPort:(int)portNumber
+{
+	// Make sure we have a HDHR Device for the Tuner
+  [[[self channel] tuner] createHDHRDevice];
+  
+	// Set our tuner to the channel
+  [[[self channel] tuner] tuneToChannel:[self channel]];
+  
+  // Set our tuners filter for this program
+  [[[self channel] tuner] setFilterForProgramNumber:[self programNumber]];
+  
+  // Set our tuner to start streaming
+  [[[self channel] tuner] startStreamingToPort:portNumber];
 }
 
 - (void) stopStreaming

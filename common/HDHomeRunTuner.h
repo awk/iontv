@@ -106,6 +106,7 @@
 @property (retain) Z2ITStation * z2itStation;
 
 - (void) startStreaming;
+- (void) startStreamingToPort:(int)portNumber;
 - (void) stopStreaming;
 - (NSData *) receiveVideoData;
 
