@@ -458,7 +458,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 - (oneway void) setHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex
 {
-	NSLog(@"setHDHomeRunChannelsAndStations deviceID = %d, tunerIndex = %d", deviceID, tunerIndex); 
+//	NSLog(@"setHDHomeRunChannelsAndStations deviceID = %d, tunerIndex = %d", deviceID, tunerIndex); 
 
 	HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:deviceID] inManagedObjectContext:[[NSApp delegate] managedObjectContext]]; 
 	if (anHDHomeRun) 
@@ -467,15 +467,20 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		if (aTuner) 
 		{ 
 			// Remove all the channels current on the tuner - we're going to replace them.
+			NSArray *oldChannels = [[aTuner channels] allObjects];
+			for (HDHomeRunChannel *aChannel in oldChannels)
+			{
+				[[[NSApp delegate] managedObjectContext] deleteObject:aChannel];
+			}
 			[aTuner removeChannels:[aTuner channels]];
 			
-			int channelIdx = 0; 
 			for (NSDictionary *aChannelDictionary in channelsArray) 
 			{ 
-				NSLog(@"setHDHomeRunChannelsAndStations new channel number %d type %@ stations %@", [aChannelDictionary valueForKey:@"channelNumber"], [aChannelDictionary valueForKey:@"channelType"], [aChannelDictionary valueForKey:@"stations"]);
+//				NSLog(@"setHDHomeRunChannelsAndStations new channel number %d type %@ stations %@", [aChannelDictionary valueForKey:@"channelNumber"], [aChannelDictionary valueForKey:@"channelType"], [aChannelDictionary valueForKey:@"stations"]);
 				// Create a new channel for this tuner
 				HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:[aChannelDictionary valueForKey:@"channelType"] andNumber:[aChannelDictionary valueForKey:@"channelNumber"] inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 				[aTuner addChannelsObject:aChannel];
+				aChannel.tuner = aTuner;
 				
 				// Remove all the stations on the given channel - they'll be replaced with the data from the array 
 				[aChannel clearAllStations]; 
@@ -484,12 +489,14 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 				[aChannel importStationsFrom:[aChannelDictionary valueForKey:@"stations"]]; 
 			} 
 
-			if (channelIdx > 0) 
+			if ([channelsArray count] > 0) 
 			{ 
 				// processed some stations - save the MOC 
 				NSError *error = nil;
 				if (![[[NSApp delegate] managedObjectContext] save:&error])
 					NSLog(@"setHDHomeRunChannelsAndStations - error occured during save %@", error);
+				
+				[[self storeUpdate] channelScanComplete:nil];
 			} 
 		} 
 	} 

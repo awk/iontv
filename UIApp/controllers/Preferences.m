@@ -508,6 +508,12 @@ static Preferences *sSharedInstance = nil;
 			nameTo:[anHDHomeRunDevice name]
 			tuner0LineupIDTo:[[[anHDHomeRunDevice tuner0] lineup] lineupID]
 			tuner1LineupIDTo:[[[anHDHomeRunDevice tuner1] lineup] lineupID]];
+
+		NSArray *tuners = [[anHDHomeRunDevice tuners] allObjects];
+		for (HDHomeRunTuner *aTuner in tuners)
+		{
+			[self pushHDHomeRunStationsOnTuner:aTuner];
+		}
 	}
 }
 
