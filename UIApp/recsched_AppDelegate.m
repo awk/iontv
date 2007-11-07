@@ -127,8 +127,17 @@ NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotificatio
 	
 	// Attempt to install the background server as a launch agent
 	[self installBackgroundServer];
+	
+	// And try again with the connection - up to 5 times
+	int i=0;
+	for (i=0; (i < 5) && (mRecServer == nil); i++)
+	{
+		mRecServer = [[NSConnection rootProxyForConnectionWithRegisteredName:kRecServerConnectionName  host:nil] retain];
+		usleep(100000);	// Sleep for one tenth of a second.
+	}
   }
-  else
+  
+  if (mRecServer != nil)
   {
     //
     // set protocol for the remote object & then register ourselves with the 
