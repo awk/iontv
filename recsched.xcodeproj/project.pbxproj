@@ -88,6 +88,7 @@
 		EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
+		EAD023D80CE20F47002B7C37 /* libhb.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = EAD023D70CE20F42002B7C37 /* libhb.dylib */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
 		EAE3FB290C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */; };
 		EAE3FB2A0C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */; };
@@ -168,6 +169,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		EAD024070CE216B4002B7C37 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 6;
+			files = (
+				EAD023D80CE20F47002B7C37 /* libhb.dylib in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		EAF9241C0CCF930100CEBD73 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -292,6 +303,7 @@
 		EA93F8180C9C4A6E004788CF /* RSRecording.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecording.m; path = common/RSRecording.m; sourceTree = "<group>"; };
 		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSOutlineView.h; path = UIApp/views/RSOutlineView.h; sourceTree = "<group>"; };
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
+		EAD023D70CE20F42002B7C37 /* libhb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libhb.dylib; path = ../HandBrake/libhb/libhb.dylib; sourceTree = SOURCE_ROOT; };
 		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKSourceTableClasses.h; path = UIApp/views/AKSourceTableClasses.h; sourceTree = "<group>"; };
 		EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AKSourceTableClasses.m; path = UIApp/views/AKSourceTableClasses.m; sourceTree = "<group>"; };
 		EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_bkgd_prefix.pch; path = BkgdServer/recsched_bkgd_prefix.pch; sourceTree = "<group>"; };
@@ -469,6 +481,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EAD023D70CE20F42002B7C37 /* libhb.dylib */,
 				EA7002870CC4288500DA9542 /* ScriptingBridge.framework */,
 				EA20AE2D0C23612800A9BDBD /* SyncServices.framework */,
 				EA20ADB90C2330AC00A9BDBD /* Security.framework */,
@@ -749,6 +762,7 @@
 			buildConfigurationList = EAEC09340C272E4E00C40D5A /* Build configuration list for PBXNativeTarget "recsched_bkgd" */;
 			buildPhases = (
 				EAEC09290C272E1200C40D5A /* Resources */,
+				EAD024070CE216B4002B7C37 /* CopyFiles */,
 				EAEC092A0C272E1200C40D5A /* Sources */,
 				EAEC092B0C272E1200C40D5A /* Frameworks */,
 			);
@@ -1209,26 +1223,7 @@
 					Foundation,
 					"-framework",
 					AppKit,
-					../HandBrake/libhb/libhb.a,
-					../HandBrake/contrib/lib/libmp4v2.a,
-					../HandBrake/contrib/lib/liba52.a,
-					../HandBrake/contrib/lib/libavformat.a,
-					../HandBrake/contrib/lib/libavcodec.a,
-					../HandBrake/contrib/lib/libavutil.a,
-					../HandBrake/contrib/lib/libdvdread.a,
-					../HandBrake/contrib/lib/libdvdcss.a,
-					../HandBrake/contrib/lib/libfaac.a,
-					../HandBrake/contrib/lib/libmp3lame.a,
-					../HandBrake/contrib/lib/libmpeg2.a,
-					../HandBrake/contrib/lib/libvorbis.a,
-					../HandBrake/contrib/lib/libvorbisenc.a,
-					../HandBrake/contrib/lib/libogg.a,
-					../HandBrake/contrib/lib/libsamplerate.a,
-					../HandBrake/contrib/lib/libx264.a,
-					../HandBrake/contrib/lib/libxvidcore.a,
-					../HandBrake/contrib/lib/libdca.a,
-					../HandBrake/contrib/lib/libmkv.a,
-					../HandBrake/contrib/lib/libswscale.a,
+					"-lhb",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = recsched_bkgd;
@@ -1258,26 +1253,7 @@
 					Foundation,
 					"-framework",
 					AppKit,
-					../HandBrake/libhb/libhb.a,
-					../HandBrake/contrib/lib/libmp4v2.a,
-					../HandBrake/contrib/lib/liba52.a,
-					../HandBrake/contrib/lib/libavformat.a,
-					../HandBrake/contrib/lib/libavcodec.a,
-					../HandBrake/contrib/lib/libavutil.a,
-					../HandBrake/contrib/lib/libdvdread.a,
-					../HandBrake/contrib/lib/libdvdcss.a,
-					../HandBrake/contrib/lib/libfaac.a,
-					../HandBrake/contrib/lib/libmp3lame.a,
-					../HandBrake/contrib/lib/libmpeg2.a,
-					../HandBrake/contrib/lib/libvorbis.a,
-					../HandBrake/contrib/lib/libvorbisenc.a,
-					../HandBrake/contrib/lib/libogg.a,
-					../HandBrake/contrib/lib/libsamplerate.a,
-					../HandBrake/contrib/lib/libx264.a,
-					../HandBrake/contrib/lib/libxvidcore.a,
-					../HandBrake/contrib/lib/libdca.a,
-					../HandBrake/contrib/lib/libmkv.a,
-					../HandBrake/contrib/lib/libswscale.a,
+					"-lhb",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = recsched_bkgd;
