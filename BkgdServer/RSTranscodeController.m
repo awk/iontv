@@ -46,10 +46,19 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		
 			// Scan the recording for a title - this is a thread operation we need to wait for it to complete (or have a callback
 			// preferably) before we can continue on with creating the real transcode job ?
-			hb_scan(mHandbrakeHandle, [mCurrentTranscoding.schedule.recording.mediaFile UTF8String], 0);
+			if ([[NSFileManager defaultManager] fileExistsAtPath:mCurrentTranscoding.schedule.recording.mediaFile])
+			{
+				hb_scan(mHandbrakeHandle, [mCurrentTranscoding.schedule.recording.mediaFile UTF8String], 0);
 			
-			// Set a timer running to watch the progress of the scan
-			[NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(scanProgressTimerCallback:) userInfo:nil repeats:YES];
+				// Set a timer running to watch the progress of the scan
+				[NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(scanProgressTimerCallback:) userInfo:nil repeats:YES];
+			}
+			else
+			{
+				mCurrentTranscoding.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
+				[mCurrentTranscoding release];
+				mCurrentTranscoding = nil;
+			}
 		}
 	}
 }
@@ -325,7 +334,25 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		[mRecordingsArrayController addObserver:self forKeyPath:@"arrangedObjects" options:0 context:nil];
 
 		// Set up any initial transcodings
-		[self updateForCompletedRecordings:[mRecordingsArrayController arrangedObjects]];
+		for (RSRecording *aRecording in [mRecordingsArrayController arrangedObjects])
+		{
+			NSLog(@"Recording ID = %@ title = %@ status = %@\ntranscoding =\n %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding);
+			if (aRecording.schedule.transcoding == NULL)
+			{
+				// Create a new transcoding entity
+				RSTranscoding *aTranscoding = [NSEntityDescription insertNewObjectForEntityForName:@"Transcoding" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+				[aTranscoding setSchedule:aRecording.schedule];
+				[aTranscoding setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
+			}
+			else if ([aRecording.schedule.transcoding.status intValue] == RSRecordingInProgressStatus)
+			{
+				// This is a prior transcoding that failed to complete when we exited the server last time,
+				// restart it now
+				aRecording.schedule.transcoding.status = [NSNumber numberWithInt:RSRecordingNotYetStartedStatus];
+				[mTranscodingsArrayController fetchWithRequest:[mTranscodingsArrayController defaultFetchRequest] merge:NO error:nil];
+			}
+		}
+		[[[NSApp delegate] managedObjectContext] processPendingChanges];
 
 		// Register for notifications when transcoding completes
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transcodingFinishedNotification:) name:RSNotificationTranscodingFinished object:nil];
