@@ -155,7 +155,11 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 	[[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
   
   mFinishRecording = NO;
-  NSString *destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.ts", [self recordedProgramsFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title, mThreadRecording.schedule.program.subTitle];
+  NSString *destinationPath;
+  if (mThreadRecording.schedule.program.subTitle != nil)
+	destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.ts", [self recordedProgramsFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title, mThreadRecording.schedule.program.subTitle];
+  else
+	destinationPath = [NSString stringWithFormat:@"%@/%@ %@.ts", [self recordedProgramsFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title];
   [[NSFileManager defaultManager] createFileAtPath:destinationPath contents:nil attributes:nil];
   NSFileHandle* transportStreamFileHandle = [NSFileHandle fileHandleForWritingAtPath:destinationPath];
   if (!transportStreamFileHandle)
