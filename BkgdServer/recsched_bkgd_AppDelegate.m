@@ -41,8 +41,19 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
 {
-	NSLog(@"recsched_bkgd_AppDelegate - applicationDidFinishLaunching");
+	// We use the same presets as Handbrake and just read their plist
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
+	NSString *presetsPath = [basePath stringByAppendingPathComponent:@"HandBrake/UserPresets.plist"];
 
+	// So we should make sure it's there before we try and use it...
+	if ([[NSFileManager defaultManager] fileExistsAtPath:presetsPath] == NO)
+	{
+		// Copy a set of defaults from the resources folder
+		NSString *defaultPresetsPath = [[NSBundle mainBundle] pathForResource:@"UserPresets" ofType:@"plist"];
+		[[NSFileManager defaultManager] copyItemAtPath:defaultPresetsPath toPath:presetsPath error:nil];
+	}
+	
 	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kTranscodeProgramsKey] boolValue] == YES)
 		mTranscodeController = [[RSTranscodeController alloc] init];
 	

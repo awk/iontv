@@ -170,7 +170,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	else
 	{
 		// Search the array for a preset with a name matching the set preferences
-		NSString *presetName = @"iPhone / iPod Touch";
+		NSString *presetName = [[NSUserDefaults standardUserDefaults] objectForKey:@"transcodePreset"];
 		NSDictionary *chosenPreset = nil;
 		for (NSDictionary *aPreset in presetsArray)
 		{

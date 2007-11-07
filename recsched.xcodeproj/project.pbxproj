@@ -89,6 +89,7 @@
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAD023D80CE20F47002B7C37 /* libhb.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = EAD023D70CE20F42002B7C37 /* libhb.dylib */; };
+		EAD024280CE246FF002B7C37 /* UserPresets.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAD024270CE246F1002B7C37 /* UserPresets.plist */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
 		EAE3FB290C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */; };
 		EAE3FB2A0C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */; };
@@ -304,6 +305,7 @@
 		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSOutlineView.h; path = UIApp/views/RSOutlineView.h; sourceTree = "<group>"; };
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
 		EAD023D70CE20F42002B7C37 /* libhb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libhb.dylib; path = ../HandBrake/libhb/libhb.dylib; sourceTree = SOURCE_ROOT; };
+		EAD024270CE246F1002B7C37 /* UserPresets.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = UserPresets.plist; path = BkgdServer/UserPresets.plist; sourceTree = "<group>"; };
 		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKSourceTableClasses.h; path = UIApp/views/AKSourceTableClasses.h; sourceTree = "<group>"; };
 		EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AKSourceTableClasses.m; path = UIApp/views/AKSourceTableClasses.m; sourceTree = "<group>"; };
 		EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_bkgd_prefix.pch; path = BkgdServer/recsched_bkgd_prefix.pch; sourceTree = "<group>"; };
@@ -631,6 +633,7 @@
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
 			isa = PBXGroup;
 			children = (
+				EAD024270CE246F1002B7C37 /* UserPresets.plist */,
 				EA7002860CC4285D00DA9542 /* iTunes_ScriptingBridge.h */,
 				EA20AF000C25CCA200A9BDBD /* RecordingThread.h */,
 				EA20AF010C25CCA200A9BDBD /* RecordingThread.m */,
@@ -834,6 +837,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EAD024280CE246FF002B7C37 /* UserPresets.plist in Resources */,
 				EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
