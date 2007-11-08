@@ -21,6 +21,16 @@ print("Synchronizing Tree\n");
 system("p4 sync //recsched/*/$BRANCH/...@$lc");
 print("Done Synchronization\n");
 
+printf("Removing build output folder, old packages and old zip archive\n");
+system("rm -rf build");
+system("rm -f iOnTV_*.zip");
+system("rm -f iOnTV.pkg");
+
+printf("Creating Source Archive source-$lc\n");
+system("cd ..; tar -cf iOnTV-src-$lc.tar --exclude '*build*' ./");
+system("cd ..;gzip iOnTV-src-$lc.tar");
+printf("Source Archive created\n");
+
 system("xcodebuild -target 'All recsched' -configuration Release BUNDLE_VERSION=$lc");
 print("Build Complete\n");
 
@@ -29,10 +39,6 @@ system("/Developer/usr/bin/packagemaker --doc iOnTV.pmdoc --version $lc --out iO
 
 printf("Creating zip archive for sparkle\n");
 system("cd build/Release; zip ../../iOnTV_$lc -r9q ./iOnTV.app");
-
-printf("Creating Source Archive source-$lc\n");
-system("cd ..; tar -cf iOnTV-src-$lc.tar --exclude '*build*' ./");
-printf("Source Archive created\n");
 
 exit 0;
 
