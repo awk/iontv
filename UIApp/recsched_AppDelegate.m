@@ -233,10 +233,6 @@ NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotificatio
 	NSDictionary *optionsDictionary = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:NSReadOnlyPersistentStoreOption];
 
 	persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:optionsDictionary error:&error];
-        if (persistentStore == nil)
-	{
-          [[NSApplication sharedApplication] presentError:error];
-        }    
 
     return persistentStoreCoordinator;
 }
