@@ -286,14 +286,16 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   {
 	lineupObjectURI = [NSURL URLWithString:lineupObjectURIString];
 	NSManagedObjectID *lineupObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:lineupObjectURI];
-	Z2ITLineup *aLineup = (Z2ITLineup*) [[[NSApp delegate] managedObjectContext] objectWithID:lineupObjectID];
+	Z2ITLineup *aLineup = nil;
+        if (lineupObjectID)
+          aLineup = (Z2ITLineup*) [[[NSApp delegate] managedObjectContext] objectWithID:lineupObjectID];
 	[mCurrentLineup setContent:aLineup];
   }
   else
   {
 	NSError *error = nil;
 	[mLineupsArrayController fetchWithRequest:[mLineupsArrayController defaultFetchRequest] merge:NO error:&error];
-	if (error == nil)
+	if ((error == nil) && ([[mLineupsArrayController arrangedObjects] count] > 0))
 		[mCurrentLineup setContent:[[mLineupsArrayController arrangedObjects] objectAtIndex:0]];
   }
   
@@ -304,7 +306,9 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   {
 	scheduleObjectURI = [NSURL URLWithString:scheduleObjectURIString];
 	NSManagedObjectID *scheduleObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:scheduleObjectURI];
-	Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
+	Z2ITSchedule *aSchedule = nil;
+        if (scheduleObjectID)
+          aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
 	[mCurrentSchedule setContent:aSchedule];
   }
 }
@@ -519,7 +523,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	}
 	if (!currentLineup)
 	{
-		currentLineup = [[mLineupsArrayController arrangedObjects] objectAtIndex:0];
+                if ([[mLineupsArrayController arrangedObjects] count] > 0)
+                  currentLineup = [[mLineupsArrayController arrangedObjects] objectAtIndex:0];
 	}
 
 	[mCurrentLineup setContent:currentLineup];
