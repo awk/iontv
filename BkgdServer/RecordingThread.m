@@ -160,8 +160,11 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 	destinationPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.ts", [self recordedProgramsFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title, mThreadRecording.schedule.program.subTitle];
   else
 	destinationPath = [NSString stringWithFormat:@"%@/%@ %@.ts", [self recordedProgramsFolder], mThreadRecording.schedule.program.programID, mThreadRecording.schedule.program.title];
-  [[NSFileManager defaultManager] createFileAtPath:destinationPath contents:nil attributes:nil];
-  NSFileHandle* transportStreamFileHandle = [NSFileHandle fileHandleForWritingAtPath:destinationPath];
+
+  // The destinationPath may have ':' in it which is illegal on HFS volumes so swap them out 
+  NSString *legalDestinationPath = [destinationPath stringByReplacingOccurrencesOfString:@":" withString:@"-"];
+  [[NSFileManager defaultManager] createFileAtPath:legalDestinationPath contents:nil attributes:nil];
+  NSFileHandle* transportStreamFileHandle = [NSFileHandle fileHandleForWritingAtPath:legalDestinationPath];
   if (!transportStreamFileHandle)
   {
 	NSLog(@"beginRecording - unable to create recording at %@", destinationPath);
@@ -169,7 +172,7 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 	return;
   }
 
-  mThreadRecording.mediaFile  = [destinationPath copy];
+  mThreadRecording.mediaFile  = [legalDestinationPath copy];
   mThreadRecording.status = [NSNumber numberWithInt:RSRecordingInProgressStatus];
   
   [anHDHRStation startStreaming];

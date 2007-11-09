@@ -48,7 +48,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 			// preferably) before we can continue on with creating the real transcode job ?
 			if ([[NSFileManager defaultManager] fileExistsAtPath:mCurrentTranscoding.schedule.recording.mediaFile])
 			{
-				hb_scan(mHandbrakeHandle, [mCurrentTranscoding.schedule.recording.mediaFile UTF8String], 0);
+				hb_scan(mHandbrakeHandle, [[NSFileManager defaultManager] fileSystemRepresentationWithPath:mCurrentTranscoding.schedule.recording.mediaFile], 0);
 			
 				// Set a timer running to watch the progress of the scan
 				[NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(scanProgressTimerCallback:) userInfo:nil repeats:YES];
@@ -209,7 +209,10 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
                 else
                   transcodingPath = [NSString stringWithFormat:@"%@/%@ %@.mp4", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title];
                 
-		[mCurrentTranscoding setMediaFile:transcodingPath];
+                NSString *legalTranscodingPath;
+                legalTranscodingPath = [transcodingPath stringByReplacingOccurrencesOfString:@":" withString:@"-"];
+                
+		[mCurrentTranscoding setMediaFile:legalTranscodingPath];
 		hb_title_t * title = (hb_title_t *) hb_list_item( titleList, 0 );
 		
 		// Construct a transcoding implementation with the title details, and add it to the Transcoding entity
