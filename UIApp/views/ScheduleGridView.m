@@ -33,7 +33,7 @@
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 
-const float kScheduleDetailsPopUpTime = 10.0;
+const float kScheduleDetailsPopUpTime = 3.0;
 
 @interface ScheduleGridLine : NSObject
 {
