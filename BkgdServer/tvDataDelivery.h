@@ -34,6 +34,13 @@
 
 extern NSString *kWebServicesSDPath;
 
+extern NSString *kTVDataDeliveryFetchFutureScheduleKey;
+extern NSString *kTVDataDeliveryLineupsOnlyKey;
+extern NSString *kTVDataDeliveryStartDateKey;
+extern NSString *kTVDataDeliveryEndDateKey;
+extern NSString *kTVDataDeliveryReportProgressToKey;
+extern NSString *kTVDataDeliveryDataRecipientKey;
+
 @interface tvDataDelivery : WSGeneratedObj
 
 // We just override some SOAP processing messages to perform authentication

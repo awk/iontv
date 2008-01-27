@@ -435,7 +435,7 @@ static int FormatSettings[4][10] =
 	if (mUIActivity)
 	{
 		mActivityToken = [mUIActivity createActivity];
-		[mUIActivity setActivity:mActivityToken progressMaxValue:100.0];
+		mActivityToken = [mUIActivity setActivity:mActivityToken progressMaxValue:100.0];
 	}
 	
 	// Start the progress timer
@@ -455,8 +455,10 @@ static int FormatSettings[4][10] =
 {
     hb_state_t s;
     hb_get_state( mHandbrakeHandle, &s );
-	
-	if ([mUIActivity shouldCancelActivity:mActivityToken])
+
+    BOOL shouldCancel = NO;
+    mActivityToken = [mUIActivity shouldCancelActivity:mActivityToken cancel:&shouldCancel];
+	if (shouldCancel)
 	{
 		// Calling stop will cause an asynchronous stop reflected
 		// in the state value
@@ -484,10 +486,10 @@ static int FormatSettings[4][10] =
                     @" (%.2f fps, avg %.2f fps, ETA %02dh%02dm%02ds)",
                     s.param.working.rate_cur, s.param.working.rate_avg, s.param.working.hours, s.param.working.minutes, s.param.working.seconds];
             }
-			[mUIActivity setActivity:mActivityToken infoString:string];
+			mActivityToken = [mUIActivity setActivity:mActivityToken infoString:string];
 			
             /* Update progress bar */
-			[mUIActivity setActivity:mActivityToken incrementBy:100.0 * s.param.working.progress - mLastProgressValue];
+			mActivityToken = [mUIActivity setActivity:mActivityToken incrementBy:100.0 * s.param.working.progress - mLastProgressValue];
 			mLastProgressValue = 100.0 * s.param.working.progress;
 			break;
         }
@@ -496,12 +498,12 @@ static int FormatSettings[4][10] =
         {
             /* Update text field */
             if (mTranscoding.schedule.program.subTitle != nil)
-              [mUIActivity setActivity:mActivityToken infoString:[NSString stringWithFormat:@"Muxing: %@ - %@", mTranscoding.schedule.program.title, mTranscoding.schedule.program.subTitle]];
+              mActivityToken = [mUIActivity setActivity:mActivityToken infoString:[NSString stringWithFormat:@"Muxing: %@ - %@", mTranscoding.schedule.program.title, mTranscoding.schedule.program.subTitle]];
             else
-              [mUIActivity setActivity:mActivityToken infoString:[NSString stringWithFormat:@"Muxing: %@", mTranscoding.schedule.program.title]];
+              mActivityToken = [mUIActivity setActivity:mActivityToken infoString:[NSString stringWithFormat:@"Muxing: %@", mTranscoding.schedule.program.title]];
             
             /* Update slider */
-			[mUIActivity setActivity:mActivityToken progressIndeterminate:YES];
+			mActivityToken = [mUIActivity setActivity:mActivityToken progressIndeterminate:YES];
             break;
         }
 			
@@ -533,8 +535,8 @@ static int FormatSettings[4][10] =
 	
 	// Since the connection just became available we'll create an activity now
 	mActivityToken = [mUIActivity createActivity];
-	[mUIActivity setActivity:mActivityToken progressMaxValue:100.0];
-	[mUIActivity setActivity:mActivityToken progressDoubleValue:mLastProgressValue];
+	mActivityToken = [mUIActivity setActivity:mActivityToken progressMaxValue:100.0];
+	mActivityToken = [mUIActivity setActivity:mActivityToken progressDoubleValue:mLastProgressValue];
 	
 	// For a timer call now - it'll update the status on the activity display etc.
 	[self transcodingProgressTimer:nil];

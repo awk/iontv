@@ -24,19 +24,48 @@
 #import "RSStoreUpdateProtocol.h"
 
 extern NSString *RSNotificationUIActivityAvailable;
+extern const int kDefaultScheduleFetchDuration;
+
+@class RSActivityProxy;
+@class RSRecording;
+@class HDHomeRunTuner;
 
 @interface RecSchedServer : NSObject <RecSchedServerProto, RSActivityDisplay, RSStoreUpdate> {
     BOOL mExitServer;
 	
 	id mUIActivity;
 	id mStoreUpdate;
+        
+        RSActivityProxy *mUIActivityProxy;
+        
+    NSMutableArray *mRecordingQueues;
+    NSCalendarDate *mLastScheduleFetchEndDate;
 }
 
 - (bool) shouldExit;
-- (void) updateSchedule;
-- (id) uiActivity;
+- (BOOL) fetchFutureSchedule:(id)info;
+- (RSActivityProxy*) uiActivity;
 - (id) storeUpdate;
+
 @property BOOL mExitServer;
 @property (retain,getter=storeUpdate) id mStoreUpdate;
-@property (retain,getter=uiActivity) id mUIActivity;
+//@property (retain,getter=uiActivity) id mUIActivity;
 @end
+
+@interface RSRecordingQueue : NSObject
+{
+  NSMutableArray *queue;
+  NSTimer *nextRecordingStartTimer;
+  HDHomeRunTuner *tuner;
+}
+
+- (id) initWithTuner:(HDHomeRunTuner*)aTuner;
+- (BOOL) addRecording:(RSRecording*)aRecording;
+- (BOOL) removeRecording:(RSRecording*)aRecording;
+
+@property (retain, readonly) NSArray *queue;
+@property (retain, readonly) HDHomeRunTuner *tuner;
+
+@end
+
+

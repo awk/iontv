@@ -132,34 +132,41 @@
 	[(RSActivityAggregateViewController*) activityToken release];
 }
 
-- (void) setActivity:(size_t)activityToken infoString:(NSString*)inInfoString
+- (size_t) setActivity:(size_t)activityToken infoString:(NSString*)inInfoString
 {
 	[(RSActivityAggregateViewController*) activityToken setInfoString:inInfoString];
+        return activityToken;
 }
 
-- (void) setActivity:(size_t)activityToken progressIndeterminate:(BOOL)isIndeterminate
+- (size_t) setActivity:(size_t)activityToken progressIndeterminate:(BOOL)isIndeterminate
 {
 	[(RSActivityAggregateViewController*) activityToken setProgressIndeterminate:isIndeterminate];
+        return activityToken;
 }
 
-- (void) setActivity:(size_t)activityToken progressMaxValue:(double)inTotal
+- (size_t) setActivity:(size_t)activityToken progressMaxValue:(double)inTotal
 {
 	[(RSActivityAggregateViewController*) activityToken setProgressMaxValue:inTotal];
+        return activityToken;
 }
 
-- (void) setActivity:(size_t)activityToken progressDoubleValue:(double)inValue
+- (size_t) setActivity:(size_t)activityToken progressDoubleValue:(double)inValue
 {
 	[(RSActivityAggregateViewController*) activityToken setProgressDoubleValue:inValue];
+        return activityToken;
 }
 
-- (void) setActivity:(size_t)activityToken incrementBy:(double)delta
+- (size_t) setActivity:(size_t)activityToken incrementBy:(double)delta
 {
 	[(RSActivityAggregateViewController*) activityToken incrementProgressBy:delta];
+        return activityToken;
 }
 
-- (BOOL) shouldCancelActivity:(size_t)activityToken
+- (size_t) shouldCancelActivity:(size_t)activityToken cancel:(BOOL*)cancel;
 {
-	return [(RSActivityAggregateViewController*) activityToken shouldCancel];
+  if (cancel)
+	*cancel = [(RSActivityAggregateViewController*) activityToken shouldCancel];
+  return activityToken;
 }
 
 @end

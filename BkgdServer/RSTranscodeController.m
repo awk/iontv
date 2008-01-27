@@ -37,6 +37,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 - (void) updateForNewTranscodings:(NSArray*)inArray
 {
 	int index = 0;
+        NSLog(@"updateForNewTranscodings - mCurrentTranscoding = %@", mCurrentTranscoding);
 	while ((mCurrentTranscoding == nil) && (index < [inArray count]))
 	{
 		RSTranscoding *candidateTranscoding = [inArray objectAtIndex:index++];
@@ -48,6 +49,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 			// preferably) before we can continue on with creating the real transcode job ?
 			if ([[NSFileManager defaultManager] fileExistsAtPath:mCurrentTranscoding.schedule.recording.mediaFile])
 			{
+                                NSLog(@"updateForNewTranscodings - have candidate for transcoding = %@", mCurrentTranscoding);
 				hb_scan(mHandbrakeHandle, [[NSFileManager defaultManager] fileSystemRepresentationWithPath:mCurrentTranscoding.schedule.recording.mediaFile], 0);
 			
 				// Set a timer running to watch the progress of the scan
@@ -55,6 +57,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 			}
 			else
 			{
+                                NSLog(@"updateForNewTranscodings - no recorded media for candidate = %@", mCurrentTranscoding);
 				mCurrentTranscoding.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
 				[mCurrentTranscoding release];
 				mCurrentTranscoding = nil;
@@ -67,7 +70,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 {
 	for (RSRecording *aRecording in inArray)
 	{
-		NSLog(@"Recording ID = %@ title = %@ status = %@\ntranscoding =\n %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding);
+		NSLog(@"updateForCompleted Recordings Recording ID = %@ title = %@ status = %@\ntranscoding =\n %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding);
 		if (aRecording.schedule.transcoding == NULL)
 		{
 			// Create a new transcoding entity
@@ -222,10 +225,12 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		mCurrentTranscoding.transcodingImp = aTranscodingImp;
 		mCurrentTranscoding.status = [NSNumber numberWithInt:RSRecordingInProgressStatus];
 		
+                NSLog(@"titleScanFinished - beginning transcoding with output file %@", legalTranscodingPath);
 		[self beginTranscoding];
 	}
 	else
 	{
+                NSLog(@"titleScanFinished - title scan found no valid titles in %@", mCurrentTranscoding.schedule.recording.mediaFile);
 		// No valid title found - mark the associated recording as 'bad'
 		mCurrentTranscoding.schedule.recording.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
 		
@@ -233,7 +238,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		mCurrentTranscoding.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
 		[mCurrentTranscoding release];
 		mCurrentTranscoding = nil;
-		
+
 		// See if there's another candidate ?
 		[self updateForNewTranscodings:[mTranscodingsArrayController arrangedObjects]];
 	}

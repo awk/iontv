@@ -24,6 +24,9 @@
 @dynamic mediaFile;
 @dynamic status;
 @dynamic schedule;
+@dynamic tuner;
+@synthesize recordingThreadController;
+@synthesize recordingQueue;
 
 + (RSRecording*) insertRecordingOfSchedule:(Z2ITSchedule*)aSchedule
 {

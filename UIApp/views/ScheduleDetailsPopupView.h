@@ -37,5 +37,11 @@ extern const float kScheduleDetailsPopupHeightPadding;
 	BOOL mMouseInCloseBox;
 	BOOL mTrackingCloseBox;
 }
+@end
+
+@interface ScheduleDetailsRecordingDotView : NSView {
+
+	IBOutlet NSObjectController *mCurrentSchedule;
+}
 
 @end

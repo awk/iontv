@@ -36,6 +36,13 @@
 // URL for SOAP services used to retrieve the listings
 // @"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService
 
+NSString *kTVDataDeliveryFetchFutureScheduleKey = @"fetchFutureSchedule";
+NSString *kTVDataDeliveryLineupsOnlyKey = @"lineupsOnly";
+NSString *kTVDataDeliveryStartDateKey = @"startDateStr";
+NSString *kTVDataDeliveryEndDateKey = @"endDateStr";
+NSString *kTVDataDeliveryReportProgressToKey = @"reportProgressTo";
+NSString *kTVDataDeliveryDataRecipientKey = @"dataRecipient";
+
 @implementation tvDataDelivery
 
 static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXMLTreeRef msgRoot, CFXMLTreeRef  deserializeRoot, void *info)
@@ -300,17 +307,17 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   
   NSDictionary *xtvdDownloadData = (NSDictionary*)downloadInfo;
   
-  id reportProgressTo = [downloadInfo valueForKey:@"reportProgressTo"];
+  id reportProgressTo = [downloadInfo valueForKey:kTVDataDeliveryReportProgressToKey];
   BOOL reportProgress = [reportProgressTo conformsToProtocol:@protocol(RSActivityDisplay)];
   
   if (reportProgress)
   {
 	activityToken = [reportProgressTo createActivity];
-	[reportProgressTo setActivity:activityToken infoString:@"Downloading Schedule Data"];
-	[reportProgressTo setActivity:activityToken progressIndeterminate:YES];
+	activityToken = [reportProgressTo setActivity:activityToken infoString:@"Downloading Schedule Data"];
+	activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:YES];
   }
 	
-  NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:@"startDateStr"] in_endTime:[xtvdDownloadData valueForKey:@"endDateStr"]];
+  NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:kTVDataDeliveryStartDateKey] in_endTime:[xtvdDownloadData valueForKey:kTVDataDeliveryEndDateKey]];
 
   if ((downloadResult == nil) || ([downloadResult valueForKey:@"xtvd"] == nil))
   {
@@ -319,25 +326,30 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 	[pool release];
 	if (reportProgress)
 	{
-		[reportProgressTo setActivity:activityToken progressIndeterminate:NO];
+		activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
 		[reportProgressTo endActivity:activityToken];
 	}
 	return;
   }
   
   NSMutableDictionary *parserCallData = [[NSMutableDictionary alloc] initWithDictionary:downloadResult];
-  if ([xtvdDownloadData valueForKey:@"lineupsOnly"] != nil)
+  if ([xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] != nil)
   {
-	[parserCallData setValue:[xtvdDownloadData valueForKey:@"lineupsOnly"] forKey:@"lineupsOnly"];
+	[parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] forKey:kTVDataDeliveryLineupsOnlyKey];
+  }
+  if ([xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil)
+  {
+	[parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
+        [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
   }
   
   if (reportProgress)
   {
-	[reportProgressTo setActivity:activityToken progressIndeterminate:NO];
+	activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
 	[reportProgressTo endActivity:activityToken];
   }
-  if ([[xtvdDownloadData valueForKey:@"dataRecipient"] respondsToSelector:@selector(handleDownloadData:)])
-    [[xtvdDownloadData valueForKey:@"dataRecipient"] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:parserCallData waitUntilDone:NO];
+  if ([[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] respondsToSelector:@selector(handleDownloadData:)])
+    [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:parserCallData waitUntilDone:NO];
   [pool release];
 }
 

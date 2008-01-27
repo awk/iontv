@@ -34,11 +34,14 @@
   HDHomeRunChannel *mCurrentHDHomeRunChannel;
 }
 
++ (NSArray*) allTunersInManagedObjectContext:(NSManagedObjectContext*)inMOC;
+
 @property (retain) NSNumber * index;
 @property (retain) NSSet* channels;
 @property (retain) HDHomeRun * device;
 @property (retain) Z2ITLineup * lineup;
 @property (retain) NSString * longName;
+@property (retain) NSSet* recordings;
 
 - (void) scanActionReportingProgressTo:(id)progressDisplay;
 - (void) exportChannelMapTo:(NSURL *)inURL;

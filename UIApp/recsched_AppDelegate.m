@@ -110,8 +110,11 @@ NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotificatio
 	// NSTask
 	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
 	NSString *backgroundServerPath = [bundlePath stringByAppendingPathComponent:@"Contents/Support/recsched_bkgd.app/Contents/MacOS/recsched_bkgd"];
-	[NSTask launchedTaskWithLaunchPath:backgroundServerPath arguments:[NSArray array]];
-	
+        BOOL launchedBackgroundServer = [[NSWorkspace sharedWorkspace] launchApplication:backgroundServerPath];
+	if (launchedBackgroundServer == NO)
+        {
+          NSLog(@"installBackgroundServer - failed to launch background server :%@", backgroundServerPath);
+        }
 }
 
 - (void) initializeServerConnection
@@ -165,6 +168,10 @@ NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotificatio
     [mServerMenuItem setTitle:@"Connect to Server"];
   }
   
+  // Setup the activity window controller now - this let's it register with the background server and
+  // to show info even if it's not visible
+  mActivityWindowController = [[NSWindowController alloc] initWithWindowNibName:@"Activity"];
+  [mActivityWindowController window];   // This will trigger the Nib to load
 }
 
 + (void) initialize

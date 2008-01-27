@@ -39,4 +39,5 @@ extern NSString *RSNotificationRecordingFinished;
 
 - (id) initWithRecording:(RSRecording*)inRecording recordingServer:(RecSchedServer*)inServer;
 - (void) beginRecording;
+- (void) startRecordingTimerFired:(NSTimer*)inTimer;
 @end

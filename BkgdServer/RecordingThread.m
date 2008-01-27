@@ -65,9 +65,7 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
   if (self != nil) {
     mRecording = [inRecording retain];
     mRecSchedServer = [inServer retain];
-	mPersistentStoreCoordinator = [[NSApp delegate] persistentStoreCoordinator];
-    NSTimer *recordingStartTimer = [[NSTimer alloc] initWithFireDate:mRecording.schedule.time interval:0 target:self selector:@selector(startRecordingTimerFired:) userInfo:self repeats:NO];
-    [[NSRunLoop currentRunLoop] addTimer:recordingStartTimer forMode:NSDefaultRunLoopMode];
+    mPersistentStoreCoordinator = [[NSApp delegate] persistentStoreCoordinator];
   }
   return self;
 }
@@ -92,9 +90,9 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 #if RECORDING_DISABLED
 - (void) beginRecording
 {
-  NSLog(@"beginRecording - timer fired for schedule %@ program title %@", mThreadSchedule, mThreadSchedule.program.title);
+  NSLog(@"beginRecording - timer fired for schedule %@ program title %@", mThreadRecording, mThreadRecording.schedule.program.title);
   
-  Z2ITStation *aStation = [mThreadSchedule station];
+  Z2ITStation *aStation = mThreadRecording.schedule.station;
   NSSet *hdhrStations = [aStation hdhrStations];
   if ([hdhrStations count] == 0)
   {
@@ -121,9 +119,15 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
             fflush(stdout);
     }
 
-    if ([[mThreadSchedule endTime] compare:[NSDate date]] == NSOrderedAscending)
+    if ([mThreadRecording.schedule.endTime compare:[NSDate date]] == NSOrderedAscending)
       mFinishRecording = YES;
   }
+
+  mThreadRecording.status = [NSNumber numberWithInt:RSRecordingFinishedStatus];
+  
+  // Remove ourselves from the queue
+  RSRecordingQueue *aRecordingQueue = mThreadRecording.recordingQueue;
+  [aRecordingQueue removeRecording:mThreadRecording];
 }
 #else  
 - (void) beginRecording
@@ -145,14 +149,14 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
   {
 	activityToken = [[mRecSchedServer uiActivity] createActivity];
   
-	[[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
+	activityToken = [[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
 		[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.tuner.lineup],
 		anHDHRStation.z2itStation.callSign]];
   }
   
   NSTimeInterval recordingDuration = [mThreadRecording.schedule.endTime timeIntervalSinceDate:[NSDate date]];
   if (activityToken)
-	[[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
+	activityToken = [[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
   
   mFinishRecording = NO;
   NSString *destinationPath;
@@ -199,20 +203,23 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 			{
 				activityToken = [[mRecSchedServer uiActivity] createActivity];
 
-				[[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
+				activityToken = [[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
 					[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.tuner.lineup],
 					anHDHRStation.z2itStation.callSign]];
 			}
 
 			if (activityToken)
-				[[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
+				activityToken = [[mRecSchedServer uiActivity] setActivity:activityToken progressMaxValue:recordingDuration];
 		}
 		
 		if (activityToken)
-			[[mRecSchedServer uiActivity] setActivity:activityToken incrementBy:[[NSDate date] timeIntervalSinceDate:lastActivityNotification]];
+			activityToken = [[mRecSchedServer uiActivity] setActivity:activityToken incrementBy:[[NSDate date] timeIntervalSinceDate:lastActivityNotification]];
 		lastActivityNotification = [NSDate date];
 		
-		if (activityToken && ([[mRecSchedServer uiActivity] shouldCancelActivity:activityToken] == YES))
+                BOOL shouldCancel = NO;
+                if (activityToken)
+                  activityToken = [[mRecSchedServer uiActivity] shouldCancelActivity:activityToken cancel:&shouldCancel];
+		if (shouldCancel == YES)
 			mFinishRecording = YES;
 	}
 	
@@ -223,6 +230,9 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
   [[mRecSchedServer uiActivity] endActivity:activityToken];
   
   mThreadRecording.status = [NSNumber numberWithInt:RSRecordingFinishedStatus];
+  
+  // Remove ourselves from the queue
+  [mThreadRecording.recordingQueue removeRecording:mThreadRecording];
   
   // Save the MOC
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
@@ -235,16 +245,13 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 	
 	// Notify everyone that this recording has finished - since we're in a seperate thread, and notifications are
 	// delivered in the thread context which triggers them we'll send a message to the server object on the main thread
-	// to send further notificaitons
+	// to send further notifications
+        NSLog(@"RecordingThread  - sending recordingComplete message to server on main thread, recording Program ID = %@", mThreadRecording.schedule.program.programID);
 	[mRecSchedServer performSelectorOnMainThread:@selector(recordingComplete:) withObject:[mThreadRecording objectID] waitUntilDone:YES];
 	
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mThreadManagedObjectContext];
 }
 #endif
-
-- (void) endRecording
-{
-}
 
 #pragma mark - Notifications
 

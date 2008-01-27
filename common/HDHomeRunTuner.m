@@ -27,6 +27,8 @@
 #import "RecSchedServer.h"
 #import "RSStoreUpdateProtocol.h"
 
+const int kCallSignStringLength = 10;
+
 @interface HDHomeRunTunerChannelScanThread : NSObject
 
 + (void) performScan:(HDHomeRunTuner*)aTuner;
@@ -38,6 +40,8 @@
 
 - (HDHomeRun*)primitiveDevice;
 - (void)setPrimitiveDevice:(HDHomeRun*)value;
+- (NSMutableSet*)primitiveChannels;
+- (void)setPrimitiveChannels:(NSMutableSet*)value;
 
 @end
 
@@ -53,11 +57,23 @@
       triggerChangeNotificationsForDependentKey:@"longName"];
 }
 
++ (NSArray *) allTunersInManagedObjectContext:(NSManagedObjectContext*)inMOC
+{
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+   
+  NSError *error = nil;
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
+  return array;
+}
+
 @dynamic index;
 @dynamic channels;
 @dynamic device;
 @dynamic lineup;
 @dynamic longName;
+@dynamic recordings;
 
 - (NSString*) longName
 {
@@ -335,6 +351,17 @@
 	}
 }
 
+- (void)addChannelsObject:(HDHomeRunChannel *)value 
+{    
+    NSSet *changedObjects = [[NSSet alloc] initWithObjects:&value count:1];
+    
+    [self willChangeValueForKey:@"channels" withSetMutation:NSKeyValueUnionSetMutation usingObjects:changedObjects];
+    [[self primitiveChannels] addObject:value];
+    [self didChangeValueForKey:@"channels" withSetMutation:NSKeyValueUnionSetMutation usingObjects:changedObjects];
+    
+    [changedObjects release];
+}
+
 #pragma mark - Notifications
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -355,7 +382,7 @@
 
 - (void)threadContextDidSave:(NSNotification *)notification
 {
-    [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:NO];
+    [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
 }
 
 #pragma mark - Thread Functions
@@ -368,8 +395,8 @@
   
   if ([type compare:@"SCANNING"] == NSOrderedSame)
   {
-	[mCurrentProgressDisplay setActivity:mCurrentActivityToken infoString:[NSString stringWithFormat:@"Scanning on Device %@ Tuner:%d %@", self.device.name, [self.index intValue]+1, data]];
-	[mCurrentProgressDisplay setActivity:mCurrentActivityToken incrementBy:1.0];
+	mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken infoString:[NSString stringWithFormat:@"Scanning on Device %@ Tuner:%d %@", self.device.name, [self.index intValue]+1, data]];
+	mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken incrementBy:1.0];
 	
 	if (mCurrentHDHomeRunChannel)
 	{
@@ -479,7 +506,10 @@
 
 	  if (callSignString)
 	  {
-		[aStation setCallSign:callSignString];
+                if ([callSignString length] > kCallSignStringLength)
+                  [aStation setCallSign:[callSignString substringToIndex:kCallSignStringLength+1]];
+                else
+                  [aStation setCallSign:callSignString];
 		Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[inMOC objectWithID:[[self lineup] objectID]];
 		Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:callSignString inLineup:lineupInThreadMOC inManagedObjectContext:inMOC];
 		if (aZ2ITStation)
@@ -488,10 +518,18 @@
 	}
   }
   
-  if ([mCurrentProgressDisplay shouldCancelActivity:mCurrentActivityToken])
+  BOOL shouldCancel = NO;
+  mCurrentActivityToken = [mCurrentProgressDisplay shouldCancelActivity:mCurrentActivityToken cancel:&shouldCancel];
+  if (shouldCancel)
   {
 	NSLog(@"Abort Channel Scan");
 	continueScan = 0;
+        if (mCurrentHDHomeRunChannel && [[mCurrentHDHomeRunChannel stations] count] == 0)
+        {
+          // Destroy the current and channel and make sure it's not in the database
+          [inMOC deleteObject:mCurrentHDHomeRunChannel];
+        }
+        mCurrentHDHomeRunChannel = nil;
   }
   return continueScan;
 }
@@ -507,18 +545,20 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 // Typically called from a seperate thread to carry out the scanning
 - (void) performScan
 {
-    NSPersistentStoreCoordinator *psc = [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator];
+    NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
     NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
     [managedObjectContext setPersistentStoreCoordinator: psc];
 	
+  HDHomeRunTuner *tunerInThreadMOC = (HDHomeRunTuner*) [managedObjectContext objectWithID:[self objectID]];
+
       // Delete any channels we might currently have - they're going to get replaced in the scan
-      [self deleteAllChannelsInMOC:managedObjectContext];
+      [tunerInThreadMOC deleteAllChannelsInMOC:managedObjectContext];
       
 	mCurrentActivityToken = 0;
 	if (mCurrentProgressDisplay)
 	{
 		mCurrentActivityToken = [mCurrentProgressDisplay createActivity];
-		[mCurrentProgressDisplay setActivity:mCurrentActivityToken progressMaxValue:390.0f];		// There are a maximum of 390 channels to scan per tuner !
+		mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken progressMaxValue:390.0f];		// There are a maximum of 390 channels to scan per tuner !
 	}
 	
     mCurrentHDHomeRunChannel = nil;

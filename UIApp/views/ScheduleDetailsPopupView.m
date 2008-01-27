@@ -28,8 +28,8 @@
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
 
-const float kScheduleDetailsPopupWidthPadding = 15.0;
-const float kScheduleDetailsPopupHeightPadding = 15.0;
+const float kScheduleDetailsPopupWidthPadding = 10.0;
+const float kScheduleDetailsPopupHeightPadding = 10.0;
 
 @implementation ScheduleDetailsPopupView
 
@@ -48,7 +48,7 @@ const float kScheduleDetailsPopupHeightPadding = 15.0;
 
 - (void) awakeFromNib
 {
-	// We need to no when the selected schedule changes so we can update
+	// We need to know when the selected schedule changes so we can update
 	[mCurrentSchedule addObserver:self forKeyPath:@"content" options:0 context:nil];
 }
 
@@ -158,6 +158,50 @@ const float kScheduleDetailsPopupHeightPadding = 15.0;
 	mTrackingCloseBox = NO;
 	[self setNeedsDisplayInRect:[self closeBoxRect]];
  }
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+			ofObject:(id)object 
+			change:(NSDictionary *)change
+			context:(void *)context
+{
+    if ((object == mCurrentSchedule) && ([keyPath isEqual:@"content"]))
+	{
+		[self setNeedsDisplay:YES];
+	}
+}
+@end
+
+@implementation ScheduleDetailsRecordingDotView
+
+- (void) drawRect:(NSRect)rect
+{
+    Z2ITSchedule *aSchedule = [mCurrentSchedule content];
+    if (aSchedule.recording != nil)
+    {
+      // Draw a small red dot inset from the bottom corner of the schedule rect to indicate that this program
+      // has or will be recorded.
+      NSRect recordingRectBounds = NSMakeRect(0, 0, 15, 15);
+      recordingRectBounds.origin.x = ([self frame].size.width - recordingRectBounds.size.width)/2;
+      recordingRectBounds.origin.y = ([self frame].size.height - recordingRectBounds.size.height)/2;
+      NSBezierPath *recordingDot = [NSBezierPath bezierPathWithOvalInRect:recordingRectBounds];
+      [NSGraphicsContext saveGraphicsState];
+      NSShadow *aShadow = [[NSShadow alloc] init];
+      [aShadow setShadowOffset:NSMakeSize(2.0, -2.0)];
+      [aShadow setShadowBlurRadius:3.0f];
+      [aShadow setShadowColor:[NSColor blackColor]];
+      [aShadow set];
+      [[NSColor redColor] set];
+      [recordingDot fill];
+      [aShadow release];
+      [NSGraphicsContext restoreGraphicsState];
+    }
+}
+
+- (void) awakeFromNib
+{
+	// We need to know when the selected schedule changes so we can update
+	[mCurrentSchedule addObserver:self forKeyPath:@"content" options:0 context:nil];
+}
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
 			ofObject:(id)object 

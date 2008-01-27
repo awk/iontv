@@ -30,6 +30,7 @@
   IBOutlet NSObjectController *mCurrentSchedule;
   IBOutlet NSArrayController *mProgramsArrayController;
   IBOutlet NSView *mProgramSearchView;
+  IBOutlet NSTableView *mProgramTableView;
   
   BOOL searchViewHidden;
 }

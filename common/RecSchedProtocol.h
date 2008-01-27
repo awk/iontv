@@ -34,20 +34,21 @@ extern NSString *kRecServerConnectionName;
 - (void) storeUpdateAvailable;
 - (void) storeUpdateUnavailable;
 
-- (BOOL) addRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID;
+- (BOOL) addRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
+- (BOOL) cancelRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
 
 - (void) reloadPreferences:(id)sender;
 
 - (oneway void) quitServer:(id)sender;
 
 // Schedule Retrieval
-- (oneway void) performDownload:(NSDictionary*)callData;
+- (oneway void) updateSchedule;
+- (oneway void) updateLineups;
 
 // HDHomeRun Device Management
 - (void) scanForHDHomeRunDevices:(id)sender;
 - (void) scanForChannelsOnHDHomeRunDeviceID:(NSNumber*)deviceID tunerIndex:(NSNumber*)tunerIndex;
 
-- (BOOL) addHDHomeRunWithID:(NSNumber*)deviceID;
 - (void) setHDHomeRunDeviceWithID:(NSNumber*)deviceID nameTo:(NSString*)name tuner0LineupIDTo:(NSString*)tuner0LineupID tuner1LineupIDTo:(NSString*) tuner1LineupID;
 - (oneway void) setHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex; 
 @end

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-$BRANCH = main;
+$BRANCH = rel_075;
 
 use Env qw(DEPOT_TOP);
 use Env qw(BRANCH);

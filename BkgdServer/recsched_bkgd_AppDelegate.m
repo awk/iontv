@@ -30,15 +30,6 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 
 @implementation recsched_bkgd_AppDelegate
 
-- (void) startTimersForRecordings
-{
-	NSArray *futureRecordings = [RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate] managedObjectContext] afterDate:[NSDate date] withStatus:RSRecordingNotYetStartedStatus];
-	for (RSRecording *aRecording in futureRecordings)
-	{
-		[[RecordingThreadController alloc] initWithRecording:aRecording recordingServer:mRecSchedServer];
-	}
-}
-
 - (void)applicationDidFinishLaunching:(NSNotification *)notification 
 {
 	// We use the same presets as Handbrake and just read their plist
@@ -49,16 +40,24 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 	// So we should make sure it's there before we try and use it...
 	if ([[NSFileManager defaultManager] fileExistsAtPath:presetsPath] == NO)
 	{
-		// Copy a set of defaults from the resources folder
-		NSString *defaultPresetsPath = [[NSBundle mainBundle] pathForResource:@"UserPresets" ofType:@"plist"];
-		[[NSFileManager defaultManager] copyItemAtPath:defaultPresetsPath toPath:presetsPath error:nil];
+            NSError *error = nil;
+            if ([[NSFileManager defaultManager] contentsOfDirectoryAtPath:[basePath stringByAppendingPathComponent:@"HandBrake"] error:&error] == nil)
+              [[NSFileManager defaultManager] createDirectoryAtPath:[basePath stringByAppendingPathComponent:@"HandBrake"] withIntermediateDirectories:YES attributes:nil error:&error];
+              
+            // Copy a set of defaults from the resources folder
+            NSString *defaultPresetsPath = [[NSBundle mainBundle] pathForResource:@"UserPresets" ofType:@"plist"];
+            [[NSFileManager defaultManager] copyItemAtPath:defaultPresetsPath toPath:presetsPath error:&error];
 	}
 	
 	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kTranscodeProgramsKey] boolValue] == YES)
 		mTranscodeController = [[RSTranscodeController alloc] init];
 	
-	[mRecSchedServer updateSchedule];
-	[self startTimersForRecordings];
+        // This will update the next 'n' hours worth of schedule data, we don't need to do it 'now' rather we can just schedule a
+        // timer for a little ways off (about 1 hour less than the default schedule retrieval duration)
+	[NSTimer scheduledTimerWithTimeInterval:(kDefaultScheduleFetchDuration - 1) * 60 * 60 target:mRecSchedServer selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
+        
+        // We also need to the set the ball rolling on fetching all the schedule data for the next 2 weeks
+        [mRecSchedServer fetchFutureSchedule:nil];
 }
 
 - (void) setupPreferences

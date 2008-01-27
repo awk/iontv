@@ -105,6 +105,12 @@ static void addToolbarItem(NSMutableDictionary *theDict,NSString *identifier,NSS
     [theDict setObject:item forKey:identifier];
 }
 
+@interface Preferences(Private)
+- (void) showPrefsView:(NSView*)inViewToBeShown;
+- (void) sendTunerDetailsWithStations:(BOOL)sendStations;
+- (void) pushHDHomeRunStationsOnTuner:(HDHomeRunTuner *)inTuner;
+- (void) selectedTunerDidChange:(HDHomeRunTuner*)newTuner;
+@end
 
 @implementation Preferences
 
@@ -191,11 +197,30 @@ static Preferences *sSharedInstance = nil;
 	return [[[NSApplication sharedApplication] delegate] managedObjectContext];
 }
 
+- (BOOL) aboutToLeavePrefsView:(NSView*)inView toShow:(NSView*)inViewToBeShown
+{
+  BOOL okToLeave = YES;
+  
+  if (inView == mTunerPrefsView)
+  {
+    // If we're leaving the tuners pref view we might need to save the current tuner selections
+    [self sendTunerDetailsWithStations:NO];   // Don't send the stations - just the tuner details
+  }
+  
+  return okToLeave;
+}
+
 - (void) showPrefsView:(NSView*)inViewToBeShown
 {
 	if (mCurrentPrefsView == inViewToBeShown)
 		return;	// Nothing to do - we're already showing the right view
-		
+	
+        if ([self aboutToLeavePrefsView:mCurrentPrefsView toShow:inViewToBeShown] == NO)
+        {
+          return;   // Cannot switch preferences at this time
+        }
+  
+        
 	// Get the containers current size
 	NSSize sizeChange;
 	sizeChange.width = [inViewToBeShown frame].size.width - [mPrefsContainerView frame].size.width ;
@@ -277,6 +302,8 @@ static Preferences *sSharedInstance = nil;
 	[aColorCell setTarget: self];						// set colorClick as the method to call
 	[aColorCell setAction: @selector (colorClickAction:)];		// when the color well is clicked on
 	[[[mColorsTable tableColumns] objectAtIndex:1] setDataCell: aColorCell];					// sets the columns cell to the color well cell
+
+    [mHDHomeRunTunersArrayController addObserver:self forKeyPath:@"selection" options:0 context:nil];
 }
 
 - (void)showPanel:(id)sender
@@ -378,10 +405,37 @@ static Preferences *sSharedInstance = nil;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
+    if ((object == mHDHomeRunTunersArrayController) && ([keyPath isEqual:@"selection"]))
+    {
+      HDHomeRunTuner *newTuner = [[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0];
+      [self selectedTunerDidChange:newTuner];
+    }
     if ((object == [NSUserDefaultsController sharedUserDefaultsController]) && ([keyPath isEqual:@"values.scheduleDownloadDuration"]))
     {
       [self updateDurationLabel];
     }
+}
+
+- (void) sendTunerDetailsWithStations:(BOOL)sendStations
+{
+      // Walk the list of HDHomeRunDevices and send the details to the server
+      NSArray *hdhomerunDevices = [mHDHomeRunDevicesArrayController arrangedObjects];
+      for (HDHomeRun *anHDHomeRunDevice in hdhomerunDevices)
+      {
+              [[[NSApp delegate] recServer] setHDHomeRunDeviceWithID:[anHDHomeRunDevice deviceID]
+                      nameTo:[anHDHomeRunDevice name]
+                      tuner0LineupIDTo:[[[anHDHomeRunDevice tuner0] lineup] lineupID]
+                      tuner1LineupIDTo:[[[anHDHomeRunDevice tuner1] lineup] lineupID]];
+
+              NSArray *tuners = [[anHDHomeRunDevice tuners] allObjects];
+              if (sendStations == YES)
+              {
+                for (HDHomeRunTuner *aTuner in tuners)
+                {
+                        [self pushHDHomeRunStationsOnTuner:aTuner];
+                }
+              }
+      }
 }
 
 - (void) savePrefs:(id)sender
@@ -462,6 +516,17 @@ static Preferences *sSharedInstance = nil;
 		[[[NSApp delegate] recServer] setHDHomeRunChannelsAndStations:sortedArray onDeviceID:[[[inTuner device] deviceID] intValue] forTunerIndex:[[inTuner index] intValue]]; 
 	} 
 }
+
+- (void) selectedTunerDidChange:(HDHomeRunTuner*)newTuner
+{
+      NSMutableArray *stationsOnTuner = [NSMutableArray arrayWithCapacity:[[newTuner channels] count] * 3];   // Start with 3 stations per channel
+      for (HDHomeRunChannel *aChannel in [newTuner channels])
+      {
+        [stationsOnTuner addObjectsFromArray:[[aChannel stations] allObjects]];
+      }
+      NSLog(@"Tuner changed - %d stations on new tuner", [stationsOnTuner count]);
+      [mVisibleStationsArrayController setContent:stationsOnTuner];
+}
 	
 #pragma mark Action Methods
 
@@ -497,24 +562,9 @@ static Preferences *sSharedInstance = nil;
 
 - (IBAction) okButtonAction:(id)sender
 {
+  [self sendTunerDetailsWithStations:YES];
   [self savePrefs:sender];
   [mPanel orderOut:sender];
-  
-	// Walk the list of HDHomeRunDevices and send the details to the server
-	NSArray *hdhomerunDevices = [mHDHomeRunDevicesArrayController arrangedObjects];
-	for (HDHomeRun *anHDHomeRunDevice in hdhomerunDevices)
-	{
-		[[[NSApp delegate] recServer] setHDHomeRunDeviceWithID:[anHDHomeRunDevice deviceID]
-			nameTo:[anHDHomeRunDevice name]
-			tuner0LineupIDTo:[[[anHDHomeRunDevice tuner0] lineup] lineupID]
-			tuner1LineupIDTo:[[[anHDHomeRunDevice tuner1] lineup] lineupID]];
-
-		NSArray *tuners = [[anHDHomeRunDevice tuners] allObjects];
-		for (HDHomeRunTuner *aTuner in tuners)
-		{
-			[self pushHDHomeRunStationsOnTuner:aTuner];
-		}
-	}
 }
 
 - (IBAction) cancelButtonAction:(id)sender
@@ -537,33 +587,7 @@ static Preferences *sSharedInstance = nil;
   [mParsingProgressIndicator setHidden:NO];
   [mRetrieveLineupsButton setEnabled:NO];
 
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-  
-  // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
-  // SchedulesDirect expects
-  CFGregorianDate startDate = CFAbsoluteTimeGetGregorianDate(currentTime,NULL);
-  
-  // Retrieve 'n' hours of data
-  CFGregorianUnits retrieveRange;
-  memset(&retrieveRange, 0, sizeof(retrieveRange));
-
-  retrieveRange.minutes = 0;
-    
-  CFAbsoluteTime endTime = CFAbsoluteTimeAddGregorianUnits(currentTime, NULL, retrieveRange);
-  CFGregorianDate endDate = CFAbsoluteTimeGetGregorianDate(endTime,NULL);
-  
-  NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
-  NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
-  
-	// Register for the complete notification
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(parsingCompleteNotification:) name:RSParsingCompleteNotification object:[NSApp delegate]];
-	
-	// Register for the error notification
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadErrorNotification:) name:RSDownloadErrorNotification object:[NSApp delegate]];
-	
- 	// Send the message to the background server
-	NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", [NSNumber numberWithBool:YES], @"lineupsOnly", nil /* really needs to be a DO port or similar */, @"dataRecipient", nil];
-	[[[NSApp delegate] recServer] performDownload:callData];
+  [[[NSApp delegate] recServer] updateLineups];
 }
 
 - (IBAction) scanDevicesButtonAction:(id)sender
@@ -708,8 +732,20 @@ static Preferences *sSharedInstance = nil;
 
 - (void) channelScanCompleteNotification:(NSNotification*)aNotification
 {
-	NSError *error = nil;
-	[mVisibleStationsArrayController fetchWithRequest:[mVisibleStationsArrayController defaultFetchRequest] merge:NO error:&error];
+        NSError *error = nil;
+
+        NSFetchRequest *aFetchRequest = [mHDHomeRunTunersArrayController defaultFetchRequest];
+        [aFetchRequest setRelationshipKeyPathsForPrefetching:[NSArray arrayWithObject:@"channels"]];
+        NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:aFetchRequest error:&error];
+        for (HDHomeRunTuner *aTuner in array)
+        {
+          [[[NSApp delegate] managedObjectContext] refreshObject:aTuner mergeChanges:YES];
+        }
+
+        if ([[mHDHomeRunTunersArrayController selectedObjects] count] >0)
+        {
+          [self selectedTunerDidChange:[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0]];
+        }
 	mChannelScanInProgress = NO;
 	[mScanChannelsButton setEnabled:YES];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:RSChannelScanCompleteNotification object:[NSApp delegate]];
@@ -719,6 +755,7 @@ static Preferences *sSharedInstance = nil;
 {
 	NSError *error = nil;
 	[mHDHomeRunDevicesArrayController fetchWithRequest:[mHDHomeRunDevicesArrayController defaultFetchRequest] merge:NO error:&error];
+        [mHDHomeRunTunersArrayController fetchWithRequest:[mHDHomeRunTunersArrayController defaultFetchRequest] merge:NO error:&error];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:[NSApp delegate]];
 }
 

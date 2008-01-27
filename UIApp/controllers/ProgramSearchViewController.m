@@ -27,6 +27,9 @@
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 
+NSString *kSubtitleColumnIdentifier = @"subtitleColumn";
+NSString *kDescriptionColumnIdentifier = @"descriptionColumn";
+
 @implementation ProgramSearchViewController
 
 - (void) dealloc {
@@ -81,4 +84,54 @@
   [mProgramSearchView setHidden:isHidden];
   searchViewHidden = isHidden;
 }
+
+#pragma mark Action Methods (from Search Table View)
+
+- (void) showSubtitleColumn:(id)sender
+{
+  NSTableColumn *subtitleColumn = [mProgramTableView tableColumnWithIdentifier:kSubtitleColumnIdentifier];
+  if (subtitleColumn)
+  {
+    if ([subtitleColumn isHidden])
+      [subtitleColumn setHidden:NO];
+    else
+      [subtitleColumn setHidden:YES];
+  }
+}
+
+- (void) showDescriptionColumn:(id)sender
+{
+   NSTableColumn *descriptionColumn = [mProgramTableView tableColumnWithIdentifier:kDescriptionColumnIdentifier];
+  if (descriptionColumn)
+  {
+    if ([descriptionColumn isHidden])
+      [descriptionColumn setHidden:NO];
+    else
+      [descriptionColumn setHidden:YES];
+  }
+}
+
+#pragma mark RSTableHeaderView delegate methods
+
+- (NSMenu*) tableHeaderView:(NSTableHeaderView*)tableHeaderView menuForEvent:(NSEvent*)event
+{
+    NSMenu *theMenu = [[[NSMenu alloc] initWithTitle:@"Contextual Menu"] autorelease];
+    NSMenuItem *theItem = nil;
+    theItem = [theMenu insertItemWithTitle:@"Subtitle" action:@selector(showSubtitleColumn:) keyEquivalent:@"" atIndex:0];
+    [theItem setTarget:self];
+    if ([[mProgramTableView tableColumnWithIdentifier:kSubtitleColumnIdentifier] isHidden])
+      [theItem setState:NSOffState];
+    else
+      [theItem setState:NSOnState];
+      
+    theItem = [theMenu insertItemWithTitle:@"Description" action:@selector(showDescriptionColumn:) keyEquivalent:@"" atIndex:0];
+    [theItem setTarget:self];
+    if ([[mProgramTableView tableColumnWithIdentifier:kDescriptionColumnIdentifier] isHidden])
+      [theItem setState:NSOffState];
+    else
+      [theItem setState:NSOnState];
+
+    return theMenu;
+}
+
 @end

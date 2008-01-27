@@ -71,6 +71,7 @@
 		EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */; };
 		EA5FC2B10B73EB1300CCD5D5 /* back_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */; };
 		EA5FC2B30B73EB2F00CCD5D5 /* forward_arrow.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */; };
+		EA6338DA0D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m in Sources */ = {isa = PBXBuildFile; fileRef = EA6338D90D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m */; };
 		EA686CEA0CA95F5600185188 /* RSActivityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA686CE90CA95F5600185188 /* RSActivityViewController.m */; };
 		EA6AB71A0CBD93AB003C3CB6 /* EmptyCPlusPlus.mm in Sources */ = {isa = PBXBuildFile; fileRef = EA6AB7190CBD93AB003C3CB6 /* EmptyCPlusPlus.mm */; };
 		EA6AB7220CBDA2E2003C3CB6 /* RSTranscodeController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */; };
@@ -88,6 +89,7 @@
 		EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
+		EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */; };
 		EAD023D80CE20F47002B7C37 /* libhb.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = EAD023D70CE20F42002B7C37 /* libhb.dylib */; };
 		EAD024280CE246FF002B7C37 /* UserPresets.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAD024270CE246F1002B7C37 /* UserPresets.plist */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
@@ -280,6 +282,9 @@
 		EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleViewController.m; path = UIApp/controllers/ScheduleViewController.m; sourceTree = "<group>"; };
 		EA5FC2B00B73EB1300CCD5D5 /* back_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = back_arrow.tif; path = Images/back_arrow.tif; sourceTree = "<group>"; };
 		EA5FC2B20B73EB2F00CCD5D5 /* forward_arrow.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = forward_arrow.tif; path = Images/forward_arrow.tif; sourceTree = "<group>"; };
+		EA6338A30D034814006F3F64 /* recsched_DataModel 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 5.xcdatamodel"; sourceTree = "<group>"; };
+		EA6338D80D03527B006F3F64 /* RSRecording4To5MigrationPolicy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecording4To5MigrationPolicy.h; path = BkgdServer/RSRecording4To5MigrationPolicy.h; sourceTree = "<group>"; };
+		EA6338D90D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecording4To5MigrationPolicy.m; path = BkgdServer/RSRecording4To5MigrationPolicy.m; sourceTree = "<group>"; };
 		EA686CE80CA95F5600185188 /* RSActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSActivityViewController.h; path = UIApp/controllers/RSActivityViewController.h; sourceTree = "<group>"; };
 		EA686CE90CA95F5600185188 /* RSActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSActivityViewController.m; path = UIApp/controllers/RSActivityViewController.m; sourceTree = "<group>"; };
 		EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSActivityDisplayProtocol.h; path = common/RSActivityDisplayProtocol.h; sourceTree = "<group>"; };
@@ -304,6 +309,8 @@
 		EA93F8180C9C4A6E004788CF /* RSRecording.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecording.m; path = common/RSRecording.m; sourceTree = "<group>"; };
 		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSOutlineView.h; path = UIApp/views/RSOutlineView.h; sourceTree = "<group>"; };
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
+		EAB16BF20CF51502001313CA /* RSProgramSearchTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSProgramSearchTableHeaderView.h; path = UIApp/views/RSProgramSearchTableHeaderView.h; sourceTree = SOURCE_ROOT; };
+		EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSProgramSearchTableHeaderView.m; path = UIApp/views/RSProgramSearchTableHeaderView.m; sourceTree = SOURCE_ROOT; };
 		EAD023D70CE20F42002B7C37 /* libhb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libhb.dylib; path = ../HandBrake/libhb/libhb.dylib; sourceTree = SOURCE_ROOT; };
 		EAD024270CE246F1002B7C37 /* UserPresets.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = UserPresets.plist; path = BkgdServer/UserPresets.plist; sourceTree = "<group>"; };
 		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKSourceTableClasses.h; path = UIApp/views/AKSourceTableClasses.h; sourceTree = "<group>"; };
@@ -655,6 +662,8 @@
 				EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */,
 				EAF8826E0B5DC0BD00373CEF /* XTVDParser.h */,
 				EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */,
+				EA6338D80D03527B006F3F64 /* RSRecording4To5MigrationPolicy.h */,
+				EA6338D90D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m */,
 			);
 			name = "Background App";
 			sourceTree = "<group>";
@@ -662,6 +671,8 @@
 		EAF890120B66DC6400373CEF /* View & UI Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EAB16BF20CF51502001313CA /* RSProgramSearchTableHeaderView.h */,
+				EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */,
 				EA5FAFC10B6FB49400CCD5D5 /* FixedNSControl.h */,
 				EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */,
 				EAF8919A0B66F2D200373CEF /* iTableColumnHeaderCell.h */,
@@ -888,6 +899,7 @@
 				EA70E7210CC0164600C3B295 /* recsched.xcmappingmodel in Sources */,
 				EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */,
 				EAF9247D0CD030D100CEBD73 /* RSColorDictionary.m in Sources */,
+				EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -942,6 +954,7 @@
 				EA70E7220CC0164600C3B295 /* recsched.xcmappingmodel in Sources */,
 				EA70E8970CC06ED500C3B295 /* RSTranscodingImp.m in Sources */,
 				EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */,
+				EA6338DA0D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1328,8 +1341,9 @@
 				EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */,
 				EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */,
 				EA70E70F0CC0112200C3B295 /* recsched_DataModel 4.xcdatamodel */,
+				EA6338A30D034814006F3F64 /* recsched_DataModel 5.xcdatamodel */,
 			);
-			currentVersion = EA70E70F0CC0112200C3B295 /* recsched_DataModel 4.xcdatamodel */;
+			currentVersion = EA6338A30D034814006F3F64 /* recsched_DataModel 5.xcdatamodel */;
 			path = recsched_DataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

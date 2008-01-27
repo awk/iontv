@@ -740,6 +740,26 @@ static NSGradient *sScheduleCellSharedGradient = nil;
 		[textStorage setForegroundColor:[NSColor blackColor]];
 	}
 	
+        Z2ITSchedule *aSchedule = [self representedObject];
+        if (aSchedule.recording != nil)
+        {
+          // Draw a small red dot inset from the bottom corner of the schedule rect to indicate that this program
+          // has or will be recorded.
+          NSRect recordingRectBounds = NSMakeRect(0, 0, 7, 7);
+          recordingRectBounds.origin.x = NSMaxX(textRect) - recordingRectBounds.size.width - 3;
+          recordingRectBounds.origin.y = NSMaxY(textRect) - recordingRectBounds.size.height - 3;
+          NSBezierPath *recordingDot = [NSBezierPath bezierPathWithOvalInRect:recordingRectBounds];
+          [NSGraphicsContext saveGraphicsState];
+          NSShadow *aShadow = [[NSShadow alloc] init];
+          [aShadow setShadowOffset:NSMakeSize(2.0, -2.0)];
+          [aShadow setShadowBlurRadius:3.0f];
+          [aShadow setShadowColor:[NSColor blackColor]];
+          [aShadow set];
+          [[NSColor redColor] set];
+          [recordingDot fill];
+          [aShadow release];
+          [NSGraphicsContext restoreGraphicsState];
+        }
 	[layoutManager drawGlyphsForGlyphRange: glyphRange atPoint: textRect.origin];
 }
 

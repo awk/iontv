@@ -36,6 +36,10 @@
 #import "ScheduleViewController.h"
 #import "ProgramSearchViewController.h"
 
+@interface MainWindowController(Private)
+- (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule;
+@end
+
 @implementation MainWindowController
 
 const CGFloat kSourceListMaxWidth = 250;
@@ -289,9 +293,11 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	Z2ITLineup *aLineup = nil;
         if (lineupObjectID)
           aLineup = (Z2ITLineup*) [[[NSApp delegate] managedObjectContext] objectWithID:lineupObjectID];
-	[mCurrentLineup setContent:aLineup];
+        if (aLineup)
+          [mCurrentLineup setContent:aLineup];
   }
-  else
+
+  if ([mCurrentLineup content] == nil)    // No lineup prefs choice - just go with the first item we can find
   {
 	NSError *error = nil;
 	[mLineupsArrayController fetchWithRequest:[mLineupsArrayController defaultFetchRequest] merge:NO error:&error];
@@ -309,7 +315,23 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	Z2ITSchedule *aSchedule = nil;
         if (scheduleObjectID)
           aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
-	[mCurrentSchedule setContent:aSchedule];
+        if (aSchedule)
+        {
+          // Use the prior schedule choice to pick the channel to select from this time, we'll actually select whatever program is
+          // currently being shown on that channel 'now'
+          NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+          NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+          [request setEntity:entityDescription];
+           
+          NSDate *nowDate = [NSDate date];
+          NSPredicate *predicate = [NSPredicate predicateWithFormat:@"station == %@ AND time <= %@ AND endTime > %@", aSchedule.station, nowDate, nowDate];
+        [request setPredicate:predicate];
+           
+          NSError *error = nil;
+          NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
+          if (array && ([array count] > 0))
+            [mCurrentSchedule setContent:[array objectAtIndex:0]];
+        }
   }
 }
 
@@ -340,28 +362,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 - (IBAction) getScheduleAction:(id)sender
 {
   [self setGetScheduleButtonEnabled:NO];
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-  
-  // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
-  // SchedulesDirect expects
-  CFGregorianDate startDate = CFAbsoluteTimeGetGregorianDate(currentTime,NULL);
-  
-  // Retrieve 'n' hours of data
-  CFGregorianUnits retrieveRange;
-  memset(&retrieveRange, 0, sizeof(retrieveRange));
-  float hours = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationKey] floatValue];
-  retrieveRange.hours = (int) hours;
-    
-  CFAbsoluteTime endTime = CFAbsoluteTimeAddGregorianUnits(currentTime, NULL, retrieveRange);
-  CFGregorianDate endDate = CFAbsoluteTimeGetGregorianDate(endTime,NULL);
-  
-  NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
-  NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
-  
-  // Send the message to the background server
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, @"startDateStr", endDateStr, @"endDateStr", nil /* really needs to be a DO port or similar */, @"dataRecipient", nil];
-  [[[NSApp delegate] recServer] performDownload:callData];
-  [callData release];
+
+  [[[NSApp delegate] recServer] updateSchedule];
 }
 
 - (IBAction) cleanupAction:(id)sender
@@ -377,8 +379,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (IBAction) recordShow:(id)sender
 {
-	if ([[NSApp delegate] recServer])
-		[[[NSApp delegate] recServer] addRecordingOfSchedule:[[mCurrentSchedule content] objectID]];
+  [self addRecordingOfSchedule:[mCurrentSchedule content]];
 }
 
 - (IBAction) recordSeasonPass:(id)sender
@@ -410,6 +411,13 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	[NSApp runModalForWindow:[self window]];
 	[NSApp endSheet:mPredicatePanel];
 	[mPredicatePanel orderOut:self];
+}
+
+#pragma mark Responder Methods
+
+- (void)flagsChanged:(NSEvent *)theEvent
+{
+//    NSLog(@"MainWindowController - flagsChanged - %@", theEvent);
 }
 
 #pragma mark Callback Methods
@@ -503,11 +511,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
 	Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
 	
-	NSLog(@"deleteFutureRecording - %@, %@", anArgument, aSchedule);
-//	if (aSchedule)
-//	{
-//		[aSchedule setToBeRecorded:[NSNumber numberWithBool:NO]];
-//	}
+        NSError *error = nil;
+        [[[NSApp delegate] recServer] cancelRecordingOfSchedule:[aSchedule objectID] error:&error];
 }
 
 - (void) parsingCompleteNotification:(NSNotification*)aNotification
@@ -703,8 +708,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 				NSManagedObjectContext *MOC = [[NSApp delegate] managedObjectContext];
 				
 				Z2ITSchedule *aSchedule = (Z2ITSchedule*) [MOC objectWithID:[storeCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:[dragInfoDict valueForKey:@"scheduleObjectURI"]]]];
-				[[[NSApp delegate] recServer] addRecordingOfSchedule:[aSchedule objectID]];
-				return YES;
+                                return [self addRecordingOfSchedule:aSchedule];
 		}
 		else
 		{
@@ -713,6 +717,17 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	}
 	else
 		return NO;
+}
+
+#pragma mark Private Internal Methods
+
+- (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule
+{
+  NSError *error = nil;
+  if ([[NSApp delegate] recServer])
+    return [[[NSApp delegate] recServer] addRecordingOfSchedule:[schedule objectID] error:&error];
+  else
+    return NO;
 }
 
 @end

@@ -18,6 +18,9 @@
 #import <Cocoa/Cocoa.h>
 
 @class Z2ITSchedule;
+@class RecordingThreadController;
+@class HDHomeRunTuner;
+@class RSRecordingQueue;
 
 enum {
 	RSRecordingNotYetStartedStatus = 0,
@@ -27,12 +30,16 @@ enum {
 };
 
 @interface RSRecording : NSManagedObject {
-
+  RecordingThreadController *recordingThreadController;
+  RSRecordingQueue *recordingQueue;
 }
 
 @property (retain) NSString * mediaFile;
 @property (retain) NSNumber * status;
 @property (retain) Z2ITSchedule * schedule;
+@property (retain) HDHomeRunTuner * tuner;
+@property (retain) RecordingThreadController * recordingThreadController;
+@property (retain) RSRecordingQueue *recordingQueue;
 
 + (RSRecording*) insertRecordingOfSchedule:(Z2ITSchedule*)aSchedule;
 + (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)date withStatus:(int)status; 
