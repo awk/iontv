@@ -28,6 +28,8 @@
 
 @class DiscreteDurationSlider;
 
+extern NSString *kSchedulesDirectURL;
+
 @interface Preferences : NSObject {
 
     IBOutlet NSTextField *mDurationTextField;
