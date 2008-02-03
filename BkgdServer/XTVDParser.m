@@ -176,7 +176,6 @@
           [aStation setFccChannelNumber:[NSNumber numberWithInt:fccChannel]];
         else
           [aStation setFccChannelNumber:nil];
-        [aStation release];
         aStation = NULL;
       }
     }
@@ -278,8 +277,7 @@
               aLineupMap = [NSEntityDescription
                   insertNewObjectForEntityForName:@"LineupMap"
                   inManagedObjectContext:mManagedObjectContext];
-              [aLineupMap retain];
-			  addLineup = YES;
+         	  addLineup = YES;
             }
 
             [aLineupMap setStation:mapStation];
@@ -294,7 +292,6 @@
 			if (addLineup)
 				[aLineup addLineupMapsObject:aLineupMap];
 
-            [aLineupMap release];
             aLineupMap = NULL;
           }
           else
@@ -305,7 +302,6 @@
         [subPool release];
         }
 
-        [aLineup release];
         aLineup = NULL;
         
       }
@@ -385,8 +381,8 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
         }
 		else
         {
-          aProgram = [[NSEntityDescription insertNewObjectForEntityForName:@"Program"
-                  inManagedObjectContext:mManagedObjectContext] autorelease];
+          aProgram = [NSEntityDescription insertNewObjectForEntityForName:@"Program"
+                  inManagedObjectContext:mManagedObjectContext];
         
 			[aProgram setProgramID:programIDString];
 			[aProgram initializeWithXMLElement:childElement];
@@ -710,7 +706,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     mManagedObjectContext = [xtvdParserData valueForKey:@"managedObjectContext"];
     if (mManagedObjectContext == nil)
     {
-      mManagedObjectContext = [[[NSManagedObjectContext alloc] init] autorelease];    // We'll release the pool at the end of the parse and this will go away too
+      mManagedObjectContext = [[NSManagedObjectContext alloc] init];
       [mManagedObjectContext setPersistentStoreCoordinator: psc];
       [mManagedObjectContext setUndoManager:nil];
     }
@@ -741,10 +737,12 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
   }
   
+  [mManagedObjectContext reset];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
   
   [[NSFileManager defaultManager] removeFileAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] handler:nil];
   [[xtvdParserData valueForKey:@"reportCompletionTo"] performSelectorOnMainThread:@selector(parsingComplete:) withObject:parseInfo waitUntilDone:NO];
+  [mManagedObjectContext release];
   [pool release];
 }
 

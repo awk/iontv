@@ -350,6 +350,8 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   }
   if ([[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] respondsToSelector:@selector(handleDownloadData:)])
     [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:parserCallData waitUntilDone:NO];
+
+  [downloadInfo release];		// We're responsible for releasing this data.
   [pool release];
 }
 
