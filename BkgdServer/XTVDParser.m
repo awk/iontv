@@ -19,6 +19,7 @@
 
 #import "XTVDParser.h"
 #import "recsched_AppDelegate.h"
+#import "tvDataDelivery.h"
 #import "Z2ITStation.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITLineup.h"
@@ -722,9 +723,9 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
     
     BOOL lineupsOnly = NO;
-    if ([xtvdParserData valueForKey:@"lineupsOnly"])
+    if ([xtvdParserData valueForKey:kTVDataDeliveryLineupsOnlyKey])
     {
-      lineupsOnly = [[xtvdParserData valueForKey:@"lineupsOnly"] boolValue];
+      lineupsOnly = [[xtvdParserData valueForKey:kTVDataDeliveryLineupsOnlyKey] boolValue];
     }
     [anXTVDParser parseXMLFile:[xtvdParserData valueForKey:@"xmlFilePath"] lineupsOnly:lineupsOnly];
     [anXTVDParser release];
@@ -759,7 +760,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 - (void)threadContextDidSave:(NSNotification *)notification
 {
 	if ([[[NSApplication sharedApplication] delegate] respondsToSelector:@selector(updateForSavedContext:)])
-		[[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:NO];
+		[[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
 }
 
 @end;
