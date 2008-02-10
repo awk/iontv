@@ -545,6 +545,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 // Typically called from a seperate thread to carry out the scanning
 - (void) performScan
 {
+  int scanResult = 0;
     NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
     NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
     [managedObjectContext setPersistentStoreCoordinator: psc];
@@ -571,7 +572,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
     {
       NSLog(@"HDHomeRunTuner - scanAction for %@", [self longName]);
 
-      channelscan_execute_all(mHDHomeRunDevice, HDHOMERUN_CHANNELSCAN_MODE_SCAN, cmd_scan_callback, self, managedObjectContext);
+      scanResult = channelscan_execute_all(mHDHomeRunDevice, HDHOMERUN_CHANNELSCAN_MODE_SCAN, cmd_scan_callback, self, managedObjectContext);
     }
   }
   @catch (NSException *anException)
@@ -590,21 +591,23 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   
   mCurrentHDHomeRunChannel = nil;
   
-  // when we save, we want to update the same object in the UI's MOC. 
-  // So listen for the did save notification from the retrieval/parsing thread MOC
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
-      name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
-  
-  NSError *error = nil;
-  if (![managedObjectContext save:&error])
+  if (scanResult > 0)
   {
-    NSLog(@"Channel scan - save returned an error %@", error);
+    // when we save, we want to update the same object in the UI's MOC. 
+    // So listen for the did save notification from the retrieval/parsing thread MOC
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
+        name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
+    
+    NSError *error = nil;
+    if (![managedObjectContext save:&error])
+    {
+      NSLog(@"Channel scan - save returned an error %@", error);
+    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   }
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
-  
   [psc unlock];
   
-  [[[[NSApp delegate] recServer] storeUpdate] channelScanComplete:nil];
+  [[[[NSApp delegate] recServer] storeUpdate] channelScanComplete:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:scanResult], @"scanResult", nil]];
   
   mCurrentProgressDisplay = nil;
 }
