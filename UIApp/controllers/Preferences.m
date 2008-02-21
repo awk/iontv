@@ -108,7 +108,6 @@ static void addToolbarItem(NSMutableDictionary *theDict,NSString *identifier,NSS
 @interface Preferences(Private)
 - (void) showPrefsView:(NSView*)inViewToBeShown;
 - (void) sendTunerDetailsWithStations:(BOOL)sendStations;
-- (void) pushHDHomeRunStationsOnTuner:(HDHomeRunTuner *)inTuner;
 - (void) selectedTunerDidChange:(HDHomeRunTuner*)newTuner;
 @end
 
@@ -432,7 +431,7 @@ static Preferences *sSharedInstance = nil;
               {
                 for (HDHomeRunTuner *aTuner in tuners)
                 {
-                        [self pushHDHomeRunStationsOnTuner:aTuner];
+                        [aTuner pushHDHomeRunStationsToServer];
                 }
               }
       }
@@ -494,27 +493,6 @@ static Preferences *sSharedInstance = nil;
   NSArray* sortDescriptors = [NSArray arrayWithObject:callSignDescriptor];
 
   return sortDescriptors;
-}
-
-- (void) pushHDHomeRunStationsOnTuner:(HDHomeRunTuner *)inTuner 
-{ 
-	if ([[NSApp delegate] recServer]) 
-	{ 
-		// Start by adding all the channels on this tuner to an array 
-		NSMutableSet *channelsSet = [inTuner mutableSetValueForKey:@"channels"]; 
-
-		// Create an array to hold the dictionaries of channel info 
-		NSMutableArray *channelsOnTuner = [NSMutableArray arrayWithCapacity:[channelsSet count]]; 
-
-		// Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array 
-		[channelsSet makeObjectsPerformSelector:@selector(addChannelInfoDictionaryTo:) withObject:channelsOnTuner]; 
-
-		NSSortDescriptor *channelDescriptor =[[[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES] autorelease]; 
-		NSArray *sortDescriptors=[NSArray arrayWithObject:channelDescriptor]; 
-		NSArray *sortedArray=[channelsOnTuner sortedArrayUsingDescriptors:sortDescriptors]; 
-
-		[[[NSApp delegate] recServer] setHDHomeRunChannelsAndStations:sortedArray onDeviceID:[[[inTuner device] deviceID] intValue] forTunerIndex:[[inTuner index] intValue]]; 
-	} 
 }
 
 - (void) selectedTunerDidChange:(HDHomeRunTuner*)newTuner
@@ -717,7 +695,7 @@ static Preferences *sSharedInstance = nil;
   [mRetrieveLineupsButton setEnabled:YES];
   NSError *error = nil;
   [mLineupsArrayController fetchWithRequest:[mLineupsArrayController defaultFetchRequest] merge:NO error:&error];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:[NSApp delegate]];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:[NSApp delegate]];
 }
 
@@ -726,7 +704,7 @@ static Preferences *sSharedInstance = nil;
   [mParsingProgressIndicator setHidden:YES];
   [mRetrieveLineupsButton setEnabled:YES];
   
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:[NSApp delegate]];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:[NSApp delegate]];
 }
 
@@ -793,7 +771,7 @@ static Preferences *sSharedInstance = nil;
 	if (returnCode == NSAlertDefaultReturn)
 	{
 		[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] importChannelMapFrom:importURL];
-		[self pushHDHomeRunStationsOnTuner:[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0]];
+		[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] pushHDHomeRunStationsToServer];
 	}
 	[importURL release];	// Copied in the file open panel did end delegate
 }

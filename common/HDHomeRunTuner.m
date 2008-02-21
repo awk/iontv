@@ -362,6 +362,52 @@ const int kCallSignStringLength = 10;
     [changedObjects release];
 }
 
+- (void) pushHDHomeRunStationsToServer
+{ 
+	if ([[NSApp delegate] recServer]) 
+	{ 
+		// Start by adding all the channels on this tuner to an array 
+		NSMutableSet *channelsSet = [self mutableSetValueForKey:@"channels"]; 
+
+		// Create an array to hold the dictionaries of channel info 
+		NSMutableArray *channelsOnTuner = [NSMutableArray arrayWithCapacity:[channelsSet count]]; 
+
+		// Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array 
+		[channelsSet makeObjectsPerformSelector:@selector(addChannelInfoDictionaryTo:) withObject:channelsOnTuner]; 
+
+		NSSortDescriptor *channelDescriptor =[[[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES] autorelease]; 
+		NSArray *sortDescriptors=[NSArray arrayWithObject:channelDescriptor]; 
+		NSArray *sortedArray=[channelsOnTuner sortedArrayUsingDescriptors:sortDescriptors]; 
+
+		[[[NSApp delegate] recServer] setHDHomeRunChannelsAndStations:sortedArray onDeviceID:[self.device.deviceID intValue] forTunerIndex:[self.index intValue]]; 
+	} 
+}
+
+- (void) copyChannelsAndStationsFrom:(HDHomeRunTuner*)sourceTuner
+{
+  if (sourceTuner == self)
+  {
+    return; // No point copying from self
+  }
+  
+  // Remove all our channels first - and remove all the channels in the background server too !
+  [self removeChannels:self.channels];
+  
+  // The interate over the channels in the source tuner and add them and the associated stations.
+  for (HDHomeRunChannel *aChannel in sourceTuner.channels)
+  {
+    HDHomeRunChannel *newChannel = [HDHomeRunChannel createChannelWithType:aChannel.channelType andNumber:aChannel.channelNumber inManagedObjectContext:[self managedObjectContext]];
+    newChannel.tuningType = aChannel.tuningType;
+    for (HDHomeRunStation *aStation in aChannel.stations)
+    {
+      HDHomeRunStation *newStation = [HDHomeRunStation createStationWithProgramNumber:aStation.programNumber forChannel:newChannel inManagedObjectContext:[self managedObjectContext]];
+      newStation.callSign = aStation.callSign;
+      newStation.z2itStation = aStation.z2itStation;
+    }
+    [self addChannelsObject:newChannel];
+  }
+}
+
 #pragma mark - Notifications
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -564,8 +610,6 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 	
     mCurrentHDHomeRunChannel = nil;
     
-    [psc lock];
-    
   @try
   {
     @synchronized(self)  
@@ -605,8 +649,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   }
-  [psc unlock];
-  
+  NSLog(@"HDHomeRunTuner - performScan complete - calling storeUpdate\n");
   [[[[NSApp delegate] recServer] storeUpdate] channelScanComplete:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:scanResult], @"scanResult", nil]];
   
   mCurrentProgressDisplay = nil;

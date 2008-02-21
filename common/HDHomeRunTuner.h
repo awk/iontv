@@ -46,6 +46,8 @@
 - (void) scanActionReportingProgressTo:(id)progressDisplay;
 - (void) exportChannelMapTo:(NSURL *)inURL;
 - (void) importChannelMapFrom:(NSURL *)inURL;
+- (void) pushHDHomeRunStationsToServer;
+- (void) copyChannelsAndStationsFrom:(HDHomeRunTuner*)sourceTuner;
 
 #if 0
 - (void) startStreaming;
