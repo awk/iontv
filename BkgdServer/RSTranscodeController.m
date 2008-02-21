@@ -380,6 +380,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 	  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
 	  [request setEntity:entityDescription];
+	  [request setFetchLimit:1];
 	   
 	  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.program.programID == %@", @"EP000809390063"];
 	  [request setPredicate:predicate];

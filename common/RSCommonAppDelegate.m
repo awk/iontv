@@ -69,6 +69,10 @@ NSString *kRSStoreUpdateConnectionName = @"resched_store_update";
 	
     NSMutableSet *allBundles = [[NSMutableSet alloc] init];
     [allBundles addObject: [NSBundle mainBundle]];
+	// Sometimes when running from debugging tools main bundle will not be the 'right thing', rather
+	// our bundle will be present in the system independantly - so add it here (if it's known).
+	if ([NSBundle bundleWithIdentifier:@"org.awkward.recsched-server"])
+		[allBundles addObject: [NSBundle bundleWithIdentifier:@"org.awkward.recsched-server"]];
     [allBundles addObjectsFromArray: [NSBundle allFrameworks]];
     
     managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles: [allBundles allObjects]] retain];

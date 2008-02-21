@@ -19,6 +19,7 @@
 #import "Z2ITSchedule.h"
 #import "Z2ITLineupMap.h"
 #import "Z2ITLineup.h"
+#import "Z2ITProgram.h"
 #import "HDHomeRunTuner.h"
 
 @implementation Z2ITStation
@@ -29,6 +30,7 @@
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"stationID == %@", inStationID];
   [request setPredicate:predicate];
@@ -51,8 +53,6 @@
   else
   {
     aStation = [array objectAtIndex:0];
-    if ([array count] > 1)
-      NSLog(@"fetchStationWithID - multiple (%d) station with ID %@", [array count], inStationID);
     return aStation;
   }
 }
@@ -129,8 +129,8 @@
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
   
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"station == %@ AND (((%@ >= time) AND (%@ < endTime)) OR ((%@ > time) AND (%@ <= endTime)))",
-	self, [value time], [value time], [value endTime], [value endTime]];
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"station == %@ AND (((time >= %@) AND (time < %@)) OR ((endTime > %@) and (endTime <= %@)))",
+	self, [value time], [value endTime], [value time], [value endTime]];
   [request setPredicate:predicate];
   
   NSError *error = nil;
@@ -158,13 +158,14 @@
 			// Program's for both the new and existing schedule are the same - this might be a complete duplicate
 			if (([[aSchedule time] compare:[value time]] == NSOrderedSame) && ([[aSchedule endTime] compare:[value endTime]] == NSOrderedSame))
 			{
-				// Duplicate schedule - we might want to update the other schedule details (in case they've changed)
-				// but for now we'll just ignore the new one
+				// Complete duplicate schedule times & the programs match - ignore it.
 				return NO;
 			}
 		}
 
-		NSLog(@"Dropping overlapping schedule %@ overlaps with %@ on station %@", aSchedule, value, self);
+//		NSLog(@"Dropping overlapping schedule for program %@ - %@ on Station %@, %@ to %@ overlaps with program %@ - %@, %@ to %@", 
+//			aSchedule.program.title, aSchedule.program.subTitle ? aSchedule.program.subTitle : @"", self.callSign, aSchedule.time, aSchedule.endTime,
+//			value.program.title, value.program.subTitle ? value.program.subTitle : @"", value.time, value.endTime);
 		[moc deleteObject:aSchedule];
 	}
   }
@@ -222,6 +223,7 @@
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:moc];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
   
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(station == %@) AND (%@ >= time) AND (%@ < endTime)", self, airDate, airDate];
   [request setPredicate:predicate];
@@ -236,8 +238,6 @@
   Z2ITSchedule *aSchedule =nil;
   if ([array count] > 0)
     aSchedule = [array objectAtIndex:0];
-  if ([array count] > 1)
-    NSLog(@"scheduleAtTime - %d schedules at time %@ for station %@", [array count], airDate, [self callSign]);
   return aSchedule;
 }
 

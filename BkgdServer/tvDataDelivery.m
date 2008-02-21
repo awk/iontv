@@ -300,14 +300,14 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 
 @implementation xtvdDownloadThread
 
-+ (void) performDownload:(id)downloadInfo
+- (void) performDownload:(id)downloadInfo
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   size_t activityToken;
   
   NSDictionary *xtvdDownloadData = (NSDictionary*)downloadInfo;
   
-  id reportProgressTo = [downloadInfo valueForKey:kTVDataDeliveryReportProgressToKey];
+  id reportProgressTo = [xtvdDownloadData valueForKey:kTVDataDeliveryReportProgressToKey];
   BOOL reportProgress = [reportProgressTo conformsToProtocol:@protocol(RSActivityDisplay)];
   
   if (reportProgress)
@@ -323,12 +323,12 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   {
 	// Error during the download - notify the other side and return
 	[[[[NSApp delegate] recServer] storeUpdate] downloadError:downloadResult];
-	[pool release];
 	if (reportProgress)
 	{
 		activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
 		[reportProgressTo endActivity:activityToken];
 	}
+	[pool release];
 	return;
   }
   
@@ -349,9 +349,8 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 	[reportProgressTo endActivity:activityToken];
   }
   if ([[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] respondsToSelector:@selector(handleDownloadData:)])
-    [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelectorOnMainThread:@selector(handleDownloadData:) withObject:parserCallData waitUntilDone:NO];
+    [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelector:@selector(handleDownloadData:) withObject:parserCallData];
 
-  [downloadInfo release];		// We're responsible for releasing this data.
   [pool release];
 }
 

@@ -27,6 +27,10 @@
 #import "Z2ITProgram.h"
 #import "RSActivityDisplayProtocol.h"
 
+NSString *kCleanupDateKey = @"cleanupDate";
+NSString *kReportCompletionToKey = @"reportCompletionTo";
+NSString *kPersistentStoreCoordinatorKey = @"persistentStoreCoordinator";
+
 @implementation XTVDParser
 
 - (void) dealloc
@@ -696,7 +700,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   
   NSDictionary *xtvdParserData = (NSDictionary*)parseInfo;
   
-  NSPersistentStoreCoordinator *psc = [xtvdParserData valueForKey:@"persistentStoreCoordinator"];
+  NSPersistentStoreCoordinator *psc = [xtvdParserData valueForKey:kPersistentStoreCoordinatorKey];
   if (psc != nil)
   {
 	XTVDParser *anXTVDParser = [[XTVDParser alloc] init];
@@ -741,7 +745,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
   
   [[NSFileManager defaultManager] removeFileAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] handler:nil];
-  [[xtvdParserData valueForKey:@"reportCompletionTo"] performSelectorOnMainThread:@selector(parsingComplete:) withObject:parseInfo waitUntilDone:NO];
+  [[xtvdParserData valueForKey:kReportCompletionToKey] performSelector:@selector(parsingComplete:) withObject:parseInfo];
   [mManagedObjectContext release];
   [pool release];
 }
@@ -765,9 +769,9 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
 @implementation xtvdCleanupThread
 
-+ (void) cleanupSchedulesIn:(NSManagedObjectContext*)mManagedObjectContext before:(NSDate*)inDate
+- (void) cleanupSchedulesIn:(NSManagedObjectContext*)inMOC before:(NSDate*)inDate
 {
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:mManagedObjectContext];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
   
@@ -775,20 +779,20 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   [request setPredicate:oldSchedulesPredicate];
   
   NSError *error = nil;
-  NSArray *array = [mManagedObjectContext executeFetchRequest:request error:&error];
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
   NSLog(@"cleanupSchedules - %d schedules before now", [array count]);
   if (array != nil)
   {
     Z2ITSchedule *aSchedule;
     for (aSchedule in array)
     {
-      [mManagedObjectContext deleteObject:aSchedule];
+      [inMOC deleteObject:aSchedule];
     }
   }
-  [mManagedObjectContext commitEditing];
+  [inMOC processPendingChanges];
 }
 
-+ (void) cleanupUnscheduledProgramsIn:(NSManagedObjectContext*)inMOC
+- (void) cleanupUnscheduledProgramsIn:(NSManagedObjectContext*)inMOC
 {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Program" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
@@ -803,51 +807,71 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     for (aProgram in array)
     {
       NSSet *schedules = [aProgram schedules];
-      if (schedules && ([schedules count] == 0))
+      if ((schedules && ([schedules count] == 0)) || (schedules == nil))
       {
         [inMOC deleteObject:aProgram];
         i++;
       }
     }
   }
-  [inMOC commitEditing];
+  [inMOC processPendingChanges];
   NSLog(@"cleanupUnschedulePrograms - %d programs %d were deleted", [array count], i);
 }
 
-+ (void) performCleanup:(id)cleanupInfo
+- (void) performCleanup:(id)cleanupInfo
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
   NSDictionary *xtvdCleanupInfo = (NSDictionary*)cleanupInfo;
 
-  NSPersistentStoreCoordinator *psc = [xtvdCleanupInfo valueForKey:@"persistentStoreCoordinator"];
+  NSPersistentStoreCoordinator *psc = [xtvdCleanupInfo valueForKey:kPersistentStoreCoordinatorKey];
   if (psc != nil)
   {
     NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
     [managedObjectContext setPersistentStoreCoordinator: psc];
-    [psc lock];
 
-    NSDate *currentDate = [xtvdCleanupInfo valueForKey:@"currentDate"];
+    NSDate *cleanupDate = [xtvdCleanupInfo valueForKey:kCleanupDateKey];
     
-    [self cleanupSchedulesIn:managedObjectContext before:currentDate];
+    [self cleanupSchedulesIn:managedObjectContext before:cleanupDate];
     
     [self cleanupUnscheduledProgramsIn:managedObjectContext];
-    [[xtvdCleanupInfo valueForKey:@"reportCompletionTo"] performSelectorOnMainThread:@selector(cleanupComplete:) withObject:nil waitUntilDone:NO];
+    [[xtvdCleanupInfo valueForKey:kReportCompletionToKey] performSelectorOnMainThread:@selector(cleanupComplete:) withObject:cleanupInfo waitUntilDone:NO];
 
     NS_DURING
-      NSError *error = nil;
-      NSLog(@"performCleanup - saving");
-      if (![managedObjectContext save:&error])
-      {
-        NSLog(@"performParse - save returned an error %@", error);
-      }
+		NSError *error = nil;
+		// when the lineup retrieval and MOC saves, we want to update the same object in the UI's MOC. 
+		// So listen for the did save notification from the retrieval/parsing thread MOC
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
+			name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
+
+		NSLog(@"performCleanup - saving");
+		if (![managedObjectContext save:&error])
+		{
+			NSLog(@"performParse - save returned an error %@", error);
+		}
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
     NS_HANDLER
-      [psc unlock];
     NS_ENDHANDLER
     
-    [psc unlock];
+	[managedObjectContext reset];
+	[managedObjectContext release];
   }
   [pool release];
+}
+
+#pragma mark - Notifications
+
+/**
+    Notification sent out when the threads own managedObjectContext has been.  This method
+    ensures updates from the thread (which has its own managed object
+    context) are merged into the application managed object content, so the 
+    user always sees the most current information.
+*/
+
+- (void)threadContextDidSave:(NSNotification *)notification
+{
+	if ([[[NSApplication sharedApplication] delegate] respondsToSelector:@selector(updateForSavedContext:)])
+		[[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
 }
 
 @end;

@@ -24,7 +24,8 @@
 #import "RSStoreUpdateProtocol.h"
 
 extern NSString *RSNotificationUIActivityAvailable;
-extern const int kDefaultScheduleFetchDuration;
+extern const int kDefaultUpdateScheduleFetchDurationInHours;
+extern const int kDefaultFutureScheduleFetchDurationInHours;
 
 @class RSActivityProxy;
 @class RSRecording;

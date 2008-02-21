@@ -32,7 +32,8 @@
 #import "HDHomeRunTuner.h"
 #import "RSStoreUpdateProtocol.h"
 
-const int kDefaultScheduleFetchDuration = 3;
+const int kDefaultUpdateScheduleFetchDurationInHours = 3;
+const int kDefaultFutureScheduleFetchDurationInHours = 12;
 NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailable";
 
 @interface RSActivityProxy : NSObject <RSActivityDisplay>
@@ -54,6 +55,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     mExitServer = NO;
     mUIActivityProxy = [[RSActivityProxy alloc] init];
     [mUIActivityProxy setUIActivity:self];    // Start with ourselves as the activity display (a text log to the console)
+	
     // Setup the recording queues in a bit (after the app startup has completed and we have a delegate etc.)
     [self performSelector:@selector(initializeRecordingQueues) withObject:nil afterDelay:0];
   }
@@ -147,6 +149,28 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	return mStoreUpdate;
 }
 
+- (void) performCleanup:(id)info
+{
+  // Clear all old items from the store
+  NSDate *cleanupDate = [NSDate dateWithTimeIntervalSinceNow:-(12 * 60 * 60)];		// 12 hours prior to now
+  NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:cleanupDate, kCleanupDateKey, self, @"reportProgressTo", self, kReportCompletionToKey,
+   [[NSApp  delegate] persistentStoreCoordinator], kPersistentStoreCoordinatorKey, nil];
+
+	if ([info valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil)
+	{
+		[callData setValue:[info valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
+	}
+	if ([info valueForKey:kTVDataDeliveryEndDateKey] != nil)
+	{
+		[callData setValue:[info valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
+	}
+			 
+  xtvdCleanupThread *aCleanupThread = [[xtvdCleanupThread alloc] init];
+  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:aCleanupThread withObject:callData];
+  [aCleanupThread release];
+  [callData release];
+}
+
 #pragma mark - Internal Methods
 
 - (void) fetchScheduleWithDuration:(int)inHours
@@ -168,11 +192,15 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
   NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
   
+  xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
   NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, kTVDataDeliveryStartDateKey, endDateStr, kTVDataDeliveryEndDateKey, self, kTVDataDeliveryDataRecipientKey, self, kTVDataDeliveryReportProgressToKey, nil];
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
+  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
+  [aDownloadThread release];
+  [callData release];
 }
 
 #pragma mark Schedule Update Methods
+
 // If the current schedule data is more than one hour out of date then download new
 // schedule data and update the database.
 - (void) autoUpdateSchedule
@@ -193,10 +221,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
           }
         }
 	// Set up a timer to fire one hour before the about to be fetched schedule data 'runs out'
-	[NSTimer scheduledTimerWithTimeInterval:(kDefaultScheduleFetchDuration - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
+	[NSTimer scheduledTimerWithTimeInterval:(kDefaultUpdateScheduleFetchDurationInHours - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
 	
 	if (updateScheduleNow)
-		[self fetchScheduleWithDuration:kDefaultScheduleFetchDuration];
+		[self fetchScheduleWithDuration:kDefaultUpdateScheduleFetchDurationInHours];
 }
 
 - (void) updateScheduleTimer:(NSTimer*)aTimer
@@ -216,25 +244,33 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   {
     // We need to determine a reasonable starting time - the best bet is to just take the latest start date in the
     // schedule list and work from there
-    mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithTimeInterval:0 sinceDate:[[Z2ITSchedule fetchScheduleWithLatestStartDateInMOC:[[NSApp delegate] managedObjectContext]] time]];
+	Z2ITSchedule *lastSchedule = [Z2ITSchedule fetchScheduleWithLatestStartDateInMOC:[[NSApp delegate] managedObjectContext]];
+	if (lastSchedule)
+	{
+		mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithTimeInterval:0 sinceDate:[lastSchedule time]];
+	}
+	else
+	{
+		mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithTimeIntervalSinceNow:0];
+	}
     [mLastScheduleFetchEndDate setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
   }
   
   // If the last schedule fetch start date is sooner than 'chunk size' before two weeks from now we need to get
   // some more data.
-  NSCalendarDate *twoWeeksOut = [[NSCalendarDate calendarDate] dateByAddingYears:0 months:0 days:14 hours:-kDefaultScheduleFetchDuration minutes:0 seconds:0];
+  NSCalendarDate *twoWeeksOut = [[NSCalendarDate calendarDate] dateByAddingYears:0 months:0 days:14 hours:-kDefaultFutureScheduleFetchDurationInHours minutes:0 seconds:0];
   [twoWeeksOut setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
   
   if ([mLastScheduleFetchEndDate compare:twoWeeksOut] == NSOrderedAscending)
   {
     if ([mLastScheduleFetchEndDate compare:[NSDate date]] == NSOrderedAscending)
     {
-      mLastScheduleFetchEndDate = [NSCalendarDate calendarDate];    // No point fetching schedule data before now
+	  [mLastScheduleFetchEndDate release];
+      mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithTimeIntervalSinceNow:0];    // No point fetching schedule data before now
       [mLastScheduleFetchEndDate setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
     }
     
-    NSCalendarDate *endDate = [mLastScheduleFetchEndDate dateByAddingYears:0 months:0 days:0 hours:kDefaultScheduleFetchDuration minutes:0 seconds:0];
-//    [endDate setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"UTC"]];
+    NSCalendarDate *endDate = [mLastScheduleFetchEndDate dateByAddingYears:0 months:0 days:0 hours:kDefaultFutureScheduleFetchDurationInHours minutes:0 seconds:0];
     
     NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", [mLastScheduleFetchEndDate yearOfCommonEra], [mLastScheduleFetchEndDate monthOfYear], [mLastScheduleFetchEndDate dayOfMonth], [mLastScheduleFetchEndDate hourOfDay]];
     NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", [endDate yearOfCommonEra], [endDate monthOfYear], [endDate dayOfMonth], [endDate hourOfDay]];
@@ -245,15 +281,18 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
         self, kTVDataDeliveryDataRecipientKey, self, kTVDataDeliveryReportProgressToKey, 
         [NSNumber numberWithBool:YES], kTVDataDeliveryFetchFutureScheduleKey,
         nil];
-    [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
+	// We 'transfer' ownership of this dictionary to this new thread - they'll release the memory for us.
+	xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
+    [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
+	[aDownloadThread release];
+	[callData release];
     return YES;
   }
   
-  // Otherwise we're done, return NO - no more data to retreive, but set a timer to fire 1 hour before the current date
-  // range is going to expire - when that time fires it'll call back to the fetchFutureSchedule method to get some more
-  // data.
-  NSDate *timerFireDate =  [[Z2ITSchedule fetchScheduleWithLatestStartDateInMOC:[[NSApp delegate] managedObjectContext]] time];
-  [timerFireDate addTimeInterval:((kDefaultScheduleFetchDuration * 60 * 60) - (60 * 60))];
+  // Otherwise we're done, return NO - no more data to retreive. SchedulesDirect maintains only approx 14 days of future
+  // schedule information, so set a timer to fire in another 'fetchFuture' hours because by then another 'fetchFuture'
+  // hours worth of schedule data should be available.
+  NSDate *timerFireDate =  [NSDate dateWithTimeIntervalSinceNow:(kDefaultFutureScheduleFetchDurationInHours * 60 * 60)];
   [NSTimer scheduledTimerWithTimeInterval:[timerFireDate timeIntervalSinceNow] target:self selector:@selector(fetchFutureScheduleTimer:) userInfo:nil repeats:YES];
   
   return NO;
@@ -275,21 +314,17 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   NSDictionary *xtvd = [downloadResult valueForKey:@"xtvd"];
   NSLog(@"getScheduleAction downloadResult messages = %@", messages);
   NSLog(@"getScheduleAction downloadResult xtvd = %@", xtvd);
-  [downloadResult release];
 
   if (xtvd != nil)
   {
 	id notificationProxy = [self uiActivity];
 	if (notificationProxy == nil)
 		notificationProxy = self;
-	id completionProxy = [self storeUpdate];
-	if (completionProxy == nil)
-		completionProxy = self;
-    NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
-        notificationProxy, @"reportProgressTo", 
-        completionProxy, @"reportCompletionTo", 
-        [[NSApp  delegate] persistentStoreCoordinator], @"persistentStoreCoordinator",
-        nil];
+	NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
+			notificationProxy, @"reportProgressTo", 
+			self, kReportCompletionToKey, 
+			[[NSApp  delegate] persistentStoreCoordinator], kPersistentStoreCoordinatorKey,
+			nil];
 
 	if ([downloadResult valueForKey:kTVDataDeliveryLineupsOnlyKey] != nil)
 		[callData setValue:[downloadResult valueForKey:kTVDataDeliveryLineupsOnlyKey] forKey:kTVDataDeliveryLineupsOnlyKey];
@@ -299,10 +334,13 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		[callData setValue:[downloadResult valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
                 [callData setValue:[downloadResult valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
         }
+
     // Start our local parsing
     xtvdParseThread *aParseThread = [[xtvdParseThread alloc] init];
     
     [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:aParseThread withObject:callData];
+	[aParseThread release];
+	[callData release];
     }
 }
 
@@ -369,15 +407,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
         [[NSFileManager defaultManager] removeItemAtPath:scheduleUpdatedPath error:nil];
         [[NSFileManager defaultManager] createFileAtPath:scheduleUpdatedPath contents:nil attributes:nil];
         
-  // Clear all old items from the store
-#if 0
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", self, @"reportProgressTo", self, @"reportCompletionTo",
-   [info valueForKey:kTVDataDeliveryFetchFutureScheduleKey], kTVDataDeliveryFetchFutureScheduleKey,
-   [[NSApp  delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
-
-  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
+#if 1
+	[self performCleanup:info];
 #else
 	// No cleanup performed - just send a fake cleanup complete notification
 	[self cleanupComplete:info];
@@ -389,7 +420,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	NSLog(@"cleanupComplete");
         if ([[info valueForKey:kTVDataDeliveryFetchFutureScheduleKey] boolValue] == YES)
         {
-        // Need to use NSCalendarDate initWithString here - 
           mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithString:[info valueForKey:kTVDataDeliveryEndDateKey] calendarFormat:@"%Y-%m-%dT%H:%M:%SZ"];
           [self performSelectorOnMainThread:@selector(fetchFutureSchedule:) withObject:nil waitUntilDone:NO];
         }
@@ -614,7 +644,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, kTVDataDeliveryStartDateKey, endDateStr, kTVDataDeliveryEndDateKey,
     self, kTVDataDeliveryDataRecipientKey,
     self, kTVDataDeliveryReportProgressToKey, nil];
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
+  xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
+  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
+  [aDownloadThread release];
+  [callData release];
 }
 
 - (oneway void) updateLineups
@@ -640,7 +673,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, kTVDataDeliveryStartDateKey, endDateStr, kTVDataDeliveryEndDateKey, [NSNumber numberWithBool:YES], kTVDataDeliveryLineupsOnlyKey,
       self, kTVDataDeliveryDataRecipientKey,
       self, kTVDataDeliveryReportProgressToKey, nil];
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:[xtvdDownloadThread class] withObject:callData];
+  xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
+  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
+  [aDownloadThread release];
+  [callData release];
 }
 
 - (void) scanForHDHomeRunDevices:(id)sender

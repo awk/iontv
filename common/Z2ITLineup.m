@@ -28,6 +28,7 @@
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Lineup" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"lineupID == %@", inLineupID];
   [request setPredicate:predicate];
@@ -49,13 +50,8 @@
     [aLineup retain];
     return aLineup;
   }
-  else if ([array count] == 0)
-  {
-      return nil;
-  }
   else
   {
-      NSLog(@"fetchLineupWithID - multiple (%d) lineups with ID %@", [array count], inLineupID);
       return nil;
   }
 }

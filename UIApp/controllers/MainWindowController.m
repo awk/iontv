@@ -35,6 +35,7 @@
 #import "RecSchedProtocol.h"
 #import "ScheduleViewController.h"
 #import "ProgramSearchViewController.h"
+#import "NSStringAdditions.h"
 
 @interface MainWindowController(Private)
 - (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule;
@@ -313,26 +314,68 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	scheduleObjectURI = [NSURL URLWithString:scheduleObjectURIString];
 	NSManagedObjectID *scheduleObjectID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:scheduleObjectURI];
 	Z2ITSchedule *aSchedule = nil;
-        if (scheduleObjectID)
-          aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
-        if (aSchedule)
-        {
-          // Use the prior schedule choice to pick the channel to select from this time, we'll actually select whatever program is
-          // currently being shown on that channel 'now'
-          NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-          NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-          [request setEntity:entityDescription];
-           
-          NSDate *nowDate = [NSDate date];
-          NSPredicate *predicate = [NSPredicate predicateWithFormat:@"station == %@ AND time <= %@ AND endTime > %@", aSchedule.station, nowDate, nowDate];
-        [request setPredicate:predicate];
-           
-          NSError *error = nil;
-          NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
-          if (array && ([array count] > 0))
-            [mCurrentSchedule setContent:[array objectAtIndex:0]];
-        }
+	if (scheduleObjectID)
+	  aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
+	if (aSchedule)
+	{
+		// Use a try/catch block here - the old objectURI/ObjectID may have become invalid if it points to an object that has been
+		// deleted on cleanup.
+		@try {
+		  // Use the prior schedule choice to pick the channel to select from this time, we'll actually select whatever program is
+		  // currently being shown on that channel 'now'
+		  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+		  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+		  [request setEntity:entityDescription];
+		   
+		  NSDate *nowDate = [NSDate date];
+		  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"station == %@ AND time <= %@ AND endTime > %@", aSchedule.station, nowDate, nowDate];
+		  [request setPredicate:predicate];
+		   
+		  NSError *error = nil;
+		  NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
+		  if (array && ([array count] > 0))
+				[mCurrentSchedule setContent:[array objectAtIndex:0]];
+		}
+		@catch (NSException * e) {
+			// No need to log anything
+		}
+	}
   }
+	// If we don't have a current schedule selected - just pick one for 'now' on the lowest numbered channel
+	if ([mCurrentSchedule content] == nil)
+	{
+	  NSError *error = nil;
+
+	  // Fetch the lineup maps
+	  NSEntityDescription *lineupEntityDescription = [NSEntityDescription entityForName:@"LineupMap" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	  NSFetchRequest *lineupRequest = [[[NSFetchRequest alloc] init] autorelease];
+	  [lineupRequest setEntity:lineupEntityDescription];
+	  NSArray *lineupArray = [[[NSApp delegate] managedObjectContext] executeFetchRequest:lineupRequest error:&error];
+
+		// We have to sort them seperately from the fetch because CoreData doesn't support using 'custom' selectors in a sort desriptor executed during a fetch.
+	  NSSortDescriptor *channelSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"channel" ascending:YES selector:@selector(numericCompare:)] autorelease];
+	  NSSortDescriptor *channelMinorSortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"channelMinor" ascending:YES] autorelease];
+	  NSArray *sortedLineupArray = [lineupArray sortedArrayUsingDescriptors:[NSArray arrayWithObjects:channelSortDescriptor, channelMinorSortDescriptor, nil]];
+		
+	  // Now fetch a schedule with matching lineup map
+	  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+	  [request setEntity:entityDescription];
+	   
+	  NSDate *nowDate = [NSDate date];
+	  NSPredicate *predicate;
+		if (sortedLineupArray && ([sortedLineupArray count] > 0))
+			predicate = [NSPredicate predicateWithFormat:@"%@ IN station.lineupMaps AND time <= %@ AND endTime > %@", [sortedLineupArray objectAtIndex:0], nowDate, nowDate];
+		else
+			predicate = [NSPredicate predicateWithFormat:@"time <= %@ AND endTime > %@", nowDate, nowDate];
+	  [request setPredicate:predicate];
+	   
+	  NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
+	  if (array && ([array count] > 0))
+	  {
+			[mCurrentSchedule setContent:[array objectAtIndex:0]];
+	  }
+	}
 }
 
 - (void) dealloc

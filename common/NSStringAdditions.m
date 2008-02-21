@@ -1,4 +1,4 @@
-//  Copyright (c) 2007, Andrew Kimpton
+//  Copyright (c) 2008, Andrew Kimpton
 //  
 //  All rights reserved.
 //  
@@ -23,40 +23,15 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "RSCommonAppDelegate.h"
-#import "RSStoreUpdateProtocol.h"
+#import "NSStringAdditions.h"
 
-extern NSString *RSParsingCompleteNotification;
-extern NSString *RSDownloadErrorNotification;
-extern NSString *RSDeviceScanCompleteNotification;
-extern NSString *RSChannelScanCompleteNotification;
-extern NSString *RSLineupRetrievalCompleteNotification;
 
-@class HDHomeRunStation;
 
-@interface recsched_AppDelegate : RSCommonAppDelegate <RSStoreUpdate>
+@implementation NSString ( ComparisonAdditions )
+
+-(NSComparisonResult) numericCompare: (NSString *) aString
 {
-    IBOutlet NSWindow *window;
-    IBOutlet NSWindow *mCoreDataProgramWindow;
-    
-    IBOutlet NSMenuItem *mServerMenuItem;
-    
-    NSTask      *mVLCTask;
-    NSTimer     *mVLCTerminateTimer;
-
-    id mRecServer;
-	
-	NSWindowController *mActivityWindowController;
+	return [self compare: aString options: NSNumericSearch];
 }
 
-- (id) recServer;
-
-- (IBAction)showCoreDataProgramWindow:(id)sender;
-- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
-- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
-- (IBAction)showActivityWindow:(id)sender;
-
-- (IBAction) quitServer:(id)sender;
-
-@property (retain,getter=recServer) id mRecServer;
 @end

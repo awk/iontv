@@ -1,4 +1,4 @@
-//  Copyright (c) 2007, Andrew Kimpton
+//  Copyright (c) 2008, Andrew Kimpton
 //  
 //  All rights reserved.
 //  
@@ -23,40 +23,11 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import "RSCommonAppDelegate.h"
-#import "RSStoreUpdateProtocol.h"
 
-extern NSString *RSParsingCompleteNotification;
-extern NSString *RSDownloadErrorNotification;
-extern NSString *RSDeviceScanCompleteNotification;
-extern NSString *RSChannelScanCompleteNotification;
-extern NSString *RSLineupRetrievalCompleteNotification;
+#import <Cocoa/Cocoa.h>
 
-@class HDHomeRunStation;
+@interface NSString ( ComparisonAdditions )
 
-@interface recsched_AppDelegate : RSCommonAppDelegate <RSStoreUpdate>
-{
-    IBOutlet NSWindow *window;
-    IBOutlet NSWindow *mCoreDataProgramWindow;
-    
-    IBOutlet NSMenuItem *mServerMenuItem;
-    
-    NSTask      *mVLCTask;
-    NSTimer     *mVLCTerminateTimer;
+- (NSComparisonResult)numericCompare:(NSString *)string;
 
-    id mRecServer;
-	
-	NSWindowController *mActivityWindowController;
-}
-
-- (id) recServer;
-
-- (IBAction)showCoreDataProgramWindow:(id)sender;
-- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
-- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
-- (IBAction)showActivityWindow:(id)sender;
-
-- (IBAction) quitServer:(id)sender;
-
-@property (retain,getter=recServer) id mRecServer;
 @end

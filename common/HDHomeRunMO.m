@@ -34,6 +34,7 @@ const int kDefaultPortNumber = 1234;
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"HDHomeRun" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"deviceID == %@", inDeviceID];
   [request setPredicate:predicate];
@@ -53,14 +54,9 @@ const int kDefaultPortNumber = 1234;
   {
       return [array objectAtIndex:0];
   }
-  else if ([array count] == 0)
-  {
-      return nil;
-  }
   else
   {
-      NSLog(@"fetchHDHomeRunWithID - multiple (%d) HDHomeRuns with ID %@", [array count], inDeviceID);
-      return [array objectAtIndex:0];
+      return nil;
   }
 }
 
@@ -77,13 +73,19 @@ const int kDefaultPortNumber = 1234;
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Lineup" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
-	
-  if ([array count] > 0)
-	aLineup = [array objectAtIndex:0];		// Just take the first lineup we have.
-	
+
+  if (!array)
+  {
+	NSLog(@"createHDHomeRunWithID %d - no lineups !");
+	return nil;
+  }
+
+	aLineup = [array objectAtIndex:0];
+  
 	// Create the Tuner objects too
 	HDHomeRunTuner *anHDHomeRunTuner;
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];

@@ -54,7 +54,7 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 	
         // This will update the next 'n' hours worth of schedule data, we don't need to do it 'now' rather we can just schedule a
         // timer for a little ways off (about 1 hour less than the default schedule retrieval duration)
-	[NSTimer scheduledTimerWithTimeInterval:(kDefaultScheduleFetchDuration - 1) * 60 * 60 target:mRecSchedServer selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
+	[NSTimer scheduledTimerWithTimeInterval:(kDefaultUpdateScheduleFetchDurationInHours - 1) * 60 * 60 target:mRecSchedServer selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
         
         // We also need to the set the ball rolling on fetching all the schedule data for the next 2 weeks
         [mRecSchedServer fetchFutureSchedule:nil];

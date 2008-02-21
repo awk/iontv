@@ -19,6 +19,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+extern NSString *kCleanupDateKey;
+extern NSString *kReportCompletionToKey;
+extern NSString *kPersistentStoreCoordinatorKey;
+
 @interface XTVDParser : NSObject {
   id	mReportProgressTo;
   NSManagedObjectContext *mManagedObjectContext;
@@ -44,7 +48,7 @@
 {
 }
 
-+ (void) performCleanup:(id)cleanupInfo;
+- (void) performCleanup:(id)cleanupInfo;
 
 @end;
 

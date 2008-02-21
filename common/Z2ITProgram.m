@@ -42,6 +42,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Program" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"programID IN %@", [NSArray arrayWithObject:inProgramID]];
   [request setPredicate:predicate];
@@ -63,13 +64,8 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
     [aProgram retain];
     return aProgram;
   }
-  else if ([array count] == 0)
+  else 
   {
-      return nil;
-  }
-  else
-  {
-      NSLog(@"fetchProgramWithID - multiple (%d) lineups with ID %@", [array count], inProgramID);
       return nil;
   }
 }
@@ -266,7 +262,6 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 			aCrewRole = [NSEntityDescription
 				insertNewObjectForEntityForName:@"CrewRole"
 				inManagedObjectContext:[self managedObjectContext]];
-			[aCrewRole retain];
 			[aCrewRole setValue:[[memberNodes objectAtIndex:0] stringValue] forKey:@"name"];
 		  }
 		[aCrewMember setRole:aCrewRole];
@@ -453,6 +448,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Advisory" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", inAdvisoryString];
   [request setPredicate:predicate];
@@ -476,8 +472,6 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   else
   {
     anAdvisory = [array objectAtIndex:0];
-    if ([array count] > 1)
-      NSLog(@"fetchAdvisoryWithName - multiple (%d) advisories with name %@", [array count], inAdvisoryString);
     return anAdvisory;
   }
 }
@@ -502,6 +496,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Genre" inManagedObjectContext:[self managedObjectContext]];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(programs CONTAINS %@) AND (relevance == %@)", self, [NSNumber numberWithInt:inRelevance]];
   [request setPredicate:predicate];
@@ -554,7 +549,8 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"CrewRole" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
-   
+  [request setFetchLimit:1]; 
+  
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", inCrewRoleNameString];
   [request setPredicate:predicate];
    
@@ -572,19 +568,11 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   if ([array count] == 1)
   {
     NSManagedObject *aCrewRole = [array objectAtIndex:0];
-    [aCrewRole retain];
     return aCrewRole;
-  }
-  else if ([array count] == 0)
-  {
-      return nil;
   }
   else
   {
-      NSLog(@"fetchCrewRoleWithName - multiple (%d) crew roles with name %@", [array count], inCrewRoleNameString);
-      NSManagedObject *aCrewRole = [array objectAtIndex:0];
-      [aCrewRole retain];
-      return aCrewRole;
+      return nil;
   }
 }
 
@@ -606,7 +594,8 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 	NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"GenreClass" inManagedObjectContext:inMOC];
 	NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
 	[request setEntity:entityDescription];
-
+	[request setFetchLimit:1];
+	
 	NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name == %@", inGenreClassNameString];
 	[request setPredicate:predicate];
 
@@ -628,11 +617,6 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 	{
 		aGenreClass = [array objectAtIndex:0];
 	}
-	else
-	{
-		NSLog(@"Warning - fetching genreClass found %d entities with name %@", [array count], inGenreClassNameString);
-		aGenreClass = [array objectAtIndex:0];
-	}
 
 	// Create a genre with the appropriate relevance
 	aGenre = [NSEntityDescription insertNewObjectForEntityForName:@"Genre" inManagedObjectContext:inMOC];
@@ -648,6 +632,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Genre" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"genreClass.name == %@ AND relevance == %@", inGenreClassNameString, inRelevance];
   [request setPredicate:predicate];
@@ -670,8 +655,6 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   else
   {
     aGenre = [array objectAtIndex:0];
-    if ([array count] > 1)
-      NSLog(@"fetchGenreClassWithName - multiple (%d) genre classes with name %@ and relevance", [array count], inGenreClassNameString, inRelevance);
     return aGenre;
   }
 }

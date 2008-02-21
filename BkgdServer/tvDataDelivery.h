@@ -93,7 +93,7 @@ extern NSString *kTVDataDeliveryDataRecipientKey;
 
 @interface xtvdDownloadThread : NSObject
 
-+ (void) performDownload:(id)downloadInfo;
+- (void) performDownload:(id)downloadInfo;
 
 @end;
 

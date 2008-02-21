@@ -35,6 +35,7 @@ NSString *RSParsingCompleteNotification = @"RSParsingCompleteNotification";
 NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 NSString *RSDeviceScanCompleteNotification = @"RSDeviceScanCompleteNotification";
 NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotification";
+NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNotification";
 
 @interface recsched_AppDelegate(private)
 

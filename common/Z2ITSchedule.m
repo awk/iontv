@@ -41,6 +41,7 @@
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
+  [request setFetchLimit:1];
    
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:NO];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];

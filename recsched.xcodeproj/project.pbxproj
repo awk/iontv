@@ -34,6 +34,7 @@
 		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
 		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
 		EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */; };
+		EA2339F10D6BDCC700451694 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2339F00D6BDCC700451694 /* NSStringAdditions.m */; };
 		EA289D160C720FCE00D2EE7B /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
 		EA289D170C720FCF00D2EE7B /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
@@ -224,6 +225,8 @@
 		EA20AF010C25CCA200A9BDBD /* RecordingThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = RecordingThread.m; path = BkgdServer/RecordingThread.m; sourceTree = "<group>"; };
 		EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProgramSearchViewController.h; path = UIApp/controllers/ProgramSearchViewController.h; sourceTree = "<group>"; };
 		EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProgramSearchViewController.m; path = UIApp/controllers/ProgramSearchViewController.m; sourceTree = "<group>"; };
+		EA2339EF0D6BDCC700451694 /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = common/NSStringAdditions.h; sourceTree = "<group>"; };
+		EA2339F00D6BDCC700451694 /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSStringAdditions.m; path = common/NSStringAdditions.m; sourceTree = "<group>"; };
 		EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HexNumberFormatter.h; path = UIApp/HexNumberFormatter.h; sourceTree = "<group>"; };
 		EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HexNumberFormatter.m; path = UIApp/HexNumberFormatter.m; sourceTree = "<group>"; };
 		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolishedBackgroundView.h; path = UIApp/views/PolishedBackgroundView.h; sourceTree = "<group>"; };
@@ -577,6 +580,8 @@
 				EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */,
 				EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */,
 				EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */,
+				EA2339EF0D6BDCC700451694 /* NSStringAdditions.h */,
+				EA2339F00D6BDCC700451694 /* NSStringAdditions.m */,
 			);
 			name = common;
 			sourceTree = "<group>";
@@ -900,6 +905,7 @@
 				EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */,
 				EAF9247D0CD030D100CEBD73 /* RSColorDictionary.m in Sources */,
 				EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */,
+				EA2339F10D6BDCC700451694 /* NSStringAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
