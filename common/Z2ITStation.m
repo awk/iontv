@@ -61,13 +61,23 @@
 {
   Z2ITStation *aStation = nil;
   
+  // Create a 'non punctuated' form of the station callsign
+  NSCharacterSet *punctuation = [NSCharacterSet characterSetWithCharactersInString:@"- "];
+  NSMutableString *plainCallSignString = [NSMutableString stringWithString:callSignString];
+  NSRange r = [plainCallSignString rangeOfCharacterFromSet:punctuation];
+  while (r.location != NSNotFound)
+  {
+    [plainCallSignString deleteCharactersInRange:r];
+    r = [plainCallSignString rangeOfCharacterFromSet:punctuation];
+  }
+  
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
-   
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"callSign LIKE %@", callSignString];
+  
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"callSign == %@", plainCallSignString];
   [request setPredicate:predicate];
-   
+  
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"stationID" ascending:YES];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
   [sortDescriptor release];
@@ -81,12 +91,11 @@
   }
   if ([array count] == 0)
   {
-    NSLog(@"No Stations with callSign %@ found", callSignString);
     return nil;
   }
   else
   {
-    aStation = [array objectAtIndex:0];
+    return [array objectAtIndex:0];
   }
   return aStation;
 }
