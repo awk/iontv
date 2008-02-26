@@ -28,6 +28,15 @@
 
 @class RSActivityAggregateViewController;
 @class RSActivityListView;
+@class RSActivityViewController;
+
+@interface RSActivityWindowController : NSWindowController {
+  IBOutlet RSActivityViewController *activityViewController;
+}
+
+@property (readonly) RSActivityViewController *activityViewController;
+
+@end
 
 @interface RSActivityViewController : NSObject <RSActivityDisplay> {
   IBOutlet RSActivityAggregateViewController *mAggregateViewControllerTemplate;
@@ -35,7 +44,10 @@
   IBOutlet RSActivityListView *mListView;
   
 //  NSMutableDictionary *mActivitiesDictionary;
+    NSConnection *activityConnection;
 }
+
+@property (readonly) NSConnection *activityConnection;
 
 @end
 

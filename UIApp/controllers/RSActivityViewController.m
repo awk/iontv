@@ -47,6 +47,10 @@
 @synthesize activityToken;
 @end
 
+@implementation RSActivityWindowController
+@synthesize activityViewController;
+@end
+
 @implementation RSActivityViewController
 
 - (void) unitTest
@@ -84,30 +88,30 @@
 - (void) awakeFromNib
 {
 	// Register ourselves for the display/feedback methods called by the server
-    NSConnection *theConnection;
+        activityConnection = [[NSConnection alloc] init];
+        [activityConnection setRootObject:self];
+        if ([activityConnection registerName:kRecUIActivityConnectionName] == NO) 
+        {
+          /* Handle error. */
+          NSLog(@"Error registering connection");
+        }
+        else
+                [[[NSApp delegate] recServer] activityDisplayAvailable];
+}
 
-    theConnection = [NSConnection defaultConnection];
-    [theConnection setRootObject:self];
-    if ([theConnection registerName:kRecUIActivityConnectionName] == NO) 
-    {
-		theConnection = [[NSConnection alloc] init];
-		[theConnection setRootObject:self];
-		if ([theConnection registerName:kRecUIActivityConnectionName] == NO) 
-		{
-            /* Handle error. */
-            NSLog(@"Error registering connection");
-		}
-		else
-			[[[NSApp delegate] recServer] activityDisplayAvailable];
-    }
-	else
-		[[[NSApp delegate] recServer] activityDisplayAvailable];
+- (void) destroyActivityConnection
+{
+  [[[NSApp delegate] recServer] activityDisplayUnavailable];
+  [activityConnection registerName:nil];
+  [activityConnection invalidate];
+  [activityConnection release];
+  activityConnection = nil;
 }
 
 - (void) dealloc
 {
 	[[[NSApp delegate] recServer] activityDisplayUnavailable];
-	
+        [self destroyActivityConnection];
 	[super dealloc];
 }
 
@@ -168,6 +172,8 @@
 	*cancel = [(RSActivityAggregateViewController*) activityToken shouldCancel];
   return activityToken;
 }
+
+@synthesize activityConnection;
 
 @end
 
