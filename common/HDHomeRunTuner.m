@@ -390,7 +390,12 @@ const int kCallSignStringLength = 10;
     return; // No point copying from self
   }
   
-  // Remove all our channels first - and remove all the channels in the background server too !
+  // Remove all our channels first !
+  NSArray *oldChannels = [[self channels] allObjects];
+  for (HDHomeRunChannel *aChannel in oldChannels)
+  {
+          [[[NSApp delegate] managedObjectContext] deleteObject:aChannel];
+  }
   [self removeChannels:self.channels];
   
   // The interate over the channels in the source tuner and add them and the associated stations.
