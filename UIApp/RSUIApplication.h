@@ -23,15 +23,11 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-extern NSString *kRSStoreUpdateConnectionName;
+#import <Cocoa/Cocoa.h>
 
-@protocol RSStoreUpdate
 
-- (void) parsingComplete:(id)info;
-- (void) cleanupComplete:(id)info;
-- (void) downloadError:(id)info;
-- (void) deviceScanComplete:(id)info;
-- (void) channelScanComplete:(id)info;
+@interface RSUIApplication : NSApplication {
+
+}
 
 @end
-

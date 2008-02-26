@@ -280,8 +280,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   
   [mCurrentSchedule setContent:nil];
 
-  // Watch for the RSParsingCompleteNotification to reset our object controllers
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(parsingCompleteNotification:) name:RSParsingCompleteNotification object:[NSApp delegate]];
+  // Watch for the RSScheduleUpdateCompleteNotification to reset our object controllers
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scheduleUpdateCompleteNotification:) name:RSScheduleUpdateCompleteNotification object:[NSApp delegate]];
   
   
   // Restore our previous lineup choice
@@ -380,7 +380,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (void) dealloc
 {
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSParsingCompleteNotification object:[NSApp delegate]];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSScheduleUpdateCompleteNotification object:[NSApp delegate]];
 
   // Store the current schedule into the preferences
   [[NSUserDefaults standardUserDefaults] setObject:[[[[mCurrentSchedule content] objectID] URIRepresentation] absoluteString] forKey:kCurrentScheduleURIKey];
@@ -558,7 +558,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
         [[[NSApp delegate] recServer] cancelRecordingOfSchedule:[aSchedule objectID] error:&error];
 }
 
-- (void) parsingCompleteNotification:(NSNotification*)aNotification
+- (void) scheduleUpdateCompleteNotification:(NSNotification*)aNotification
 {
 	// Store the current lineup selection (if there is one)
 	Z2ITLineup *currentLineup = [mCurrentLineup content];
@@ -567,7 +567,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	
 	if (error)
 	{
-		NSLog(@"parsingCompleteNotification - fetchWithRequest got error %@", error);
+		NSLog(@"scheduleUpdateCompleteNotification - fetchWithRequest got error %@", error);
 	}
 	if (!currentLineup)
 	{

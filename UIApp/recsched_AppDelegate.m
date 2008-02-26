@@ -29,13 +29,15 @@
 #import "HDHomeRunTuner.h"
 #import "RecSchedProtocol.h"
 #import "MainWindowController.h"
+#import "RSActivityViewController.h"
+#import "RSFirstRunWindowController.h"
 #import "Sparkle/Sparkle.h"
 
-NSString *RSParsingCompleteNotification = @"RSParsingCompleteNotification";
 NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 NSString *RSDeviceScanCompleteNotification = @"RSDeviceScanCompleteNotification";
 NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotification";
 NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNotification";
+NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotification";
 
 @interface recsched_AppDelegate(private)
 
@@ -111,7 +113,8 @@ NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNot
 	// NSTask
 	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
 	NSString *backgroundServerPath = [bundlePath stringByAppendingPathComponent:@"Contents/Support/recsched_bkgd.app/Contents/MacOS/recsched_bkgd"];
-        BOOL launchedBackgroundServer = [[NSWorkspace sharedWorkspace] launchApplication:backgroundServerPath];
+        BOOL launchedBackgroundServer = NO;
+//        launchedBackgroundServer = [[NSWorkspace sharedWorkspace] launchApplication:backgroundServerPath];
 	if (launchedBackgroundServer == NO)
         {
           NSLog(@"installBackgroundServer - failed to launch background server :%@", backgroundServerPath);
@@ -171,7 +174,7 @@ NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNot
   
   // Setup the activity window controller now - this let's it register with the background server and
   // to show info even if it's not visible
-  mActivityWindowController = [[NSWindowController alloc] initWithWindowNibName:@"Activity"];
+  mActivityWindowController = [[RSActivityWindowController alloc] initWithWindowNibName:@"Activity"];
   [mActivityWindowController window];   // This will trigger the Nib to load
 }
 
@@ -205,6 +208,13 @@ NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNot
 	}
   }
   return self;
+}
+
+- (void) dealloc
+{
+  [mFirstRunWindowController release];
+  [mActivityWindowController release];
+  [super dealloc];
 }
 
 - (NSURL *)urlForPersistentStore {
@@ -251,6 +261,8 @@ NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNot
 	// server which may also have just been updated.
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sparkleWillRestart:) name:SUUpdaterWillRestartNotification object:nil];
 }
+
+#pragma mark - Actions
 
 - (IBAction)showCoreDataProgramWindow:(id)sender
 {
@@ -368,9 +380,21 @@ NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNot
 {
 	if (!mActivityWindowController)
 	{
-		mActivityWindowController = [[NSWindowController alloc] initWithWindowNibName:@"Activity"];
+		mActivityWindowController = [[RSActivityWindowController alloc] initWithWindowNibName:@"Activity"];
 	}
 	[mActivityWindowController showWindow:self];
+}
+
+- (IBAction) launchFirstRunWizard:(id)sender
+{
+  if (mFirstRunWindowController == nil)
+  {
+    mFirstRunWindowController = [[RSFirstRunWindowController alloc] initWithWindowNibName:@"FirstRun"];
+  }
+  if (mFirstRunWindowController)
+  {
+    [mFirstRunWindowController showWindow:sender];
+  }
 }
 
 #pragma mark - Delegate Messages
@@ -440,9 +464,16 @@ NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNot
 	if (info)
 		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"parsingCompleteInfo"];
 
-	[[NSNotificationCenter defaultCenter] postNotificationName:RSParsingCompleteNotification object:self userInfo:infoDict];
-
-	[[window delegate] setGetScheduleButtonEnabled:YES];
+        if ([info valueForKey:@"lineupsOnly"] && [[info valueForKey:@"lineupsOnly"] boolValue] == YES)
+        {
+          [[NSNotificationCenter defaultCenter] postNotificationName:RSLineupRetrievalCompleteNotification object:self userInfo:infoDict];
+        }
+        else
+        {
+          [[NSNotificationCenter defaultCenter] postNotificationName:RSScheduleUpdateCompleteNotification object:self userInfo:infoDict];
+          [[window delegate] setGetScheduleButtonEnabled:YES];
+        }
+        
 	NSLog(@"Parsing Complete");
 }
 
@@ -480,6 +511,13 @@ NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNot
 	[[NSNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:self userInfo:infoDict];
 
 	NSLog(@"Channel Scan Complete");
+}
+
+#pragma mark Properties
+
+- (RSActivityWindowController*) activityWindowController
+{
+  return mActivityWindowController;
 }
 
 @synthesize mRecServer;

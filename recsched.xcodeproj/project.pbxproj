@@ -34,7 +34,10 @@
 		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
 		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
 		EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */; };
-		EA2339F10D6BDCC700451694 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2339F00D6BDCC700451694 /* NSStringAdditions.m */; };
+		EA23871B0D5E5CF400343704 /* RSFirstRunWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23871A0D5E5CF400343704 /* RSFirstRunWindowController.m */; };
+		EA23871F0D5E5D0F00343704 /* FirstRun.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA23871D0D5E5D0F00343704 /* FirstRun.xib */; };
+		EA2387300D5E5E3100343704 /* RSUIApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23872F0D5E5E3100343704 /* RSUIApplication.m */; };
+		EA2387330D5E5E4900343704 /* RSFirstRunContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2387320D5E5E4900343704 /* RSFirstRunContentView.m */; };
 		EA289D160C720FCE00D2EE7B /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
 		EA289D170C720FCF00D2EE7B /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
@@ -53,6 +56,8 @@
 		EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
 		EA308FE00C67C78A0005E89B /* RSColorDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = EA308FB60C66A7470005E89B /* RSColorDictionary.m */; };
 		EA3090C40C6AB59F0005E89B /* RSWishlistController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3090C30C6AB59E0005E89B /* RSWishlistController.m */; };
+		EA39B7CA0D6C8CFC0049CB89 /* assistantBackground.tiff in Resources */ = {isa = PBXBuildFile; fileRef = EA39B7C90D6C8CFC0049CB89 /* assistantBackground.tiff */; };
+		EA39B7E00D6E21720049CB89 /* RSChannelTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA39B7DF0D6E21720049CB89 /* RSChannelTableView.m */; };
 		EA3B40500C8C79470042C793 /* ScheduleDetailsPopupView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */; };
 		EA3B40570C8C7AEE0042C793 /* closebox.png in Resources */ = {isa = PBXBuildFile; fileRef = EA3B40550C8C7AEE0042C793 /* closebox.png */; };
 		EA3B40580C8C7AEE0042C793 /* closebox_pressed.png in Resources */ = {isa = PBXBuildFile; fileRef = EA3B40560C8C7AEE0042C793 /* closebox_pressed.png */; };
@@ -63,6 +68,8 @@
 		EA490DBA0CAF376E00A1DE02 /* ActivityAggregateView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA490DB80CAF376E00A1DE02 /* ActivityAggregateView.xib */; };
 		EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */; };
 		EA4BA1190C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */; };
+		EA4F2D020D73A80A005BC950 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4F2D010D73A80A005BC950 /* NSStringAdditions.m */; };
+		EA4F2D030D73A80A005BC950 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4F2D010D73A80A005BC950 /* NSStringAdditions.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
 		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
 		EA5FAFCA0B6FB50D00CCD5D5 /* DiscreteDurationSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC90B6FB50D00CCD5D5 /* DiscreteDurationSlider.m */; };
@@ -226,7 +233,13 @@
 		EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProgramSearchViewController.h; path = UIApp/controllers/ProgramSearchViewController.h; sourceTree = "<group>"; };
 		EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProgramSearchViewController.m; path = UIApp/controllers/ProgramSearchViewController.m; sourceTree = "<group>"; };
 		EA2339EF0D6BDCC700451694 /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = common/NSStringAdditions.h; sourceTree = "<group>"; };
-		EA2339F00D6BDCC700451694 /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSStringAdditions.m; path = common/NSStringAdditions.m; sourceTree = "<group>"; };
+		EA2387190D5E5CF400343704 /* RSFirstRunWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSFirstRunWindowController.h; path = UIApp/controllers/RSFirstRunWindowController.h; sourceTree = "<group>"; };
+		EA23871A0D5E5CF400343704 /* RSFirstRunWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSFirstRunWindowController.m; path = UIApp/controllers/RSFirstRunWindowController.m; sourceTree = "<group>"; };
+		EA23871E0D5E5D0F00343704 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/FirstRun.xib; sourceTree = "<group>"; };
+		EA23872E0D5E5E3100343704 /* RSUIApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSUIApplication.h; path = UIApp/RSUIApplication.h; sourceTree = "<group>"; };
+		EA23872F0D5E5E3100343704 /* RSUIApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSUIApplication.m; path = UIApp/RSUIApplication.m; sourceTree = "<group>"; };
+		EA2387310D5E5E4900343704 /* RSFirstRunContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSFirstRunContentView.h; path = UIApp/views/RSFirstRunContentView.h; sourceTree = "<group>"; };
+		EA2387320D5E5E4900343704 /* RSFirstRunContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSFirstRunContentView.m; path = UIApp/views/RSFirstRunContentView.m; sourceTree = "<group>"; };
 		EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HexNumberFormatter.h; path = UIApp/HexNumberFormatter.h; sourceTree = "<group>"; };
 		EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HexNumberFormatter.m; path = UIApp/HexNumberFormatter.m; sourceTree = "<group>"; };
 		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolishedBackgroundView.h; path = UIApp/views/PolishedBackgroundView.h; sourceTree = "<group>"; };
@@ -257,6 +270,9 @@
 		EA308FB60C66A7470005E89B /* RSColorDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSColorDictionary.m; path = common/RSColorDictionary.m; sourceTree = "<group>"; };
 		EA3090C20C6AB59E0005E89B /* RSWishlistController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSWishlistController.h; path = UIApp/controllers/RSWishlistController.h; sourceTree = "<group>"; };
 		EA3090C30C6AB59E0005E89B /* RSWishlistController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSWishlistController.m; path = UIApp/controllers/RSWishlistController.m; sourceTree = "<group>"; };
+		EA39B7C90D6C8CFC0049CB89 /* assistantBackground.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = assistantBackground.tiff; path = Images/assistantBackground.tiff; sourceTree = "<group>"; };
+		EA39B7DE0D6E21720049CB89 /* RSChannelTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSChannelTableView.h; path = UIApp/views/RSChannelTableView.h; sourceTree = "<group>"; };
+		EA39B7DF0D6E21720049CB89 /* RSChannelTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSChannelTableView.m; path = UIApp/views/RSChannelTableView.m; sourceTree = "<group>"; };
 		EA3B404E0C8C79470042C793 /* ScheduleDetailsPopupView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleDetailsPopupView.h; path = UIApp/views/ScheduleDetailsPopupView.h; sourceTree = "<group>"; };
 		EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleDetailsPopupView.m; path = UIApp/views/ScheduleDetailsPopupView.m; sourceTree = "<group>"; };
 		EA3B40550C8C7AEE0042C793 /* closebox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = closebox.png; path = Images/closebox.png; sourceTree = "<group>"; };
@@ -270,6 +286,7 @@
 		EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSCommonAppDelegate.h; path = common/RSCommonAppDelegate.h; sourceTree = "<group>"; };
 		EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSCommonAppDelegate.m; path = common/RSCommonAppDelegate.m; sourceTree = "<group>"; };
+		EA4F2D010D73A80A005BC950 /* NSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSStringAdditions.m; path = common/NSStringAdditions.m; sourceTree = "<group>"; };
 		EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Preferences.h; path = UIApp/controllers/Preferences.h; sourceTree = "<group>"; };
 		EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Preferences.m; path = UIApp/controllers/Preferences.m; sourceTree = "<group>"; };
 		EA5FAFC10B6FB49400CCD5D5 /* FixedNSControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = FixedNSControl.h; path = UIApp/views/FixedNSControl.h; sourceTree = "<group>"; };
@@ -414,6 +431,8 @@
 		080E96DDFE201D6D7F000001 /* UI App */ = {
 			isa = PBXGroup;
 			children = (
+				EA23872E0D5E5E3100343704 /* RSUIApplication.h */,
+				EA23872F0D5E5E3100343704 /* RSUIApplication.m */,
 				EABF0EC20CDE85D600DFFA0F /* Controllers */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				32CA4F630368D1EE00C91783 /* recsched_Prefix.pch */,
@@ -477,6 +496,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EA23871D0D5E5D0F00343704 /* FirstRun.xib */,
 				EAF923F20CCEE15000CEBD73 /* Credits.html */,
 				EAF923BF0CCEC33600CEBD73 /* Preferences.xib */,
 				EAF923BA0CCEC21900CEBD73 /* MainMenu.xib */,
@@ -523,6 +543,7 @@
 		EA2939860C0CC89E0053E2B8 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				EA39B7C90D6C8CFC0049CB89 /* assistantBackground.tiff */,
 				EAF923CE0CCED90100CEBD73 /* ST.png */,
 				EAF923C70CCECAEB00CEBD73 /* CC.png */,
 				EAF923C80CCECAEB00CEBD73 /* HD.png */,
@@ -572,6 +593,7 @@
 		EABF0EAC0CDE7DAC00DFFA0F /* common */ = {
 			isa = PBXGroup;
 			children = (
+				EA4F2D010D73A80A005BC950 /* NSStringAdditions.m */,
 				EA308FB50C66A7470005E89B /* RSColorDictionary.h */,
 				EA308FB60C66A7470005E89B /* RSColorDictionary.m */,
 				EABF0EB90CDE7FD500DFFA0F /* Managed Objects */,
@@ -581,7 +603,6 @@
 				EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */,
 				EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */,
 				EA2339EF0D6BDCC700451694 /* NSStringAdditions.h */,
-				EA2339F00D6BDCC700451694 /* NSStringAdditions.m */,
 			);
 			name = common;
 			sourceTree = "<group>";
@@ -626,6 +647,8 @@
 		EABF0EC20CDE85D600DFFA0F /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				EA2387190D5E5CF400343704 /* RSFirstRunWindowController.h */,
+				EA23871A0D5E5CF400343704 /* RSFirstRunWindowController.m */,
 				EA5FC2A30B73E20C00CCD5D5 /* ScheduleViewController.h */,
 				EA5FC2A40B73E20C00CCD5D5 /* ScheduleViewController.m */,
 				EA686CE80CA95F5600185188 /* RSActivityViewController.h */,
@@ -676,6 +699,8 @@
 		EAF890120B66DC6400373CEF /* View & UI Classes */ = {
 			isa = PBXGroup;
 			children = (
+				EA2387310D5E5E4900343704 /* RSFirstRunContentView.h */,
+				EA2387320D5E5E4900343704 /* RSFirstRunContentView.m */,
 				EAB16BF20CF51502001313CA /* RSProgramSearchTableHeaderView.h */,
 				EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */,
 				EA5FAFC10B6FB49400CCD5D5 /* FixedNSControl.h */,
@@ -706,6 +731,8 @@
 				EA3B404F0C8C79470042C793 /* ScheduleDetailsPopupView.m */,
 				EA490BD70CAEE61E00A1DE02 /* RSActivityListView.h */,
 				EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */,
+				EA39B7DE0D6E21720049CB89 /* RSChannelTableView.h */,
+				EA39B7DF0D6E21720049CB89 /* RSChannelTableView.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -846,6 +873,8 @@
 				EAF923CA0CCECAEB00CEBD73 /* HD.png in Resources */,
 				EAF923CF0CCED90100CEBD73 /* ST.png in Resources */,
 				EAF923F40CCEE15000CEBD73 /* Credits.html in Resources */,
+				EA23871F0D5E5D0F00343704 /* FirstRun.xib in Resources */,
+				EA39B7CA0D6C8CFC0049CB89 /* assistantBackground.tiff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -905,7 +934,11 @@
 				EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */,
 				EAF9247D0CD030D100CEBD73 /* RSColorDictionary.m in Sources */,
 				EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */,
-				EA2339F10D6BDCC700451694 /* NSStringAdditions.m in Sources */,
+				EA23871B0D5E5CF400343704 /* RSFirstRunWindowController.m in Sources */,
+				EA2387300D5E5E3100343704 /* RSUIApplication.m in Sources */,
+				EA2387330D5E5E4900343704 /* RSFirstRunContentView.m in Sources */,
+				EA39B7E00D6E21720049CB89 /* RSChannelTableView.m in Sources */,
+				EA4F2D020D73A80A005BC950 /* NSStringAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -961,6 +994,7 @@
 				EA70E8970CC06ED500C3B295 /* RSTranscodingImp.m in Sources */,
 				EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */,
 				EA6338DA0D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m in Sources */,
+				EA4F2D030D73A80A005BC950 /* NSStringAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -996,6 +1030,14 @@
 				089C165DFE840E0CC02AAC07 /* English */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		EA23871D0D5E5D0F00343704 /* FirstRun.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA23871E0D5E5D0F00343704 /* English */,
+			);
+			name = FirstRun.xib;
 			sourceTree = "<group>";
 		};
 		EA4909E50CADD0EB00A1DE02 /* Activity.xib */ = {

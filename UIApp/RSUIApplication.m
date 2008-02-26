@@ -23,15 +23,28 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-extern NSString *kRSStoreUpdateConnectionName;
+#import "RSUIApplication.h"
 
-@protocol RSStoreUpdate
 
-- (void) parsingComplete:(id)info;
-- (void) cleanupComplete:(id)info;
-- (void) downloadError:(id)info;
-- (void) deviceScanComplete:(id)info;
-- (void) channelScanComplete:(id)info;
+@implementation RSUIApplication
 
+- (void)sendEvent:(NSEvent *)theEvent
+{
+  // If we get a Key down for Cmd-Alt-4 try to launch the 'first run wizard'
+  if (([theEvent type] == NSKeyDown) && ([theEvent keyCode] == 21) &&
+    (([theEvent modifierFlags] & (NSShiftKeyMask|NSAlternateKeyMask|NSCommandKeyMask)) == (NSShiftKeyMask|NSAlternateKeyMask|NSCommandKeyMask)) && 
+    (([theEvent modifierFlags] & (NSControlKeyMask)) == 0))
+  {
+    if ([[NSApp delegate] respondsToSelector:@selector(launchFirstRunWizard:)])
+    {
+      NSMethodSignature *aSignature = [[NSApp delegate] methodSignatureForSelector:@selector(launchFirstRunWizard:)];
+      NSInvocation *anInvocation = [NSInvocation invocationWithMethodSignature:aSignature];
+      [anInvocation setSelector:@selector(launchFirstRunWizard:)];
+      [anInvocation setArgument:&self atIndex:0];
+      [anInvocation invokeWithTarget:[NSApp delegate]];
+    }
+  }
+  else
+    return [super sendEvent:theEvent];
+}
 @end
-

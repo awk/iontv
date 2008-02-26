@@ -26,13 +26,15 @@
 #import "RSCommonAppDelegate.h"
 #import "RSStoreUpdateProtocol.h"
 
-extern NSString *RSParsingCompleteNotification;
 extern NSString *RSDownloadErrorNotification;
 extern NSString *RSDeviceScanCompleteNotification;
 extern NSString *RSChannelScanCompleteNotification;
 extern NSString *RSLineupRetrievalCompleteNotification;
+extern NSString *RSScheduleUpdateCompleteNotification;
 
 @class HDHomeRunStation;
+@class RSFirstRunWindowController;
+@class RSActivityWindowController;
 
 @interface recsched_AppDelegate : RSCommonAppDelegate <RSStoreUpdate>
 {
@@ -46,7 +48,8 @@ extern NSString *RSLineupRetrievalCompleteNotification;
 
     id mRecServer;
 	
-	NSWindowController *mActivityWindowController;
+	RSActivityWindowController *mActivityWindowController;
+        RSFirstRunWindowController *mFirstRunWindowController;
 }
 
 - (id) recServer;
@@ -55,8 +58,10 @@ extern NSString *RSLineupRetrievalCompleteNotification;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
 - (IBAction)showActivityWindow:(id)sender;
-
+- (IBAction)launchFirstRunWizard:(id)sender;
 - (IBAction) quitServer:(id)sender;
+
+- (RSActivityWindowController*) activityWindowController;
 
 @property (retain,getter=recServer) id mRecServer;
 @end

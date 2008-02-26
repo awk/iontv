@@ -25,7 +25,7 @@
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
+	<string>RSUIApplication</string>
 	<key>SUFeedURL</key>
 	<string>http://iontv-app.com/appcast/iOnTV.xml</string>
 </dict>

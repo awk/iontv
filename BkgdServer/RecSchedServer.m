@@ -106,7 +106,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   // Connect to server
   NSConnection *uiActivityServerConnection = [NSConnection connectionWithRegisteredName:kRecUIActivityConnectionName host:nil];
   mUIActivity = [uiActivityServerConnection rootProxy];
-   
+
   // check if connection worked.
   if (mUIActivity == nil) 
   {
@@ -118,11 +118,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     // set protocol for the remote object & then register ourselves with the 
     // messaging server.
     [mUIActivity setProtocolForProxy:@protocol(RSActivityDisplay)];
-    
-    // Register so that we know when the connection goes away
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(uiActivityConnectionDidDie:)
-            name:NSConnectionDidDieNotification
-            object:uiActivityServerConnection];
     
     [mUIActivityProxy setUIActivity:mUIActivity];
   }
@@ -352,6 +347,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
                 [callData setValue:[downloadResult valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
         }
 
+	[downloadResult release];
+	
     // Start our local parsing
     xtvdParseThread *aParseThread = [[xtvdParseThread alloc] init];
     
@@ -359,12 +356,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	[aParseThread release];
 	[callData release];
     }
-}
-
-- (void) uiActivityConnectionDidDie:(NSNotification*)notification
-{
-  mUIActivity = nil;
-  [mUIActivityProxy setUIActivity:self];
 }
 
 #pragma mark Activity Protocol Methods
@@ -419,10 +410,18 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 {
 	NSLog(@"parsingComplete");
         
+if ([info valueForKey:kTVDataDeliveryLineupsOnlyKey] && [[info valueForKey:kTVDataDeliveryLineupsOnlyKey] boolValue] == YES)
+        {
+          // Lineups only - no need to clean up or update anything else
+
+        }
+        else
+        {
         // Update the 'scheduleUpdated' file
         NSString *scheduleUpdatedPath = [NSString stringWithFormat:@"%@/scheduleUpdated", [[NSApp delegate] applicationSupportFolder]];
         [[NSFileManager defaultManager] removeItemAtPath:scheduleUpdatedPath error:nil];
         [[NSFileManager defaultManager] createFileAtPath:scheduleUpdatedPath contents:nil attributes:nil];
+		}
         
 #if 1
 	[self performCleanup:info];
