@@ -34,4 +34,6 @@ extern NSString *RSNotificationTranscodingFinished;
 	RSTranscoding *mCurrentTranscoding;
 }
 
+- (void) updateForCompletedRecordings:(NSArray*)inArray;
+
 @end

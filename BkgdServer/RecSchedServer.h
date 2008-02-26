@@ -30,6 +30,7 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
 @class RSActivityProxy;
 @class RSRecording;
 @class HDHomeRunTuner;
+@class RSTranscodeController;
 
 @interface RecSchedServer : NSObject <RecSchedServerProto, RSActivityDisplay, RSStoreUpdate> {
     BOOL mExitServer;
@@ -37,7 +38,8 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
 	id mUIActivity;
 	id mStoreUpdate;
         
-        RSActivityProxy *mUIActivityProxy;
+  RSActivityProxy *mUIActivityProxy;
+	RSTranscodeController *mTranscodeController;
         
     NSMutableArray *mRecordingQueues;
     NSCalendarDate *mLastScheduleFetchEndDate;
@@ -47,6 +49,7 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
 - (BOOL) fetchFutureSchedule:(id)info;
 - (RSActivityProxy*) uiActivity;
 - (id) storeUpdate;
+- (void) performCleanup:(id)info;
 
 @property BOOL mExitServer;
 @property (retain,getter=storeUpdate) id mStoreUpdate;
@@ -63,6 +66,7 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
 - (id) initWithTuner:(HDHomeRunTuner*)aTuner;
 - (BOOL) addRecording:(RSRecording*)aRecording;
 - (BOOL) removeRecording:(RSRecording*)aRecording;
+- (void) recordingComplete:(RSRecording *)recordingJustFinished;
 
 @property (retain, readonly) NSArray *queue;
 @property (retain, readonly) HDHomeRunTuner *tuner;

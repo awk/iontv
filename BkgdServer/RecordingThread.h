@@ -24,8 +24,6 @@
 @class HDHomeRunDevice;
 @class RecSchedServer;
 
-extern NSString *RSNotificationRecordingFinished;
-
 @interface RecordingThreadController : NSObject {
   RSRecording *mRecording;
   bool mFinishRecording;

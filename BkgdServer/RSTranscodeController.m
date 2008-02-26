@@ -37,7 +37,6 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 - (void) updateForNewTranscodings:(NSArray*)inArray
 {
 	int index = 0;
-        NSLog(@"updateForNewTranscodings - mCurrentTranscoding = %@", mCurrentTranscoding);
 	while ((mCurrentTranscoding == nil) && (index < [inArray count]))
 	{
 		RSTranscoding *candidateTranscoding = [inArray objectAtIndex:index++];
@@ -49,7 +48,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 			// preferably) before we can continue on with creating the real transcode job ?
 			if ([[NSFileManager defaultManager] fileExistsAtPath:mCurrentTranscoding.schedule.recording.mediaFile])
 			{
-                                NSLog(@"updateForNewTranscodings - have candidate for transcoding = %@", mCurrentTranscoding);
+        NSLog(@"updateForNewTranscodings - have candidate for transcoding = %@", mCurrentTranscoding.schedule.program.title);
 				hb_scan(mHandbrakeHandle, [[NSFileManager defaultManager] fileSystemRepresentationWithPath:mCurrentTranscoding.schedule.recording.mediaFile], 0);
 			
 				// Set a timer running to watch the progress of the scan
@@ -57,20 +56,23 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 			}
 			else
 			{
-                                NSLog(@"updateForNewTranscodings - no recorded media for candidate = %@", mCurrentTranscoding);
+				NSLog(@"updateForNewTranscodings - no recorded media for candidate = %@", mCurrentTranscoding.schedule.program.title);
 				mCurrentTranscoding.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
 				[mCurrentTranscoding release];
 				mCurrentTranscoding = nil;
 			}
 		}
 	}
+	
+	// Save any updated status
+	[[NSApp delegate] saveAction:self];
 }
 
 - (void) updateForCompletedRecordings:(NSArray*)inArray
 {
 	for (RSRecording *aRecording in inArray)
 	{
-		NSLog(@"updateForCompleted Recordings Recording ID = %@ title = %@ status = %@\ntranscoding =\n %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding);
+		NSLog(@"updateForCompleted Recordings Recording ID = %@ title = %@ status = %@ %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding == nil ? @"No Transcoding" : aRecording.schedule.transcoding);
 		if (aRecording.schedule.transcoding == NULL)
 		{
 			// Create a new transcoding entity
@@ -302,17 +304,6 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	[self updateForNewTranscodings:[mTranscodingsArrayController arrangedObjects]];
 }
 
-- (void) recordingFinishedNotification:(NSNotification*)aNotification
-{
-	// Recording has finished - begin the transcode process
-	NSManagedObjectID *recordingObjectID = [aNotification object];
-	RSRecording *aRecording = (RSRecording*)[[[NSApp delegate] managedObjectContext] objectRegisteredForID:recordingObjectID];
-	
-	NSLog(@"recordingFinishedNotification - %@ just finished, status = %@", aRecording, aRecording.status);
-	
-	[self updateForCompletedRecordings:[NSArray arrayWithObject:aRecording]];
-}
-	
 #pragma mark init and dealloc
 
 - (id) init
@@ -344,7 +335,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 		// Set up any initial transcodings
 		for (RSRecording *aRecording in [mRecordingsArrayController arrangedObjects])
 		{
-			NSLog(@"Recording ID = %@ title = %@ status = %@\ntranscoding =\n %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding);
+			NSLog(@"Recording ID = %@ title = %@ status = %@ %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding == nil ? @"No Transcoding" : @"Has Transcoding");
 			if (aRecording.schedule.transcoding == NULL)
 			{
 				// Create a new transcoding entity
@@ -364,40 +355,8 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 
 		// Register for notifications when transcoding completes
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(transcodingFinishedNotification:) name:RSNotificationTranscodingFinished object:nil];
-		
-		// Register for notifications when recording completes
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingFinishedNotification:) name:RSNotificationRecordingFinished object:nil];
-
-//		[NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(updateRecordings:) userInfo:nil repeats:NO];
 	}
 	return self;
-}
-
-- (void) updateRecordings:(NSTimer*)aTimer
-{
-	NSLog(@"Time To update the recordings");
-	
-	  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-	  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-	  [request setEntity:entityDescription];
-	  [request setFetchLimit:1];
-	   
-	  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.program.programID == %@", @"EP000809390063"];
-	  [request setPredicate:predicate];
-	  
-	  NSError *error = nil;
-	  NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
-	  
-	RSRecording *aRecording = [array objectAtIndex:0];
-	if (aRecording)
-	{
-		aRecording.status = [NSNumber numberWithInt:RSRecordingFinishedStatus];
-		if (aRecording.schedule.transcoding)
-			[[[NSApp delegate] managedObjectContext] deleteObject:aRecording.schedule.transcoding];
-		aRecording.schedule.transcoding = nil;
-	}
-	[[[NSApp delegate] managedObjectContext] processPendingChanges];
-	[self updateForCompletedRecordings:[mRecordingsArrayController arrangedObjects]];
 }
 
 - (void) dealloc

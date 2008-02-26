@@ -775,7 +775,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
   
-  NSPredicate *oldSchedulesPredicate = [NSPredicate predicateWithFormat:@"endTime < %@", inDate];
+  NSPredicate *oldSchedulesPredicate = [NSPredicate predicateWithFormat:@"(endTime < %@) AND (recording == nil) AND (transcoding == nil)", inDate];
   [request setPredicate:oldSchedulesPredicate];
   
   NSError *error = nil;
@@ -847,7 +847,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 		NSLog(@"performCleanup - saving");
 		if (![managedObjectContext save:&error])
 		{
-			NSLog(@"performParse - save returned an error %@", error);
+			NSLog(@"performCleanup - save returned an error %@", error);
 		}
 		[[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
     NS_HANDLER

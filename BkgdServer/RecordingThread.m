@@ -29,8 +29,6 @@
 
 #define RECORDING_DISABLED 0
 
-NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
-
 @implementation RecordingThreadController
 
 - (void) initializeThreadData
@@ -132,7 +130,7 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
 #else  
 - (void) beginRecording
 {
-  NSLog(@"beginRecording - timer fired for schedule %@ program title %@", mThreadRecording.schedule, mThreadRecording.schedule.program.title);
+  NSLog(@"beginRecording - program title %@", mThreadRecording.schedule.program.title);
   
   Z2ITStation *aStation = mThreadRecording.schedule.station;
   NSSet *hdhrStations = [aStation hdhrStations];
@@ -235,21 +233,21 @@ NSString *RSNotificationRecordingFinished = @"RSNotificationRecordingFinished";
   [mThreadRecording.recordingQueue removeRecording:mThreadRecording];
   
   // Save the MOC
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
-        name:NSManagedObjectContextDidSaveNotification object:mThreadManagedObjectContext];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
+			name:NSManagedObjectContextDidSaveNotification object:mThreadManagedObjectContext];
     
   [mThreadManagedObjectContext processPendingChanges];
   NSError *error = nil;
   if (![mThreadManagedObjectContext save:&error])
-	NSLog(@"Error saving after record completed - %@", error);
+		NSLog(@"Error saving after record completed - %@", error);
+	
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mThreadManagedObjectContext];
 	
 	// Notify everyone that this recording has finished - since we're in a seperate thread, and notifications are
 	// delivered in the thread context which triggers them we'll send a message to the server object on the main thread
 	// to send further notifications
-        NSLog(@"RecordingThread  - sending recordingComplete message to server on main thread, recording Program ID = %@", mThreadRecording.schedule.program.programID);
+	NSLog(@"RecordingThread  - sending recordingComplete message to server on main thread, recording Program Title = %@", mThreadRecording.schedule.program.title);
 	[mRecSchedServer performSelectorOnMainThread:@selector(recordingComplete:) withObject:[mThreadRecording objectID] waitUntilDone:YES];
-	
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mThreadManagedObjectContext];
 }
 #endif
 

@@ -69,8 +69,6 @@ struct colorDetails defaultColorList[] = {
 
 + (NSDictionary*) colorDictionaryNamedDefault
 {
-	NSLog(@"returning default color dictionary");
-	
 	int numColors = sizeof(defaultColorList) / sizeof(struct colorDetails);
 	
 	NSMutableDictionary *aDictionary = [NSMutableDictionary dictionaryWithCapacity:numColors];

@@ -31,6 +31,7 @@
 #import "RecordingThread.h"
 #import "HDHomeRunTuner.h"
 #import "RSStoreUpdateProtocol.h"
+#import "RSTranscodeController.h"
 
 const int kDefaultUpdateScheduleFetchDurationInHours = 3;
 const int kDefaultFutureScheduleFetchDurationInHours = 12;
@@ -58,6 +59,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	
     // Setup the recording queues in a bit (after the app startup has completed and we have a delegate etc.)
     [self performSelector:@selector(initializeRecordingQueues) withObject:nil afterDelay:0];
+		[self performSelector:@selector(initializeTranscodingController) withObject:nil afterDelay:0];
   }
   return self;
 }
@@ -85,9 +87,18 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
       for (RSRecording *aRecording in aTuner.recordings)
       {
         if (([aRecording.status intValue] == RSRecordingNotYetStartedStatus) && ([aRecording.schedule.endTime compare:[NSDate date]] == NSOrderedDescending))
+				{
+					aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
           [aQueue addRecording:aRecording];
+				}
       }
     }
+}
+
+- (void) initializeTranscodingController
+{
+	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kTranscodeProgramsKey] boolValue] == YES)
+		mTranscodeController = [[RSTranscodeController alloc] init];
 }
 
 - (void) initializeUIActivityConnection
@@ -197,6 +208,13 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
   [aDownloadThread release];
   [callData release];
+}
+
+- (void) recordingComplete:(NSManagedObjectID *)aRecordingObjectID
+{
+	RSRecording *recordingJustFinished = (RSRecording*)[[[NSApp delegate] managedObjectContext] objectRegisteredForID:aRecordingObjectID];
+	[recordingJustFinished.recordingQueue recordingComplete:recordingJustFinished];
+	[mTranscodeController updateForCompletedRecordings:[NSArray arrayWithObject:recordingJustFinished]];
 }
 
 #pragma mark Schedule Update Methods
@@ -312,8 +330,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   NSDictionary *downloadResult = (NSDictionary*)inDownloadResult;
   NSDictionary *messages = [downloadResult valueForKey:@"messages"];
   NSDictionary *xtvd = [downloadResult valueForKey:@"xtvd"];
-  NSLog(@"getScheduleAction downloadResult messages = %@", messages);
-  NSLog(@"getScheduleAction downloadResult xtvd = %@", xtvd);
+  NSLog(@"getScheduleAction downloadResult message = %@", [messages valueForKey:@"message"]);
 
   if (xtvd != nil)
   {
@@ -438,11 +455,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 - (void) channelScanComplete:(id)info
 {
 	NSLog(@"channelScanComplete %@", info);
-}
-
-- (void) recordingComplete:(NSManagedObjectID *)aRecordingObjectID
-{
-	[[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationRecordingFinished object:aRecordingObjectID];
 }
 
 #pragma mark - Server Methods
@@ -604,12 +616,9 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
           mySchedule.recording.recordingThreadController = nil;
           
           // Remove the recording from the queue
-          for (RSRecordingQueue *aQueue in mRecordingQueues)
-          {
-            [aQueue removeRecording:mySchedule.recording];
-//            [[aQueueDict valueForKey:@"queue"] removeObjectIdenticalTo:mySchedule.recording];
-          }
-          // Remove the recording from the ManagedObjectContext
+					[mySchedule.recording.recordingQueue removeRecording:mySchedule.recording];
+
+					// Remove the recording from the ManagedObjectContext
           [[[NSApp delegate] managedObjectContext] deleteObject:mySchedule.recording];
           return YES;
         }
@@ -1208,9 +1217,25 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 - (BOOL) removeRecording:(RSRecording*)aRecording
 {
+	NSLog(@"removeRecording of %@", aRecording.schedule.program.title);
   if ([queue containsObject:aRecording])
   {
     [queue removeObjectIdenticalTo:aRecording];
+		
+		NSLog(@"  recording removed there are %d items still in the recording queue", [queue count]);
+		// Removing this recording means that another recording on this queue could be scheduled
+		if ([queue count] > 0)
+		{
+			NSLog(@"  nextRecordingStartTimer == %@", nextRecordingStartTimer);
+				if (nextRecordingStartTimer == nil)
+				{
+					NSTimeInterval recordingStartTimeInterval = [[[queue objectAtIndex:0] schedule].time timeIntervalSinceNow];
+					if (recordingStartTimeInterval < 0)
+						recordingStartTimeInterval = 0;
+					nextRecordingStartTimer = [NSTimer scheduledTimerWithTimeInterval:recordingStartTimeInterval target:self selector:@selector(startRecordingTimerFired:) userInfo:[queue objectAtIndex:0] repeats:NO];
+					NSLog(@"  created new nextRecordingStartTimer == %@ to fire in %.2f seconds", nextRecordingStartTimer, recordingStartTimeInterval);
+				}
+		}
     return YES;
   }
   else
@@ -1221,8 +1246,33 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 - (void) startRecordingTimerFired:(NSTimer*)aTimer
 {
   RSRecording *recordingToStart = [aTimer userInfo];
-  NSLog(@"RSRecordingQueue - time to start a recording %@", recordingToStart);
-  [recordingToStart.recordingThreadController startRecordingTimerFired:aTimer];
+  NSLog(@"RSRecordingQueue - time to start a recording of %@ on %@, %@", recordingToStart.schedule.program.title, self.tuner.longName, recordingToStart.schedule.station.callSign);
+	nextRecordingStartTimer = nil;
+
+	[recordingToStart.recordingThreadController startRecordingTimerFired:aTimer];
+}
+
+- (void) recordingComplete:(RSRecording *)recordingJustFinished
+{
+	NSLog(@"recordingFinishedNotification: %@ just finished recording, there are %d items in the queue", recordingJustFinished.schedule.program.title, [queue count]);
+	
+	// Remove this item from the queue
+	[queue removeObjectIdenticalTo:recordingJustFinished];
+	
+	if ([queue count] > 0)
+	{
+		// Set up a timer for the next item in the queue
+		RSRecording *nextRecordingDue = [queue objectAtIndex:0];
+		NSTimeInterval nextRecordingStartTimeInterval = [nextRecordingDue.schedule.time timeIntervalSinceNow];
+		
+		// Make sure the new recording doesn't (somehow) start before this one ends
+		if (nextRecordingStartTimeInterval < 0)
+			nextRecordingStartTimeInterval = 0;
+
+		NSLog(@"recordingFinishedNotification: another recording starts in %.2f seconds", nextRecordingStartTimeInterval);
+		
+		nextRecordingStartTimer = [NSTimer scheduledTimerWithTimeInterval:nextRecordingStartTimeInterval target:self selector:@selector(startRecordingTimerFired:) userInfo:nextRecordingDue repeats:NO];
+	}
 }
 
 @synthesize queue;
