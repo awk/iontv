@@ -39,7 +39,6 @@ extern NSString *RSScheduleUpdateCompleteNotification;
 @interface recsched_AppDelegate : RSCommonAppDelegate <RSStoreUpdate>
 {
     IBOutlet NSWindow *window;
-    IBOutlet NSWindow *mCoreDataProgramWindow;
     
     IBOutlet NSMenuItem *mServerMenuItem;
     
@@ -54,7 +53,6 @@ extern NSString *RSScheduleUpdateCompleteNotification;
 
 - (id) recServer;
 
-- (IBAction)showCoreDataProgramWindow:(id)sender;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
 - (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
 - (IBAction)showActivityWindow:(id)sender;

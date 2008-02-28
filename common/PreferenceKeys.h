@@ -29,6 +29,8 @@ extern NSString *kDeleteTranscodingsAfterAddKey;
 extern NSString *kCurrentLineupURIKey;
 extern NSString *kCurrentScheduleURIKey;
 
+extern NSString *kFirstRunAssistantCompletedKey;
+
 // Not really a key - just a string that's shared between the preferences, preferences UI and the download thread
 extern NSString *kWebServicesSDHostname;
 extern NSString *kWebServicesSDPath;

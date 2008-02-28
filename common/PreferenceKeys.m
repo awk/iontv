@@ -29,6 +29,8 @@ NSString *kDeleteTranscodingsAfterAddKey = @"deleteTranscodingsAfterAdd";
 NSString *kCurrentLineupURIKey = @"currentLineupURI";
 NSString *kCurrentScheduleURIKey = @"currentScheduleURI";
 
+NSString *kFirstRunAssistantCompletedKey = @"firstRunAssistantCompleted";
+
 // URL for SOAP services used to retrieve the listings
 // @"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService
 NSString *kWebServicesSDHostname = @"webservices.schedulesdirect.tmsdatadirect.com";

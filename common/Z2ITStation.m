@@ -261,7 +261,7 @@
   // Find all programs (schedules) on this station which are on the air between the two times, 
   // this includes programs starting before the given inStartTime but end after the given inStartTime,
   // as well as all programs with start times between the two input values
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"((station == %@) AND (time >= %@) AND (time <= %@)) OR ((station == %@) AND (time < %@) AND (endTime > %@))", self, startDate, endDate, self, startDate, startDate];
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(station == %@) AND (((time >= %@) AND (time <= %@)) OR ((endTime >= %@) AND (endTime <= %@)))", self, startDate, endDate, startDate, endDate];
   [request setPredicate:predicate];
    
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];

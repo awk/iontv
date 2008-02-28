@@ -493,32 +493,15 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 
 - (Z2ITGenre*) genreWithRelevance:(int)inRelevance
 {
-  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Genre" inManagedObjectContext:[self managedObjectContext]];
-  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
-  [request setEntity:entityDescription];
-  [request setFetchLimit:1];
-   
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(programs CONTAINS %@) AND (relevance == %@)", self, [NSNumber numberWithInt:inRelevance]];
-  [request setPredicate:predicate];
-   
-  NSError *error = nil;
-  NSArray *array = [[self managedObjectContext] executeFetchRequest:request error:&error];
-  if (array == nil)
+  for (Z2ITGenre* aGenre in self.genres)
   {
-      NSLog(@"Error executing fetch request to find genre with relevance %d", inRelevance);
-      return nil;
+    if ([aGenre.relevance intValue] == inRelevance)
+    {
+      return aGenre;
+    }
   }
-  
-  if ([array count] == 0)
-  {
-      return nil;
-  }
-  else
-  {
-      return [array objectAtIndex:0];
-  }
+  return nil;
 }
-
 
 @dynamic colorCode;
 @dynamic descriptionStr;

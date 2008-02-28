@@ -260,14 +260,16 @@ NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotif
 	// Register to be notified when an update through sparkle completes - we use this to restart the background
 	// server which may also have just been updated.
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sparkleWillRestart:) name:SUUpdaterWillRestartNotification object:nil];
+        
+        // Launch the first run assistant if the key is not present in the prefs file
+        BOOL firstRunAlreadyCompleted = [[NSUserDefaults standardUserDefaults] boolForKey:kFirstRunAssistantCompletedKey];
+        if (firstRunAlreadyCompleted == NO)
+        {
+          [self performSelector:@selector(launchFirstRunWizard:) withObject:nil afterDelay:0];
+        }
 }
 
 #pragma mark - Actions
-
-- (IBAction)showCoreDataProgramWindow:(id)sender
-{
-	[mCoreDataProgramWindow makeKeyAndOrderFront:sender];
-}
 
 - (IBAction) launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow
 {
