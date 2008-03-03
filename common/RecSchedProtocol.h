@@ -46,7 +46,7 @@ extern NSString *kRecServerConnectionName;
 - (oneway void) updateLineups;
 
 // HDHomeRun Device Management
-- (void) scanForHDHomeRunDevices:(id)sender;
+- (oneway void) scanForHDHomeRunDevices:(id)sender;
 - (void) scanForChannelsOnHDHomeRunDeviceID:(NSNumber*)deviceID tunerIndex:(NSNumber*)tunerIndex;
 
 - (void) setHDHomeRunDeviceWithID:(NSNumber*)deviceID nameTo:(NSString*)name tuner0LineupIDTo:(NSString*)tuner0LineupID tuner1LineupIDTo:(NSString*) tuner1LineupID;

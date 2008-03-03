@@ -33,6 +33,7 @@
 #import "RecSchedProtocol.h"
 #import "RSColorDictionary.h"
 #import "Z2ITLineup.h"
+#import "RSNotifications.h"
 #import <Security/Security.h>
 
 #define SCAN_DISABLED 0
@@ -572,7 +573,10 @@ static Preferences *sSharedInstance = nil;
 {
 	[mScanTunersButton setEnabled:NO];
 	
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceScanCompleteNotification:) name:RSDeviceScanCompleteNotification object:[NSApp delegate]];
+	[[NSDistributedNotificationCenter defaultCenter] addObserver:self
+            selector:@selector(deviceScanCompleteNotification:)
+            name:RSDeviceScanCompleteNotification object:RSBackgroundApplication
+            suspensionBehavior:NSNotificationSuspensionBehaviorCoalesce];
 	[[[NSApp delegate] recServer] scanForHDHomeRunDevices:self];
 	
 	[mScanTunersButton setEnabled:YES];
@@ -734,7 +738,7 @@ static Preferences *sSharedInstance = nil;
 	NSError *error = nil;
 	[mHDHomeRunDevicesArrayController fetchWithRequest:[mHDHomeRunDevicesArrayController defaultFetchRequest] merge:NO error:&error];
         [mHDHomeRunTunersArrayController fetchWithRequest:[mHDHomeRunTunersArrayController defaultFetchRequest] merge:NO error:&error];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:[NSApp delegate]];
+        [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:RSBackgroundApplication];
 }
 
 #pragma mark Open/Save Panel Delegate Methods

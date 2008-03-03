@@ -15,6 +15,7 @@
 #import "HDHomeRunMO.h"
 #import "Z2ITLineup.h"
 #import "RSActivityViewController.h"
+#import "RSNotifications.h"
 
 const NSInteger kSchedulesDirectTabViewIndex = 0;
 const NSInteger kTunerTabViewIndex = 1;
@@ -99,7 +100,7 @@ const NSInteger kChannelList = 3;
 {
   // Remove ourselves from observing the completion notification
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:[NSApp delegate]];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:RSBackgroundApplication];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:RSChannelScanCompleteNotification object:[NSApp delegate]];
 
   [[self window] performClose:sender];
@@ -121,7 +122,7 @@ const NSInteger kChannelList = 3;
 
 - (IBAction) continueFromDeviceScan:(id)sender
 {
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:RSBackgroundApplication];
   [self showStartChannelScan:sender];
 }
 
@@ -183,6 +184,11 @@ const NSInteger kChannelList = 3;
     }
     scanningTuner = nil;
   }
+  
+  // Write the key to the prefs to show that we're done
+  [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kFirstRunAssistantCompletedKey];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+  
   [[self window] performClose:sender];
 }
 
@@ -245,6 +251,10 @@ const NSInteger kChannelList = 3;
 
 - (void) deviceScanCompleteNotification:(NSNotification*)aNotification
 {
+  // We should update (re-fetch) the NSArrayController with the list of HDHomeRunTuners in the system to update ui
+  NSError *error = nil;
+  [mDevicesArrayController fetchWithRequest:[mDevicesArrayController defaultFetchRequest] merge:NO error:&error];
+  
   // Scan again in another 5 seconds
   [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(scanForHDHomeRunDevicesTimerFired:) userInfo:nil repeats:NO];
 }
@@ -380,7 +390,10 @@ const NSInteger kChannelList = 3;
   
   // Once every 5 seconds we'll send a 'scan for devices' message to the server and then update the results from
   // the completion notification
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceScanCompleteNotification:) name:RSDeviceScanCompleteNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] addObserver:self
+      selector:@selector(deviceScanCompleteNotification:)
+      name:RSDeviceScanCompleteNotification object:RSBackgroundApplication
+      suspensionBehavior:NSNotificationSuspensionBehaviorCoalesce];
 
   [[[NSApp delegate] recServer] scanForHDHomeRunDevices:self];
 }
@@ -393,6 +406,28 @@ const NSInteger kChannelList = 3;
 - (void) showStartChannelScan:(id)sender
 {
   [mTabView selectTabViewItemAtIndex:kStartChannelScan];
+  
+  // Count the number of lineups in use
+  NSMutableArray *lineupsInUseArray = [NSMutableArray arrayWithCapacity:5];
+  for (HDHomeRun *aHDHomeRun in [mDevicesArrayController arrangedObjects])
+  {
+    for (HDHomeRunTuner *aTuner in [aHDHomeRun tuners])
+    {
+      if (![lineupsInUseArray containsObject:[aTuner lineup]])
+      {
+        [lineupsInUseArray addObject:[aTuner lineup]];
+      }
+    }
+  }
+  [mLineupArrayController setSelectedObjects:[NSArray arrayWithObject:[lineupsInUseArray objectAtIndex:0]]];
+  if ([lineupsInUseArray count] == 1)
+  {
+    [mChannelScanLineupSelectionPopupButton setEnabled:NO];
+  }
+  else
+  {
+    [mChannelScanLineupSelectionPopupButton setEnabled:YES];
+  }
 }
 
 

@@ -17,6 +17,7 @@
   IBOutlet NSTabView *mTabView;
   IBOutlet NSArrayController *mLineupArrayController;
   IBOutlet NSArrayController *mStationsOnLineupController;
+  IBOutlet NSArrayController *mDevicesArrayController;
   
   // Outlets for the SchedulesDirect tab
   IBOutlet NSTextField *mSDUsernameField;
@@ -30,11 +31,13 @@
   // Outlets for the Tuners tab
   
   // Outlets for the Start Scan Tab
+  IBOutlet NSPopUpButton *mChannelScanLineupSelectionPopupButton;
   IBOutlet NSView *mChannelScanActivityContainerView;
   IBOutlet NSButton *mChannelScanGoBackButton;
   IBOutlet NSButton *mChannelScanScanButton;
 
   // Outlets for the Station mapping tab
+  IBOutlet NSPopUpButton *mStationMappingLineupSelectionPopupButton;
   
   // Property instance variables
   Z2ITLineup *scanLineupSelection;

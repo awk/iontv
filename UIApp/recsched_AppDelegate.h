@@ -27,7 +27,6 @@
 #import "RSStoreUpdateProtocol.h"
 
 extern NSString *RSDownloadErrorNotification;
-extern NSString *RSDeviceScanCompleteNotification;
 extern NSString *RSChannelScanCompleteNotification;
 extern NSString *RSLineupRetrievalCompleteNotification;
 extern NSString *RSScheduleUpdateCompleteNotification;

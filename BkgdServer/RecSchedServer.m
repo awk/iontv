@@ -32,6 +32,7 @@
 #import "HDHomeRunTuner.h"
 #import "RSStoreUpdateProtocol.h"
 #import "RSTranscodeController.h"
+#import "RSNotifications.h"
 
 const int kDefaultUpdateScheduleFetchDurationInHours = 3;
 const int kDefaultFutureScheduleFetchDurationInHours = 12;
@@ -218,26 +219,33 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 // schedule data and update the database.
 - (void) autoUpdateSchedule
 {
-        // We maintain a file 'scheduleUpdated' in the application support/recsched folder. The last modified date
-        // on this file is the last time the schedule was downloaded.
-        NSString *scheduleUpdatedPath = [NSString stringWithFormat:@"%@/scheduleUpdated", [[NSApp delegate] applicationSupportFolder]];
-        BOOL updateScheduleNow = YES;
-        if ([[NSFileManager defaultManager] fileExistsAtPath:scheduleUpdatedPath])
-        {
-          NSError *error = nil;
-          NSDictionary *storeAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:scheduleUpdatedPath error:&error];
-          if (!error)
-          {
-            // -3600 is one hour in the past
-            if ([[storeAttributes valueForKey:NSFileModificationDate] timeIntervalSinceNow] > -3600)
-                    updateScheduleNow = NO;
-          }
-        }
-	// Set up a timer to fire one hour before the about to be fetched schedule data 'runs out'
-	[NSTimer scheduledTimerWithTimeInterval:(kDefaultUpdateScheduleFetchDurationInHours - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
-	
-	if (updateScheduleNow)
-		[self fetchScheduleWithDuration:kDefaultUpdateScheduleFetchDurationInHours];
+  if ([[NSUserDefaults standardUserDefaults] boolForKey:kFirstRunAssistantCompletedKey] == NO)
+  {
+      // First run wizard not complete - just try again later
+      [NSTimer scheduledTimerWithTimeInterval:(kDefaultUpdateScheduleFetchDurationInHours - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
+      return;
+  }
+
+  // We maintain a file 'scheduleUpdated' in the application support/recsched folder. The last modified date
+  // on this file is the last time the schedule was downloaded.
+  NSString *scheduleUpdatedPath = [NSString stringWithFormat:@"%@/scheduleUpdated", [[NSApp delegate] applicationSupportFolder]];
+  BOOL updateScheduleNow = YES;
+  if ([[NSFileManager defaultManager] fileExistsAtPath:scheduleUpdatedPath])
+  {
+    NSError *error = nil;
+    NSDictionary *storeAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:scheduleUpdatedPath error:&error];
+    if (!error)
+    {
+      // -3600 is one hour in the past
+      if ([[storeAttributes valueForKey:NSFileModificationDate] timeIntervalSinceNow] > -3600)
+              updateScheduleNow = NO;
+    }
+  }
+  // Set up a timer to fire one hour before the about to be fetched schedule data 'runs out'
+  [NSTimer scheduledTimerWithTimeInterval:(kDefaultUpdateScheduleFetchDurationInHours - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
+  
+  if (updateScheduleNow)
+          [self fetchScheduleWithDuration:kDefaultUpdateScheduleFetchDurationInHours];
 }
 
 - (void) updateScheduleTimer:(NSTimer*)aTimer
@@ -253,6 +261,13 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 // up into chunks lessers the load on the data servers and also breaks the parsing up into slightly more managed portions.
 - (BOOL) fetchFutureSchedule:(id)info
 {
+  if ([[NSUserDefaults standardUserDefaults] boolForKey:kFirstRunAssistantCompletedKey] == NO)
+  {
+    // First Run Wizard not completed - need to try again later, perhaps 1 hour from now ?
+    [NSTimer scheduledTimerWithTimeInterval:60 * 60 target:self selector:@selector(fetchFutureScheduleTimer:) userInfo:nil repeats:NO];
+    return NO;
+  }
+  
   if (mLastScheduleFetchEndDate == nil)
   {
     // We need to determine a reasonable starting time - the best bet is to just take the latest start date in the
@@ -408,27 +423,23 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 - (void) parsingComplete:(id)info
 {
-	NSLog(@"parsingComplete");
+  NSLog(@"parsingComplete");
         
-if ([info valueForKey:kTVDataDeliveryLineupsOnlyKey] && [[info valueForKey:kTVDataDeliveryLineupsOnlyKey] boolValue] == YES)
-        {
-          // Lineups only - no need to clean up or update anything else
+  if ([info valueForKey:kTVDataDeliveryLineupsOnlyKey] && [[info valueForKey:kTVDataDeliveryLineupsOnlyKey] boolValue] == YES)
+  {
+    // Lineups only - no need to clean up or update anything else
+  }
+  else
+  {
+    // Update the 'scheduleUpdated' file
+    NSString *scheduleUpdatedPath = [NSString stringWithFormat:@"%@/scheduleUpdated", [[NSApp delegate] applicationSupportFolder]];
+    [[NSFileManager defaultManager] removeItemAtPath:scheduleUpdatedPath error:nil];
+    [[NSFileManager defaultManager] createFileAtPath:scheduleUpdatedPath contents:nil attributes:nil];
+  }
 
-        }
-        else
-        {
-        // Update the 'scheduleUpdated' file
-        NSString *scheduleUpdatedPath = [NSString stringWithFormat:@"%@/scheduleUpdated", [[NSApp delegate] applicationSupportFolder]];
-        [[NSFileManager defaultManager] removeItemAtPath:scheduleUpdatedPath error:nil];
-        [[NSFileManager defaultManager] createFileAtPath:scheduleUpdatedPath contents:nil attributes:nil];
-		}
-        
-#if 1
-	[self performCleanup:info];
-#else
-	// No cleanup performed - just send a fake cleanup complete notification
-	[self cleanupComplete:info];
-#endif
+  [[self storeUpdate] parsingComplete:info];
+  
+  [self performCleanup:info];
 }
 
 - (void) cleanupComplete:(id)info
@@ -444,11 +455,6 @@ if ([info valueForKey:kTVDataDeliveryLineupsOnlyKey] && [[info valueForKey:kTVDa
 - (void) downloadError:(id)info
 {
 	NSLog(@"downloadError %@", info);
-}
-
-- (void) deviceScanComplete:(id)info
-{
-	NSLog(@"deviceScanComplete %@", info);
 }
 
 - (void) channelScanComplete:(id)info
@@ -732,8 +738,21 @@ if ([info valueForKey:kTVDataDeliveryLineupsOnlyKey] && [[info valueForKey:kTVDa
 	{
 		NSLog(@"scanForHDHomeRunDevices - saving context reported error %@", error);
 	}
-	NSDictionary *scanInfo = [NSDictionary dictionaryWithObjectsAndKeys:existingHDHomeRuns, @"existingHDHomeRuns", newHDHomeRuns, @"newHDHomeRuns", nil];
-	[[self storeUpdate] deviceScanComplete:scanInfo];
+        
+        // Having saved the MOC we need to get the URI's for each of the existing and new HDHomeRuns.
+        NSMutableArray *existingURIs = [NSMutableArray arrayWithCapacity:[existingHDHomeRuns count]];
+        for (HDHomeRun *anHDHomeRun in existingHDHomeRuns)
+        {
+          [existingURIs addObject:[[[anHDHomeRun objectID] URIRepresentation] absoluteString]];
+        }
+        NSMutableArray *newURIs = [NSMutableArray arrayWithCapacity:[newHDHomeRuns count]];
+        for (HDHomeRun *anHDHomeRun in newHDHomeRuns)
+        {
+          [newURIs addObject:[[[anHDHomeRun objectID] URIRepresentation] absoluteString]];
+        }
+        
+	NSDictionary *scanInfo = [NSDictionary dictionaryWithObjectsAndKeys:existingURIs, @"existingHDHomeRunURIs", newURIs, @"newHDHomeRunURIs", nil];
+        [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSDeviceScanCompleteNotification object:RSBackgroundApplication userInfo:scanInfo deliverImmediately:NO];
 }
 
 

@@ -34,7 +34,6 @@
 #import "Sparkle/Sparkle.h"
 
 NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
-NSString *RSDeviceScanCompleteNotification = @"RSDeviceScanCompleteNotification";
 NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotification";
 NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNotification";
 NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotification";
@@ -491,17 +490,6 @@ NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotif
 		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"downloadErrorInfo"];
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:self userInfo:infoDict];
-}
-
-- (void) deviceScanComplete:(id)info
-{
-	NSDictionary *infoDict = nil;
-	if (info)
-		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"deviceScanCompleteInfo"];
-
-	[[NSNotificationCenter defaultCenter] postNotificationName:RSDeviceScanCompleteNotification object:self userInfo:infoDict];
-
-	NSLog(@"Device Scan Complete");
 }
 
 - (void) channelScanComplete:(id)info
