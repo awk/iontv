@@ -30,7 +30,6 @@ extern NSString *kRSStoreUpdateConnectionName;
 - (void) parsingComplete:(id)info;
 - (void) cleanupComplete:(id)info;
 - (void) downloadError:(id)info;
-- (void) deviceScanComplete:(id)info;
 - (void) channelScanComplete:(id)info;
 
 @end
