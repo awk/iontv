@@ -43,6 +43,8 @@
 		EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
 		EA29391E0C0CB2740053E2B8 /* HexNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */; };
 		EA293ACF0C0D95F00053E2B8 /* PolishedBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */; };
+		EA2BC5B10D7CFF30006241FB /* RSNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2BC5B00D7CFF30006241FB /* RSNotifications.m */; };
+		EA2BC5B20D7CFF30006241FB /* RSNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2BC5B00D7CFF30006241FB /* RSNotifications.m */; };
 		EA2EE03F0C07D2300002420F /* hdhomerun_channelscan.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */; };
 		EA2EE0400C07D2320002420F /* hdhomerun_config.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02B0C07D2130002420F /* hdhomerun_config.c */; };
 		EA2EE0410C07D2340002420F /* hdhomerun_control.c in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE02C0C07D2130002420F /* hdhomerun_control.c */; };
@@ -244,6 +246,8 @@
 		EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HexNumberFormatter.m; path = UIApp/HexNumberFormatter.m; sourceTree = "<group>"; };
 		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolishedBackgroundView.h; path = UIApp/views/PolishedBackgroundView.h; sourceTree = "<group>"; };
 		EA293ACE0C0D95F00053E2B8 /* PolishedBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PolishedBackgroundView.m; path = UIApp/views/PolishedBackgroundView.m; sourceTree = "<group>"; };
+		EA2BC5AF0D7CFF30006241FB /* RSNotifications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSNotifications.h; path = common/RSNotifications.h; sourceTree = "<group>"; };
+		EA2BC5B00D7CFF30006241FB /* RSNotifications.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSNotifications.m; path = common/RSNotifications.m; sourceTree = "<group>"; };
 		EA2EE0290C07D2130002420F /* hdhomerun_channelscan.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_channelscan.c; path = ../libhdhomerun/hdhomerun_channelscan.c; sourceTree = SOURCE_ROOT; };
 		EA2EE02A0C07D2130002420F /* hdhomerun_channelscan.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = hdhomerun_channelscan.h; path = ../libhdhomerun/hdhomerun_channelscan.h; sourceTree = SOURCE_ROOT; };
 		EA2EE02B0C07D2130002420F /* hdhomerun_config.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = hdhomerun_config.c; path = ../libhdhomerun/hdhomerun_config.c; sourceTree = SOURCE_ROOT; };
@@ -593,6 +597,8 @@
 		EABF0EAC0CDE7DAC00DFFA0F /* common */ = {
 			isa = PBXGroup;
 			children = (
+				EA2BC5AF0D7CFF30006241FB /* RSNotifications.h */,
+				EA2BC5B00D7CFF30006241FB /* RSNotifications.m */,
 				EA4F2D010D73A80A005BC950 /* NSStringAdditions.m */,
 				EA308FB50C66A7470005E89B /* RSColorDictionary.h */,
 				EA308FB60C66A7470005E89B /* RSColorDictionary.m */,
@@ -939,6 +945,7 @@
 				EA2387330D5E5E4900343704 /* RSFirstRunContentView.m in Sources */,
 				EA39B7E00D6E21720049CB89 /* RSChannelTableView.m in Sources */,
 				EA4F2D020D73A80A005BC950 /* NSStringAdditions.m in Sources */,
+				EA2BC5B10D7CFF30006241FB /* RSNotifications.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -995,6 +1002,7 @@
 				EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */,
 				EA6338DA0D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m in Sources */,
 				EA4F2D030D73A80A005BC950 /* NSStringAdditions.m in Sources */,
+				EA2BC5B20D7CFF30006241FB /* RSNotifications.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
