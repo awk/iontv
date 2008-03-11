@@ -34,7 +34,6 @@
 #import "Sparkle/Sparkle.h"
 
 NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
-NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotification";
 NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNotification";
 NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotification";
 
@@ -260,8 +259,10 @@ NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotif
 	// server which may also have just been updated.
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sparkleWillRestart:) name:SUUpdaterWillRestartNotification object:nil];
         
-        // Launch the first run assistant if the key is not present in the prefs file
-        BOOL firstRunAlreadyCompleted = [[NSUserDefaults standardUserDefaults] boolForKey:kFirstRunAssistantCompletedKey];
+        // Launch the first run assistant if the key is not present in the store metadata
+        NSError *error = nil;
+        NSDictionary *storeMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreWithURL:[[NSApp delegate] urlForPersistentStore] error:&error];
+        BOOL firstRunAlreadyCompleted = [[storeMetadata valueForKey:kFirstRunAssistantCompletedKey] boolValue];
         if (firstRunAlreadyCompleted == NO)
         {
           [self performSelector:@selector(launchFirstRunWizard:) withObject:nil afterDelay:0];
@@ -492,6 +493,7 @@ NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotif
 	[[NSNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:self userInfo:infoDict];
 }
 
+#if 0
 - (void) channelScanComplete:(id)info
 {
 	NSDictionary *infoDict = nil;
@@ -502,6 +504,7 @@ NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotif
 
 	NSLog(@"Channel Scan Complete");
 }
+#endif
 
 #pragma mark Properties
 

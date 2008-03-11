@@ -593,9 +593,12 @@ static Preferences *sSharedInstance = nil;
       mChannelScanInProgress = YES;
       [mScanChannelsButton setEnabled:NO];
 
-	  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(channelScanCompleteNotification:) name:RSChannelScanCompleteNotification object:[NSApp delegate]];
+      [[NSDistributedNotificationCenter defaultCenter] addObserver:self
+          selector:@selector(channelScanCompleteNotification:)
+          name:RSChannelScanCompleteNotification object:RSBackgroundApplication
+          suspensionBehavior:NSNotificationSuspensionBehaviorCoalesce];
   
-	  [[[NSApp delegate] recServer] scanForChannelsOnHDHomeRunDeviceID:[[aTuner device] deviceID] tunerIndex:[aTuner index]];
+      [[[NSApp delegate] recServer] scanForChannelsOnHDHomeRunDeviceID:[[aTuner device] deviceID] tunerIndex:[aTuner index]];
   }
 }
 
@@ -730,7 +733,7 @@ static Preferences *sSharedInstance = nil;
         }
 	mChannelScanInProgress = NO;
 	[mScanChannelsButton setEnabled:YES];
-	[[NSNotificationCenter defaultCenter] removeObserver:self name:RSChannelScanCompleteNotification object:[NSApp delegate]];
+	[[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSChannelScanCompleteNotification object:RSBackgroundApplication];
 }
 
 - (void) deviceScanCompleteNotification:(NSNotification*)aNotification

@@ -219,7 +219,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 // schedule data and update the database.
 - (void) autoUpdateSchedule
 {
-  if ([[NSUserDefaults standardUserDefaults] boolForKey:kFirstRunAssistantCompletedKey] == NO)
+  NSError *error = nil;
+  NSDictionary *storeMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreWithURL:[[NSApp delegate] urlForPersistentStore] error:&error];
+  BOOL firstRunAlreadyCompleted = [[storeMetadata valueForKey:kFirstRunAssistantCompletedKey] boolValue];
+  if (firstRunAlreadyCompleted == NO)
   {
       // First run wizard not complete - just try again later
       [NSTimer scheduledTimerWithTimeInterval:(kDefaultUpdateScheduleFetchDurationInHours - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
@@ -261,10 +264,21 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 // up into chunks lessers the load on the data servers and also breaks the parsing up into slightly more managed portions.
 - (BOOL) fetchFutureSchedule:(id)info
 {
-  if ([[NSUserDefaults standardUserDefaults] boolForKey:kFirstRunAssistantCompletedKey] == NO)
+  NSError *error = nil;
+  NSDictionary *storeMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreWithURL:[[NSApp delegate] urlForPersistentStore] error:&error];
+  BOOL firstRunAlreadyCompleted = [[storeMetadata valueForKey:kFirstRunAssistantCompletedKey] boolValue];
+  
+  // If there's a pending timer to issue a fetchFutureSchedule call invalidate it now - we'll start a new one later.
+  if ([mFetchFutureScheduleTimer isValid])
+  {
+    [mFetchFutureScheduleTimer invalidate];
+    mFetchFutureScheduleTimer  = nil;
+  }
+  
+  if (firstRunAlreadyCompleted == NO)
   {
     // First Run Wizard not completed - need to try again later, perhaps 1 hour from now ?
-    [NSTimer scheduledTimerWithTimeInterval:60 * 60 target:self selector:@selector(fetchFutureScheduleTimer:) userInfo:nil repeats:NO];
+    mFetchFutureScheduleTimer = [NSTimer scheduledTimerWithTimeInterval:60 * 60 target:self selector:@selector(fetchFutureScheduleTimer:) userInfo:nil repeats:NO];
     return NO;
   }
   
@@ -321,7 +335,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   // schedule information, so set a timer to fire in another 'fetchFuture' hours because by then another 'fetchFuture'
   // hours worth of schedule data should be available.
   NSDate *timerFireDate =  [NSDate dateWithTimeIntervalSinceNow:(kDefaultFutureScheduleFetchDurationInHours * 60 * 60)];
-  [NSTimer scheduledTimerWithTimeInterval:[timerFireDate timeIntervalSinceNow] target:self selector:@selector(fetchFutureScheduleTimer:) userInfo:nil repeats:YES];
+  mFetchFutureScheduleTimer = [NSTimer scheduledTimerWithTimeInterval:[timerFireDate timeIntervalSinceNow] target:self selector:@selector(fetchFutureScheduleTimer:) userInfo:nil repeats:NO];
   
   return NO;
 }
@@ -329,6 +343,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 - (void) fetchFutureScheduleTimer:(NSTimer*)aTimer
 {
   NSLog(@"Time To fetch future schedule data");
+  mFetchFutureScheduleTimer = nil;
   [self fetchFutureSchedule:nil];
 }
 
@@ -455,11 +470,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 - (void) downloadError:(id)info
 {
 	NSLog(@"downloadError %@", info);
-}
-
-- (void) channelScanComplete:(id)info
-{
-	NSLog(@"channelScanComplete %@", info);
 }
 
 #pragma mark - Server Methods
@@ -838,7 +848,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 				if (![[[NSApp delegate] managedObjectContext] save:&error])
 					NSLog(@"setHDHomeRunChannelsAndStations - error occured during save %@", error);
 				
-				[[self storeUpdate] channelScanComplete:nil];
+                                [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:RSBackgroundApplication userInfo:nil deliverImmediately:NO];
 			} 
 		} 
 	} 

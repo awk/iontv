@@ -23,3 +23,4 @@ extern NSString *RSBackgroundApplication;
 
 // Distributed Notifications sent by the background server to the UI App
 extern NSString *RSDeviceScanCompleteNotification;
+extern NSString *RSChannelScanCompleteNotification;

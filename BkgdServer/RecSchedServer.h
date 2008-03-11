@@ -43,6 +43,8 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
         
     NSMutableArray *mRecordingQueues;
     NSCalendarDate *mLastScheduleFetchEndDate;
+    
+    NSTimer *mFetchFutureScheduleTimer;
 }
 
 - (bool) shouldExit;

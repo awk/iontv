@@ -16,8 +16,10 @@
   // Outlets for the window/nib
   IBOutlet NSTabView *mTabView;
   IBOutlet NSArrayController *mLineupArrayController;
-  IBOutlet NSArrayController *mStationsOnLineupController;
+  IBOutlet NSArrayController *mHDHRStationsOnLineupController;
   IBOutlet NSArrayController *mDevicesArrayController;
+  IBOutlet NSArrayController *mAllStationsArrayController;
+  IBOutlet NSArrayController *mZ2ITStationsOnLineupController;
   
   // Outlets for the SchedulesDirect tab
   IBOutlet NSTextField *mSDUsernameField;
@@ -56,6 +58,7 @@
 - (IBAction) beginChannelScan:(id)sender;
 - (IBAction) viewHDHRStation:(id)sender;
 - (IBAction) channelListFinish:(id)sender;
+- (IBAction) firstRunWindowFinished:(id) sender;
 
 - (IBAction) cancelAndClose:(id)sender;
 - (IBAction) previousTab:(id)sender;

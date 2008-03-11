@@ -25,7 +25,7 @@
 #import "Z2ITStation.h"
 #import "recsched_bkgd_AppDelegate.h"
 #import "RecSchedServer.h"
-#import "RSStoreUpdateProtocol.h"
+#import "RSNotifications.h"
 
 const int kCallSignStringLength = 10;
 
@@ -654,8 +654,8 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
   }
-  NSLog(@"HDHomeRunTuner - performScan complete - calling storeUpdate\n");
-  [[[[NSApp delegate] recServer] storeUpdate] channelScanComplete:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:scanResult], @"scanResult", nil]];
+  NSLog(@"HDHomeRunTuner - performScan complete - sending notification");
+  [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:RSBackgroundApplication userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:scanResult], @"scanResult", nil] deliverImmediately:NO];
   
   mCurrentProgressDisplay = nil;
 }

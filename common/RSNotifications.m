@@ -22,3 +22,4 @@ NSString *RSBackgroundApplication = @"RSBackgroundApplication";
 
 
 NSString *RSDeviceScanCompleteNotification = @"RSDeviceScanCompleteNotification";
+NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotification";

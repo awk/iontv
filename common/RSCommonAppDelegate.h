@@ -38,5 +38,6 @@
 - (NSPersistentStore *)persistentStore;
 - (NSManagedObjectModel *)managedObjectModel;
 - (NSManagedObjectContext *)managedObjectContext;
+- (NSURL *)urlForPersistentStore;
 
 @end
