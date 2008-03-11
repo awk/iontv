@@ -764,6 +764,7 @@
 				8D11072C0486CEB800E47090 /* Sources */,
 				8D11072E0486CEB800E47090 /* Frameworks */,
 				EAF9241C0CCF930100CEBD73 /* CopyFiles */,
+				EA6F09720D86D4AB0040C488 /* Sign Application */,
 			);
 			buildRules = (
 			);
@@ -817,6 +818,7 @@
 				EAD024070CE216B4002B7C37 /* CopyFiles */,
 				EAEC092A0C272E1200C40D5A /* Sources */,
 				EAEC092B0C272E1200C40D5A /* Frameworks */,
+				EA6F097C0D86D6720040C488 /* Sign Application */,
 			);
 			buildRules = (
 			);
@@ -894,6 +896,39 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		EA6F09720D86D4AB0040C488 /* Sign Application */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(WRAPPER_NAME)",
+			);
+			name = "Sign Application";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "codesign -f -s 'iOnTV Code Signing Certificate' -v ${TARGET_BUILD_DIR}/${WRAPPER_NAME}\n";
+		};
+		EA6F097C0D86D6720040C488 /* Sign Application */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(TARGET_BUILD_DIR)/$(WRAPPER_NAME)",
+			);
+			name = "Sign Application";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "codesign -f -s 'iOnTV Code Signing Certificate' -v ${TARGET_BUILD_DIR}/${WRAPPER_NAME}";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8D11072C0486CEB800E47090 /* Sources */ = {
