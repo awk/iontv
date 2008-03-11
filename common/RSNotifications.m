@@ -23,3 +23,5 @@ NSString *RSBackgroundApplication = @"RSBackgroundApplication";
 
 NSString *RSDeviceScanCompleteNotification = @"RSDeviceScanCompleteNotification";
 NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotification";
+NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNotification";
+NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotification";

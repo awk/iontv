@@ -61,6 +61,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     // Setup the recording queues in a bit (after the app startup has completed and we have a delegate etc.)
     [self performSelector:@selector(initializeRecordingQueues) withObject:nil afterDelay:0];
 		[self performSelector:@selector(initializeTranscodingController) withObject:nil afterDelay:0];
+                
+    // Watch for schedule and lineup download/parsing complete notifications
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(scheduleUpdateCompleteNotification:) name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];            
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(lineupRetrievalCompleteNotification:) name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];            
   }
   return self;
 }
@@ -68,6 +72,9 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 - (void) dealloc
 {
   [mUIActivityProxy release];
+  
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
   [super dealloc];
 }
 
@@ -388,6 +395,23 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     }
 }
 
+#pragma mark Notifications
+
+- (void) lineupRetrievalCompleteNotification:(NSNotification *)aNotification
+{
+  [self performCleanup:[aNotification userInfo]];
+}
+
+- (void) scheduleUpdateCompleteNotification:(NSNotification *)aNotification
+{
+  // Update the 'scheduleUpdated' file
+  NSString *scheduleUpdatedPath = [NSString stringWithFormat:@"%@/scheduleUpdated", [[NSApp delegate] applicationSupportFolder]];
+  [[NSFileManager defaultManager] removeItemAtPath:scheduleUpdatedPath error:nil];
+  [[NSFileManager defaultManager] createFileAtPath:scheduleUpdatedPath contents:nil attributes:nil];
+
+  [self performCleanup:[aNotification userInfo]];
+}
+
 #pragma mark Activity Protocol Methods
 
 - (size_t) createActivity
@@ -435,27 +459,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 }
 
 #pragma mark Store Update Protocol Methods
-
-- (void) parsingComplete:(id)info
-{
-  NSLog(@"parsingComplete");
-        
-  if ([info valueForKey:kTVDataDeliveryLineupsOnlyKey] && [[info valueForKey:kTVDataDeliveryLineupsOnlyKey] boolValue] == YES)
-  {
-    // Lineups only - no need to clean up or update anything else
-  }
-  else
-  {
-    // Update the 'scheduleUpdated' file
-    NSString *scheduleUpdatedPath = [NSString stringWithFormat:@"%@/scheduleUpdated", [[NSApp delegate] applicationSupportFolder]];
-    [[NSFileManager defaultManager] removeItemAtPath:scheduleUpdatedPath error:nil];
-    [[NSFileManager defaultManager] createFileAtPath:scheduleUpdatedPath contents:nil attributes:nil];
-  }
-
-  [[self storeUpdate] parsingComplete:info];
-  
-  [self performCleanup:info];
-}
 
 - (void) cleanupComplete:(id)info
 {

@@ -18,6 +18,7 @@
 #import "Z2ITStation.h"
 #import "RSActivityViewController.h"
 #import "RSNotifications.h"
+#import "RecSchedServer.h"
 
 const NSInteger kSchedulesDirectTabViewIndex = 0;
 const NSInteger kTunerTabViewIndex = 1;
@@ -95,7 +96,7 @@ const NSInteger kFinishedTabViewIndex = 4;
   [mLineupsRetrievalProgressIndicator startAnimation:self];
 
   // We need to know when the lineup retrieval completes.
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(lineupRetrievalCompleteNotification:) name:RSLineupRetrievalCompleteNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(lineupRetrievalCompleteNotification:) name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
 
   [[[NSApp delegate] recServer] updateLineups];
 }
@@ -103,7 +104,7 @@ const NSInteger kFinishedTabViewIndex = 4;
 - (IBAction) cancelAndClose:(id)sender
 {
   // Remove ourselves from observing the completion notification
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDeviceScanCompleteNotification object:RSBackgroundApplication];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSChannelScanCompleteNotification object:RSBackgroundApplication];
 
@@ -241,7 +242,7 @@ const NSInteger kFinishedTabViewIndex = 4;
 - (void) lineupRetrievalCompleteNotification:(NSNotification*)aNotification
 {
   // Remove ourselves from observing the completion notification
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
   
 //  NSError *error = nil;
 //  [mLineupArrayController fetchWithRequest:[mLineupArrayController defaultFetchRequest] merge:NO error:&error];

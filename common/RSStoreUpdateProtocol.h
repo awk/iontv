@@ -27,7 +27,6 @@ extern NSString *kRSStoreUpdateConnectionName;
 
 @protocol RSStoreUpdate
 
-- (void) parsingComplete:(id)info;
 - (void) cleanupComplete:(id)info;
 - (void) downloadError:(id)info;
 

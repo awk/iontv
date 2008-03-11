@@ -27,6 +27,7 @@
 #import "ScheduleView.h"
 #import "Preferences.h"
 #import "RSRecording.h"
+#import "RSNotifications.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
 #import "Z2ITStation.h"
@@ -281,7 +282,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   [mCurrentSchedule setContent:nil];
 
   // Watch for the RSScheduleUpdateCompleteNotification to reset our object controllers
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(scheduleUpdateCompleteNotification:) name:RSScheduleUpdateCompleteNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(scheduleUpdateCompleteNotification:) name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];
   
   
   // Restore our previous lineup choice
@@ -380,7 +381,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (void) dealloc
 {
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSScheduleUpdateCompleteNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];
 
   // Store the current schedule into the preferences
   [[NSUserDefaults standardUserDefaults] setObject:[[[[mCurrentSchedule content] objectID] URIRepresentation] absoluteString] forKey:kCurrentScheduleURIKey];

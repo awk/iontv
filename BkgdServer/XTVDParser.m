@@ -19,6 +19,7 @@
 
 #import "XTVDParser.h"
 #import "recsched_AppDelegate.h"
+#import "RSNotifications.h"
 #import "tvDataDelivery.h"
 #import "Z2ITStation.h"
 #import "Z2ITSchedule.h"
@@ -745,7 +746,21 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
   
   [[NSFileManager defaultManager] removeFileAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] handler:nil];
-  [[xtvdParserData valueForKey:kReportCompletionToKey] performSelector:@selector(parsingComplete:) withObject:parseInfo];
+  
+  // Only certain standard types of data can be passed through a distributed notification - so we build a new userInfo dictionary containing just the 
+  // important valid details.
+  NSDictionary *notificationInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      [xtvdParserData valueForKey:kTVDataDeliveryFetchFutureScheduleKey], kTVDataDeliveryFetchFutureScheduleKey,
+                                      [xtvdParserData valueForKey:kTVDataDeliveryEndDateKey], kTVDataDeliveryEndDateKey,
+                                      nil];
+  if ([[xtvdParserData valueForKey:kTVDataDeliveryLineupsOnlyKey] boolValue])
+  {
+    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication userInfo:notificationInfo];
+  }
+  else
+  {
+    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication userInfo:notificationInfo];
+  }
   [mManagedObjectContext release];
   [pool release];
 }

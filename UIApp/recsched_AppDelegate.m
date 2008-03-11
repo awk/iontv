@@ -34,8 +34,6 @@
 #import "Sparkle/Sparkle.h"
 
 NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
-NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNotification";
-NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotification";
 
 @interface recsched_AppDelegate(private)
 
@@ -460,25 +458,6 @@ NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotif
 
 #pragma mark - Store Update Protocol
 
-- (void) parsingComplete:(id)info
-{
-	NSDictionary *infoDict = nil;
-	if (info)
-		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"parsingCompleteInfo"];
-
-        if ([info valueForKey:@"lineupsOnly"] && [[info valueForKey:@"lineupsOnly"] boolValue] == YES)
-        {
-          [[NSNotificationCenter defaultCenter] postNotificationName:RSLineupRetrievalCompleteNotification object:self userInfo:infoDict];
-        }
-        else
-        {
-          [[NSNotificationCenter defaultCenter] postNotificationName:RSScheduleUpdateCompleteNotification object:self userInfo:infoDict];
-          [[window delegate] setGetScheduleButtonEnabled:YES];
-        }
-        
-	NSLog(@"Parsing Complete");
-}
-
 - (void) cleanupComplete:(id)info
 {
 	NSLog(@"Cleanup Complete");
@@ -492,19 +471,6 @@ NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotif
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:self userInfo:infoDict];
 }
-
-#if 0
-- (void) channelScanComplete:(id)info
-{
-	NSDictionary *infoDict = nil;
-	if (info)
-		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"channelScanCompleteInfo"];
-
-	[[NSNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:self userInfo:infoDict];
-
-	NSLog(@"Channel Scan Complete");
-}
-#endif
 
 #pragma mark Properties
 
