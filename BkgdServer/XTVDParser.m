@@ -850,7 +850,11 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
     [self cleanupSchedulesIn:managedObjectContext before:cleanupDate];
     
     [self cleanupUnscheduledProgramsIn:managedObjectContext];
-    [[xtvdCleanupInfo valueForKey:kReportCompletionToKey] performSelectorOnMainThread:@selector(cleanupComplete:) withObject:cleanupInfo waitUntilDone:NO];
+		NSDictionary *notificationInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      [xtvdCleanupInfo valueForKey:kTVDataDeliveryFetchFutureScheduleKey], kTVDataDeliveryFetchFutureScheduleKey,
+                                      [xtvdCleanupInfo valueForKey:kTVDataDeliveryEndDateKey], kTVDataDeliveryEndDateKey,
+                                      nil];
+    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSCleanupCompleteNotification object:RSBackgroundApplication userInfo:notificationInfo];
 
     NS_DURING
 		NSError *error = nil;

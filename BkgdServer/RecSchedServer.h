@@ -21,7 +21,6 @@
 
 #import "RecSchedProtocol.h"
 #import "RSActivityDisplayProtocol.h"
-#import "RSStoreUpdateProtocol.h"
 
 extern NSString *RSNotificationUIActivityAvailable;
 extern const int kDefaultUpdateScheduleFetchDurationInHours;
@@ -32,11 +31,10 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
 @class HDHomeRunTuner;
 @class RSTranscodeController;
 
-@interface RecSchedServer : NSObject <RecSchedServerProto, RSActivityDisplay, RSStoreUpdate> {
+@interface RecSchedServer : NSObject <RecSchedServerProto, RSActivityDisplay> {
     BOOL mExitServer;
 	
 	id mUIActivity;
-	id mStoreUpdate;
         
   RSActivityProxy *mUIActivityProxy;
 	RSTranscodeController *mTranscodeController;
@@ -50,11 +48,9 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
 - (bool) shouldExit;
 - (BOOL) fetchFutureSchedule:(id)info;
 - (RSActivityProxy*) uiActivity;
-- (id) storeUpdate;
 - (void) performCleanup:(id)info;
 
 @property BOOL mExitServer;
-@property (retain,getter=storeUpdate) id mStoreUpdate;
 //@property (retain,getter=uiActivity) id mUIActivity;
 @end
 

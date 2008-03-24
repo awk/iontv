@@ -24,15 +24,12 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "RSCommonAppDelegate.h"
-#import "RSStoreUpdateProtocol.h"
-
-extern NSString *RSDownloadErrorNotification;
 
 @class HDHomeRunStation;
 @class RSFirstRunWindowController;
 @class RSActivityWindowController;
 
-@interface recsched_AppDelegate : RSCommonAppDelegate <RSStoreUpdate>
+@interface recsched_AppDelegate : RSCommonAppDelegate
 {
     IBOutlet NSWindow *window;
     

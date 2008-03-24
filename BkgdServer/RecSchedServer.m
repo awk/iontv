@@ -30,7 +30,6 @@
 #import "XTVDParser.h"
 #import "RecordingThread.h"
 #import "HDHomeRunTuner.h"
-#import "RSStoreUpdateProtocol.h"
 #import "RSTranscodeController.h"
 #import "RSNotifications.h"
 
@@ -65,6 +64,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     // Watch for schedule and lineup download/parsing complete notifications
     [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(scheduleUpdateCompleteNotification:) name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];            
     [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(lineupRetrievalCompleteNotification:) name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];            
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(cleanupCompleteNotification:) name:RSCleanupCompleteNotification object:RSBackgroundApplication];            
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadErrorNotification:) name:RSDownloadErrorNotification object:RSBackgroundApplication];            
   }
   return self;
 }
@@ -75,6 +76,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSCleanupCompleteNotification object:RSBackgroundApplication];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:RSBackgroundApplication];
   [super dealloc];
 }
 
@@ -134,33 +137,9 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   [[NSNotificationCenter defaultCenter] postNotificationName:RSNotificationUIActivityAvailable object:self];
 }
 
-- (void) initializeStoreUpdateConnection
-{
-  // Connect to server
-  mStoreUpdate = [[NSConnection rootProxyForConnectionWithRegisteredName:kRSStoreUpdateConnectionName  host:nil] retain];
-   
-  // check if connection worked.
-  if (mStoreUpdate == nil) 
-  {
-    NSLog(@"couldn't connect with User Interface (store update) Application");
-  }
-  else
-  {
-    //
-    // set protocol for the remote object & then register ourselves with the 
-    // messaging server.
-    [mStoreUpdate setProtocolForProxy:@protocol(RSStoreUpdate)];
-  }
-}
-
 - (RSActivityProxy*) uiActivity
 {
     return mUIActivityProxy;
-}
-
-- (id) storeUpdate
-{
-	return mStoreUpdate;
 }
 
 - (void) performCleanup:(id)info
@@ -412,6 +391,21 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   [self performCleanup:[aNotification userInfo]];
 }
 
+- (void) cleanupCompleteNotification:(NSNotification *)aNotification
+{
+	NSLog(@"cleanupComplete");
+	if ([[[aNotification userInfo] valueForKey:kTVDataDeliveryFetchFutureScheduleKey] boolValue] == YES)
+	{
+		mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithString:[[aNotification userInfo] valueForKey:kTVDataDeliveryEndDateKey] calendarFormat:@"%Y-%m-%dT%H:%M:%SZ"];
+		[self performSelectorOnMainThread:@selector(fetchFutureSchedule:) withObject:nil waitUntilDone:NO];
+	}
+}
+
+- (void) downloadErrorNotification:(NSNotification *)aNotification
+{
+	NSLog(@"downloadError %@", [aNotification userInfo]);
+}
+
 #pragma mark Activity Protocol Methods
 
 - (size_t) createActivity
@@ -458,23 +452,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   return activityToken;
 }
 
-#pragma mark Store Update Protocol Methods
-
-- (void) cleanupComplete:(id)info
-{
-	NSLog(@"cleanupComplete");
-        if ([[info valueForKey:kTVDataDeliveryFetchFutureScheduleKey] boolValue] == YES)
-        {
-          mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithString:[info valueForKey:kTVDataDeliveryEndDateKey] calendarFormat:@"%Y-%m-%dT%H:%M:%SZ"];
-          [self performSelectorOnMainThread:@selector(fetchFutureSchedule:) withObject:nil waitUntilDone:NO];
-        }
-}
-
-- (void) downloadError:(id)info
-{
-	NSLog(@"downloadError %@", info);
-}
-
 #pragma mark - Server Methods
 
 - (void) activityDisplayAvailable
@@ -486,17 +463,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 {
 	[mUIActivity release];
 	mUIActivity = nil;
-}
-
-- (void) storeUpdateAvailable
-{
-	[self initializeStoreUpdateConnection];
-}
-
-- (void) storeUpdateUnavailable
-{
-	[mStoreUpdate release];
-	mStoreUpdate = nil;
 }
 
 - (bool) shouldExit
@@ -873,7 +839,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	[[NSUserDefaults standardUserDefaults] addSuiteNamed:@"org.awkward.iontv"];
 }
 
-@synthesize mStoreUpdate;
 @synthesize mExitServer;
 @end
 

@@ -27,9 +27,9 @@
 #import "tvDataDelivery.h"
 #import "Preferences.h"
 #import "RSActivityDisplayProtocol.h"
-#import "RSStoreUpdateProtocol.h"
 #import "recsched_bkgd_AppDelegate.h"
 #import "RecSchedServer.h"
+#import "RSNotifications.h"
 
 #import <Security/Security.h>
 
@@ -321,26 +321,26 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 
   if ((downloadResult == nil) || ([downloadResult valueForKey:@"xtvd"] == nil))
   {
-	// Error during the download - notify the other side and return
-	[[[[NSApp delegate] recServer] storeUpdate] downloadError:downloadResult];
-	if (reportProgress)
-	{
-		activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
-		[reportProgressTo endActivity:activityToken];
-	}
-	[pool release];
-	return;
+		// Error during the download - notify the other side and return
+		[[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:RSBackgroundApplication userInfo:downloadResult];
+		if (reportProgress)
+		{
+			activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
+			[reportProgressTo endActivity:activityToken];
+		}
+		[pool release];
+		return;
   }
   
   NSMutableDictionary *parserCallData = [[NSMutableDictionary alloc] initWithDictionary:downloadResult];
   if ([xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] != nil)
   {
-	[parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] forKey:kTVDataDeliveryLineupsOnlyKey];
+		[parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] forKey:kTVDataDeliveryLineupsOnlyKey];
   }
   if ([xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil)
   {
-	[parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
-        [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
+		[parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
+    [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
   }
   
   if (reportProgress)

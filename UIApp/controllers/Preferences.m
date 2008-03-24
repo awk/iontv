@@ -703,7 +703,7 @@ static Preferences *sSharedInstance = nil;
   NSError *error = nil;
   [mLineupsArrayController fetchWithRequest:[mLineupsArrayController defaultFetchRequest] merge:NO error:&error];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:RSBackgroundApplication];
 }
 
 - (void) downloadErrorNotification:(NSNotification *)aNotification
@@ -712,7 +712,7 @@ static Preferences *sSharedInstance = nil;
   [mRetrieveLineupsButton setEnabled:YES];
   
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:[NSApp delegate]];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:RSBackgroundApplication];
 }
 
 - (void) channelScanCompleteNotification:(NSNotification*)aNotification

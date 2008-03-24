@@ -33,8 +33,6 @@
 #import "RSFirstRunWindowController.h"
 #import "Sparkle/Sparkle.h"
 
-NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
-
 @interface recsched_AppDelegate(private)
 
 - (void) installBackgroundServer;
@@ -187,21 +185,6 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
     [Preferences setupDefaults];
 
     [self initializeServerConnection];
-
-	// Register ourselves for the display/feedback methods called by the server
-    NSConnection *theConnection;
-
-    theConnection = [[NSConnection alloc] init];
-    [theConnection setRootObject:self];
-    if ([theConnection registerName:kRSStoreUpdateConnectionName] == NO) 
-    {
-            /* Handle error. */
-            NSLog(@"Error registering connection");
-    }
-	else
-	{
-		[[self recServer] storeUpdateAvailable];
-	}
   }
   return self;
 }
@@ -409,7 +392,6 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 
     int reply = NSTerminateNow;
 
-    [[self recServer] storeUpdateUnavailable];
     return reply;
 }
 
@@ -454,22 +436,6 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 	{
 		[mRecServer quitServer:self];
 	}
-}
-
-#pragma mark - Store Update Protocol
-
-- (void) cleanupComplete:(id)info
-{
-	NSLog(@"Cleanup Complete");
-}
-
-- (void) downloadError:(id)info
-{
-	NSDictionary *infoDict = nil;
-	if (info)
-		infoDict = [NSDictionary dictionaryWithObject:info forKey:@"downloadErrorInfo"];
-
-	[[NSNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:self userInfo:infoDict];
 }
 
 #pragma mark Properties

@@ -26,3 +26,6 @@ extern NSString *RSDeviceScanCompleteNotification;
 extern NSString *RSChannelScanCompleteNotification;
 extern NSString *RSLineupRetrievalCompleteNotification;
 extern NSString *RSScheduleUpdateCompleteNotification;
+extern NSString *RSCleanupCompleteNotification;
+extern NSString *RSDownloadErrorNotification;
+
