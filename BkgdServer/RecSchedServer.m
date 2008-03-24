@@ -501,83 +501,87 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   
   if (mySchedule)
   {
-        NSLog(@"addRecordingOfSchedule");
-	NSLog(@"  My Program title = %@, My Schedule start time = %@ channel = %@, %s", mySchedule.program.title, mySchedule.time, mySchedule.station.callSign, 
-            ([mySchedule recording] == nil ? "does not have prior recording" : "has prior recording"));
-	if ([mySchedule recording] == nil)
-	{
-                // Find out if a tuner for this recording is available.
-                NSSet *candidateStations = mySchedule.station.hdhrStations;
-                NSMutableArray *conflictingSchedules = [NSMutableArray arrayWithCapacity:1];
-                RSRecording *aRecording = nil;
-                NSLog(@"  There are %d candidate stations and %d recording queues", [candidateStations count], [mRecordingQueues count]);
-                for (HDHomeRunStation *aStation in candidateStations)
-                {
-                  for (RSRecordingQueue *aRecordingQueue in mRecordingQueues)
-                  {
-                    NSLog(@"  Checking Queue for tuner %@", aRecordingQueue.tuner.longName);
-                    if (aRecordingQueue.tuner == aStation.channel.tuner)
-                    {
-                      NSLog(@"  Tuner %@ has the station, there are %d recordings in the queue", aRecordingQueue.tuner.longName, [aRecordingQueue.queue count]);
-                      // Does the Tuners queue have space/time for this recording ?
-                      BOOL hasOverlaps = NO;
-                      for (RSRecording *aPreviouslyScheduledRecording in aRecordingQueue.queue)
-                      {
-                        if ([aPreviouslyScheduledRecording.schedule overlapsWith:mySchedule])
-                        {
-                          NSLog(@"  Queue for tuner %@ has overlap with schedule title %@", aStation.channel.tuner.longName, aPreviouslyScheduledRecording.schedule.program.title);
-                          hasOverlaps = YES;
-                          [conflictingSchedules addObject:[aPreviouslyScheduledRecording.schedule objectID]];
-                        }
-                      }
-                      if (!hasOverlaps)
-                      {
-                        NSLog(@"  There are no overlaps - creating a recording on tuner %@", aRecordingQueue.tuner.longName);
-                        
-                        // When we construct a recording we also need to associate it with the specific station on this tuner and 
-                        // store that relationship. We'll use the relationship to reconstruct the queues on launch and also to use
-                        // the correct station/tuner/device when recording starts. Otherwise there are no adequate guaruntees that our
-                        // work schedule will actually come true.
-                        aRecording = [RSRecording insertRecordingOfSchedule:mySchedule];
-                        if (aRecording)
-                        {
-                          [aRecordingQueue addRecording:aRecording];
-//                          [self addRecording:aRecording toQueue:[recordingQueueDict valueForKey:@"queue"]];
-                          break;
-                        }
-                      }
-                    }
-                    if (aRecording)
-                      break;
-                  }
-                  if (aRecording)
-                    break;
-                }
-                
-		if (aRecording)
+		NSLog(@"addRecordingOfSchedule");
+		NSLog(@"  My Program title = %@, My Schedule start time = %@ channel = %@, %s", mySchedule.program.title, mySchedule.time, mySchedule.station.callSign, 
+					([mySchedule recording] == nil ? "does not have prior recording" : "has prior recording"));
+		if ([mySchedule recording] == nil)
 		{
-			aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
-			if (![[[NSApp delegate] managedObjectContext] save:error])
-                        {
-				NSLog(@"addRecordingOfSchedule - error occured during save %@", *error);
-                                return NO;
-                        }
-                        else
-                          return YES;
+			// Find out if a tuner for this recording is available.
+			NSSet *candidateStations = mySchedule.station.hdhrStations;
+			NSMutableArray *conflictingSchedules = [NSMutableArray arrayWithCapacity:1];
+			RSRecording *aRecording = nil;
+			NSLog(@"  There are %d candidate stations and %d recording queues", [candidateStations count], [mRecordingQueues count]);
+			for (HDHomeRunStation *aStation in candidateStations)
+			{
+				for (RSRecordingQueue *aRecordingQueue in mRecordingQueues)
+				{
+					NSLog(@"  Checking Queue for tuner %@", aRecordingQueue.tuner.longName);
+					if (aRecordingQueue.tuner == aStation.channel.tuner)
+					{
+						NSLog(@"  Tuner %@ has the station, there are %d recordings in the queue", aRecordingQueue.tuner.longName, [aRecordingQueue.queue count]);
+						// Does the Tuners queue have space/time for this recording ?
+						BOOL hasOverlaps = NO;
+						for (RSRecording *aPreviouslyScheduledRecording in aRecordingQueue.queue)
+						{
+							if ([aPreviouslyScheduledRecording.schedule overlapsWith:mySchedule])
+							{
+								NSLog(@"  Queue for tuner %@ has overlap with schedule title %@", aStation.channel.tuner.longName, aPreviouslyScheduledRecording.schedule.program.title);
+								hasOverlaps = YES;
+								[conflictingSchedules addObject:[aPreviouslyScheduledRecording.schedule objectID]];
+							}
+						}
+						if (!hasOverlaps)
+						{
+							NSLog(@"  There are no overlaps - creating a recording on tuner %@", aRecordingQueue.tuner.longName);
+
+							// When we construct a recording we also need to associate it with the specific station on this tuner and 
+							// store that relationship. We'll use the relationship to reconstruct the queues on launch and also to use
+							// the correct station/tuner/device when recording starts. Otherwise there are no adequate guaruntees that our
+							// work schedule will actually come true.
+							aRecording = [RSRecording insertRecordingOfSchedule:mySchedule];
+							if (aRecording)
+							{
+								[aRecordingQueue addRecording:aRecording];
+								break;
+							}
+						}
+					}
+					if (aRecording)
+						break;
+				}
+				if (aRecording)
+					break;
+			}
+
+			if (aRecording)
+			{
+				aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
+				if (![[[NSApp delegate] managedObjectContext] save:error])
+				{
+					NSLog(@"addRecordingOfSchedule - error occured during save %@", *error);
+					return NO;
+				}
+				else
+					return YES;
+			}
+			else
+			{
+				// No recording created - probably because of overlaps - we should construct an appropriate error object to return.
+				if (error != nil)
+				{
+					NSString *descriptionStr = [NSString stringWithFormat:@"The recording of %@, cannot be scheduled because it conflicts with %d other program%@",
+																		 mySchedule.program.title, [conflictingSchedules count], [conflictingSchedules count] > 1 ? @"s." : @"."];
+					NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:
+																 conflictingSchedules, @"conflictingSchedules",
+																 descriptionStr, NSLocalizedDescriptionKey,
+																 nil];
+					*error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
+				}
+				return NO;
+			}
 		}
-                else
-                {
-                  // No recording created - probably because of overlaps - we should construct an appropriate error object to return.
-                  if (error != nil)
-                  {
-                    NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:conflictingSchedules, @"conflictingSchedules", nil];
-                    *error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
-                  }
-                  return NO;
-                }
-	}
-        else // Already scheduled to be recorded
-          return YES;
+		else // Already scheduled to be recorded
+			return YES;
   }
   else
   {

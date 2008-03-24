@@ -169,9 +169,9 @@
   NSFileHandle* transportStreamFileHandle = [NSFileHandle fileHandleForWritingAtPath:legalDestinationPath];
   if (!transportStreamFileHandle)
   {
-	NSLog(@"beginRecording - unable to create recording at %@", destinationPath);
-	[[mRecSchedServer uiActivity] endActivity:activityToken];
-	return;
+		NSLog(@"beginRecording - unable to create recording at %@", destinationPath);
+		[[mRecSchedServer uiActivity] endActivity:activityToken];
+		return;
   }
 
   mThreadRecording.mediaFile  = [legalDestinationPath copy];
@@ -184,12 +184,28 @@
   {
     usleep(64000);
 
-	NSData *videoData = [anHDHRStation receiveVideoData];
-	if (videoData)
-	{
-		[transportStreamFileHandle writeData:videoData];
-		[videoData release];
-	}
+		NSData *videoData = [anHDHRStation receiveVideoData];
+		if (videoData)
+		{
+			@try {
+				[transportStreamFileHandle writeData:videoData];
+			}
+			@catch (NSException * e) {
+				if ([e name] == NSFileHandleOperationException)
+				{
+					NSLog(@"RecordingThread - exception during write: %@", [e reason]);
+				}
+				else
+				{
+					NSLog(@"RecordingThread - unexpected exception: %@", e);
+				}
+				mThreadRecording.status = [NSNumber numberWithInt:RSRecordingErrorStatus];
+				mFinishRecording = YES;
+			}
+			@finally {
+				[videoData release];
+			}
+		}
 
 
 	if ([[NSDate date] timeIntervalSinceDate:lastActivityNotification] > kNotificationInterval)
