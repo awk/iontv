@@ -15,22 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-
 #import <Cocoa/Cocoa.h>
 
-// Sender for notifications from the background server app
-extern NSString *RSBackgroundApplication;
+@interface NSManagedObjectContext ( RecschedAdditions )
 
-// Distributed Notifications sent by the background server to the UI App
-extern NSString *RSDeviceScanCompleteNotification;
-extern NSString *RSChannelScanCompleteNotification;
-extern NSString *RSLineupRetrievalCompleteNotification;
-extern NSString *RSScheduleUpdateCompleteNotification;
-extern NSString *RSCleanupCompleteNotification;
-extern NSString *RSDownloadErrorNotification;
+- (void)refreshObjectWithoutCache:(NSManagedObject *)object mergeChanges:(BOOL)flag;
 
-extern NSString *RSRecordingAddedNotification;
-extern NSString *RSRecordingRemovedNotification;
-
-extern NSString *RSRecordingAddedRecordingURIKey;
-extern NSString *RSRecordingRemovedRecordingOfScheduleURIKey;
+@end

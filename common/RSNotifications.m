@@ -28,3 +28,8 @@ NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotif
 NSString *RSCleanupCompleteNotification = @"RSCleanupCompleteNotification";
 NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 
+NSString *RSRecordingAddedNotification = @"RSRecordingAddedNotification";
+NSString *RSRecordingRemovedNotification = @"RSRecordingRemovedNotification";
+
+NSString *RSRecordingAddedRecordingURIKey =  @"recordingURI";
+NSString *RSRecordingRemovedRecordingOfScheduleURIKey = @"scheduleURI";

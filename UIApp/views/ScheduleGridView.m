@@ -25,6 +25,9 @@
 
 #import "AKColorExtensions.h"
 #import "MainWindowController.h"
+#import "NSManagedObjectContextAdditions.h"
+#import "RSNotifications.h"
+#import "RSRecording.h"
 #import "ScheduleViewController.h"
 #import "ScheduleGridView.h"
 #import "ScheduleStationColumnView.h"
@@ -34,6 +37,10 @@
 #import "Z2ITSchedule.h"
 
 const float kScheduleDetailsPopUpTime = 3.0;
+
+@interface ScheduleGridView(Private)
+- (BOOL) scheduleIsVisible:(Z2ITSchedule*)inSchedule;
+@end
 
 @interface ScheduleGridLine : NSObject
 {
@@ -84,12 +91,18 @@ const float kScheduleDetailsPopUpTime = 3.0;
           selector: @selector(frameDidChange:)
           name: NSViewFrameDidChangeNotification
           object: self];
-    }
+
+    	[[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingAdded:) name:RSRecordingAddedNotification object:RSBackgroundApplication];
+			[[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingRemoved:) name:RSRecordingRemovedNotification object:RSBackgroundApplication];
+		}
     return self;
 }
 
 - (void) dealloc 
 {
+	[[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSRecordingAddedNotification object:RSBackgroundApplication];
+	[[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSRecordingRemovedNotification object:RSBackgroundApplication];
+
   [delegate release];
   [mSelectedSchedule release];
   [super dealloc];
@@ -444,10 +457,70 @@ const float kScheduleDetailsPopUpTime = 3.0;
   [self updateForNewStartTime];
 }
 
+- (void)recordingAdded: (NSNotification *)notification
+{
+	NSURL *newRecordingURI = [NSURL URLWithString:[[notification userInfo] valueForKey:RSRecordingAddedRecordingURIKey]];
+	NSManagedObjectID *newRecordingID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:newRecordingURI];
+	RSRecording *newRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:newRecordingID];
+	if ([self scheduleIsVisible:newRecording.schedule])
+	{
+		[[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:newRecording.schedule mergeChanges:YES];
+		[self setNeedsDisplay:YES];
+	}
+}
+
+- (void)recordingRemoved: (NSNotification *)notification
+{
+	NSURL *removedRecordingOfScheduleURI = [NSURL URLWithString:[[notification userInfo] valueForKey:RSRecordingRemovedRecordingOfScheduleURIKey]];
+	NSManagedObjectID *removedRecordingOfScheduleID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:removedRecordingOfScheduleURI];
+	Z2ITSchedule *removedRecordingOfSchedule = (Z2ITSchedule *) [[[NSApp delegate] managedObjectContext] objectWithID:removedRecordingOfScheduleID];
+	if ([self scheduleIsVisible:removedRecordingOfSchedule])
+	{
+		[[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:removedRecordingOfSchedule mergeChanges:YES];
+		[self setNeedsDisplay:YES];
+	}
+}
+
 @synthesize mStartTime;
 @synthesize mVisibleTimeSpan;
 @synthesize mStartStationIndex;
 @synthesize mSelectedSchedule;
+@end
+
+@implementation ScheduleGridView(Private)
+
+- (BOOL) scheduleIsVisible:(Z2ITSchedule*)inSchedule
+{
+	BOOL isVisible = NO;
+	
+	NSDate *gridStartDate = [NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime];
+	NSDate *gridEndDate = [NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime+mVisibleTimeSpan];
+	// Schedule starts between grid start and end times
+	if (([gridStartDate compare:inSchedule.time] == NSOrderedAscending) && ([inSchedule.time compare:gridEndDate] == NSOrderedDescending))
+	{
+		isVisible = YES;
+	}
+	
+	// Schedule ends between grid start and end times
+	if (([gridStartDate compare:inSchedule.endTime] == NSOrderedAscending) && ([inSchedule.endTime compare:gridEndDate] == NSOrderedDescending))
+	{
+		isVisible = YES;
+	}
+	
+	if (isVisible)
+	{
+		for (ScheduleGridLine *aGridLine in mStationsInViewArray)
+		{
+			if ([aGridLine station] == [inSchedule station])
+			{
+				isVisible = YES;
+				break;
+			}
+		}
+	}
+	return isVisible;
+}
+
 @end
 
 @implementation ScheduleGridLine

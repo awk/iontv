@@ -91,6 +91,8 @@
 		EA70E7210CC0164600C3B295 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */; };
 		EA70E7220CC0164600C3B295 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */; };
 		EA70E8970CC06ED500C3B295 /* RSTranscodingImp.m in Sources */ = {isa = PBXBuildFile; fileRef = EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */; };
+		EA74EE8C0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74EE8B0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m */; };
+		EA74EE8D0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74EE8B0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m */; };
 		EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */; };
 		EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
 		EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
@@ -312,7 +314,6 @@
 		EA686CE80CA95F5600185188 /* RSActivityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSActivityViewController.h; path = UIApp/controllers/RSActivityViewController.h; sourceTree = "<group>"; };
 		EA686CE90CA95F5600185188 /* RSActivityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSActivityViewController.m; path = UIApp/controllers/RSActivityViewController.m; sourceTree = "<group>"; };
 		EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSActivityDisplayProtocol.h; path = common/RSActivityDisplayProtocol.h; sourceTree = "<group>"; };
-		EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSStoreUpdateProtocol.h; path = common/RSStoreUpdateProtocol.h; sourceTree = "<group>"; };
 		EA6AB7190CBD93AB003C3CB6 /* EmptyCPlusPlus.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = EmptyCPlusPlus.mm; path = BkgdServer/EmptyCPlusPlus.mm; sourceTree = "<group>"; };
 		EA6AB7200CBDA2E2003C3CB6 /* RSTranscodeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSTranscodeController.h; path = BkgdServer/RSTranscodeController.h; sourceTree = "<group>"; };
 		EA6AB7210CBDA2E2003C3CB6 /* RSTranscodeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSTranscodeController.m; path = BkgdServer/RSTranscodeController.m; sourceTree = "<group>"; };
@@ -324,6 +325,8 @@
 		EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched.xcmappingmodel; sourceTree = "<group>"; };
 		EA70E8950CC06ED500C3B295 /* RSTranscodingImp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSTranscodingImp.h; path = BkgdServer/RSTranscodingImp.h; sourceTree = "<group>"; };
 		EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSTranscodingImp.m; path = BkgdServer/RSTranscodingImp.m; sourceTree = "<group>"; };
+		EA74EE8A0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSManagedObjectContextAdditions.h; path = common/NSManagedObjectContextAdditions.h; sourceTree = "<group>"; };
+		EA74EE8B0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSManagedObjectContextAdditions.m; path = common/NSManagedObjectContextAdditions.m; sourceTree = "<group>"; };
 		EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreferenceKeys.m; path = common/PreferenceKeys.m; sourceTree = "<group>"; };
 		EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferenceKeys.h; path = common/PreferenceKeys.h; sourceTree = "<group>"; };
 		EA8E1C570CC9408800DD109F /* HardDrive.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HardDrive.tiff; path = Images/HardDrive.tiff; sourceTree = "<group>"; };
@@ -609,6 +612,8 @@
 				EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */,
 				EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */,
 				EA2339EF0D6BDCC700451694 /* NSStringAdditions.h */,
+				EA74EE8A0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.h */,
+				EA74EE8B0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m */,
 			);
 			name = common;
 			sourceTree = "<group>";
@@ -618,7 +623,6 @@
 			children = (
 				EAE655730B9E691000CDB279 /* RecSchedProtocol.h */,
 				EA686D760CA96FD200185188 /* RSActivityDisplayProtocol.h */,
-				EA686D7D0CA9985400185188 /* RSStoreUpdateProtocol.h */,
 			);
 			name = Protocols;
 			sourceTree = "<group>";
@@ -981,6 +985,7 @@
 				EA39B7E00D6E21720049CB89 /* RSChannelTableView.m in Sources */,
 				EA4F2D020D73A80A005BC950 /* NSStringAdditions.m in Sources */,
 				EA2BC5B10D7CFF30006241FB /* RSNotifications.m in Sources */,
+				EA74EE8D0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1038,6 +1043,7 @@
 				EA6338DA0D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m in Sources */,
 				EA4F2D030D73A80A005BC950 /* NSStringAdditions.m in Sources */,
 				EA2BC5B20D7CFF30006241FB /* RSNotifications.m in Sources */,
+				EA74EE8C0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

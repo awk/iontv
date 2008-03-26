@@ -562,7 +562,11 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 					return NO;
 				}
 				else
+				{
+					NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[aRecording objectID] URIRepresentation] absoluteString], RSRecordingAddedRecordingURIKey, nil];
+					[[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSRecordingAddedNotification object:RSBackgroundApplication userInfo:info];
 					return YES;
+				}
 			}
 			else
 			{
@@ -590,28 +594,37 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   }
 }
 
-- (BOOL) cancelRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error
+- (BOOL) cancelRecording:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error
 {
-  Z2ITSchedule *mySchedule = nil;
-  mySchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
+  RSRecording *myRecording = nil;
+  myRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
   
-  if (mySchedule)
+  if (myRecording)
   {
-	NSLog(@"My Program title = %@, My Schedule start time = %@ channel = %@, recording = %@", mySchedule.program.title, mySchedule.time, mySchedule.station.callSign, [mySchedule recording]);
-	if ([mySchedule recording] != nil)
-	{
-          // We need to cancel/delete the recording thread controller - we can do this by setting the recordings thread controller property to nil
-          mySchedule.recording.recordingThreadController = nil;
-          
-          // Remove the recording from the queue
-					[mySchedule.recording.recordingQueue removeRecording:mySchedule.recording];
+		// Cache the schedule - we use it in the notification.
+		Z2ITSchedule *scheduleBeingRecorded = myRecording.schedule;
+		
+		NSLog(@"My Program title = %@, My Schedule start time = %@ channel = %@, recording = %@", myRecording.schedule.program.title, myRecording.schedule.time, myRecording.schedule.station.callSign, myRecording);
+		// We need to cancel/delete the recording thread controller - we can do this by setting the recordings thread controller property to nil
+		myRecording.recordingThreadController = nil;
+		
+		// Remove the recording from the queue
+		[myRecording.recordingQueue removeRecording:myRecording];
 
-					// Remove the recording from the ManagedObjectContext
-          [[[NSApp delegate] managedObjectContext] deleteObject:mySchedule.recording];
-          return YES;
-        }
-        else
-          return NO;
+		// Remove the recording from the ManagedObjectContext
+		[[[NSApp delegate] managedObjectContext] deleteObject:myRecording];
+
+		if (![[[NSApp delegate] managedObjectContext] save:error])
+		{
+			NSLog(@"cancelRecording - error occured during save %@", *error);
+			return NO;
+		}
+		else
+		{
+			NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[scheduleBeingRecorded objectID] URIRepresentation] absoluteString], RSRecordingRemovedRecordingOfScheduleURIKey, nil];
+			[[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSRecordingRemovedNotification object:RSBackgroundApplication userInfo:info];
+			return YES;
+		}
   }
   else
     return NO;

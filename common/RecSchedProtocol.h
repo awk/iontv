@@ -33,7 +33,7 @@ extern NSString *kRecServerConnectionName;
 - (void) activityDisplayUnavailable;
 
 - (BOOL) addRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
-- (BOOL) cancelRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
+- (BOOL) cancelRecording:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
 
 - (void) reloadPreferences:(id)sender;
 

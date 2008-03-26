@@ -200,7 +200,7 @@ const float kScheduleDetailsPopupHeightPadding = 10.0;
 - (void) awakeFromNib
 {
 	// We need to know when the selected schedule changes so we can update
-	[mCurrentSchedule addObserver:self forKeyPath:@"content" options:0 context:nil];
+	[mCurrentSchedule addObserver:self forKeyPath:@"content.recording" options:0 context:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -208,7 +208,7 @@ const float kScheduleDetailsPopupHeightPadding = 10.0;
 			change:(NSDictionary *)change
 			context:(void *)context
 {
-    if ((object == mCurrentSchedule) && ([keyPath isEqual:@"content"]))
+    if ((object == mCurrentSchedule) && ([keyPath isEqual:@"content.recording"]))
 	{
 		[self setNeedsDisplay:YES];
 	}

@@ -37,6 +37,7 @@
 #import "ScheduleViewController.h"
 #import "ProgramSearchViewController.h"
 #import "NSStringAdditions.h"
+#import "NSManagedObjectContextAdditions.h"
 
 @interface MainWindowController(Private)
 - (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule;
@@ -106,7 +107,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	// No future recordings array - create one
 	if (myFirstArray)
 	{
-		mergedRecordingArray = [myFirstArray copy];
+		mergedRecordingArray = [myFirstArray mutableCopy];
 	}
 	else
 		mergedRecordingArray = [[NSMutableArray alloc] initWithCapacity:[mySecondArray count]];
@@ -284,6 +285,9 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   // Watch for the RSScheduleUpdateCompleteNotification to reset our object controllers
   [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(scheduleUpdateCompleteNotification:) name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];
   
+	// Watch for RSRecordingAdded and RSRecordingRemoved notification to update the recordings array controller
+	[[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingAddedNotification:) name:RSRecordingAddedNotification object:RSBackgroundApplication];
+	[[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingRemovedNotification:) name:RSRecordingRemovedNotification object:RSBackgroundApplication];
   
   // Restore our previous lineup choice
   NSString *lineupObjectURIString = [[NSUserDefaults standardUserDefaults] stringForKey:kCurrentLineupURIKey];
@@ -382,6 +386,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 - (void) dealloc
 {
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];
+	[[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSRecordingAddedNotification object:RSBackgroundApplication];
+	[[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSRecordingRemovedNotification object:RSBackgroundApplication];
 
   // Store the current schedule into the preferences
   [[NSUserDefaults standardUserDefaults] setObject:[[[[mCurrentSchedule content] objectID] URIRepresentation] absoluteString] forKey:kCurrentScheduleURIKey];
@@ -553,10 +559,10 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 - (void) deleteFutureRecording:(id)anArgument
 {
 	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
-	Z2ITSchedule *aSchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+	RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
 	
-        NSError *error = nil;
-        [[[NSApp delegate] recServer] cancelRecordingOfSchedule:[aSchedule objectID] error:&error];
+	NSError *error = nil;
+	[[[NSApp delegate] recServer] cancelRecording:[aRecording objectID] error:&error];
 }
 
 - (void) scheduleUpdateCompleteNotification:(NSNotification*)aNotification
@@ -572,14 +578,48 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	}
 	if (!currentLineup)
 	{
-                if ([[mLineupsArrayController arrangedObjects] count] > 0)
-                  currentLineup = [[mLineupsArrayController arrangedObjects] objectAtIndex:0];
+		if ([[mLineupsArrayController arrangedObjects] count] > 0)
+			currentLineup = [[mLineupsArrayController arrangedObjects] objectAtIndex:0];
 	}
 
 	[mCurrentLineup setContent:currentLineup];
 	
 	// Trigger the schedule view to redraw
 	[[mScheduleView delegate] setStartTime:[[mScheduleView delegate] startTime]];
+}
+
+- (void) recordingAddedNotification:(NSNotification*)aNotification
+{
+	NSError *error = nil;
+	
+	// Refetch the current schedule to update it's 'recording dot'
+	NSURL *newRecordingURI = [NSURL URLWithString:[[aNotification userInfo] valueForKey:RSRecordingAddedRecordingURIKey]];
+	NSManagedObjectID *newRecordingID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:newRecordingURI];
+	RSRecording *newRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:newRecordingID];
+	if (newRecording.schedule == self.currentSchedule)
+	{
+		[[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:self.currentSchedule mergeChanges:YES];
+	}
+	
+	// Reload the recordings array controller to add the new recording
+	[mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:NO error:&error];
+}
+
+- (void) recordingRemovedNotification:(NSNotification*)aNotification
+{
+	NSError *error = nil;
+
+	// Refetch the current schedule to update it's 'recording dot'
+	NSURL *removedRecordingOfScheduleURI = [NSURL URLWithString:[[aNotification userInfo] valueForKey:RSRecordingRemovedRecordingOfScheduleURIKey]];
+	NSManagedObjectID *removedRecordingOfScheduleID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:removedRecordingOfScheduleURI];
+	Z2ITSchedule *removedRecordingOfSchedule = (Z2ITSchedule *) [[[NSApp delegate] managedObjectContext] objectWithID:removedRecordingOfScheduleID];
+	if (removedRecordingOfSchedule == self.currentSchedule)
+	{
+		[[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:self.currentSchedule mergeChanges:YES];
+	}
+
+	// Reload the recordings array controller to remove the recording
+	[mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:NO error:&error];
 }
 
 #pragma mark Window Delegate Methods
