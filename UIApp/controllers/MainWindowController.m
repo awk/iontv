@@ -41,6 +41,7 @@
 
 @interface MainWindowController(Private)
 - (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule;
+- (BOOL) addSeasonPassForProgram:(Z2ITProgram*)schedule onStation:(Z2ITStation*)station;
 @end
 
 @implementation MainWindowController
@@ -434,7 +435,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (IBAction) recordSeasonPass:(id)sender
 {
-	NSLog(@"Create a season pass");
+	[self addSeasonPassForProgram:[[mCurrentSchedule content] program] onStation:[[mCurrentSchedule content] station]];
 }
 
 - (IBAction) watchStation:(id)sender
@@ -812,6 +813,19 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
     return [[[NSApp delegate] recServer] addRecordingOfSchedule:[schedule objectID] error:&error];
   else
     return NO;
+}
+
+- (BOOL) addSeasonPassForProgram:(Z2ITProgram*)program onStation:(Z2ITStation*)station
+{
+	NSError *error = nil;
+	if ([[NSApp delegate] recServer])
+	{
+		return [[[NSApp delegate] recServer] addSeasonPassForProgram:[program objectID] onStation:[station objectID] error:&error];
+	}
+	else
+	{
+		return NO;
+	}
 }
 
 @end

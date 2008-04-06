@@ -27,6 +27,7 @@
 #import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
 #import "RSRecording.h"
+#import "RSSeasonPass.h"
 #import "XTVDParser.h"
 #import "RecordingThread.h"
 #import "HDHomeRunTuner.h"
@@ -628,6 +629,27 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   }
   else
     return NO;
+}
+
+- (BOOL) addSeasonPassForProgram:(NSManagedObjectID*)programObjectID onStation:(NSManagedObjectID*)stationObjectID error:(NSError**)error
+{
+  Z2ITProgram *myProgram = nil;
+  myProgram = (Z2ITProgram*) [[[NSApp delegate] managedObjectContext] objectWithID:programObjectID];
+  Z2ITStation *myStation = nil;
+	myStation = (Z2ITStation*) [[[NSApp delegate] managedObjectContext] objectWithID:stationObjectID];
+	
+  if (myProgram && myStation)
+  {
+		NSLog(@"addSeasonPassForSchedule");
+		NSLog(@"  My Program title = %@, series ID = %@ channel = %@", myProgram.title, myProgram.series, myStation.callSign);
+		RSSeasonPass *aSeasonPass = [RSSeasonPass insertSeasonPassForProgram:myProgram onStation:myStation];
+		NSArray *futureSchedules = [aSeasonPass fetchFutureSchedules];
+		for (Z2ITSchedule *aSchedule in futureSchedules)
+		{
+			NSLog(@"    %@ - %@ at %@", aSchedule.program.title, aSchedule.program.subTitle, aSchedule.time);
+		}
+	}
+	return NO;
 }
 
 - (oneway void) updateSchedule

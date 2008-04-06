@@ -91,8 +91,14 @@
 		EA70E7210CC0164600C3B295 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */; };
 		EA70E7220CC0164600C3B295 /* recsched.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */; };
 		EA70E8970CC06ED500C3B295 /* RSTranscodingImp.m in Sources */ = {isa = PBXBuildFile; fileRef = EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */; };
+		EA7133E80DA853B600F93E87 /* recsched_5_6.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA7133E70DA853B600F93E87 /* recsched_5_6.xcmappingmodel */; };
+		EA7133E90DA853B600F93E87 /* recsched_5_6.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA7133E70DA853B600F93E87 /* recsched_5_6.xcmappingmodel */; };
 		EA74EE8C0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74EE8B0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m */; };
 		EA74EE8D0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74EE8B0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m */; };
+		EA74F0220DA1CAA500565EA6 /* RSSeasonPass.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74F0210DA1CAA500565EA6 /* RSSeasonPass.m */; };
+		EA74F0230DA1CAA500565EA6 /* RSSeasonPass.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74F0210DA1CAA500565EA6 /* RSSeasonPass.m */; };
+		EA74F0290DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74F0280DA1CC0000565EA6 /* RSRecordingOptions.m */; };
+		EA74F02A0DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74F0280DA1CC0000565EA6 /* RSRecordingOptions.m */; };
 		EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */; };
 		EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
 		EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
@@ -325,8 +331,14 @@
 		EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched.xcmappingmodel; sourceTree = "<group>"; };
 		EA70E8950CC06ED500C3B295 /* RSTranscodingImp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSTranscodingImp.h; path = BkgdServer/RSTranscodingImp.h; sourceTree = "<group>"; };
 		EA70E8960CC06ED500C3B295 /* RSTranscodingImp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSTranscodingImp.m; path = BkgdServer/RSTranscodingImp.m; sourceTree = "<group>"; };
+		EA7133E70DA853B600F93E87 /* recsched_5_6.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched_5_6.xcmappingmodel; sourceTree = "<group>"; };
 		EA74EE8A0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSManagedObjectContextAdditions.h; path = common/NSManagedObjectContextAdditions.h; sourceTree = "<group>"; };
 		EA74EE8B0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSManagedObjectContextAdditions.m; path = common/NSManagedObjectContextAdditions.m; sourceTree = "<group>"; };
+		EA74F01E0D9FD1C500565EA6 /* recsched_DataModel 6.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 6.xcdatamodel"; sourceTree = "<group>"; };
+		EA74F0200DA1CAA500565EA6 /* RSSeasonPass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSSeasonPass.h; path = common/RSSeasonPass.h; sourceTree = "<group>"; };
+		EA74F0210DA1CAA500565EA6 /* RSSeasonPass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSSeasonPass.m; path = common/RSSeasonPass.m; sourceTree = "<group>"; };
+		EA74F0270DA1CC0000565EA6 /* RSRecordingOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecordingOptions.h; path = common/RSRecordingOptions.h; sourceTree = "<group>"; };
+		EA74F0280DA1CC0000565EA6 /* RSRecordingOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecordingOptions.m; path = common/RSRecordingOptions.m; sourceTree = "<group>"; };
 		EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreferenceKeys.m; path = common/PreferenceKeys.m; sourceTree = "<group>"; };
 		EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferenceKeys.h; path = common/PreferenceKeys.h; sourceTree = "<group>"; };
 		EA8E1C570CC9408800DD109F /* HardDrive.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HardDrive.tiff; path = Images/HardDrive.tiff; sourceTree = "<group>"; };
@@ -535,6 +547,7 @@
 			children = (
 				EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */,
 				EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */,
+				EA7133E70DA853B600F93E87 /* recsched_5_6.xcmappingmodel */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -650,6 +663,10 @@
 				EA083E470BA77D47003C27FA /* Z2ITScheduleExtras.m */,
 				EAF8830E0B5DCE4800373CEF /* Z2ITStation.h */,
 				EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */,
+				EA74F0200DA1CAA500565EA6 /* RSSeasonPass.h */,
+				EA74F0210DA1CAA500565EA6 /* RSSeasonPass.m */,
+				EA74F0270DA1CC0000565EA6 /* RSRecordingOptions.h */,
+				EA74F0280DA1CC0000565EA6 /* RSRecordingOptions.m */,
 			);
 			name = "Managed Objects";
 			sourceTree = "<group>";
@@ -986,6 +1003,9 @@
 				EA4F2D020D73A80A005BC950 /* NSStringAdditions.m in Sources */,
 				EA2BC5B10D7CFF30006241FB /* RSNotifications.m in Sources */,
 				EA74EE8D0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m in Sources */,
+				EA74F0230DA1CAA500565EA6 /* RSSeasonPass.m in Sources */,
+				EA74F02A0DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */,
+				EA7133E80DA853B600F93E87 /* recsched_5_6.xcmappingmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1044,6 +1064,9 @@
 				EA4F2D030D73A80A005BC950 /* NSStringAdditions.m in Sources */,
 				EA2BC5B20D7CFF30006241FB /* RSNotifications.m in Sources */,
 				EA74EE8C0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m in Sources */,
+				EA74F0220DA1CAA500565EA6 /* RSSeasonPass.m in Sources */,
+				EA74F0290DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */,
+				EA7133E90DA853B600F93E87 /* recsched_5_6.xcmappingmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1439,8 +1462,9 @@
 				EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */,
 				EA70E70F0CC0112200C3B295 /* recsched_DataModel 4.xcdatamodel */,
 				EA6338A30D034814006F3F64 /* recsched_DataModel 5.xcdatamodel */,
+				EA74F01E0D9FD1C500565EA6 /* recsched_DataModel 6.xcdatamodel */,
 			);
-			currentVersion = EA6338A30D034814006F3F64 /* recsched_DataModel 5.xcdatamodel */;
+			currentVersion = EA74F01E0D9FD1C500565EA6 /* recsched_DataModel 6.xcdatamodel */;
 			path = recsched_DataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

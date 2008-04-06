@@ -214,6 +214,7 @@
 @dynamic hdhrStations;
 @dynamic lineupMaps;
 @dynamic schedules;
+@dynamic seasonPasses;
 
 - (Z2ITSchedule*)scheduleAtTime:(CFAbsoluteTime) inAirTime
 {

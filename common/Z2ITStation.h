@@ -52,6 +52,7 @@
 @property (retain) NSSet* hdhrStations;
 @property (retain) NSSet* lineupMaps;
 @property (retain) NSSet* schedules;
+@property (retain) NSSet* seasonPasses;
 
 @end
 

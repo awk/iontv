@@ -25,6 +25,7 @@
 @dynamic status;
 @dynamic schedule;
 @dynamic tuner;
+@dynamic recordingOptions;
 @synthesize recordingThreadController;
 @synthesize recordingQueue;
 
