@@ -33,3 +33,5 @@ NSString *RSRecordingRemovedNotification = @"RSRecordingRemovedNotification";
 
 NSString *RSRecordingAddedRecordingURIKey =  @"recordingURI";
 NSString *RSRecordingRemovedRecordingOfScheduleURIKey = @"scheduleURI";
+
+NSString *RSMigrationCompleteNotification = @"RSMigrationCompleteNotification";

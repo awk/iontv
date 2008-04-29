@@ -34,3 +34,5 @@ extern NSString *RSRecordingRemovedNotification;
 
 extern NSString *RSRecordingAddedRecordingURIKey;
 extern NSString *RSRecordingRemovedRecordingOfScheduleURIKey;
+
+extern NSString *RSMigrationCompleteNotification;
