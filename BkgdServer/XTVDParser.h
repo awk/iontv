@@ -20,7 +20,6 @@
 #import <Cocoa/Cocoa.h>
 
 extern NSString *kCleanupDateKey;
-extern NSString *kReportCompletionToKey;
 extern NSString *kPersistentStoreCoordinatorKey;
 
 @interface XTVDParser : NSObject {

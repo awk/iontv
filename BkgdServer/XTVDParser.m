@@ -29,7 +29,6 @@
 #import "RSActivityDisplayProtocol.h"
 
 NSString *kCleanupDateKey = @"cleanupDate";
-NSString *kReportCompletionToKey = @"reportCompletionTo";
 NSString *kPersistentStoreCoordinatorKey = @"persistentStoreCoordinator";
 
 @implementation XTVDParser
@@ -600,7 +599,8 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
       
         // A program might exist more than once in the schedule, so we may have multiple sequential entries for the same program,
         // instead of advancing with each successful test we advance only if we don't have a match
-        if ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame)
+        if ((existingProgramIndex < [existingProgramsArray count]) &&
+            ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame))
         {
           aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
         }
@@ -608,7 +608,8 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
         if (!aProgram)
         {
           existingProgramIndex++;
-          if ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame)
+          if ((existingProgramIndex < [existingProgramsArray count]) && 
+              ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame))
           {
             aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
           }
