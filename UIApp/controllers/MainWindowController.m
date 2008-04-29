@@ -410,24 +410,6 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   [mGetScheduleButton setEnabled:enabled forSegment:0];
 }
 
-- (IBAction) getScheduleAction:(id)sender
-{
-  [self setGetScheduleButtonEnabled:NO];
-
-  [[[NSApp delegate] recServer] updateSchedule];
-}
-
-- (IBAction) cleanupAction:(id)sender
-{
-#if 0
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-  NSDate *currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentTime];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:currentDate, @"currentDate", [[[NSApplication sharedApplication] delegate] persistentStoreCoordinator], @"persistentStoreCoordinator", nil];
-  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:[xtvdCleanupThread class] withObject:callData];
-  [callData release];
-#endif
-}
-
 - (IBAction) recordShow:(id)sender
 {
   [self addRecordingOfSchedule:[mCurrentSchedule content]];

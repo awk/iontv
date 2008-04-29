@@ -57,8 +57,6 @@ extern NSString *RSSSchedulePBoardType;
   NSArray *mDraggedNodes;		// Temporary copy of the nodes being dragged around
 }
 
-- (IBAction) getScheduleAction:(id)sender;
-- (IBAction) cleanupAction:(id)sender;
 - (IBAction) recordShow:(id)sender;
 - (IBAction) recordSeasonPass:(id)sender;
 - (IBAction) watchStation:(id)sender;
