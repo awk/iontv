@@ -28,20 +28,22 @@
 @class HDHomeRunStation;
 @class RSFirstRunWindowController;
 @class RSActivityWindowController;
+@class RSMigrationSheetController;
 
 @interface recsched_AppDelegate : RSCommonAppDelegate
 {
-    IBOutlet NSWindow *window;
-    
-    IBOutlet NSMenuItem *mServerMenuItem;
-    
-    NSTask      *mVLCTask;
-    NSTimer     *mVLCTerminateTimer;
+  IBOutlet NSWindow *window;
+  
+  IBOutlet NSMenuItem *mServerMenuItem;
+  
+  NSTask      *mVLCTask;
+  NSTimer     *mVLCTerminateTimer;
 
-    id mRecServer;
+  id mRecServer;
 	
-	RSActivityWindowController *mActivityWindowController;
-        RSFirstRunWindowController *mFirstRunWindowController;
+  RSActivityWindowController *mActivityWindowController;
+  RSFirstRunWindowController *mFirstRunWindowController;
+  RSMigrationSheetController *mMigrationSheetController;
 }
 
 - (id) recServer;

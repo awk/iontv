@@ -31,11 +31,14 @@
 #import "MainWindowController.h"
 #import "RSActivityViewController.h"
 #import "RSFirstRunWindowController.h"
+#import "RSMigrationSheetController.h"
+#import "RSNotifications.h"
 #import "Sparkle/Sparkle.h"
 
 @interface recsched_AppDelegate(private)
 
 - (void) installBackgroundServer;
+- (void) showMigrationSheet;
 
 @end
 
@@ -68,52 +71,6 @@
 @implementation recsched_AppDelegate
 
 #pragma mark - Server Communication
-
-- (void) installBackgroundServer
-{
-#if 0
-	OSStatus status;
-	AuthorizationRef adminAuthRef;
-	
-	status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &adminAuthRef);
-	if (status != noErr)
-		return;
-		
-	AuthorizationItem adminAuthRightItem = {kAuthorizationRightExecute, 0, NULL, 0};
-	AuthorizationRights adminRights = {1, &adminAuthRightItem};
-
-	const char *utf8String = [[NSString stringWithString:@"iOnTV needs administrator privileges to install the background recording server. "] UTF8String];
-	AuthorizationItem adminAuthEnvItem = {kAuthorizationEnvironmentPrompt, strlen(utf8String), (void*) utf8String, 0};
-	AuthorizationEnvironment authEnvironment = {1, &adminAuthEnvItem};
-	AuthorizationFlags authFlags = kAuthorizationFlagDefaults |
-			kAuthorizationFlagInteractionAllowed |
-			kAuthorizationFlagPreAuthorize |
-			kAuthorizationFlagExtendRights;
-			
-	status = AuthorizationCopyRights (adminAuthRef, &adminRights, &authEnvironment, authFlags, NULL );
-	if (status != noErr)
-		return;
-		
-	NSString *installBkgdServerAppPath = [[NSBundle mainBundle] pathForAuxiliaryExecutable:@"InstallBkgdServer"];
-	
-	// Launch the installation tool with the appropriate privileges
-	status = AuthorizationExecuteWithPrivileges(adminAuthRef, [installBkgdServerAppPath cStringUsingEncoding:NSASCIIStringEncoding], kAuthorizationFlagDefaults, NULL /*args*/, NULL);
-	
-	// Free the authorization reference
-	//AuthorizationFree(adminAuthRef, kAuthorizationFlagDefaults);
-#endif
-
-	// LaunchAgents seem unreliable - if we need a connection to the User Interface then we probably need to create login item, for now we'll just start it manually here using
-	// NSTask
-	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
-	NSString *backgroundServerPath = [bundlePath stringByAppendingPathComponent:@"Contents/Support/recsched_bkgd.app/Contents/MacOS/recsched_bkgd"];
-        BOOL launchedBackgroundServer = NO;
-//        launchedBackgroundServer = [[NSWorkspace sharedWorkspace] launchApplication:backgroundServerPath];
-	if (launchedBackgroundServer == NO)
-        {
-          NSLog(@"installBackgroundServer - failed to launch background server :%@", backgroundServerPath);
-        }
-}
 
 - (void) initializeServerConnection
 {
@@ -193,6 +150,7 @@
 {
   [mFirstRunWindowController release];
   [mActivityWindowController release];
+  [mMigrationSheetController release];
   [super dealloc];
 }
 
@@ -239,6 +197,12 @@
 	// Register to be notified when an update through sparkle completes - we use this to restart the background
 	// server which may also have just been updated.
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sparkleWillRestart:) name:SUUpdaterWillRestartNotification object:nil];
+        
+        if ([self storeNeedsMigrating])
+        {
+          [self showMigrationSheet];
+          return;
+        }
         
         // Launch the first run assistant if the key is not present in the store metadata
         NSError *error = nil;
@@ -446,4 +410,81 @@
 }
 
 @synthesize mRecServer;
+@end
+
+@implementation recsched_AppDelegate(private)
+
+- (void) installBackgroundServer
+{
+#if 0
+	OSStatus status;
+	AuthorizationRef adminAuthRef;
+	
+	status = AuthorizationCreate(NULL, kAuthorizationEmptyEnvironment, kAuthorizationFlagDefaults, &adminAuthRef);
+	if (status != noErr)
+		return;
+		
+	AuthorizationItem adminAuthRightItem = {kAuthorizationRightExecute, 0, NULL, 0};
+	AuthorizationRights adminRights = {1, &adminAuthRightItem};
+
+	const char *utf8String = [[NSString stringWithString:@"iOnTV needs administrator privileges to install the background recording server. "] UTF8String];
+	AuthorizationItem adminAuthEnvItem = {kAuthorizationEnvironmentPrompt, strlen(utf8String), (void*) utf8String, 0};
+	AuthorizationEnvironment authEnvironment = {1, &adminAuthEnvItem};
+	AuthorizationFlags authFlags = kAuthorizationFlagDefaults |
+			kAuthorizationFlagInteractionAllowed |
+			kAuthorizationFlagPreAuthorize |
+			kAuthorizationFlagExtendRights;
+			
+	status = AuthorizationCopyRights (adminAuthRef, &adminRights, &authEnvironment, authFlags, NULL );
+	if (status != noErr)
+		return;
+		
+	NSString *installBkgdServerAppPath = [[NSBundle mainBundle] pathForAuxiliaryExecutable:@"InstallBkgdServer"];
+	
+	// Launch the installation tool with the appropriate privileges
+	status = AuthorizationExecuteWithPrivileges(adminAuthRef, [installBkgdServerAppPath cStringUsingEncoding:NSASCIIStringEncoding], kAuthorizationFlagDefaults, NULL /*args*/, NULL);
+	
+	// Free the authorization reference
+	//AuthorizationFree(adminAuthRef, kAuthorizationFlagDefaults);
+#endif
+
+	// LaunchAgents seem unreliable - if we need a connection to the User Interface then we probably need to create login item, for now we'll just start it manually here using
+	// NSTask
+	NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
+	NSString *backgroundServerPath = [bundlePath stringByAppendingPathComponent:@"Contents/Support/recsched_bkgd.app/Contents/MacOS/recsched_bkgd"];
+        BOOL launchedBackgroundServer = NO;
+//        launchedBackgroundServer = [[NSWorkspace sharedWorkspace] launchApplication:backgroundServerPath];
+	if (launchedBackgroundServer == NO)
+        {
+          NSLog(@"installBackgroundServer - failed to launch background server :%@", backgroundServerPath);
+        }
+}
+
+- (void) migrationCompleteNotification:(NSNotification*)aNotification
+{
+  // We probably need to reintialize the persistent store co-ordinator now that that migration
+  // has completed.
+  [persistentStore release];
+  persistentStore = nil;
+  [persistentStoreCoordinator release];
+  persistentStoreCoordinator = nil;
+  
+  // Fake a change to the managedObjectContext property on the delegate - this will force the
+  // various array controllers to reset themselves.
+  [[NSApp delegate] willChangeValueForKey:@"managedObjectContext"];
+  [managedObjectContext release];
+  managedObjectContext = nil;
+  [[NSApp delegate] didChangeValueForKey:@"managedObjectContext"];
+}
+
+- (void) showMigrationSheet
+{
+  if (!mMigrationSheetController)
+  {
+    mMigrationSheetController = [[RSMigrationSheetController alloc] initWithWindow:window];
+  }
+  [mMigrationSheetController showMigrationSheet];
+  [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(migrationCompleteNotification:) name:RSMigrationCompleteNotification object:RSBackgroundApplication];
+}
+
 @end
