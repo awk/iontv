@@ -23,7 +23,10 @@
 
 @interface recsched_bkgd_AppDelegate : RSCommonAppDelegate
 {
-	RecSchedServer *mRecSchedServer;
+  RecSchedServer *mRecSchedServer;
+    
+  BOOL mMigrationInProgress;
+  size_t mMigrationActivityToken;
 }
 
 - (NSURL *)urlForPersistentStore;
@@ -31,4 +34,6 @@
 
 - (IBAction) saveAction:(id)sender;
 
+- (BOOL) migrateStore;
+- (BOOL) migrationInProgress;
 @end
