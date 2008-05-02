@@ -57,10 +57,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     mExitServer = NO;
     mUIActivityProxy = [[RSActivityProxy alloc] init];
     [mUIActivityProxy setUIActivity:self];    // Start with ourselves as the activity display (a text log to the console)
-	
+
     // Setup the recording queues in a bit (after the app startup has completed and we have a delegate etc.)
     [self performSelector:@selector(initializeRecordingQueues) withObject:nil afterDelay:0];
-		[self performSelector:@selector(initializeTranscodingController) withObject:nil afterDelay:0];
+    [self performSelector:@selector(initializeTranscodingController) withObject:nil afterDelay:0];
                 
     // Watch for schedule and lineup download/parsing complete notifications
     [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(scheduleUpdateCompleteNotification:) name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];            
@@ -84,6 +84,13 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 - (void) initializeRecordingQueues
 {
+    if ([[NSApp delegate] migrationInProgress])
+    {
+      // We need to wait until any CoreData Store migration is over before we can being recording etc.
+      // Try again in 15 seconds.
+      [self performSelector:@selector(initializeRecordingQueues) withObject:nil afterDelay:15];
+      return;
+    }
     // Initialize our array of recording queues - we have one queue (an NSMutableArray) per tuner
     NSArray *allTuners = [HDHomeRunTuner allTunersInManagedObjectContext:[[NSApp delegate] managedObjectContext]];
     mRecordingQueues = [[NSMutableArray alloc] initWithCapacity:[allTuners count]];
@@ -109,8 +116,16 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 - (void) initializeTranscodingController
 {
-	if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kTranscodeProgramsKey] boolValue] == YES)
-		mTranscodeController = [[RSTranscodeController alloc] init];
+    if ([[NSApp delegate] migrationInProgress])
+    {
+      // We need to wait until any CoreData Store migration is over before we can being transcoding etc.
+      // Try again in 15 seconds.
+      [self performSelector:@selector(initializeTranscodingController) withObject:nil afterDelay:15];
+      return;
+    }
+
+    if ([[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kTranscodeProgramsKey] boolValue] == YES)
+            mTranscodeController = [[RSTranscodeController alloc] init];
 }
 
 - (void) initializeUIActivityConnection
@@ -147,8 +162,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 {
   // Clear all old items from the store
   NSDate *cleanupDate = [NSDate dateWithTimeIntervalSinceNow:-(12 * 60 * 60)];		// 12 hours prior to now
-  NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:cleanupDate, kCleanupDateKey, self, @"reportProgressTo", self, kReportCompletionToKey,
-   [[NSApp  delegate] persistentStoreCoordinator], kPersistentStoreCoordinatorKey, nil];
+  NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:cleanupDate, kCleanupDateKey,
+                                                                                      self, @"reportProgressTo", 
+                                                                                      [[NSApp  delegate] persistentStoreCoordinator], kPersistentStoreCoordinatorKey,
+                                                                                      nil];
 
 	if ([info valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil)
 	{
@@ -307,14 +324,13 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     NSLog(@"Fetching future schedule data for %@ to %@", startDateStr, endDateStr);
     
     NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, kTVDataDeliveryStartDateKey, endDateStr, kTVDataDeliveryEndDateKey, 
-        self, kTVDataDeliveryDataRecipientKey, self, kTVDataDeliveryReportProgressToKey, 
-        [NSNumber numberWithBool:YES], kTVDataDeliveryFetchFutureScheduleKey,
-        nil];
-	// We 'transfer' ownership of this dictionary to this new thread - they'll release the memory for us.
-	xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
+                                                                          self, kTVDataDeliveryDataRecipientKey, self, kTVDataDeliveryReportProgressToKey, 
+                                                                          [NSNumber numberWithBool:YES], kTVDataDeliveryFetchFutureScheduleKey, nil];
+    // We 'transfer' ownership of this dictionary to this new thread - they'll release the memory for us.
+    xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
     [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
-	[aDownloadThread release];
-	[callData release];
+    [aDownloadThread release];
+    [callData release];
     return YES;
   }
   
@@ -351,7 +367,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		notificationProxy = self;
 	NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
 			notificationProxy, @"reportProgressTo", 
-			self, kReportCompletionToKey, 
 			[[NSApp  delegate] persistentStoreCoordinator], kPersistentStoreCoordinatorKey,
 			nil];
 
@@ -394,12 +409,12 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 - (void) cleanupCompleteNotification:(NSNotification *)aNotification
 {
-	NSLog(@"cleanupComplete");
-	if ([[[aNotification userInfo] valueForKey:kTVDataDeliveryFetchFutureScheduleKey] boolValue] == YES)
-	{
-		mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithString:[[aNotification userInfo] valueForKey:kTVDataDeliveryEndDateKey] calendarFormat:@"%Y-%m-%dT%H:%M:%SZ"];
-		[self performSelectorOnMainThread:@selector(fetchFutureSchedule:) withObject:nil waitUntilDone:NO];
-	}
+  NSLog(@"cleanupComplete");
+  if ([[[aNotification userInfo] valueForKey:kTVDataDeliveryFetchFutureScheduleKey] boolValue] == YES)
+  {
+    mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithString:[[aNotification userInfo] valueForKey:kTVDataDeliveryEndDateKey] calendarFormat:@"%Y-%m-%dT%H:%M:%SZ"];
+    [self performSelectorOnMainThread:@selector(fetchFutureSchedule:) withObject:nil waitUntilDone:NO];
+  }
 }
 
 - (void) downloadErrorNotification:(NSNotification *)aNotification
@@ -650,36 +665,6 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		}
 	}
 	return NO;
-}
-
-- (oneway void) updateSchedule
-{
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-  
-  // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
-  // SchedulesDirect expects
-  CFGregorianDate startDate = CFAbsoluteTimeGetGregorianDate(currentTime,NULL);
-  
-  // Retrieve 'n' hours of data
-  CFGregorianUnits retrieveRange;
-  memset(&retrieveRange, 0, sizeof(retrieveRange));
-  float hours = [[[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kScheduleDownloadDurationKey] floatValue];
-  retrieveRange.hours = (int) hours;
-    
-  CFAbsoluteTime endTime = CFAbsoluteTimeAddGregorianUnits(currentTime, NULL, retrieveRange);
-  CFGregorianDate endDate = CFAbsoluteTimeGetGregorianDate(endTime,NULL);
-  
-  NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
-  NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
-  
-  // Send the message to the background server
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, kTVDataDeliveryStartDateKey, endDateStr, kTVDataDeliveryEndDateKey,
-    self, kTVDataDeliveryDataRecipientKey,
-    self, kTVDataDeliveryReportProgressToKey, nil];
-  xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
-  [aDownloadThread release];
-  [callData release];
 }
 
 - (oneway void) updateLineups

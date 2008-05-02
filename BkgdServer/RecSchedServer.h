@@ -32,17 +32,17 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
 @class RSTranscodeController;
 
 @interface RecSchedServer : NSObject <RecSchedServerProto, RSActivityDisplay> {
-    BOOL mExitServer;
+  BOOL mExitServer;
 	
-	id mUIActivity;
+  id mUIActivity;
         
   RSActivityProxy *mUIActivityProxy;
-	RSTranscodeController *mTranscodeController;
+  RSTranscodeController *mTranscodeController;
         
-    NSMutableArray *mRecordingQueues;
-    NSCalendarDate *mLastScheduleFetchEndDate;
-    
-    NSTimer *mFetchFutureScheduleTimer;
+  NSMutableArray *mRecordingQueues;
+  NSCalendarDate *mLastScheduleFetchEndDate;
+  
+  NSTimer *mFetchFutureScheduleTimer;
 }
 
 - (bool) shouldExit;

@@ -41,7 +41,6 @@ extern NSString *kRecServerConnectionName;
 - (oneway void) quitServer:(id)sender;
 
 // Schedule Retrieval
-- (oneway void) updateSchedule;
 - (oneway void) updateLineups;
 
 // HDHomeRun Device Management
