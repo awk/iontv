@@ -107,17 +107,24 @@ NSString *kRSStoreUpdateConnectionName = @"resched_store_update";
     }
     
     url = [self urlForPersistentStore]; //[NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched_bkgd.dat"]];
-    persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
-	// Turn on Migration for the store
-	NSDictionary *optionsDictionary = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:NSMigratePersistentStoresAutomaticallyOption];
-
-	persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:optionsDictionary error:&error];
-        if (persistentStore == nil)
-        {
-            [[NSApplication sharedApplication] presentError:error];
-        }    
-
-    return persistentStoreCoordinator;
+  
+    // Do we need to migrate the store to a new model version ?
+    if ([self storeNeedsMigrating])
+    {
+      NSLog(@"persistentStoreCoordinator - store needs migrating !");
+      return nil;
+    }
+    else
+    {
+      // no need to migrate
+      persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
+      persistentStore = [persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:url options:nil error:&error];
+      if (persistentStore == nil)
+      {
+          [[NSApplication sharedApplication] presentError:error];
+      }    
+      return persistentStoreCoordinator;
+    }
 }
 
 - (NSPersistentStore*) persistentStore
@@ -134,6 +141,30 @@ NSString *kRSStoreUpdateConnectionName = @"resched_store_update";
 	return nil;
 }
 
+
+- (BOOL) storeNeedsMigrating
+{
+  NSURL *url = [self urlForPersistentStore];
+  NSError *error = nil;
+  
+  // Do we need to migrate the store to a new model version ?
+  NSDictionary *sourceMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:NSSQLiteStoreType
+                                                                                            URL:url
+                                                                                          error:&error];
+   
+  if (sourceMetadata == nil) {
+      // Having no source metadata isn't a fatal error it just means that the source didn't exist
+      // no need to migrate - nothing to migrate from !
+      return NO;
+  }
+   
+  NSPersistentStoreCoordinator *aPersistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel: [self managedObjectModel]];
+  NSManagedObjectModel *destinationModel = [aPersistentStoreCoordinator managedObjectModel];
+  BOOL pscCompatibile = [destinationModel isConfiguration:nil
+                              compatibleWithStoreMetadata:sourceMetadata];
+  [aPersistentStoreCoordinator release];                                
+  return !pscCompatibile;
+}
 
 /**
     Returns the managed object context for the application (which is already

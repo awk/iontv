@@ -39,5 +39,5 @@
 - (NSManagedObjectModel *)managedObjectModel;
 - (NSManagedObjectContext *)managedObjectContext;
 - (NSURL *)urlForPersistentStore;
-
+- (BOOL) storeNeedsMigrating;
 @end
