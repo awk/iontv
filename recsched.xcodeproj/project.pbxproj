@@ -108,6 +108,7 @@
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */; };
+		EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */; };
 		EAD023D80CE20F47002B7C37 /* libhb.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = EAD023D70CE20F42002B7C37 /* libhb.dylib */; };
 		EAD024280CE246FF002B7C37 /* UserPresets.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAD024270CE246F1002B7C37 /* UserPresets.plist */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
@@ -350,6 +351,8 @@
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
 		EAB16BF20CF51502001313CA /* RSProgramSearchTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSProgramSearchTableHeaderView.h; path = UIApp/views/RSProgramSearchTableHeaderView.h; sourceTree = SOURCE_ROOT; };
 		EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSProgramSearchTableHeaderView.m; path = UIApp/views/RSProgramSearchTableHeaderView.m; sourceTree = SOURCE_ROOT; };
+		EAC8F79F0DCA99E100A289CD /* RSMigrationSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSMigrationSheetController.h; path = UIApp/RSMigrationSheetController.h; sourceTree = "<group>"; };
+		EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSMigrationSheetController.m; path = UIApp/RSMigrationSheetController.m; sourceTree = "<group>"; };
 		EAD023D70CE20F42002B7C37 /* libhb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libhb.dylib; path = ../HandBrake/libhb/libhb.dylib; sourceTree = SOURCE_ROOT; };
 		EAD024270CE246F1002B7C37 /* UserPresets.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = UserPresets.plist; path = BkgdServer/UserPresets.plist; sourceTree = "<group>"; };
 		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKSourceTableClasses.h; path = UIApp/views/AKSourceTableClasses.h; sourceTree = "<group>"; };
@@ -688,6 +691,8 @@
 				EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */,
 				EA3090C20C6AB59E0005E89B /* RSWishlistController.h */,
 				EA3090C30C6AB59E0005E89B /* RSWishlistController.m */,
+				EAC8F79F0DCA99E100A289CD /* RSMigrationSheetController.h */,
+				EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -1006,6 +1011,7 @@
 				EA74F0230DA1CAA500565EA6 /* RSSeasonPass.m in Sources */,
 				EA74F02A0DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */,
 				EA7133E80DA853B600F93E87 /* recsched_5_6.xcmappingmodel in Sources */,
+				EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
