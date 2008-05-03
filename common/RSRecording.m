@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 #import "RSRecording.h"
+#import "RSRecordingOptions.h"
 #import "RecSchedProtocol.h"
 #import "Z2ITSchedule.h"
 
@@ -35,6 +36,10 @@
 	[aRecording setSchedule:aSchedule];
 	[aSchedule setRecording:aRecording];
 	[aRecording setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
+
+	RSRecordingOptions *options = [NSEntityDescription insertNewObjectForEntityForName:@"RecordingOptions" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	options.keepUntil = kRSRecordingOptionsKeepUntilSpaceNeeded;
+  aRecording.recordingOptions = options;
 	return aRecording;
 }
 
