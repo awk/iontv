@@ -658,13 +658,25 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		NSLog(@"addSeasonPassForSchedule");
 		NSLog(@"  My Program title = %@, series ID = %@ channel = %@", myProgram.title, myProgram.series, myStation.callSign);
 		RSSeasonPass *aSeasonPass = [RSSeasonPass insertSeasonPassForProgram:myProgram onStation:myStation];
+
+		if (![[[NSApp delegate] managedObjectContext] save:error])
+		{
+			NSLog(@"addSeasonPassForProgram - error occured during save %@", *error);
+			return NO;
+		}
+		else
+		{
+			NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[aSeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassAddedSeasonPassURIKey, nil];
+			[[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSSeasonPassAddedNotification object:RSBackgroundApplication userInfo:info];
+		}
+		
 		NSArray *futureSchedules = [aSeasonPass fetchFutureSchedules];
 		for (Z2ITSchedule *aSchedule in futureSchedules)
 		{
 			NSLog(@"    %@ - %@ at %@", aSchedule.program.title, aSchedule.program.subTitle, aSchedule.time);
 		}
 	}
-	return NO;
+	return YES;
 }
 
 - (oneway void) updateLineups
