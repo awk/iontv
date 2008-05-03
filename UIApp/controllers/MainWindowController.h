@@ -48,7 +48,8 @@ extern NSString *RSSSchedulePBoardType;
   IBOutlet NSTreeController *mViewSelectionTreeController;
   
   IBOutlet NSArrayController *mRecordingsArrayController;
-  
+  IBOutlet NSArrayController *mSeasonPassArrayController;
+	
   IBOutlet NSArrayController *mLineupsArrayController;
   
   IBOutlet ProgramSearchViewController *mProgramSearchViewController;
