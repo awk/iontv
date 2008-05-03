@@ -55,52 +55,12 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
   }
   else
   {
-    [self performSelector:@selector(migrationComplete:) withObject:nil afterDelay:0];
+    [self performSelector:@selector(beginFetchingSchedules:) withObject:nil afterDelay:0];
   }
 }
 
-- (void) migrationComplete:(id)unused
+- (void) beginFetchingSchedules:(id)unused
 {
-  NSError *error = nil;
-  NSString *originalPath = [[self urlForPersistentStore] path];
-  NSString *legacyPath = [NSString stringWithFormat:@"%@~", originalPath];
-  NSString *migrationPath = [NSString stringWithFormat:@"%@_mig.dat", [[[self urlForPersistentStore] path] stringByDeletingPathExtension]];
-  BOOL success = NO;
-  
-  // Remove any old backup file if present
-  if ([[NSFileManager defaultManager] isDeletableFileAtPath:legacyPath])
-  {
-    [[NSFileManager defaultManager] removeItemAtPath:legacyPath error:&error];
-  }
-  
-  // Move the original source datastore to the backup location
-  success = [[NSFileManager defaultManager] moveItemAtPath:originalPath toPath:legacyPath error:&error];
-
-  if (!success) {
-     NSLog(@"Unable to move CoreData Store to backup location after migration - error = %@", error);
-  }
-   
-  // Move the migrated datastore to the original location
-  success = [[NSFileManager defaultManager] moveItemAtPath:migrationPath toPath:originalPath error:&error];
-
-  if (!success)
-  {
-    NSLog(@"Unable to move CoreData Store from migration location after migration, restoring backup - error = %@", error);
-    [[NSFileManager defaultManager] moveItemAtPath:legacyPath toPath:originalPath error:&error];
-    return;
-  }
-   
-
-  mMigrationInProgress = NO;
-  
-  if (mMigrationActivityToken)
-  {
-    [[[self recServer] uiActivity] endActivity:mMigrationActivityToken];
-    mMigrationActivityToken = 0;
-  }
-  
-  [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSMigrationCompleteNotification object:RSBackgroundApplication];
-  
   // This will update the next 'n' hours worth of schedule data, we don't need to do it 'now' rather we can just schedule a
   // timer for a little ways off (about 1 hour less than the default schedule retrieval duration)
   [NSTimer scheduledTimerWithTimeInterval:(kDefaultUpdateScheduleFetchDurationInHours - 1) * 60 * 60 target:mRecSchedServer selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO]; 
@@ -313,6 +273,51 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
 - (BOOL) migrationInProgress
 {
   return mMigrationInProgress;
+}
+
+- (void) migrationComplete:(NSNumber*)status
+{
+  NSError *error = nil;
+  NSString *originalPath = [[self urlForPersistentStore] path];
+  NSString *legacyPath = [NSString stringWithFormat:@"%@~", originalPath];
+  NSString *migrationPath = [NSString stringWithFormat:@"%@_mig.dat", [[[self urlForPersistentStore] path] stringByDeletingPathExtension]];
+  BOOL success = NO;
+  
+  // Remove any old backup file if present
+  if ([[NSFileManager defaultManager] isDeletableFileAtPath:legacyPath])
+  {
+    [[NSFileManager defaultManager] removeItemAtPath:legacyPath error:&error];
+  }
+  
+  // Move the original source datastore to the backup location
+  success = [[NSFileManager defaultManager] moveItemAtPath:originalPath toPath:legacyPath error:&error];
+	
+  if (!success) {
+		NSLog(@"Unable to move CoreData Store to backup location after migration - error = %@", error);
+  }
+	
+  // Move the migrated datastore to the original location
+  success = [[NSFileManager defaultManager] moveItemAtPath:migrationPath toPath:originalPath error:&error];
+	
+  if (!success)
+  {
+    NSLog(@"Unable to move CoreData Store from migration location after migration, restoring backup - error = %@", error);
+    [[NSFileManager defaultManager] moveItemAtPath:legacyPath toPath:originalPath error:&error];
+    return;
+  }
+	
+	
+  mMigrationInProgress = NO;
+  
+  if (mMigrationActivityToken)
+  {
+    [[[self recServer] uiActivity] endActivity:mMigrationActivityToken];
+    mMigrationActivityToken = 0;
+  }
+  
+  [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSMigrationCompleteNotification object:RSBackgroundApplication];
+	
+	[self beginFetchingSchedules:nil];
 }
 
 @end
