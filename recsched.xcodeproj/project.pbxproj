@@ -108,6 +108,8 @@
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */; };
+		EAC3529C0DCD355E00963287 /* RSRecordingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */; };
+		EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */; };
 		EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */; };
 		EAD023D80CE20F47002B7C37 /* libhb.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = EAD023D70CE20F42002B7C37 /* libhb.dylib */; };
 		EAD024280CE246FF002B7C37 /* UserPresets.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAD024270CE246F1002B7C37 /* UserPresets.plist */; };
@@ -351,6 +353,11 @@
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
 		EAB16BF20CF51502001313CA /* RSProgramSearchTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSProgramSearchTableHeaderView.h; path = UIApp/views/RSProgramSearchTableHeaderView.h; sourceTree = SOURCE_ROOT; };
 		EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSProgramSearchTableHeaderView.m; path = UIApp/views/RSProgramSearchTableHeaderView.m; sourceTree = SOURCE_ROOT; };
+		EAC3529A0DCD355E00963287 /* RSRecordingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecordingAdditions.h; path = UIApp/RSRecordingAdditions.h; sourceTree = "<group>"; };
+		EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecordingAdditions.m; path = UIApp/RSRecordingAdditions.m; sourceTree = "<group>"; };
+		EAC352A50DCD368700963287 /* RSSourceListKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSSourceListKeys.h; path = UIApp/RSSourceListKeys.h; sourceTree = "<group>"; };
+		EAC352E60DCD381400963287 /* RSSeasonPassAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSSeasonPassAdditions.h; path = UIApp/RSSeasonPassAdditions.h; sourceTree = "<group>"; };
+		EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSSeasonPassAdditions.m; path = UIApp/RSSeasonPassAdditions.m; sourceTree = "<group>"; };
 		EAC8F79F0DCA99E100A289CD /* RSMigrationSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSMigrationSheetController.h; path = UIApp/RSMigrationSheetController.h; sourceTree = "<group>"; };
 		EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSMigrationSheetController.m; path = UIApp/RSMigrationSheetController.m; sourceTree = "<group>"; };
 		EAD023D70CE20F42002B7C37 /* libhb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libhb.dylib; path = ../HandBrake/libhb/libhb.dylib; sourceTree = SOURCE_ROOT; };
@@ -465,6 +472,11 @@
 				EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */,
 				EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */,
 				EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */,
+				EAC3529A0DCD355E00963287 /* RSRecordingAdditions.h */,
+				EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */,
+				EAC352A50DCD368700963287 /* RSSourceListKeys.h */,
+				EAC352E60DCD381400963287 /* RSSeasonPassAdditions.h */,
+				EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */,
 			);
 			name = "UI App";
 			sourceTree = "<group>";
@@ -1012,6 +1024,8 @@
 				EA74F02A0DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */,
 				EA7133E80DA853B600F93E87 /* recsched_5_6.xcmappingmodel in Sources */,
 				EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */,
+				EAC3529C0DCD355E00963287 /* RSRecordingAdditions.m in Sources */,
+				EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
