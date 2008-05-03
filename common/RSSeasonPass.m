@@ -16,6 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 #import "RSSeasonPass.h"
+#import "RSRecordingOptions.h"
 #import "Z2ITProgram.h"
 #import "Z2ITStation.h"
 
@@ -32,6 +33,8 @@
 	[aSeasonPass setSeries:aProgram.series];
 	
 	RSSeasonPassOptions *options = [NSEntityDescription insertNewObjectForEntityForName:@"SeasonPassOptions" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+	options.keepUntil = kRSRecordingOptionsKeepUntilSpaceNeeded;
+	options.showType = kRSSeasonPassOptionsShowTypeRepeatsAndFirstRuns;
 	[aSeasonPass setOptions:options];
 	
 	return aSeasonPass;
