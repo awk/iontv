@@ -36,3 +36,10 @@ extern NSString *RSRecordingAddedRecordingURIKey;
 extern NSString *RSRecordingRemovedRecordingOfScheduleURIKey;
 
 extern NSString *RSMigrationCompleteNotification;
+
+extern NSString *RSSeasonPassAddedNotification;
+extern NSString *RSSeasonPassRemovedNotification;
+
+extern NSString *RSSeasonPassAddedSeasonPassURIKey;
+extern NSString *RSSeasonPassRemovedSeasonPassURIKey;
+

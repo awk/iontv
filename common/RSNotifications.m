@@ -35,3 +35,9 @@ NSString *RSRecordingAddedRecordingURIKey =  @"recordingURI";
 NSString *RSRecordingRemovedRecordingOfScheduleURIKey = @"scheduleURI";
 
 NSString *RSMigrationCompleteNotification = @"RSMigrationCompleteNotification";
+
+NSString *RSSeasonPassAddedNotification = @"RSSeasonPassAddedNotification";
+NSString *RSSeasonPassRemovedNotification = @"RSSeasonPassRemovedNotification";
+
+NSString *RSSeasonPassAddedSeasonPassURIKey = @"RSSeasonPassAddedSeasonPassURIKey";
+NSString *RSSeasonPassRemovedSeasonPassURIKey = @"RSSeasonPassRemovedSeasonPassURIKey";
