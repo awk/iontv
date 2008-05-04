@@ -25,13 +25,15 @@
 @dynamic series;
 @dynamic options;
 @dynamic station;
+@dynamic title;
 
 + (RSSeasonPass*) insertSeasonPassForProgram:(Z2ITProgram*)aProgram onStation:(Z2ITStation*)aStation
 {
 	RSSeasonPass *aSeasonPass = [NSEntityDescription insertNewObjectForEntityForName:@"SeasonPass" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 	[aSeasonPass setStation:aStation];
 	[aSeasonPass setSeries:aProgram.series];
-	
+	[aSeasonPass setTitle:aProgram.title];
+        
 	RSSeasonPassOptions *options = [NSEntityDescription insertNewObjectForEntityForName:@"SeasonPassOptions" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 	options.keepUntil = kRSRecordingOptionsKeepUntilSpaceNeeded;
 	options.showType = kRSSeasonPassOptionsShowTypeRepeatsAndFirstRuns;

@@ -27,13 +27,14 @@
 #import "RSSourceListKeys.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
+#import "Z2ITStation.h"
 
 @implementation RSSeasonPass (SourceListAdditions)
 
 - (void) buildSourceListNodeAndAddTo:(NSMutableArray *)anArray
 {
   NSMutableDictionary *aSeasonPassNode = [NSMutableDictionary dictionaryWithCapacity:5];
-  NSString *labelStr = [NSString stringWithFormat:@"%@", self.series];
+  NSString *labelStr = [NSString stringWithFormat:@"%@ - %@", self.title, self.station.callSign];
   [aSeasonPassNode setValue:labelStr forKey:RSSourceListLabelKey];
   [aSeasonPassNode setValue:self.objectID forKey:RSSourceListObjectIDKey];
   [aSeasonPassNode setValue:@"seasonPassSelected:" forKey:RSSourceListActionMessageNameKey];

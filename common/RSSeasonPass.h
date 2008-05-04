@@ -28,6 +28,7 @@
 @property (retain) NSString * series;
 @property (retain) RSSeasonPassOptions * options;
 @property (retain) Z2ITStation * station;
+@property (retain) NSString * title;
 
 + (RSSeasonPass*) insertSeasonPassForProgram:(Z2ITProgram*)aProgram onStation:(Z2ITStation*)aStation;
 
