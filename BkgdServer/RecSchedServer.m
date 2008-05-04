@@ -655,28 +655,56 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	
   if (myProgram && myStation)
   {
-		NSLog(@"addSeasonPassForSchedule");
-		NSLog(@"  My Program title = %@, series ID = %@ channel = %@", myProgram.title, myProgram.series, myStation.callSign);
-		RSSeasonPass *aSeasonPass = [RSSeasonPass insertSeasonPassForProgram:myProgram onStation:myStation];
+    NSLog(@"addSeasonPassForSchedule");
+    NSLog(@"  My Program title = %@, series ID = %@ channel = %@", myProgram.title, myProgram.series, myStation.callSign);
+    RSSeasonPass *aSeasonPass = [RSSeasonPass insertSeasonPassForProgram:myProgram onStation:myStation];
 
-		if (![[[NSApp delegate] managedObjectContext] save:error])
-		{
-			NSLog(@"addSeasonPassForProgram - error occured during save %@", *error);
-			return NO;
-		}
-		else
-		{
-			NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[aSeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassAddedSeasonPassURIKey, nil];
-			[[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSSeasonPassAddedNotification object:RSBackgroundApplication userInfo:info];
-		}
-		
-		NSArray *futureSchedules = [aSeasonPass fetchFutureSchedules];
-		for (Z2ITSchedule *aSchedule in futureSchedules)
-		{
-			NSLog(@"    %@ - %@ at %@", aSchedule.program.title, aSchedule.program.subTitle, aSchedule.time);
-		}
-	}
-	return YES;
+    if (![[[NSApp delegate] managedObjectContext] save:error])
+    {
+      NSLog(@"addSeasonPassForProgram - error occured during save %@", *error);
+      return NO;
+    }
+    else
+    {
+      NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[aSeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassAddedSeasonPassURIKey, nil];
+      [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSSeasonPassAddedNotification object:RSBackgroundApplication userInfo:info];
+    }
+
+    NSArray *futureSchedules = [aSeasonPass fetchFutureSchedules];
+    for (Z2ITSchedule *aSchedule in futureSchedules)
+    {
+      NSLog(@"    %@ - %@ at %@", aSchedule.program.title, aSchedule.program.subTitle, aSchedule.time);
+    }
+  }
+  return YES;
+}
+
+- (BOOL) deleteSeasonPass:(NSManagedObjectID*)seasonPassObjectID error:(NSError**)error
+{
+  RSSeasonPass *mySeasonPass = nil;
+  mySeasonPass = (RSSeasonPass*) [[[NSApp delegate] managedObjectContext] objectWithID:seasonPassObjectID];
+
+  if (mySeasonPass)
+  {
+    NSLog(@"My Season Pass Episode ID = %@ channel = %@", mySeasonPass.series, mySeasonPass.station.callSign);
+
+    // Remove the season pass from the ManagedObjectContext
+    [[[NSApp delegate] managedObjectContext] deleteObject:mySeasonPass];
+
+    if (![[[NSApp delegate] managedObjectContext] save:error])
+    {
+      NSLog(@"deleteSeasonPass - error occured during save %@", *error);
+      return NO;
+    }
+    else
+    {
+      NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[mySeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassRemovedSeasonPassURIKey, nil];
+      [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSSeasonPassRemovedNotification object:RSBackgroundApplication userInfo:info];
+      return YES;
+    }
+  }
+  else
+    return NO;
 }
 
 - (oneway void) updateLineups
