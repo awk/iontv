@@ -176,6 +176,43 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	[treeNodes release];
 }
 
+- (void) futureRecordingSelected:(id)anArgument
+{
+	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
+	RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+	if (aRecording)
+		[self setCurrentSchedule:aRecording.schedule];
+}
+
+- (void) seasonPassSelected:(id)anArgument
+{
+  NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
+  RSSeasonPass *aSeasonPass = (RSSeasonPass*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+  if (aSeasonPass)
+  {
+//    [self setCurrentSchedule:aRecording.schedule];
+    NSLog(@"seasonPassSelected: %@", aSeasonPass);
+  }
+}
+
+- (void) deleteFutureRecording:(id)anArgument
+{
+	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
+	RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+	
+	NSError *error = nil;
+	[[[NSApp delegate] recServer] cancelRecording:[aRecording objectID] error:&error];
+}
+
+- (void) deleteSeasonPass:(id)anArgument
+{
+	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
+	RSSeasonPass *aSeasonPass = (RSSeasonPass*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+	
+	NSError *error = nil;
+	[[[NSApp delegate] recServer] deleteSeasonPass:[aSeasonPass objectID] error:&error];
+}
+
 #pragma mark Initialization/Startup
 
 - (void) awakeFromNib
@@ -437,14 +474,6 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	[mProgramSearchViewController setSearchViewHidden:NO];
 }
 
-- (void) futureRecordingSelected:(id)anArgument
-{
-	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
-	RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
-	if (aRecording)
-		[self setCurrentSchedule:aRecording.schedule];
-}
-
 - (void)observeValueForKeyPath:(NSString *)keyPath
 			ofObject:(id)object 
 			change:(NSDictionary *)change
@@ -502,15 +531,6 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 		enableItem = YES;
 		
 	return enableItem;
-}
-
-- (void) deleteFutureRecording:(id)anArgument
-{
-	NSManagedObjectID *anObjectID = [anArgument valueForKey:RSSourceListObjectIDKey];
-	RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
-	
-	NSError *error = nil;
-	[[[NSApp delegate] recServer] cancelRecording:[aRecording objectID] error:&error];
 }
 
 #pragma mark Notifications
