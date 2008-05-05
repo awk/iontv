@@ -32,10 +32,10 @@ extern NSString *kRecServerConnectionName;
 - (void) activityDisplayAvailable;
 - (void) activityDisplayUnavailable;
 
-- (BOOL) addRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
-- (BOOL) cancelRecording:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
-- (BOOL) addSeasonPassForProgram:(NSManagedObjectID*)programObjectID onStation:(NSManagedObjectID*)stationObjectID error:(NSError**)error;
-- (BOOL) deleteSeasonPass:(NSManagedObjectID*)seasonPassObjectID error:(NSError**)error;
+- (BOOL) addRecordingOfScheduleWithObjectID:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
+- (BOOL) cancelRecordingWithObjectID:(NSManagedObjectID*)recordingObjectID error:(NSError**)error;
+- (BOOL) addSeasonPassForProgramWithObjectID:(NSManagedObjectID*)programObjectID onStation:(NSManagedObjectID*)stationObjectID error:(NSError**)error;
+- (BOOL) deleteSeasonPassWithObjectID:(NSManagedObjectID*)seasonPassObjectID error:(NSError**)error;
 
 - (void) reloadPreferences:(id)sender;
 

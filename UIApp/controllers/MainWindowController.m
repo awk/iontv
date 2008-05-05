@@ -201,7 +201,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	RSRecording *aRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
 	
 	NSError *error = nil;
-	[[[NSApp delegate] recServer] cancelRecording:[aRecording objectID] error:&error];
+	[[[NSApp delegate] recServer] cancelRecordingWithObjectID:[aRecording objectID] error:&error];
 }
 
 - (void) deleteSeasonPass:(id)anArgument
@@ -210,7 +210,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	RSSeasonPass *aSeasonPass = (RSSeasonPass*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
 	
 	NSError *error = nil;
-	[[[NSApp delegate] recServer] deleteSeasonPass:[aSeasonPass objectID] error:&error];
+	[[[NSApp delegate] recServer] deleteSeasonPassWithObjectID:[aSeasonPass objectID] error:&error];
 }
 
 #pragma mark Initialization/Startup
@@ -595,7 +595,23 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 - (void) seasonPassAddedNotification:(NSNotification*)aNotification
 {
 	NSError *error = nil;
-	
+	NSArray *newRecordings = [[aNotification userInfo] valueForKey:RSSeasonPassNewRecordingsURIKey];
+  if ([newRecordings count] > 0)
+  {
+    for (NSString *recordingURI in newRecordings)
+    {
+      NSManagedObjectID *newRecordingID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:[NSURL URLWithString:recordingURI]];
+      RSRecording *newRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:newRecordingID];
+      if (newRecording.schedule == self.currentSchedule)
+      {
+        [[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:self.currentSchedule mergeChanges:YES];
+      }
+    }
+    
+    // Reload the recordings array controller to add the new recordings
+    [mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:NO error:&error];
+  }
+  
 	// Reload the season pass array controller to add the new season pass
 	[mSeasonPassArrayController fetchWithRequest:[mSeasonPassArrayController defaultFetchRequest] merge:NO error:&error];
 }
@@ -603,7 +619,22 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 - (void) seasonPassRemovedNotification:(NSNotification*)aNotification
 {
 	NSError *error = nil;
-	
+  NSArray *cancelledRecordings = [[aNotification userInfo] valueForKey:RSSeasonPassCancelledRecordingsURIKey];
+  if ([cancelledRecordings count] > 0)
+  {
+    for (NSString *removedRecordingOfScheduleURI in cancelledRecordings)
+    {
+      NSManagedObjectID *removedRecordingOfScheduleID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:[NSURL URLWithString:removedRecordingOfScheduleURI]];
+      Z2ITSchedule *removedRecordingOfSchedule = (Z2ITSchedule *) [[[NSApp delegate] managedObjectContext] objectWithID:removedRecordingOfScheduleID];
+      if (removedRecordingOfSchedule == self.currentSchedule)
+      {
+        [[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:self.currentSchedule mergeChanges:YES];
+      }
+    }
+    // Reload the recordings array controller to remove the recordings
+    [mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:NO error:&error];
+  }
+  
 	// Reload the season pass array controller to remove the new season pass
 	[mSeasonPassArrayController fetchWithRequest:[mSeasonPassArrayController defaultFetchRequest] merge:NO error:&error];
 }
@@ -795,7 +826,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 {
   NSError *error = nil;
   if ([[NSApp delegate] recServer])
-    return [[[NSApp delegate] recServer] addRecordingOfSchedule:[schedule objectID] error:&error];
+    return [[[NSApp delegate] recServer] addRecordingOfScheduleWithObjectID:[schedule objectID] error:&error];
   else
     return NO;
 }
@@ -805,7 +836,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	NSError *error = nil;
 	if ([[NSApp delegate] recServer])
 	{
-		if ([[[NSApp delegate] recServer] addSeasonPassForProgram:[program objectID] onStation:[station objectID] error:&error] == NO)
+		if ([[[NSApp delegate] recServer] addSeasonPassForProgramWithObjectID:[program objectID] onStation:[station objectID] error:&error] == NO)
 		{
 			[[NSAlert alertWithError:error] runModal];
 			return NO;

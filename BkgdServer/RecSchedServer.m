@@ -49,6 +49,11 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 @end
 
+@interface RecSchedServer(Private)
+- (RSRecording *) addRecordingOfSchedule:(Z2ITSchedule*)schedule error:(NSError**)error;
+- (void)cancelRecording:(RSRecording*)aRecording;
+@end
+
 @implementation RecSchedServer
 
 - (id) init {
@@ -510,129 +515,45 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   }
 }
 
-- (BOOL) addRecordingOfSchedule:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error
+- (BOOL) addRecordingOfScheduleWithObjectID:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error
 {
   Z2ITSchedule *mySchedule = nil;
   mySchedule = (Z2ITSchedule*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
   
+  RSRecording *aRecording = nil;
   if (mySchedule)
   {
-		NSLog(@"addRecordingOfSchedule");
-		NSLog(@"  My Program title = %@, My Schedule start time = %@ channel = %@, %s", mySchedule.program.title, mySchedule.time, mySchedule.station.callSign, 
-					([mySchedule recording] == nil ? "does not have prior recording" : "has prior recording"));
-		if ([mySchedule recording] == nil)
-		{
-			// Find out if a tuner for this recording is available.
-			NSSet *candidateStations = mySchedule.station.hdhrStations;
-			NSMutableArray *conflictingSchedules = [NSMutableArray arrayWithCapacity:1];
-			RSRecording *aRecording = nil;
-			NSLog(@"  There are %d candidate stations and %d recording queues", [candidateStations count], [mRecordingQueues count]);
-			for (HDHomeRunStation *aStation in candidateStations)
-			{
-				for (RSRecordingQueue *aRecordingQueue in mRecordingQueues)
-				{
-					NSLog(@"  Checking Queue for tuner %@", aRecordingQueue.tuner.longName);
-					if (aRecordingQueue.tuner == aStation.channel.tuner)
-					{
-						NSLog(@"  Tuner %@ has the station, there are %d recordings in the queue", aRecordingQueue.tuner.longName, [aRecordingQueue.queue count]);
-						// Does the Tuners queue have space/time for this recording ?
-						BOOL hasOverlaps = NO;
-						for (RSRecording *aPreviouslyScheduledRecording in aRecordingQueue.queue)
-						{
-							if ([aPreviouslyScheduledRecording.schedule overlapsWith:mySchedule])
-							{
-								NSLog(@"  Queue for tuner %@ has overlap with schedule title %@", aStation.channel.tuner.longName, aPreviouslyScheduledRecording.schedule.program.title);
-								hasOverlaps = YES;
-								[conflictingSchedules addObject:[aPreviouslyScheduledRecording.schedule objectID]];
-							}
-						}
-						if (!hasOverlaps)
-						{
-							NSLog(@"  There are no overlaps - creating a recording on tuner %@", aRecordingQueue.tuner.longName);
-
-							// When we construct a recording we also need to associate it with the specific station on this tuner and 
-							// store that relationship. We'll use the relationship to reconstruct the queues on launch and also to use
-							// the correct station/tuner/device when recording starts. Otherwise there are no adequate guaruntees that our
-							// work schedule will actually come true.
-							aRecording = [RSRecording insertRecordingOfSchedule:mySchedule];
-							if (aRecording)
-							{
-								[aRecordingQueue addRecording:aRecording];
-								break;
-							}
-						}
-					}
-					if (aRecording)
-						break;
-				}
-				if (aRecording)
-					break;
-			}
-
-			if (aRecording)
-			{
-				aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
-				if (![[[NSApp delegate] managedObjectContext] save:error])
-				{
-					NSLog(@"addRecordingOfSchedule - error occured during save %@", *error);
-					return NO;
-				}
-				else
-				{
-					NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[aRecording objectID] URIRepresentation] absoluteString], RSRecordingAddedRecordingURIKey, nil];
-					[[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSRecordingAddedNotification object:RSBackgroundApplication userInfo:info];
-					return YES;
-				}
-			}
-			else
-			{
-				// No recording created - probably because of overlaps - we should construct an appropriate error object to return.
-				if (error != nil)
-				{
-					NSString *descriptionStr = [NSString stringWithFormat:@"The recording of %@, cannot be scheduled because it conflicts with %d other program%@",
-																		 mySchedule.program.title, [conflictingSchedules count], [conflictingSchedules count] > 1 ? @"s." : @"."];
-					NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:
-																 conflictingSchedules, @"conflictingSchedules",
-																 descriptionStr, NSLocalizedDescriptionKey,
-																 nil];
-					*error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
-				}
-				return NO;
-			}
-		}
-		else // Already scheduled to be recorded
-			return YES;
+    aRecording = [self addRecordingOfSchedule:mySchedule error:error];
+    if (![[[NSApp delegate] managedObjectContext] save:error])
+    {
+      NSLog(@"addRecordingOfSchedule - error occured during save %@", *error);
+      return NO;
+    }
+    else
+    {
+      NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[aRecording objectID] URIRepresentation] absoluteString], RSRecordingAddedRecordingURIKey, nil];
+      [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSRecordingAddedNotification object:RSBackgroundApplication userInfo:info];
+      return YES;
+    }
   }
-  else
-  {
-    NSLog(@"Could not find matching local schedule for the program");
-    return NO;
-  }
+  
+  return (aRecording != nil ? YES : NO);
 }
 
-- (BOOL) cancelRecording:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error
+- (BOOL) cancelRecordingWithObjectID:(NSManagedObjectID*)recordingObjectID error:(NSError**)error
 {
   RSRecording *myRecording = nil;
-  myRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:scheduleObjectID];
+  myRecording = (RSRecording*) [[[NSApp delegate] managedObjectContext] objectWithID:recordingObjectID];
   
   if (myRecording)
   {
-		// Cache the schedule - we use it in the notification.
-		Z2ITSchedule *scheduleBeingRecorded = myRecording.schedule;
-		
-		NSLog(@"My Program title = %@, My Schedule start time = %@ channel = %@, recording = %@", myRecording.schedule.program.title, myRecording.schedule.time, myRecording.schedule.station.callSign, myRecording);
-		// We need to cancel/delete the recording thread controller - we can do this by setting the recordings thread controller property to nil
-		myRecording.recordingThreadController = nil;
-		
-		// Remove the recording from the queue
-		[myRecording.recordingQueue removeRecording:myRecording];
-
-		// Remove the recording from the ManagedObjectContext
-		[[[NSApp delegate] managedObjectContext] deleteObject:myRecording];
-
+    // Cache the schedule - we use it in the notification.
+    Z2ITSchedule *scheduleBeingRecorded = myRecording.schedule;
+    
+    [self cancelRecording:myRecording];
 		if (![[[NSApp delegate] managedObjectContext] save:error])
 		{
-			NSLog(@"cancelRecording - error occured during save %@", *error);
+			NSLog(@"cancelRecordingWithObjectID - error occured during save %@", *error);
 			return NO;
 		}
 		else
@@ -646,7 +567,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     return NO;
 }
 
-- (BOOL) addSeasonPassForProgram:(NSManagedObjectID*)programObjectID onStation:(NSManagedObjectID*)stationObjectID error:(NSError**)error
+- (BOOL) addSeasonPassForProgramWithObjectID:(NSManagedObjectID*)programObjectID onStation:(NSManagedObjectID*)stationObjectID error:(NSError**)error
 {
   Z2ITProgram *myProgram = nil;
   myProgram = (Z2ITProgram*) [[[NSApp delegate] managedObjectContext] objectWithID:programObjectID];
@@ -659,46 +580,72 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     NSLog(@"  My Program title = %@, series ID = %@ channel = %@", myProgram.title, myProgram.series, myStation.callSign);
     RSSeasonPass *aSeasonPass = [RSSeasonPass insertSeasonPassForProgram:myProgram onStation:myStation];
 
+    NSArray *futureSchedules = [aSeasonPass fetchFutureSchedules];
+    NSMutableArray *newRecordings = [NSMutableArray arrayWithCapacity:[futureSchedules count]];
+    
+    for (Z2ITSchedule *aSchedule in futureSchedules)
+    {
+      RSRecording *aRecording = nil;
+      NSLog(@"    %@ - %@ at %@", aSchedule.program.title, aSchedule.program.subTitle, aSchedule.time);
+      aRecording = [self addRecordingOfSchedule:aSchedule error:error];
+      if (aRecording)
+      {
+        [aSeasonPass addRecordingsObject:aRecording];
+        [newRecordings addObject:[[[aRecording objectID] URIRepresentation] absoluteString]];
+      }
+      else
+      {
+        return NO;
+      }
+    }
     if (![[[NSApp delegate] managedObjectContext] save:error])
     {
-      NSLog(@"addSeasonPassForProgram - error occured during save %@", *error);
+      NSLog(@"addSeasonPassForProgramWithObjectID - error occured during save %@", *error);
       return NO;
     }
     else
     {
-      NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[aSeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassAddedSeasonPassURIKey, nil];
+      // In addition to the basic 'new season pass' we also need to include an array of the schedules that have just been added to the recording list.
+      NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[aSeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassAddedSeasonPassURIKey,
+                                                                      newRecordings, RSSeasonPassNewRecordingsURIKey,
+                                                                      nil];
       [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSSeasonPassAddedNotification object:RSBackgroundApplication userInfo:info];
-    }
-
-    NSArray *futureSchedules = [aSeasonPass fetchFutureSchedules];
-    for (Z2ITSchedule *aSchedule in futureSchedules)
-    {
-      NSLog(@"    %@ - %@ at %@", aSchedule.program.title, aSchedule.program.subTitle, aSchedule.time);
     }
   }
   return YES;
 }
 
-- (BOOL) deleteSeasonPass:(NSManagedObjectID*)seasonPassObjectID error:(NSError**)error
+- (BOOL) deleteSeasonPassWithObjectID:(NSManagedObjectID*)seasonPassObjectID error:(NSError**)error
 {
   RSSeasonPass *mySeasonPass = nil;
   mySeasonPass = (RSSeasonPass*) [[[NSApp delegate] managedObjectContext] objectWithID:seasonPassObjectID];
 
   if (mySeasonPass)
   {
-    NSLog(@"My Season Pass Episode ID = %@ channel = %@", mySeasonPass.series, mySeasonPass.station.callSign);
-
+    NSLog(@"My Season Pass Title = %@ Episode ID = %@ channel = %@", mySeasonPass.title, mySeasonPass.series, mySeasonPass.station.callSign);
+    
+    NSMutableArray *scheduleRecordingsCancelled = [NSMutableArray arrayWithCapacity:[[mySeasonPass recordings] count]];
+    
+    // Remove any scheduled recordings
+    for (RSRecording *aRecording in [mySeasonPass recordings])
+    {
+      [scheduleRecordingsCancelled addObject:[[[aRecording.schedule objectID] URIRepresentation] absoluteString]];
+      [self cancelRecording:aRecording];
+    }
+    
     // Remove the season pass from the ManagedObjectContext
     [[[NSApp delegate] managedObjectContext] deleteObject:mySeasonPass];
 
     if (![[[NSApp delegate] managedObjectContext] save:error])
     {
-      NSLog(@"deleteSeasonPass - error occured during save %@", *error);
+      NSLog(@"deleteSeasonPassWithObjectID - error occured during save %@", *error);
       return NO;
     }
     else
     {
-      NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[mySeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassRemovedSeasonPassURIKey, nil];
+      NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[mySeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassRemovedSeasonPassURIKey, 
+                                                                      scheduleRecordingsCancelled, RSSeasonPassCancelledRecordingsURIKey, 
+                                                                      nil];
       [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSSeasonPassRemovedNotification object:RSBackgroundApplication userInfo:info];
       return YES;
     }
@@ -904,6 +851,106 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 }
 
 @synthesize mExitServer;
+@end
+
+@implementation RecSchedServer(Private)
+
+- (RSRecording *) addRecordingOfSchedule:(Z2ITSchedule*)schedule error:(NSError**)error
+{
+  NSLog(@"addRecordingOfSchedule");
+  NSLog(@"  My Program title = %@, My Schedule start time = %@ channel = %@, %s", schedule.program.title, schedule.time, schedule.station.callSign, 
+        ([schedule recording] == nil ? "does not have prior recording" : "has prior recording"));
+  if ([schedule recording] == nil)
+  {
+    // Find out if a tuner for this recording is available.
+    NSSet *candidateStations = schedule.station.hdhrStations;
+    NSMutableArray *conflictingSchedules = [NSMutableArray arrayWithCapacity:1];
+    RSRecording *aRecording = nil;
+    NSLog(@"  There are %d candidate stations and %d recording queues", [candidateStations count], [mRecordingQueues count]);
+    for (HDHomeRunStation *aStation in candidateStations)
+    {
+      for (RSRecordingQueue *aRecordingQueue in mRecordingQueues)
+      {
+        NSLog(@"  Checking Queue for tuner %@", aRecordingQueue.tuner.longName);
+        if (aRecordingQueue.tuner == aStation.channel.tuner)
+        {
+          NSLog(@"  Tuner %@ has the station, there are %d recordings in the queue", aRecordingQueue.tuner.longName, [aRecordingQueue.queue count]);
+          // Does the Tuners queue have space/time for this recording ?
+          BOOL hasOverlaps = NO;
+          for (RSRecording *aPreviouslyScheduledRecording in aRecordingQueue.queue)
+          {
+            if ([aPreviouslyScheduledRecording.schedule overlapsWith:schedule])
+            {
+              NSLog(@"  Queue for tuner %@ has overlap with schedule title %@", aStation.channel.tuner.longName, aPreviouslyScheduledRecording.schedule.program.title);
+              hasOverlaps = YES;
+              [conflictingSchedules addObject:[aPreviouslyScheduledRecording.schedule objectID]];
+            }
+          }
+          if (!hasOverlaps)
+          {
+            NSLog(@"  There are no overlaps - creating a recording on tuner %@", aRecordingQueue.tuner.longName);
+            
+            // When we construct a recording we also need to associate it with the specific station on this tuner and 
+            // store that relationship. We'll use the relationship to reconstruct the queues on launch and also to use
+            // the correct station/tuner/device when recording starts. Otherwise there are no adequate guaruntees that our
+            // work schedule will actually come true.
+            aRecording = [RSRecording insertRecordingOfSchedule:schedule];
+            if (aRecording)
+            {
+              [aRecordingQueue addRecording:aRecording];
+              break;
+            }
+          }
+        }
+        if (aRecording)
+          break;
+      }
+      if (aRecording)
+        break;
+    }
+    
+    if (aRecording)
+    {
+      aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
+      return aRecording;
+    }
+    else
+    {
+      // No recording created - probably because of overlaps - we should construct an appropriate error object to return.
+      if (error != nil)
+      {
+        NSString *descriptionStr = [NSString stringWithFormat:@"The recording of %@, cannot be scheduled because it conflicts with %d other program%@",
+                                    schedule.program.title, [conflictingSchedules count], [conflictingSchedules count] > 1 ? @"s." : @"."];
+        NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                               conflictingSchedules, @"conflictingSchedules",
+                               descriptionStr, NSLocalizedDescriptionKey,
+                               nil];
+        *error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
+      }
+      return nil;
+    }
+  }
+  else
+  {
+    // Already scheduled to be recorded
+    return schedule.recording;
+  }
+}
+
+- (void)cancelRecording:(RSRecording*)aRecording
+{
+  NSLog(@"cancelRecording:");
+  NSLog(@"  My Program title = %@, My Schedule start time = %@ channel = %@", aRecording.schedule.program.title, aRecording.schedule.time, aRecording.schedule.station.callSign);
+  // We need to cancel/delete the recording thread controller - we can do this by setting the recordings thread controller property to nil
+  aRecording.recordingThreadController = nil;
+  
+  // Remove the recording from the queue
+  [aRecording.recordingQueue removeRecording:aRecording];
+  
+  // Remove the recording from the ManagedObjectContext
+  [[[NSApp delegate] managedObjectContext] deleteObject:aRecording];
+}
+
 @end
 
 @implementation RSActivityProxy
