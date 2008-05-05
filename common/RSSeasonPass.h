@@ -20,6 +20,7 @@
 @class Z2ITStation;
 @class RSSeasonPassOptions;
 @class Z2ITProgram;
+@class RSRecording;
 
 @interface RSSeasonPass : NSManagedObject {
 
@@ -29,6 +30,7 @@
 @property (retain) RSSeasonPassOptions * options;
 @property (retain) Z2ITStation * station;
 @property (retain) NSString * title;
+@property (retain) NSSet* recordings;
 
 + (RSSeasonPass*) insertSeasonPassForProgram:(Z2ITProgram*)aProgram onStation:(Z2ITStation*)aStation;
 
@@ -36,3 +38,11 @@
 
 @end
 
+// coalesce these into one @interface RSSeasonPass (CoreDataGeneratedAccessors) section
+@interface RSSeasonPass (CoreDataGeneratedAccessors)
+- (void)addRecordingsObject:(RSRecording *)value;
+- (void)removeRecordingsObject:(RSRecording *)value;
+- (void)addRecordings:(NSSet *)value;
+- (void)removeRecordings:(NSSet *)value;
+
+@end

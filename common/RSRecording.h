@@ -22,6 +22,7 @@
 @class HDHomeRunTuner;
 @class RSRecordingQueue;
 @class RSRecordingOptions;
+@class RSSeasonPass;
 
 enum {
 	RSRecordingNotYetStartedStatus = 0,
@@ -42,6 +43,7 @@ enum {
 @property (retain) RecordingThreadController * recordingThreadController;
 @property (retain) RSRecordingQueue *recordingQueue;
 @property (retain) RSRecordingOptions *recordingOptions;
+@property (retain) RSSeasonPass* seasonPass;
 
 + (RSRecording*) insertRecordingOfSchedule:(Z2ITSchedule*)aSchedule;
 + (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)date withStatus:(int)status; 

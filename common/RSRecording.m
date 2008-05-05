@@ -27,6 +27,7 @@
 @dynamic schedule;
 @dynamic tuner;
 @dynamic recordingOptions;
+@dynamic seasonPass;
 @synthesize recordingThreadController;
 @synthesize recordingQueue;
 

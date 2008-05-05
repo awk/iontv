@@ -26,6 +26,7 @@
 @dynamic options;
 @dynamic station;
 @dynamic title;
+@dynamic recordings;
 
 + (RSSeasonPass*) insertSeasonPassForProgram:(Z2ITProgram*)aProgram onStation:(Z2ITStation*)aStation
 {
