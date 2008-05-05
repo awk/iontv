@@ -31,7 +31,7 @@ NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 NSString *RSRecordingAddedNotification = @"RSRecordingAddedNotification";
 NSString *RSRecordingRemovedNotification = @"RSRecordingRemovedNotification";
 
-NSString *RSRecordingAddedRecordingURIKey =  @"recordingURI";
+NSString *RSRecordingAddedRecordingsURIKey =  @"recordingURI";
 NSString *RSRecordingRemovedRecordingOfScheduleURIKey = @"scheduleURI";
 
 NSString *RSMigrationCompleteNotification = @"RSMigrationCompleteNotification";

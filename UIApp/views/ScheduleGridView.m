@@ -459,14 +459,18 @@ const float kScheduleDetailsPopUpTime = 3.0;
 
 - (void)recordingAdded: (NSNotification *)notification
 {
-	NSURL *newRecordingURI = [NSURL URLWithString:[[notification userInfo] valueForKey:RSRecordingAddedRecordingURIKey]];
-	NSManagedObjectID *newRecordingID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:newRecordingURI];
-	RSRecording *newRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:newRecordingID];
-	if ([self scheduleIsVisible:newRecording.schedule])
-	{
-		[[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:newRecording.schedule mergeChanges:YES];
-		[self setNeedsDisplay:YES];
-	}
+  NSArray *newRecordings = [[notification userInfo] valueForKey:RSRecordingAddedRecordingsURIKey];
+  for (NSString *newRecordingURIString in newRecordings)
+  {
+    NSURL *newRecordingURI = [NSURL URLWithString:newRecordingURIString];
+    NSManagedObjectID *newRecordingID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:newRecordingURI];
+    RSRecording *newRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:newRecordingID];
+    if ([self scheduleIsVisible:newRecording.schedule])
+    {
+      [[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:newRecording.schedule mergeChanges:YES];
+      [self setNeedsDisplay:YES];
+    }
+  }
 }
 
 - (void)recordingRemoved: (NSNotification *)notification

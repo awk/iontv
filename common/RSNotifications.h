@@ -32,7 +32,7 @@ extern NSString *RSDownloadErrorNotification;
 extern NSString *RSRecordingAddedNotification;
 extern NSString *RSRecordingRemovedNotification;
 
-extern NSString *RSRecordingAddedRecordingURIKey;
+extern NSString *RSRecordingAddedRecordingsURIKey;
 extern NSString *RSRecordingRemovedRecordingOfScheduleURIKey;
 
 extern NSString *RSMigrationCompleteNotification;

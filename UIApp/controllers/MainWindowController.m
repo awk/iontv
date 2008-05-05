@@ -563,14 +563,18 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	NSError *error = nil;
 	
 	// Refetch the current schedule to update it's 'recording dot'
-	NSURL *newRecordingURI = [NSURL URLWithString:[[aNotification userInfo] valueForKey:RSRecordingAddedRecordingURIKey]];
-	NSManagedObjectID *newRecordingID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:newRecordingURI];
-	RSRecording *newRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:newRecordingID];
-	if (newRecording.schedule == self.currentSchedule)
-	{
-		[[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:self.currentSchedule mergeChanges:YES];
-	}
-	
+  NSArray *newRecordings = [[aNotification userInfo] valueForKey:RSRecordingAddedRecordingsURIKey];
+  
+  for (NSString *recordingURIString in newRecordings)
+  {
+    NSURL *newRecordingURI = [NSURL URLWithString:recordingURIString];
+    NSManagedObjectID *newRecordingID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:newRecordingURI];
+    RSRecording *newRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:newRecordingID];
+    if (newRecording.schedule == self.currentSchedule)
+    {
+      [[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:self.currentSchedule mergeChanges:YES];
+    }
+  }
 	// Reload the recordings array controller to add the new recording
 	[mRecordingsArrayController fetchWithRequest:[mRecordingsArrayController defaultFetchRequest] merge:NO error:&error];
 }
