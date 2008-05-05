@@ -18,6 +18,7 @@
 #import "RSSeasonPass.h"
 #import "RSRecordingOptions.h"
 #import "Z2ITProgram.h"
+#import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
 
 @implementation RSSeasonPass
@@ -41,6 +42,17 @@
 	[aSeasonPass setOptions:options];
 	
 	return aSeasonPass;
+}
+
++ (NSArray *) fetchSeasonPasses
+{
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"SeasonPass" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+  
+  NSError *error = nil;
+  NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
+  return array;
 }
 
 - (NSArray *)fetchFutureSchedules

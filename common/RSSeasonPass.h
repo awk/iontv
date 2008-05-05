@@ -33,6 +33,7 @@
 @property (retain) NSSet* recordings;
 
 + (RSSeasonPass*) insertSeasonPassForProgram:(Z2ITProgram*)aProgram onStation:(Z2ITStation*)aStation;
++ (NSArray *) fetchSeasonPasses;
 
 - (NSArray *)fetchFutureSchedules;
 
