@@ -42,4 +42,5 @@ extern NSString *RSSeasonPassRemovedNotification;
 
 extern NSString *RSSeasonPassAddedSeasonPassURIKey;
 extern NSString *RSSeasonPassRemovedSeasonPassURIKey;
-
+extern NSString *RSSeasonPassNewRecordingsURIKey;
+extern NSString *RSSeasonPassCancelledRecordingsURIKey;

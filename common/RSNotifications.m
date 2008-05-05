@@ -41,3 +41,5 @@ NSString *RSSeasonPassRemovedNotification = @"RSSeasonPassRemovedNotification";
 
 NSString *RSSeasonPassAddedSeasonPassURIKey = @"RSSeasonPassAddedSeasonPassURIKey";
 NSString *RSSeasonPassRemovedSeasonPassURIKey = @"RSSeasonPassRemovedSeasonPassURIKey";
+NSString *RSSeasonPassNewRecordingsURIKey = @"RSSeasonPassNewRecordingsURIKey";
+NSString *RSSeasonPassCancelledRecordingsURIKey = @"RSSeasonPassCancelledRecordingsURIKey";
