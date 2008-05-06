@@ -27,8 +27,23 @@
 
 @implementation RSSeasonPassCalendarViewController
 
-- (void) dealloc {
-	[super dealloc];
+- (id) init
+{
+  self = [super init];
+  if (self != nil) {
+      if (![NSBundle loadNibNamed:@"SeasonPassCalendarView" owner:self])
+      {
+        NSLog(@"Error loading SeasonPassCalendarView NIB");
+        [self release];
+        return nil;
+      }
+  }
+  return self;
+}
+
+- (void) dealloc
+{
+  [super dealloc];
 }
 
 - (void) awakeFromNib
