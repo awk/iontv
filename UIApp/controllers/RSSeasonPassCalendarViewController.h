@@ -29,11 +29,27 @@
 @interface RSSeasonPassCalendarViewController : NSObject {
   IBOutlet NSView *mSeasonPassCalendarView;
   
+  IBOutlet NSView *mCalendarContainerView;
+  IBOutlet NSView *mMonthView;
+  IBOutlet NSView *mWeekView;
+  
+  IBOutlet NSSegmentedControl *mViewSegmentedControl;
+  
   BOOL seasonPassCalendarViewHidden;
+  BOOL displayingMonths;
+  BOOL displayingWeeks;
+  
+  NSCalendarDate *displayStartDate;
+  NSCalendarDate *selectedDate;
 }
 
 @property BOOL seasonPassCalendarViewHidden;
+@property BOOL displayingMonths;
+@property BOOL displayingWeeks;
+@property(retain) NSCalendarDate *displayStartDate;
+@property(retain) NSCalendarDate *selectedDate;
 
 - (NSView*) view;
+- (IBAction) segmentCellClicked:(id)sender;
 
 @end

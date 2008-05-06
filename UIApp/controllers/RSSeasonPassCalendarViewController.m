@@ -25,12 +25,26 @@
 
 #import "RSSeasonPassCalendarViewController.h"
 
+@interface RSSeasonPassCalendarViewController (Private)
+
+@end;
+
+enum {
+  kPreviousCellTag = 0, 
+  kWeekCellTag,
+  kMonthCellTag,
+  kNextCellTag
+};
+
 @implementation RSSeasonPassCalendarViewController
 
 - (id) init
 {
   self = [super init];
   if (self != nil) {
+      [self addObserver:self forKeyPath:@"displayStartDate" options:0 context:nil];
+      [self addObserver:self forKeyPath:@"selectedDate" options:0 context:nil];
+      self.selectedDate = [NSCalendarDate calendarDate];
       if (![NSBundle loadNibNamed:@"SeasonPassCalendarView" owner:self])
       {
         NSLog(@"Error loading SeasonPassCalendarView NIB");
@@ -48,7 +62,13 @@
 
 - (void) awakeFromNib
 {
+  [mCalendarContainerView addSubview:mMonthView];
+  [mCalendarContainerView addSubview:mWeekView];
+  
+  self.displayingMonths = YES;
 }
+
+#pragma mark View Handling
 
 - (NSView*) view
 {
@@ -65,5 +85,101 @@
   [mSeasonPassCalendarView setHidden:isHidden];
   seasonPassCalendarViewHidden = isHidden;
 }
+
+- (BOOL) displayingMonths
+{
+  return displayingMonths;
+}
+
+- (void) setDisplayingMonths:(BOOL)displayMonths
+{
+  if (displayMonths == YES)
+  {
+    self.displayingWeeks = NO;
+    self.displayStartDate = [self.selectedDate dateByAddingYears:0 months:0 days:-([self.selectedDate dayOfMonth]-1) hours:0 minutes:0 seconds:0];
+  }
+  displayingMonths = displayMonths;
+  [mViewSegmentedControl setSelected:displayMonths forSegment:kMonthCellTag];
+  [mMonthView setHidden:!displayMonths];
+}
+
+- (BOOL) displayingWeeks
+{
+  return displayingWeeks;
+}
+
+- (void) setDisplayingWeeks:(BOOL)displayWeeks
+{
+  if (displayWeeks == YES)
+  {
+    self.displayingMonths = NO;
+    self.displayStartDate = [self.selectedDate dateByAddingYears:0 months:0 days:-[self.selectedDate dayOfWeek] hours:0 minutes:0 seconds:0];
+  }
+  displayingWeeks = displayWeeks;
+  [mViewSegmentedControl setSelected:displayWeeks forSegment:kWeekCellTag];
+  [mWeekView setHidden:!displayWeeks];
+}
+
+#pragma mark Actions
+
+- (IBAction) segmentCellClicked:(id)sender
+{
+  int clickedSegmentTag = [[sender cell] tagForSegment:[sender selectedSegment]];
+  switch (clickedSegmentTag)
+  {
+    case kPreviousCellTag:
+      if (self.displayingMonths)
+      {
+        [mViewSegmentedControl setSelected:YES forSegment:kMonthCellTag];
+        self.displayStartDate = [self.displayStartDate dateByAddingYears:0 months:-1 days:0 hours:0 minutes:0 seconds:0]; 
+      }
+      else if (self.displayingWeeks)
+      {
+        [mViewSegmentedControl setSelected:YES forSegment:kWeekCellTag];
+        self.displayStartDate = [self.displayStartDate dateByAddingYears:0 months:0 days:-7 hours:0 minutes:0 seconds:0]; 
+      }
+      break;
+    case kNextCellTag:
+      if (self.displayingMonths)
+      {
+        [mViewSegmentedControl setSelected:YES forSegment:kMonthCellTag];
+        self.displayStartDate = [self.displayStartDate dateByAddingYears:0 months:1 days:0 hours:0 minutes:0 seconds:0]; 
+      }
+      else if (self.displayingWeeks)
+      {
+        [mViewSegmentedControl setSelected:YES forSegment:kWeekCellTag];
+        self.displayStartDate = [self.displayStartDate dateByAddingYears:0 months:0 days:7 hours:0 minutes:0 seconds:0]; 
+      }
+      break;
+    case kMonthCellTag:
+      self.displayingMonths = YES;
+      break;
+    case kWeekCellTag:
+      self.displayingWeeks = YES;
+      break;
+    default:
+      break;
+  }
+}
+
+#pragma KVO
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+			ofObject:(id)object 
+			change:(NSDictionary *)change
+			context:(void *)context
+{
+  if ((object == self) && ([keyPath isEqual:@"displayStartDate"]))
+  {
+    NSLog(@"displayStartDate changed => %@", self.displayStartDate);
+  }
+  if ((object == self) && ([keyPath isEqual:@"selectedDate"]))
+  {
+    NSLog(@"selectedDate changed => %@", self.selectedDate);
+  }
+}
+
+@synthesize displayStartDate;
+@synthesize selectedDate;
 
 @end
