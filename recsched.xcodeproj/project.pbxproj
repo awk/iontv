@@ -109,6 +109,8 @@
 		EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */; };
 		EABE726C0DCFF2EC0013310F /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE726B0DCFF2EC0013310F /* ProgramSearchViewController.m */; };
 		EABE726E0DCFF3310013310F /* RSSeasonPassCalendarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE726D0DCFF3310013310F /* RSSeasonPassCalendarViewController.m */; };
+		EABE72B00DD0AB1B0013310F /* SeasonPassCalendarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EABE72AE0DD0AB1B0013310F /* SeasonPassCalendarView.xib */; };
+		EABE730A0DD0D8DF0013310F /* RSCalendarMonthView.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE73090DD0D8DF0013310F /* RSCalendarMonthView.m */; };
 		EAC3529C0DCD355E00963287 /* RSRecordingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */; };
 		EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */; };
 		EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */; };
@@ -356,6 +358,9 @@
 		EABE726A0DCFF2EC0013310F /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProgramSearchViewController.h; path = UIApp/controllers/ProgramSearchViewController.h; sourceTree = "<group>"; };
 		EABE726B0DCFF2EC0013310F /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProgramSearchViewController.m; path = UIApp/controllers/ProgramSearchViewController.m; sourceTree = "<group>"; };
 		EABE726D0DCFF3310013310F /* RSSeasonPassCalendarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSSeasonPassCalendarViewController.m; path = UIApp/controllers/RSSeasonPassCalendarViewController.m; sourceTree = "<group>"; };
+		EABE72AF0DD0AB1B0013310F /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/SeasonPassCalendarView.xib; sourceTree = "<group>"; };
+		EABE73080DD0D8DF0013310F /* RSCalendarMonthView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSCalendarMonthView.h; path = UIApp/views/RSCalendarMonthView.h; sourceTree = "<group>"; };
+		EABE73090DD0D8DF0013310F /* RSCalendarMonthView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSCalendarMonthView.m; path = UIApp/views/RSCalendarMonthView.m; sourceTree = "<group>"; };
 		EAC3529A0DCD355E00963287 /* RSRecordingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecordingAdditions.h; path = UIApp/RSRecordingAdditions.h; sourceTree = "<group>"; };
 		EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecordingAdditions.m; path = UIApp/RSRecordingAdditions.m; sourceTree = "<group>"; };
 		EAC352A50DCD368700963287 /* RSSourceListKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSSourceListKeys.h; path = UIApp/RSSourceListKeys.h; sourceTree = "<group>"; };
@@ -533,6 +538,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EABE72AE0DD0AB1B0013310F /* SeasonPassCalendarView.xib */,
 				EA23871D0D5E5D0F00343704 /* FirstRun.xib */,
 				EAF923F20CCEE15000CEBD73 /* Credits.html */,
 				EAF923BF0CCEC33600CEBD73 /* Preferences.xib */,
@@ -782,6 +788,8 @@
 				EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */,
 				EA39B7DE0D6E21720049CB89 /* RSChannelTableView.h */,
 				EA39B7DF0D6E21720049CB89 /* RSChannelTableView.m */,
+				EABE73080DD0D8DF0013310F /* RSCalendarMonthView.h */,
+				EABE73090DD0D8DF0013310F /* RSCalendarMonthView.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -926,6 +934,7 @@
 				EAF923F40CCEE15000CEBD73 /* Credits.html in Resources */,
 				EA23871F0D5E5D0F00343704 /* FirstRun.xib in Resources */,
 				EA39B7CA0D6C8CFC0049CB89 /* assistantBackground.tiff in Resources */,
+				EABE72B00DD0AB1B0013310F /* SeasonPassCalendarView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1032,6 +1041,7 @@
 				EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */,
 				EABE726C0DCFF2EC0013310F /* ProgramSearchViewController.m in Sources */,
 				EABE726E0DCFF3310013310F /* RSSeasonPassCalendarViewController.m in Sources */,
+				EABE730A0DD0D8DF0013310F /* RSCalendarMonthView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1152,6 +1162,14 @@
 				EA490DB90CAF376E00A1DE02 /* English */,
 			);
 			name = ActivityAggregateView.xib;
+			sourceTree = "<group>";
+		};
+		EABE72AE0DD0AB1B0013310F /* SeasonPassCalendarView.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EABE72AF0DD0AB1B0013310F /* English */,
+			);
+			name = SeasonPassCalendarView.xib;
 			sourceTree = "<group>";
 		};
 		EAF923BA0CCEC21900CEBD73 /* MainMenu.xib */ = {
