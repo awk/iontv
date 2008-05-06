@@ -65,6 +65,8 @@ enum {
   [mCalendarContainerView addSubview:mMonthView];
   [mCalendarContainerView addSubview:mWeekView];
   
+  [mMonthView setFrameSize:[mCalendarContainerView frame].size];
+  
   self.displayingMonths = YES;
 }
 
