@@ -29,6 +29,7 @@
 #import "RSRecording.h"
 #import "RSNotifications.h"
 #import "RSSeasonPass.h"
+#import "RSSeasonPassCalendarViewController.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
 #import "Z2ITStation.h"
@@ -192,6 +193,9 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   {
 //    [self setCurrentSchedule:aRecording.schedule];
     NSLog(@"seasonPassSelected: %@", aSeasonPass);
+    [mScheduleContainerView setHidden:YES];
+    mProgramSearchViewController.searchViewHidden = YES;
+    mSeasonPassCalendarViewController.seasonPassCalendarViewHidden = NO;
   }
 }
 
@@ -249,6 +253,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   NSView *bottomContainerView = [[mScheduleSplitView subviews] objectAtIndex:1];
   [bottomContainerView addSubview:mScheduleContainerView];
   [bottomContainerView addSubview:[mProgramSearchViewController view]];
+  [bottomContainerView addSubview:[mSeasonPassCalendarViewController view]];
   
   NSSize scheduleSize = [bottomContainerView frame].size;
   NSRect newFrame = [mScheduleContainerView frame];
@@ -259,6 +264,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   newFrame.size = scheduleSize;
   [[mProgramSearchViewController view] setFrame:newFrame];
   mProgramSearchViewController.searchViewHidden=YES;
+  [[mSeasonPassCalendarViewController view] setFrame:newFrame];
+  mSeasonPassCalendarViewController.seasonPassCalendarViewHidden = YES;
   
   [mTopLevelSplitView setDividerStyle:NSSplitViewDividerStyleThin];
   [mTopLevelSplitView setPosition:kSourceListMinWidth + ((kSourceListMaxWidth - kSourceListMinWidth) / 2) ofDividerAtIndex:0];
@@ -465,12 +472,14 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 - (void) showSchedule:(id)anArgument
 {
 	[mScheduleContainerView setHidden:NO];
+        mSeasonPassCalendarViewController.seasonPassCalendarViewHidden = YES;
 	[mProgramSearchViewController setSearchViewHidden:YES];
 }
 
 - (void) showSearch:(id)anArgument
 {
 	[mScheduleContainerView setHidden:YES];
+        mSeasonPassCalendarViewController.seasonPassCalendarViewHidden = YES;
 	[mProgramSearchViewController setSearchViewHidden:NO];
 }
 

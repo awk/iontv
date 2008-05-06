@@ -29,6 +29,7 @@
 @class ScheduleView;
 @class RSWishlistController;
 @class ProgramSearchViewController;
+@class RSSeasonPassCalendarViewController;
 
 extern NSString *RSSSchedulePBoardType;
 
@@ -53,6 +54,7 @@ extern NSString *RSSSchedulePBoardType;
   IBOutlet NSArrayController *mLineupsArrayController;
   
   IBOutlet ProgramSearchViewController *mProgramSearchViewController;
+  IBOutlet RSSeasonPassCalendarViewController *mSeasonPassCalendarViewController;
   
   float mDetailViewMinHeight;
   NSArray *mDraggedNodes;		// Temporary copy of the nodes being dragged around

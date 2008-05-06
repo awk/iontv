@@ -33,7 +33,6 @@
 		EA20ADB70C23307800A9BDBD /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
 		EA20ADBA0C2330AC00A9BDBD /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
 		EA20AE2E0C23612800A9BDBD /* SyncServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20AE2D0C23612800A9BDBD /* SyncServices.framework */; };
-		EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */; };
 		EA23871B0D5E5CF400343704 /* RSFirstRunWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23871A0D5E5CF400343704 /* RSFirstRunWindowController.m */; };
 		EA23871F0D5E5D0F00343704 /* FirstRun.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA23871D0D5E5D0F00343704 /* FirstRun.xib */; };
 		EA2387300D5E5E3100343704 /* RSUIApplication.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23872F0D5E5E3100343704 /* RSUIApplication.m */; };
@@ -108,6 +107,8 @@
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */; };
+		EABE726C0DCFF2EC0013310F /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE726B0DCFF2EC0013310F /* ProgramSearchViewController.m */; };
+		EABE726E0DCFF3310013310F /* RSSeasonPassCalendarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE726D0DCFF3310013310F /* RSSeasonPassCalendarViewController.m */; };
 		EAC3529C0DCD355E00963287 /* RSRecordingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */; };
 		EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */; };
 		EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */; };
@@ -243,8 +244,6 @@
 		EA20AE2D0C23612800A9BDBD /* SyncServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SyncServices.framework; path = /System/Library/Frameworks/SyncServices.framework; sourceTree = "<absolute>"; };
 		EA20AF000C25CCA200A9BDBD /* RecordingThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = RecordingThread.h; path = BkgdServer/RecordingThread.h; sourceTree = "<group>"; };
 		EA20AF010C25CCA200A9BDBD /* RecordingThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = RecordingThread.m; path = BkgdServer/RecordingThread.m; sourceTree = "<group>"; };
-		EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProgramSearchViewController.h; path = UIApp/controllers/ProgramSearchViewController.h; sourceTree = "<group>"; };
-		EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProgramSearchViewController.m; path = UIApp/controllers/ProgramSearchViewController.m; sourceTree = "<group>"; };
 		EA2339EF0D6BDCC700451694 /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = common/NSStringAdditions.h; sourceTree = "<group>"; };
 		EA2387190D5E5CF400343704 /* RSFirstRunWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSFirstRunWindowController.h; path = UIApp/controllers/RSFirstRunWindowController.h; sourceTree = "<group>"; };
 		EA23871A0D5E5CF400343704 /* RSFirstRunWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSFirstRunWindowController.m; path = UIApp/controllers/RSFirstRunWindowController.m; sourceTree = "<group>"; };
@@ -353,6 +352,10 @@
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
 		EAB16BF20CF51502001313CA /* RSProgramSearchTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSProgramSearchTableHeaderView.h; path = UIApp/views/RSProgramSearchTableHeaderView.h; sourceTree = SOURCE_ROOT; };
 		EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSProgramSearchTableHeaderView.m; path = UIApp/views/RSProgramSearchTableHeaderView.m; sourceTree = SOURCE_ROOT; };
+		EABE72660DCFF1BC0013310F /* RSSeasonPassCalendarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSSeasonPassCalendarViewController.h; path = UIApp/controllers/RSSeasonPassCalendarViewController.h; sourceTree = "<group>"; };
+		EABE726A0DCFF2EC0013310F /* ProgramSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProgramSearchViewController.h; path = UIApp/controllers/ProgramSearchViewController.h; sourceTree = "<group>"; };
+		EABE726B0DCFF2EC0013310F /* ProgramSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProgramSearchViewController.m; path = UIApp/controllers/ProgramSearchViewController.m; sourceTree = "<group>"; };
+		EABE726D0DCFF3310013310F /* RSSeasonPassCalendarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSSeasonPassCalendarViewController.m; path = UIApp/controllers/RSSeasonPassCalendarViewController.m; sourceTree = "<group>"; };
 		EAC3529A0DCD355E00963287 /* RSRecordingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecordingAdditions.h; path = UIApp/RSRecordingAdditions.h; sourceTree = "<group>"; };
 		EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecordingAdditions.m; path = UIApp/RSRecordingAdditions.m; sourceTree = "<group>"; };
 		EAC352A50DCD368700963287 /* RSSourceListKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSSourceListKeys.h; path = UIApp/RSSourceListKeys.h; sourceTree = "<group>"; };
@@ -689,6 +692,10 @@
 		EABF0EC20CDE85D600DFFA0F /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				EABE726A0DCFF2EC0013310F /* ProgramSearchViewController.h */,
+				EABE726B0DCFF2EC0013310F /* ProgramSearchViewController.m */,
+				EABE72660DCFF1BC0013310F /* RSSeasonPassCalendarViewController.h */,
+				EABE726D0DCFF3310013310F /* RSSeasonPassCalendarViewController.m */,
 				EA2387190D5E5CF400343704 /* RSFirstRunWindowController.h */,
 				EA23871A0D5E5CF400343704 /* RSFirstRunWindowController.m */,
 				EA5FC2A30B73E20C00CCD5D5 /* ScheduleViewController.h */,
@@ -699,8 +706,6 @@
 				EA0674300B58084D009B0E27 /* MainWindowController.m */,
 				EA5FAEA50B6D75CE00CCD5D5 /* Preferences.h */,
 				EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */,
-				EA20BFB10B9661F8009EDC44 /* ProgramSearchViewController.h */,
-				EA20BFB20B9661F8009EDC44 /* ProgramSearchViewController.m */,
 				EA3090C20C6AB59E0005E89B /* RSWishlistController.h */,
 				EA3090C30C6AB59E0005E89B /* RSWishlistController.m */,
 				EAC8F79F0DCA99E100A289CD /* RSMigrationSheetController.h */,
@@ -992,7 +997,6 @@
 				EA5FAFD80B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m in Sources */,
 				EA5FBEAF0B724DB400CCD5D5 /* ScheduleGridView.m in Sources */,
 				EA5FC2A50B73E20C00CCD5D5 /* ScheduleViewController.m in Sources */,
-				EA20BFB30B9661F8009EDC44 /* ProgramSearchViewController.m in Sources */,
 				EA083E480BA77D47003C27FA /* Z2ITScheduleExtras.m in Sources */,
 				EA2EE0780C07D57A0002420F /* HDHomeRunMO.m in Sources */,
 				EA2EE1060C07DCC70002420F /* HDHomeRunTuner.m in Sources */,
@@ -1026,6 +1030,8 @@
 				EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */,
 				EAC3529C0DCD355E00963287 /* RSRecordingAdditions.m in Sources */,
 				EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */,
+				EABE726C0DCFF2EC0013310F /* ProgramSearchViewController.m in Sources */,
+				EABE726E0DCFF3310013310F /* RSSeasonPassCalendarViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
