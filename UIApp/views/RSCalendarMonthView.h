@@ -27,12 +27,16 @@
 
 @class RSSeasonPassCalendarViewController;
 
-@interface RSCalendarMonthView : NSView {
+@interface RSCalendarMonthView : NSControl {
 
   IBOutlet RSSeasonPassCalendarViewController *mCalendarController;
   
-  NSMutableAttributedString *monthHeaderString;
-  NSMutableAttributedString *daysHeaderString;
+  NSMutableAttributedString *mMonthHeaderString;
+  NSMutableAttributedString *mDaysHeaderString;
+  
+  NSCalendarDate *mDrawingStartDate;
+  int mNumOfRows;
+  NSMutableArray *mCalendarCells;
 }
 
 @end

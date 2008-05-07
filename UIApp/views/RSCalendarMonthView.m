@@ -29,6 +29,7 @@
 @interface RSCalendarMonthView (Private)
 
 - (void) updateMonthHeaderString;
+- (void) updateDrawingStartDate;
 
 @end
 
@@ -40,22 +41,23 @@
         // Initialization code here.
         [self setPostsFrameChangedNotifications:YES];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(frameDidChangeNotification:) name:NSViewFrameDidChangeNotification object:self];
-    }
     
-    NSFont *font = [NSFont fontWithName:@"Helvetica Neue" size:11.0];
-    NSColor *headerTextColor = [NSColor colorWithDeviceHue:0 saturation:0 brightness:98.0/255.0 alpha:1.0];
-    NSDictionary *attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, 
-                                     headerTextColor, NSForegroundColorAttributeName,
-                                     nil];
-    NSMutableString *daysHeaderText = [NSMutableString string];
-    NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
-    NSArray *daysOfWeek = [dateFormatter weekdaySymbols];
-    int i = 0;
-    for (i = 0; i < 7; i++)
-    {
-      [daysHeaderText appendFormat:@"\t%@", [daysOfWeek objectAtIndex:i]];
+        NSFont *font = [NSFont fontWithName:@"Helvetica Neue" size:11.0];
+        NSColor *headerTextColor = [NSColor colorWithDeviceHue:0 saturation:0 brightness:98.0/255.0 alpha:1.0];
+        NSDictionary *attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName, 
+                                         headerTextColor, NSForegroundColorAttributeName,
+                                         nil];
+        NSMutableString *daysHeaderText = [NSMutableString string];
+        NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+        NSArray *daysOfWeek = [dateFormatter weekdaySymbols];
+        int i = 0;
+        for (i = 0; i < 7; i++)
+        {
+          [daysHeaderText appendFormat:@"\t%@", [daysOfWeek objectAtIndex:i]];
+        }
+        mDaysHeaderString = [[NSMutableAttributedString alloc] initWithString:daysHeaderText attributes:attrsDictionary];
+        mNumOfRows = 5;
     }
-    daysHeaderString = [[NSMutableAttributedString alloc] initWithString:daysHeaderText attributes:attrsDictionary];
 
     return self;
 }
@@ -71,6 +73,23 @@
     [[NSColor whiteColor] setFill];
     [NSBezierPath fillRect:rect];
     
+    // Draw each cell starting at the top left and proceeding left->right, top->bottom
+    int col = 0;
+    int row = 0;
+    float cellHeight = (NSMaxY([self frame]) - 50.0)  / mNumOfRows;
+    float cellWidth = [self frame].size.width / 7.0;
+    NSRect cellRect = NSMakeRect(0, NSMaxY([self frame]) - cellHeight, cellWidth, cellHeight);
+    for (row = 0; row < mNumOfRows; row++)
+    {
+      cellRect.origin.y = (mNumOfRows-1 - row) * cellHeight;
+      for (col = 0; col < 7; col++)
+      {
+        cellRect.origin.x = col * cellWidth;
+        NSTextFieldCell *aCell = [mCalendarCells objectAtIndex:row * 7 + col];
+        [aCell drawWithFrame:cellRect inView:self];
+      }
+    }
+
     NSRect headerFrame = [self frame];
     headerFrame.size.height = 50;
     headerFrame.origin.y = NSMaxY([self frame]) - headerFrame.size.height;
@@ -104,12 +123,12 @@
     
     // Draw the row boundaries
     [aPath removeAllPoints];
-    for (i = 1; i < 5; i++)
+    for (i = 1; i < mNumOfRows; i++)
     {
       NSPoint left, right;
       left.x = NSMinX([self frame]);
       right.x = NSMaxX([self frame]);
-      left.y = right.y = floor((i * ([self frame].size.height - 50.0) / 5.0)) + 0.5;
+      left.y = right.y = floor((i * ([self frame].size.height - 50.0) / mNumOfRows)) + 0.5;
       [aPath moveToPoint:left];
       [aPath lineToPoint:right];
     }
@@ -118,16 +137,16 @@
     
     // Draw the Text across the top
     NSRect textFrame = headerFrame;
-    NSSize textSize = [monthHeaderString size];
+    NSSize textSize = [mMonthHeaderString size];
     textFrame.size.height = textSize.height;
     textFrame.origin.y += 20;
-    [monthHeaderString drawInRect:textFrame];
+    [mMonthHeaderString drawInRect:textFrame];
     
     textFrame = headerFrame;
-    textSize = [daysHeaderString size];
+    textSize = [mDaysHeaderString size];
     textFrame.size.height = textSize.height;
     textFrame.origin.y += 3;
-    [daysHeaderString drawInRect:textFrame];
+    [mDaysHeaderString drawInRect:textFrame];
 }
 
 #pragma KVO
@@ -140,6 +159,7 @@
   if ((object == mCalendarController) && ([keyPath isEqual:@"displayStartDate"]))
   {
     [self updateMonthHeaderString];
+    [self updateDrawingStartDate];
   }
   if ((object == mCalendarController) && ([keyPath isEqual:@"selectedDate"]))
   {
@@ -170,11 +190,11 @@
     }
 
     [paragraphStyle setTabStops:tabStopArray];
-    NSRange entireStringRange = NSMakeRange(0, [daysHeaderString length]);
-    [daysHeaderString beginEditing];
-    [daysHeaderString removeAttribute:NSParagraphStyleAttributeName range:entireStringRange];
-    [daysHeaderString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:entireStringRange];
-    [daysHeaderString endEditing];
+    NSRange entireStringRange = NSMakeRange(0, [mDaysHeaderString length]);
+    [mDaysHeaderString beginEditing];
+    [mDaysHeaderString removeAttribute:NSParagraphStyleAttributeName range:entireStringRange];
+    [mDaysHeaderString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:entireStringRange];
+    [mDaysHeaderString endEditing];
 }
 
 - (void) updateMonthHeaderString
@@ -190,10 +210,63 @@
                                      nil];
 
     NSAttributedString *monthString = [[[NSAttributedString alloc] initWithString:[mCalendarController.displayStartDate descriptionWithCalendarFormat:@"%B %Y"] attributes:attrsDictionary] autorelease];
-    [monthHeaderString release];
-    monthHeaderString = [monthString retain];
+    [mMonthHeaderString release];
+    mMonthHeaderString = [monthString retain];
 
     [self setNeedsDisplay:YES];
+}
+
+- (void) updateDrawingStartDate
+{
+  // The drawing start date is the date of the first sunday preceeding the displayStart date, eg.
+  // if the display start date is 05-01-08 (a Thursday) then the drawingStartDate is 04-27-08
+  
+  int dayOffset = [mCalendarController.displayStartDate dayOfWeek];
+  mDrawingStartDate = [mCalendarController.displayStartDate dateByAddingYears:0 months:0 days:-dayOffset hours:0 minutes:0 seconds:0];
+  
+  // If the dayOffset plus the number of days in the month is more than 35 (ie 5 weeks) then we need an extra row in the grid.
+  NSRange daysInMonth = [[NSCalendar currentCalendar] rangeOfUnit:NSDayCalendarUnit inUnit:NSMonthCalendarUnit forDate:mCalendarController.displayStartDate];
+  if (dayOffset + daysInMonth.length > 35)
+  {
+    mNumOfRows = 6;
+  }
+  else
+  {
+    mNumOfRows = 5;
+  }
+  
+  [mCalendarCells release];
+  mCalendarCells = [[NSMutableArray alloc] initWithCapacity:mNumOfRows * 7];
+  NSCalendarDate *aCellDate = [[mDrawingStartDate copy] autorelease];
+  NSCalendarDate *todaysDate = [NSCalendarDate calendarDate];
+  int i=0;
+  for (i=0; i < mNumOfRows * 7; i++)
+  {
+    NSTextFieldCell *aCell = [[NSTextFieldCell alloc] init];
+    NSString *dayLabel = [NSString stringWithFormat:@"%d", [aCellDate dayOfMonth]];
+    [aCell setStringValue:dayLabel];
+    [aCell setAlignment:NSRightTextAlignment];
+    [aCell setFont:[NSFont fontWithName:@"Helvetica Neue" size:12.0]];
+    if ([aCellDate monthOfYear] == [mCalendarController.displayStartDate monthOfYear])
+    {
+      [aCell setTextColor:[NSColor blackColor]];
+    }
+    else
+    {
+      [aCell setTextColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:153.0/255.0 alpha:1.0]];
+    }
+    
+    if (([aCellDate yearOfCommonEra] == [todaysDate yearOfCommonEra]) &&
+        ([aCellDate dayOfYear] == [todaysDate dayOfYear]))
+    {
+      [aCell setBackgroundColor:[NSColor colorWithDeviceRed:229.0/255.0 green:236.0/255.0 blue:247.0/255.0 alpha:1.0]];
+      [aCell setDrawsBackground:YES];
+    }
+    [mCalendarCells addObject:aCell];
+    [aCell release];
+    aCellDate = [aCellDate dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
+  }
+  [self setNeedsDisplay:YES];
 }
 
 @end
