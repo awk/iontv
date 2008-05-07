@@ -42,7 +42,6 @@ enum {
 {
   self = [super init];
   if (self != nil) {
-      [self addObserver:self forKeyPath:@"displayStartDate" options:0 context:nil];
       [self addObserver:self forKeyPath:@"selectedDate" options:0 context:nil];
       self.selectedDate = [NSCalendarDate calendarDate];
       if (![NSBundle loadNibNamed:@"SeasonPassCalendarView" owner:self])
@@ -66,7 +65,6 @@ enum {
   [mCalendarContainerView addSubview:mWeekView];
   
   [mMonthView setFrameSize:[mCalendarContainerView frame].size];
-  
   self.displayingMonths = YES;
 }
 
@@ -99,9 +97,9 @@ enum {
   {
     self.displayingWeeks = NO;
     self.displayStartDate = [self.selectedDate dateByAddingYears:0 months:0 days:-([self.selectedDate dayOfMonth]-1) hours:0 minutes:0 seconds:0];
+    [mViewSegmentedControl selectSegmentWithTag:kMonthCellTag];
   }
   displayingMonths = displayMonths;
-  [mViewSegmentedControl setSelected:displayMonths forSegment:kMonthCellTag];
   [mMonthView setHidden:!displayMonths];
 }
 
@@ -171,10 +169,6 @@ enum {
 			change:(NSDictionary *)change
 			context:(void *)context
 {
-  if ((object == self) && ([keyPath isEqual:@"displayStartDate"]))
-  {
-    NSLog(@"displayStartDate changed => %@", self.displayStartDate);
-  }
   if ((object == self) && ([keyPath isEqual:@"selectedDate"]))
   {
     NSLog(@"selectedDate changed => %@", self.selectedDate);
