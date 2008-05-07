@@ -191,8 +191,6 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   RSSeasonPass *aSeasonPass = (RSSeasonPass*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
   if (aSeasonPass)
   {
-//    [self setCurrentSchedule:aRecording.schedule];
-    NSLog(@"seasonPassSelected: %@", aSeasonPass);
     [mScheduleContainerView setHidden:YES];
     mProgramSearchViewController.searchViewHidden = YES;
     mSeasonPassCalendarViewController.seasonPassCalendarViewHidden = NO;
@@ -492,7 +490,6 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	{
 		if ([[mViewSelectionTreeController selection] valueForKey:RSSourceListActionMessageNameKey] != NSNoSelectionMarker)
 		{
-			NSLog(@"Show view selection for %@", [[mViewSelectionTreeController selection] valueForKey:RSSourceListLabelKey]);
 			SEL actionSelector = NSSelectorFromString([[mViewSelectionTreeController selection] valueForKey:RSSourceListActionMessageNameKey]);
 			if ([self respondsToSelector:actionSelector])
 				[self performSelector:actionSelector withObject:[mViewSelectionTreeController selection]];
