@@ -25,6 +25,7 @@
 
 #import "RSCalendarMonthView.h"
 #import "RSSeasonPassCalendarViewController.h"
+#import "RSSeasonPassCalendarCell.h"
 
 @interface RSCalendarMonthView (Private)
 
@@ -68,6 +69,20 @@
   [mCalendarController addObserver:self forKeyPath:@"selectedDate" options:0 context:nil];
 }
 
+- (void) setDelegate:(id)delegate
+{
+  if (delegate != mDelegate)
+  {
+    [mDelegate release];
+    mDelegate = [delegate retain];
+  }
+}
+
+- (id) delegate
+{
+  return mDelegate;
+}
+
 - (void)drawRect:(NSRect)rect {
     // Fill with white background
     [[NSColor whiteColor] setFill];
@@ -85,7 +100,7 @@
       for (col = 0; col < 7; col++)
       {
         cellRect.origin.x = col * cellWidth;
-        NSTextFieldCell *aCell = [mCalendarCells objectAtIndex:row * 7 + col];
+        RSSeasonPassCalendarCell *aCell = [mCalendarCells objectAtIndex:row * 7 + col];
         [aCell drawWithFrame:cellRect inView:self];
       }
     }
@@ -163,7 +178,6 @@
   }
   if ((object == mCalendarController) && ([keyPath isEqual:@"selectedDate"]))
   {
-    NSLog(@"selectedDate changed => %@", mCalendarController.selectedDate);
     [self setNeedsDisplay:YES];
   }
 }
@@ -242,7 +256,7 @@
   int i=0;
   for (i=0; i < mNumOfRows * 7; i++)
   {
-    NSTextFieldCell *aCell = [[NSTextFieldCell alloc] init];
+    RSSeasonPassCalendarCell *aCell = [[RSSeasonPassCalendarCell alloc] init];
     NSString *dayLabel = [NSString stringWithFormat:@"%d", [aCellDate dayOfMonth]];
     [aCell setStringValue:dayLabel];
     [aCell setAlignment:NSRightTextAlignment];
@@ -261,6 +275,11 @@
     {
       [aCell setBackgroundColor:[NSColor colorWithDeviceRed:229.0/255.0 green:236.0/255.0 blue:247.0/255.0 alpha:1.0]];
       [aCell setDrawsBackground:YES];
+    }
+    
+    if ([mDelegate respondsToSelector:@selector(calendarMonthView: eventListForDate:)])
+    {
+      [aCell setScheduleList:[mDelegate calendarMonthView:self eventListForDate:aCellDate]];
     }
     [mCalendarCells addObject:aCell];
     [aCell release];

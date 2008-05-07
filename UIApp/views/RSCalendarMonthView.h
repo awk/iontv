@@ -37,6 +37,17 @@
   NSCalendarDate *mDrawingStartDate;
   int mNumOfRows;
   NSMutableArray *mCalendarCells;
+  
+  IBOutlet id  mDelegate;
 }
+
+- (void) setDelegate:(id)delegate;
+- (id) delegate;
+
+@end
+
+@interface NSObject(RSCalendarMonthViewDelegate)
+
+- (NSArray*) calendarMonthView:(RSCalendarMonthView*)calendarMonthView eventListForDate:(NSCalendarDate*)date;
 
 @end

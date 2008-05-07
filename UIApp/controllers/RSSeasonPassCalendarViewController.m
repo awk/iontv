@@ -24,6 +24,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "RSSeasonPassCalendarViewController.h"
+#import "RSCalendarMonthView.h"
 
 @interface RSSeasonPassCalendarViewController (Private)
 
@@ -42,7 +43,6 @@ enum {
 {
   self = [super init];
   if (self != nil) {
-      [self addObserver:self forKeyPath:@"selectedDate" options:0 context:nil];
       self.selectedDate = [NSCalendarDate calendarDate];
       if (![NSBundle loadNibNamed:@"SeasonPassCalendarView" owner:self])
       {
@@ -162,20 +162,37 @@ enum {
   }
 }
 
-#pragma KVO
-
-- (void)observeValueForKeyPath:(NSString *)keyPath
-			ofObject:(id)object 
-			change:(NSDictionary *)change
-			context:(void *)context
-{
-  if ((object == self) && ([keyPath isEqual:@"selectedDate"]))
-  {
-    NSLog(@"selectedDate changed => %@", self.selectedDate);
-  }
-}
-
 @synthesize displayStartDate;
 @synthesize selectedDate;
+
+#pragma mark CalendarView Delegate Methods
+
+- (NSArray*) calendarMonthView:(RSCalendarMonthView*)calendarMonthView eventListForDate:(NSCalendarDate*)date
+{
+  if ([[NSApp delegate] managedObjectContext] == nil)
+  {
+    return nil;
+  }
+  
+  NSCalendarDate *beginningOfDay = [date dateByAddingYears:0 months:0 days:0 hours:-[date hourOfDay] minutes:-[date minuteOfHour] seconds:-[date secondOfMinute]];
+  NSCalendarDate *endOfDay = [beginningOfDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+   
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.time >= %@ and schedule.time < %@", beginningOfDay, endOfDay];
+  [request setPredicate:predicate];
+  
+  NSError *error = nil;
+  NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
+  if ([array count] > 0)
+  {
+    return [array autorelease];
+  }
+  else
+  {
+    return nil;
+  }
+}
 
 @end
