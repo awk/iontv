@@ -53,6 +53,10 @@
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.endTime > %@ and status == %@", aDate, [NSNumber numberWithInt:status]];
   [request setPredicate:predicate];
   
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:YES];
+  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+  [sortDescriptor release];
+
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
   return array;
@@ -67,6 +71,10 @@
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.time < %@", [NSDate dateWithTimeIntervalSinceNow:0]];
   [request setPredicate:predicate];
   
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:NO];
+  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+  [sortDescriptor release];
+
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
   return array;
