@@ -1,0 +1,4 @@
+# Ignore the Mac .DS_Store files
+.DS_Store
+*.mode1v3
+*.pbxuser
