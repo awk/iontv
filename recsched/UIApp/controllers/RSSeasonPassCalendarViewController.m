@@ -65,7 +65,8 @@ enum {
   [mCalendarContainerView addSubview:mWeekView];
   
   [mMonthView setFrameSize:[mCalendarContainerView frame].size];
-  self.displayingMonths = YES;
+  [mWeekView setFrameSize:[mCalendarContainerView frame].size];
+  self.displayingWeeks = YES;
 }
 
 #pragma mark View Handling
