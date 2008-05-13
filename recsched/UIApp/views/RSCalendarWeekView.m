@@ -18,6 +18,8 @@ const float kHeaderHeight = 24.0;
 - (void) updateTabStopPositions;
 - (void) frameDidChangeNotification:(NSNotification*)aNotification;
 - (void) scrollerChanged:(id)sender;
+
+- (void) drawHourRowsInRect:(NSRect) rect;
 @end
 
 
@@ -35,13 +37,13 @@ const float kHeaderHeight = 24.0;
         scrollerFrame.size.width = [NSScroller scrollerWidth];
         scrollerFrame.size.height -= kHeaderHeight;
         scrollerFrame.origin.x = NSMaxX(frame) - scrollerFrame.size.width;
-        NSScroller *vertScroller = [[NSScroller alloc] initWithFrame:scrollerFrame];
-        [self addSubview:vertScroller];
-        [vertScroller setFloatValue:0.0 knobProportion:0.5];
-        [vertScroller setAutoresizingMask:NSViewMinXMargin | NSViewHeightSizable];
-        [vertScroller setEnabled:YES];
-        [vertScroller setAction:@selector(scrollerChanged:)];
-        [vertScroller setTarget:self];
+        mVertScroller = [[NSScroller alloc] initWithFrame:scrollerFrame];
+        [self addSubview:mVertScroller];
+        [mVertScroller setFloatValue:0.0 knobProportion:0.5];
+        [mVertScroller setAutoresizingMask:NSViewMinXMargin | NSViewHeightSizable];
+        [mVertScroller setEnabled:YES];
+        [mVertScroller setAction:@selector(scrollerChanged:)];
+        [mVertScroller setTarget:self];
     }
 
     return self;
@@ -106,6 +108,8 @@ const float kHeaderHeight = 24.0;
     textFrame.size.height = textSize.height;
     textFrame.origin.y += 3;
     [mDaysHeaderString drawInRect:textFrame];
+    
+    [self drawHourRowsInRect:rect];
 }
 
 #pragma KVO
@@ -271,10 +275,10 @@ const float kHeaderHeight = 24.0;
   switch ([sender hitPart])
   {
     case NSScrollerIncrementLine:
-      scrollerValue += 1.0 / 96.0 /* 24 hours, 4 segments per hour */;
+      scrollerValue += 1.0 / 48.0 /* 12 hours, 4 segments per hour */;
       break;
     case NSScrollerDecrementLine:
-      scrollerValue -= 1.0 / 96.0 /* 24 hours, 4 segments per hour */;
+      scrollerValue -= 1.0 / 48.0 /* 12 hours, 4 segments per hour */;
       break;
     case NSScrollerIncrementPage:
       scrollerValue = 1.0;
@@ -286,5 +290,94 @@ const float kHeaderHeight = 24.0;
       break;
   }
   [sender setFloatValue:scrollerValue];
+  [self setNeedsDisplay:YES];
 }
+
+#pragma mark Drawing Methods
+
+- (void) drawHourRowsInRect:(NSRect) rect
+{
+  NSBezierPath *aPath = [[[NSBezierPath alloc] init] autorelease];
+  int i = 0;
+  
+  int hoursValue = floor([mVertScroller floatValue] * 12.0) + 12.0;
+  NSColor *headerTextColor = [NSColor colorWithDeviceHue:0 saturation:0 brightness:0 alpha:1.0];
+  NSFont *font = [NSFont fontWithName:@"Helvetica Neue" size:11.0];
+  NSColor *textColor = [NSColor colorWithDeviceHue:0 saturation:0 brightness:132.0/255.0 alpha:1.0];
+  NSMutableDictionary *attrsDictionary = [NSMutableDictionary dictionaryWithObjectsAndKeys:headerTextColor, NSForegroundColorAttributeName,
+                                                                                           font, NSFontAttributeName,
+                                                                                           textColor, NSForegroundColorAttributeName,
+                                                                                           nil];
+    
+  // We need to calculate the offset of the horizontal lines due to the position of the scroll bar
+  // The scroll bar increments at a rate of 1/48 (4 parts per hour, 12 hours per page). So the initial offset of the first line is a portion of 
+  // the height of 1 hour.
+  float hourHeight = (NSMaxY([self frame]) - kHeaderHeight) / 12.0;
+  float unused;
+  float vertMotionOffset = modff([mVertScroller floatValue] * 12.0, &unused) * hourHeight;
+  // Draw 12 horizontal lines down the page (one for each hour)
+  [aPath removeAllPoints];
+  for (i=0; i < 12; i++)
+  {
+    NSPoint left, right;
+    left.y = right.y = floor((i * hourHeight) + vertMotionOffset) + 0.5;
+    left.x = NSMinX([self frame]) + kHoursColumnWidth;
+    right.x = NSMaxX([self frame]);
+    if (left.y < (NSMaxY([self frame]) - kHeaderHeight))
+    {
+      [aPath moveToPoint:left];
+      [aPath lineToPoint:right];
+    }
+    NSString *timeString = nil;
+    if (hoursValue == 12)
+    {
+      timeString = [NSString stringWithFormat:@"NOON"];
+    }
+    else if (hoursValue < 12)
+    {
+      timeString = [NSString stringWithFormat:@"%d AM", hoursValue];
+    }
+    else if (hoursValue > 12)
+    {
+      timeString = [NSString stringWithFormat:@"%d PM", hoursValue - 12];
+    }
+    if (timeString)
+    {
+      NSPoint textOrigin = NSMakePoint(NSMinX([self frame]), left.y);
+      NSRect textRect = [timeString boundingRectWithSize:NSMakeSize(kHoursColumnWidth, [self frame].size.height)
+                                                 options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesDeviceMetrics
+                                              attributes:attrsDictionary];
+      textRect.origin.y = textOrigin.y - textRect.size.height / 2.0;
+      textRect.origin.x = kHoursColumnWidth - textRect.size.width - 8;
+      if ((NSMinY(textRect) > NSMinY([self frame])) && (NSMaxY(textRect) < NSMaxY([self frame]) - kHeaderHeight))
+      {
+        [timeString drawInRect:textRect withAttributes:attrsDictionary];
+      }
+    }
+    hoursValue--;
+  }
+  [[NSColor colorWithDeviceHue:0 saturation:0 brightness:204.0/255.0 alpha:1.0] setStroke];
+  [aPath setLineWidth:1.0];
+  [aPath stroke];
+
+  
+  // Draw 12 horizontal lines down the page (one for each  1/2 hour)
+  [aPath removeAllPoints];
+  for (i=0; i < 12; i++)
+  {
+    NSPoint left, right;
+    left.y = right.y = floor((i * hourHeight) + (0.5 * hourHeight) + vertMotionOffset) + 0.5;
+    left.x = NSMinX([self frame]) + kHoursColumnWidth;
+    right.x = NSMaxX([self frame]);
+    if (left.y < (NSMaxY([self frame]) - kHeaderHeight))
+    {
+      [aPath moveToPoint:left];
+      [aPath lineToPoint:right];
+    }
+  }
+  [[NSColor colorWithDeviceHue:0 saturation:0 brightness:229.0/255.0 alpha:1.0] setStroke];
+  [aPath setLineWidth:1.0];
+  [aPath stroke];
+}
+
 @end

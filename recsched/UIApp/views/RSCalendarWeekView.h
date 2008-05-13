@@ -17,6 +17,7 @@
   NSMutableAttributedString *mDaysHeaderString;
   
   NSCalendarDate *mDrawingStartDate;
+  NSScroller *mVertScroller;
 }
 
 @end
