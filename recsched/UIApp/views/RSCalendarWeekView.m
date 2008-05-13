@@ -8,6 +8,8 @@
 
 #import "RSCalendarWeekView.h"
 #import "RSSeasonPassCalendarViewController.h"
+#import "RSRecording.h"
+#import "Z2ITSchedule.h"
 
 const float kHoursColumnWidth = 50.0;
 const float kHeaderHeight = 24.0;
@@ -16,10 +18,12 @@ const float kHeaderHeight = 24.0;
 
 - (void) updateDrawingStartDate;
 - (void) updateTabStopPositions;
+- (void) updateRecordingEvents;
 - (void) frameDidChangeNotification:(NSNotification*)aNotification;
 - (void) scrollerChanged:(id)sender;
 
 - (void) drawHourRowsInRect:(NSRect) rect;
+- (void) drawEventsInRect:(NSRect) rect;
 @end
 
 
@@ -110,6 +114,7 @@ const float kHeaderHeight = 24.0;
     [mDaysHeaderString drawInRect:textFrame];
     
     [self drawHourRowsInRect:rect];
+    [self drawEventsInRect:rect];
 }
 
 #pragma KVO
@@ -121,6 +126,7 @@ const float kHeaderHeight = 24.0;
 {
   if ((object == mCalendarController) && ([keyPath isEqual:@"displayStartDate"]))
   {
+    [self updateRecordingEvents];
     [self updateDrawingStartDate];
     [self updateTabStopPositions];
   }
@@ -293,6 +299,33 @@ const float kHeaderHeight = 24.0;
   [self setNeedsDisplay:YES];
 }
 
+- (void) updateRecordingEvents
+{
+  if ([[NSApp delegate] managedObjectContext] == nil)
+  {
+    return; // No Moc to get events from
+  }
+
+  [mEventsPerDay release];
+  mEventsPerDay = [[NSMutableArray alloc] initWithCapacity:7];
+
+  NSCalendarDate *aDay = [mCalendarController.displayStartDate dateByAddingYears:0
+                                                                          months:0
+                                                                            days:-[mCalendarController.displayStartDate dayOfWeek]
+                                                                           hours:-[mCalendarController.displayStartDate hourOfDay]
+                                                                         minutes:-[mCalendarController.displayStartDate minuteOfHour]
+                                                                         seconds:-[mCalendarController.displayStartDate secondOfMinute]];
+  int i=0;
+  for (i = 0; i < 7; i++)
+  {
+    NSCalendarDate *endOfDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
+    NSArray *recordings = [RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate] managedObjectContext] afterDate:aDay beforeDate:endOfDay];
+    [mEventsPerDay addObject:recordings];
+    aDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
+  }
+  [self setNeedsDisplay:YES];
+}
+
 #pragma mark Drawing Methods
 
 - (void) drawHourRowsInRect:(NSRect) rect
@@ -380,4 +413,53 @@ const float kHeaderHeight = 24.0;
   [aPath stroke];
 }
 
+- (void) drawEventsInRect:(NSRect) rect
+{
+  int i=0;
+  NSCalendarDate *aDay = [mCalendarController.displayStartDate dateByAddingYears:0
+                                                                          months:0
+                                                                            days:-[mCalendarController.displayStartDate dayOfWeek]
+                                                                           hours:-[mCalendarController.displayStartDate hourOfDay]
+                                                                         minutes:-[mCalendarController.displayStartDate minuteOfHour]
+                                                                         seconds:-[mCalendarController.displayStartDate secondOfMinute]];
+
+  [[NSGraphicsContext currentContext] saveGraphicsState];
+  [NSBezierPath clipRect:NSMakeRect(NSMinX([self frame]) + kHoursColumnWidth, NSMinY([self frame]), [self frame].size.width - [NSScroller scrollerWidth], [self frame].size.height - kHeaderHeight)]; 
+  for (i=0; i < 7; i++)
+  {
+    NSCalendarDate *endOfDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
+    for (RSRecording *aRecording in [mEventsPerDay objectAtIndex:i])
+    {
+      NSDate *eventStartTime = aRecording.schedule.time;
+      NSDate *eventEndTime = aRecording.schedule.endTime;
+
+      // Clamp events to be within the days time boundaries
+      if ([eventStartTime laterDate:aDay] == aDay)
+      {
+        eventStartTime = aDay;
+      }
+      if ([eventEndTime laterDate:endOfDay] == eventEndTime)
+      {
+        eventEndTime = endOfDay;
+      }
+
+      // Calculate the display rect size and position for the event
+      NSRect scheduleFrameRect;
+      NSTimeInterval eventDurationInSeconds = [eventEndTime timeIntervalSinceDate:eventStartTime];
+      scheduleFrameRect.size.height = (([self frame].size.height - kHeaderHeight) / (12.0 * 60.0 * 60.0) * eventDurationInSeconds);
+      scheduleFrameRect.size.width = ([self frame].size.width - kHoursColumnWidth - [NSScroller scrollerWidth]) / 7;
+      scheduleFrameRect.origin.x = kHoursColumnWidth + i * (([self frame].size.width - kHoursColumnWidth - [NSScroller scrollerWidth]) / 7);
+
+      // We draw 'up' from the events end time. We must also take into account the height of the page and the offset for the bottom of the page.
+      NSDate *timeAtBottomOfPage = [aDay addTimeInterval:(12.0 * 60.0 * 60.0) + (12.0 * 60.0 * 60.0 * [mVertScroller floatValue])];
+      NSTimeInterval timeIntervalFromBottomOfPage = [timeAtBottomOfPage timeIntervalSinceDate:eventEndTime];
+
+      scheduleFrameRect.origin.y = ([self frame].size.height - kHeaderHeight) / (12.0 * 60.0 * 60.0) * timeIntervalFromBottomOfPage;
+
+      [NSBezierPath fillRect:scheduleFrameRect];
+    }
+    aDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
+  }
+  [[NSGraphicsContext currentContext] restoreGraphicsState];
+}
 @end

@@ -18,6 +18,7 @@
   
   NSCalendarDate *mDrawingStartDate;
   NSScroller *mVertScroller;
+  NSMutableArray *mEventsPerDay;
 }
 
 @end
