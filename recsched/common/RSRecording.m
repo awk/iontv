@@ -68,7 +68,25 @@
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
    
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.time < %@", [NSDate dateWithTimeIntervalSinceNow:0]];
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.time < %@", aDate];
+  [request setPredicate:predicate];
+  
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:NO];
+  [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
+  [sortDescriptor release];
+
+  NSError *error = nil;
+  NSArray *array = [inMOC executeFetchRequest:request error:&error];
+  return array;
+}
+
++ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)afterDate beforeDate:(NSDate*)beforeDate
+{
+  NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:inMOC];
+  NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
+  [request setEntity:entityDescription];
+   
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(schedule.time < %@ AND schedule.time > %@) OR (schedule.endTime < %@ AND schedule.endTime > %@)", beforeDate, afterDate, beforeDate, afterDate];
   [request setPredicate:predicate];
   
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:NO];
