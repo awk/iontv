@@ -113,6 +113,7 @@
 		EABE730A0DD0D8DF0013310F /* RSCalendarMonthView.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE73090DD0D8DF0013310F /* RSCalendarMonthView.m */; };
 		EABE74D00DD156640013310F /* RSSeasonPassCalendarCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE74CF0DD156640013310F /* RSSeasonPassCalendarCell.m */; };
 		EABE76400DD3AD900013310F /* RSCalendarWeekView.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE763F0DD3AD900013310F /* RSCalendarWeekView.m */; };
+		EABE7A290DDB19A30013310F /* RSScheduleCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE7A280DDB19A30013310F /* RSScheduleCell.m */; };
 		EAC3529C0DCD355E00963287 /* RSRecordingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */; };
 		EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */; };
 		EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */; };
@@ -367,6 +368,8 @@
 		EABE74CF0DD156640013310F /* RSSeasonPassCalendarCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSSeasonPassCalendarCell.m; path = UIApp/views/RSSeasonPassCalendarCell.m; sourceTree = "<group>"; };
 		EABE763E0DD3AD900013310F /* RSCalendarWeekView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSCalendarWeekView.h; path = UIApp/views/RSCalendarWeekView.h; sourceTree = "<group>"; };
 		EABE763F0DD3AD900013310F /* RSCalendarWeekView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSCalendarWeekView.m; path = UIApp/views/RSCalendarWeekView.m; sourceTree = "<group>"; };
+		EABE7A270DDB19A30013310F /* RSScheduleCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSScheduleCell.h; path = UIApp/views/RSScheduleCell.h; sourceTree = "<group>"; };
+		EABE7A280DDB19A30013310F /* RSScheduleCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSScheduleCell.m; path = UIApp/views/RSScheduleCell.m; sourceTree = "<group>"; };
 		EAC3529A0DCD355E00963287 /* RSRecordingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecordingAdditions.h; path = UIApp/RSRecordingAdditions.h; sourceTree = "<group>"; };
 		EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecordingAdditions.m; path = UIApp/RSRecordingAdditions.m; sourceTree = "<group>"; };
 		EAC352A50DCD368700963287 /* RSSourceListKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSSourceListKeys.h; path = UIApp/RSSourceListKeys.h; sourceTree = "<group>"; };
@@ -800,6 +803,8 @@
 				EABE74CF0DD156640013310F /* RSSeasonPassCalendarCell.m */,
 				EABE763E0DD3AD900013310F /* RSCalendarWeekView.h */,
 				EABE763F0DD3AD900013310F /* RSCalendarWeekView.m */,
+				EABE7A270DDB19A30013310F /* RSScheduleCell.h */,
+				EABE7A280DDB19A30013310F /* RSScheduleCell.m */,
 			);
 			name = "View & UI Classes";
 			sourceTree = "<group>";
@@ -1054,6 +1059,7 @@
 				EABE730A0DD0D8DF0013310F /* RSCalendarMonthView.m in Sources */,
 				EABE74D00DD156640013310F /* RSSeasonPassCalendarCell.m in Sources */,
 				EABE76400DD3AD900013310F /* RSCalendarWeekView.m in Sources */,
+				EABE7A290DDB19A30013310F /* RSScheduleCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
