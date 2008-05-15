@@ -9,6 +9,8 @@
 #import "RSCalendarWeekView.h"
 #import "RSSeasonPassCalendarViewController.h"
 #import "RSRecording.h"
+#import "RSScheduleCell.h"
+#import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 
 const float kHoursColumnWidth = 50.0;
@@ -26,7 +28,9 @@ const float kHeaderHeight = 24.0;
 - (void) drawEventsInRect:(NSRect) rect;
 @end
 
-
+NSString *kEventsArrayRecordingsKey = @"eventsArrayRecordingsKey";
+NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
+ 
 @implementation RSCalendarWeekView
 
 - (id)initWithFrame:(NSRect)frame {
@@ -320,7 +324,18 @@ const float kHeaderHeight = 24.0;
   {
     NSCalendarDate *endOfDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
     NSArray *recordings = [RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate] managedObjectContext] afterDate:aDay beforeDate:endOfDay];
-    [mEventsPerDay addObject:recordings];
+    NSMutableArray *scheduleCells = [NSMutableArray arrayWithCapacity:[recordings count]];
+    for (RSRecording *aRecording in recordings)
+    {
+      RSScheduleCell *aScheduleCell = [[RSScheduleCell alloc] initTextCell:@"--"];
+      [aScheduleCell setBordered:YES];
+      [aScheduleCell setRepresentedObject:aRecording.schedule];
+      [aScheduleCell setStringValue:aRecording.schedule.program.title];
+      [scheduleCells addObject:aScheduleCell];
+      [aScheduleCell release];
+    }
+    NSDictionary *cellsAndRecordingsDict = [NSDictionary dictionaryWithObjectsAndKeys:recordings, kEventsArrayRecordingsKey, scheduleCells, kEventsArrayCellsKey, nil];
+    [mEventsPerDay addObject:cellsAndRecordingsDict];
     aDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
   }
   [self setNeedsDisplay:YES];
@@ -415,7 +430,7 @@ const float kHeaderHeight = 24.0;
 
 - (void) drawEventsInRect:(NSRect) rect
 {
-  int i=0;
+  int dayIndex=0;
   NSCalendarDate *aDay = [mCalendarController.displayStartDate dateByAddingYears:0
                                                                           months:0
                                                                             days:-[mCalendarController.displayStartDate dayOfWeek]
@@ -425,11 +440,16 @@ const float kHeaderHeight = 24.0;
 
   [[NSGraphicsContext currentContext] saveGraphicsState];
   [NSBezierPath clipRect:NSMakeRect(NSMinX([self frame]) + kHoursColumnWidth, NSMinY([self frame]), [self frame].size.width - [NSScroller scrollerWidth], [self frame].size.height - kHeaderHeight)]; 
-  for (i=0; i < 7; i++)
+  for (dayIndex = 0; dayIndex < 7; dayIndex++)
   {
     NSCalendarDate *endOfDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
-    for (RSRecording *aRecording in [mEventsPerDay objectAtIndex:i])
+    NSArray *recordings = [[mEventsPerDay objectAtIndex:dayIndex] valueForKey:kEventsArrayRecordingsKey];
+    NSArray *cells = [[mEventsPerDay objectAtIndex:dayIndex] valueForKey:kEventsArrayCellsKey];
+    int recordingIndex;
+    for (recordingIndex=0; recordingIndex < [recordings count]; recordingIndex++)
     {
+      RSRecording *aRecording = [recordings objectAtIndex:recordingIndex];
+      RSScheduleCell *aScheduleCell = [cells objectAtIndex:recordingIndex];
       NSDate *eventStartTime = aRecording.schedule.time;
       NSDate *eventEndTime = aRecording.schedule.endTime;
 
@@ -448,7 +468,7 @@ const float kHeaderHeight = 24.0;
       NSTimeInterval eventDurationInSeconds = [eventEndTime timeIntervalSinceDate:eventStartTime];
       scheduleFrameRect.size.height = (([self frame].size.height - kHeaderHeight) / (12.0 * 60.0 * 60.0) * eventDurationInSeconds);
       scheduleFrameRect.size.width = ([self frame].size.width - kHoursColumnWidth - [NSScroller scrollerWidth]) / 7;
-      scheduleFrameRect.origin.x = kHoursColumnWidth + i * (([self frame].size.width - kHoursColumnWidth - [NSScroller scrollerWidth]) / 7);
+      scheduleFrameRect.origin.x = kHoursColumnWidth + dayIndex * (([self frame].size.width - kHoursColumnWidth - [NSScroller scrollerWidth]) / 7);
 
       // We draw 'up' from the events end time. We must also take into account the height of the page and the offset for the bottom of the page.
       NSDate *timeAtBottomOfPage = [aDay addTimeInterval:(12.0 * 60.0 * 60.0) + (12.0 * 60.0 * 60.0 * [mVertScroller floatValue])];
@@ -456,7 +476,8 @@ const float kHeaderHeight = 24.0;
 
       scheduleFrameRect.origin.y = ([self frame].size.height - kHeaderHeight) / (12.0 * 60.0 * 60.0) * timeIntervalFromBottomOfPage;
 
-      [NSBezierPath fillRect:scheduleFrameRect];
+//      [NSBezierPath fillRect:scheduleFrameRect];
+        [aScheduleCell drawWithFrame:scheduleFrameRect inView:self];
     }
     aDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
   }
