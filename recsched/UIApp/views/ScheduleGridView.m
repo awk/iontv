@@ -557,7 +557,7 @@ const float kScheduleDetailsPopUpTime = 3.0;
 
   for (id loopItem in mSchedulesInLineArray)
   {
-    RSScheduleCell *aTextCell = [[RSScheduleCell alloc] initTextCell:@"--"];
+    RSScheduleGridCell *aTextCell = [[RSScheduleGridCell alloc] initTextCell:@"--"];
     [aTextCell setBordered:YES];
     [aTextCell setRepresentedObject:loopItem];
     [aTextCell setStringValue:[[loopItem program] title]];
