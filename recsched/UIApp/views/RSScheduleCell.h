@@ -34,3 +34,14 @@
 - (NSImage*) cellImageWithFrame:(NSRect)inFrame inView:(NSView*)inView;
 @end
 
+@interface RSScheduleGridCell : RSScheduleCell
+{
+}
+
+@end
+
+@interface RSScheduleCalendarCell : RSScheduleCell
+{
+}
+
+@end

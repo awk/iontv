@@ -11,6 +11,13 @@
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 
+@interface RSScheduleCell(Private)
+
+- (NSRect) textRectForCellFrame:(NSRect)cellFrame;
+- (void) drawRecordingDotWithFrame:(NSRect)cellFrame inView:(NSView*)conrolView;
+
+@end
+
 @implementation RSScheduleCell
 
 static NSGradient *sScheduleCellSharedGradient = nil;
@@ -36,7 +43,7 @@ static NSGradient *sScheduleCellSharedGradient = nil;
 	if (cellFrame.size.width < 20)
 		return;		// No point trying to draw in something so small
 		
-	NSRect textRect = NSInsetRect(cellFrame, 4, 2);
+	NSRect textRect = [self textRectForCellFrame:cellFrame];
 	
 	NSTextStorage *textStorage = [[[NSTextStorage alloc] initWithString:[self stringValue]] autorelease];
 	NSTextContainer *textContainer = [[[NSTextContainer alloc] initWithContainerSize: textRect.size] autorelease];
@@ -59,26 +66,7 @@ static NSGradient *sScheduleCellSharedGradient = nil;
 		[textStorage setForegroundColor:[NSColor blackColor]];
 	}
 	
-        Z2ITSchedule *aSchedule = [self representedObject];
-        if (aSchedule.recording != nil)
-        {
-          // Draw a small red dot inset from the bottom corner of the schedule rect to indicate that this program
-          // has or will be recorded.
-          NSRect recordingRectBounds = NSMakeRect(0, 0, 7, 7);
-          recordingRectBounds.origin.x = NSMaxX(textRect) - recordingRectBounds.size.width - 3;
-          recordingRectBounds.origin.y = NSMaxY(textRect) - recordingRectBounds.size.height - 3;
-          NSBezierPath *recordingDot = [NSBezierPath bezierPathWithOvalInRect:recordingRectBounds];
-          [NSGraphicsContext saveGraphicsState];
-          NSShadow *aShadow = [[NSShadow alloc] init];
-          [aShadow setShadowOffset:NSMakeSize(2.0, -2.0)];
-          [aShadow setShadowBlurRadius:3.0f];
-          [aShadow setShadowColor:[NSColor blackColor]];
-          [aShadow set];
-          [[NSColor redColor] set];
-          [recordingDot fill];
-          [aShadow release];
-          [NSGraphicsContext restoreGraphicsState];
-        }
+        [self drawRecordingDotWithFrame:cellFrame inView:controlView];
 	[layoutManager drawGlyphsForGlyphRange: glyphRange atPoint: textRect.origin];
 }
 
@@ -154,14 +142,6 @@ static NSGradient *sScheduleCellSharedGradient = nil;
 			[[genreColor darkerColorBy:0.40] set];
 			[framePath stroke];
 		}
-
-//		if ([self isHighlighted])
-//		{
-//			[[self highlightColorWithFrame:cellFrame inView:controlView] set];
-//			[framePath setLineWidth:3];
-//  		[framePath stroke];
-//		}
-
 	}
 	
 	[self drawInteriorWithFrame:insetCellFrame inView:controlView];
@@ -204,3 +184,53 @@ static NSGradient *sScheduleCellSharedGradient = nil;
 
 @end
 
+@implementation RSScheduleCell(Private)
+
+- (NSRect) textRectForCellFrame:(NSRect)cellFrame
+{
+  return NSInsetRect(cellFrame, 4, 2);
+}
+
+- (void) drawRecordingDotWithFrame:(NSRect)cellFrame inView:(NSView*)conrolView
+{
+  // Implemented by subclasses
+}
+
+@end
+
+#pragma mark - RSScheduleGridCell
+
+@implementation RSScheduleGridCell
+
+- (void) drawRecordingDotWithFrame:(NSRect)cellFrame inView:(NSView*)conrolView
+{
+  Z2ITSchedule *aSchedule = [self representedObject];
+  if (aSchedule.recording != nil)
+  {
+    // Draw a small red dot inset from the bottom corner of the schedule rect to indicate that this program
+    // has or will be recorded.
+    NSRect textRect = [self textRectForCellFrame:cellFrame];
+    NSRect recordingRectBounds = NSMakeRect(0, 0, 7, 7);
+    recordingRectBounds.origin.x = NSMaxX(textRect) - recordingRectBounds.size.width - 3;
+    recordingRectBounds.origin.y = NSMaxY(textRect) - recordingRectBounds.size.height - 3;
+    NSBezierPath *recordingDot = [NSBezierPath bezierPathWithOvalInRect:recordingRectBounds];
+    [NSGraphicsContext saveGraphicsState];
+    NSShadow *aShadow = [[NSShadow alloc] init];
+    [aShadow setShadowOffset:NSMakeSize(2.0, -2.0)];
+    [aShadow setShadowBlurRadius:3.0f];
+    [aShadow setShadowColor:[NSColor blackColor]];
+    [aShadow set];
+    [[NSColor redColor] set];
+    [recordingDot fill];
+    [aShadow release];
+    [NSGraphicsContext restoreGraphicsState];
+  }
+}
+
+@end
+
+#pragma mark - RSScheduleCalendarCell
+
+@implementation RSScheduleCalendarCell
+
+@end
