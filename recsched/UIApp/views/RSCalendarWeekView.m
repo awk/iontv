@@ -15,6 +15,9 @@
 
 const float kHoursColumnWidth = 50.0;
 const float kHeaderHeight = 24.0;
+const float kHoursPerPage = 6.0;
+const float kHoursPerDay = 24.0;
+const float kSegmentsPerHour = 4.0;
 
 @interface RSCalendarWeekView(Private)
 
@@ -47,7 +50,7 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
         scrollerFrame.origin.x = NSMaxX(frame) - scrollerFrame.size.width;
         mVertScroller = [[NSScroller alloc] initWithFrame:scrollerFrame];
         [self addSubview:mVertScroller];
-        [mVertScroller setFloatValue:0.0 knobProportion:0.5];
+        [mVertScroller setFloatValue:0.0 knobProportion:kHoursPerPage / kHoursPerDay];
         [mVertScroller setAutoresizingMask:NSViewMinXMargin | NSViewHeightSizable];
         [mVertScroller setEnabled:YES];
         [mVertScroller setAction:@selector(scrollerChanged:)];
@@ -285,16 +288,16 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
   switch ([sender hitPart])
   {
     case NSScrollerIncrementLine:
-      scrollerValue += 1.0 / 48.0 /* 12 hours, 4 segments per hour */;
+      scrollerValue += 1.0 / ((kHoursPerDay - kHoursPerPage) * kSegmentsPerHour);
       break;
     case NSScrollerDecrementLine:
-      scrollerValue -= 1.0 / 48.0 /* 12 hours, 4 segments per hour */;
+      scrollerValue -= 1.0 / ((kHoursPerDay - kHoursPerPage) * kSegmentsPerHour);
       break;
     case NSScrollerIncrementPage:
-      scrollerValue = 1.0;
+      scrollerValue += kHoursPerPage / (kHoursPerDay - kHoursPerPage);
       break;
     case NSScrollerDecrementPage:
-      scrollerValue = 0.0;
+      scrollerValue -= kHoursPerPage / (kHoursPerDay - kHoursPerPage);
       break;
     default:
       break;
@@ -327,10 +330,11 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
     NSMutableArray *scheduleCells = [NSMutableArray arrayWithCapacity:[recordings count]];
     for (RSRecording *aRecording in recordings)
     {
-      RSScheduleCell *aScheduleCell = [[RSScheduleCell alloc] initTextCell:@"--"];
+      RSScheduleCalendarCell *aScheduleCell = [[RSScheduleCalendarCell alloc] initTextCell:@"--"];
       [aScheduleCell setBordered:YES];
       [aScheduleCell setRepresentedObject:aRecording.schedule];
       [aScheduleCell setStringValue:aRecording.schedule.program.title];
+      [aScheduleCell setFont:[NSFont fontWithName:@"Helvetica Neue" size:11.0]];
       [scheduleCells addObject:aScheduleCell];
       [aScheduleCell release];
     }
@@ -348,7 +352,7 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
   NSBezierPath *aPath = [[[NSBezierPath alloc] init] autorelease];
   int i = 0;
   
-  int hoursValue = floor([mVertScroller floatValue] * 12.0) + 12.0;
+  int hoursValue = floor([mVertScroller floatValue] * (kHoursPerDay - kHoursPerPage)) + kHoursPerPage;
   NSColor *headerTextColor = [NSColor colorWithDeviceHue:0 saturation:0 brightness:0 alpha:1.0];
   NSFont *font = [NSFont fontWithName:@"Helvetica Neue" size:11.0];
   NSColor *textColor = [NSColor colorWithDeviceHue:0 saturation:0 brightness:132.0/255.0 alpha:1.0];
@@ -358,14 +362,14 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
                                                                                            nil];
     
   // We need to calculate the offset of the horizontal lines due to the position of the scroll bar
-  // The scroll bar increments at a rate of 1/48 (4 parts per hour, 12 hours per page). So the initial offset of the first line is a portion of 
-  // the height of 1 hour.
-  float hourHeight = (NSMaxY([self frame]) - kHeaderHeight) / 12.0;
+  // The scroll bar increments so that each 'line' (in NSScrollbar terms) is 1/kSegmentsPerHour of an hours.
+  // So the initial offset of the first line is a portion of the height of 1 hour.
+  float hourHeight = (NSMaxY([self frame]) - kHeaderHeight) / kHoursPerPage;
   float unused;
-  float vertMotionOffset = modff([mVertScroller floatValue] * 12.0, &unused) * hourHeight;
-  // Draw 12 horizontal lines down the page (one for each hour)
+  float vertMotionOffset = modff([mVertScroller floatValue] * (kHoursPerDay - kHoursPerPage), &unused) * hourHeight;
+  // Draw kHoursPerPage horizontal lines down the page (one for each hour)
   [aPath removeAllPoints];
-  for (i=0; i < 12; i++)
+  for (i=0; i < kHoursPerPage; i++)
   {
     NSPoint left, right;
     left.y = right.y = floor((i * hourHeight) + vertMotionOffset) + 0.5;
@@ -409,9 +413,9 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
   [aPath stroke];
 
   
-  // Draw 12 horizontal lines down the page (one for each  1/2 hour)
+  // Draw kHoursPerPage horizontal lines down the page (one for each  1/2 hour)
   [aPath removeAllPoints];
-  for (i=0; i < 12; i++)
+  for (i=0; i < kHoursPerPage; i++)
   {
     NSPoint left, right;
     left.y = right.y = floor((i * hourHeight) + (0.5 * hourHeight) + vertMotionOffset) + 0.5;
@@ -449,7 +453,7 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
     for (recordingIndex=0; recordingIndex < [recordings count]; recordingIndex++)
     {
       RSRecording *aRecording = [recordings objectAtIndex:recordingIndex];
-      RSScheduleCell *aScheduleCell = [cells objectAtIndex:recordingIndex];
+      RSScheduleCalendarCell *aScheduleCell = [cells objectAtIndex:recordingIndex];
       NSDate *eventStartTime = aRecording.schedule.time;
       NSDate *eventEndTime = aRecording.schedule.endTime;
 
@@ -466,18 +470,17 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
       // Calculate the display rect size and position for the event
       NSRect scheduleFrameRect;
       NSTimeInterval eventDurationInSeconds = [eventEndTime timeIntervalSinceDate:eventStartTime];
-      scheduleFrameRect.size.height = (([self frame].size.height - kHeaderHeight) / (12.0 * 60.0 * 60.0) * eventDurationInSeconds);
+      scheduleFrameRect.size.height = (([self frame].size.height - kHeaderHeight) / (kHoursPerPage * 60.0 * 60.0) * eventDurationInSeconds);
       scheduleFrameRect.size.width = ([self frame].size.width - kHoursColumnWidth - [NSScroller scrollerWidth]) / 7;
       scheduleFrameRect.origin.x = kHoursColumnWidth + dayIndex * (([self frame].size.width - kHoursColumnWidth - [NSScroller scrollerWidth]) / 7);
 
       // We draw 'up' from the events end time. We must also take into account the height of the page and the offset for the bottom of the page.
-      NSDate *timeAtBottomOfPage = [aDay addTimeInterval:(12.0 * 60.0 * 60.0) + (12.0 * 60.0 * 60.0 * [mVertScroller floatValue])];
+      NSDate *timeAtBottomOfPage = [aDay addTimeInterval:(kHoursPerPage * 60.0 * 60.0) + ((kHoursPerDay - kHoursPerPage) * 60.0 * 60.0 * [mVertScroller floatValue])];
       NSTimeInterval timeIntervalFromBottomOfPage = [timeAtBottomOfPage timeIntervalSinceDate:eventEndTime];
 
-      scheduleFrameRect.origin.y = ([self frame].size.height - kHeaderHeight) / (12.0 * 60.0 * 60.0) * timeIntervalFromBottomOfPage;
+      scheduleFrameRect.origin.y = ([self frame].size.height - kHeaderHeight) / (kHoursPerPage * 60.0 * 60.0) * timeIntervalFromBottomOfPage;
 
-//      [NSBezierPath fillRect:scheduleFrameRect];
-        [aScheduleCell drawWithFrame:scheduleFrameRect inView:self];
+      [aScheduleCell drawWithFrame:scheduleFrameRect inView:self];
     }
     aDay = [aDay dateByAddingYears:0 months:0 days:1 hours:0 minutes:0 seconds:0];
   }
