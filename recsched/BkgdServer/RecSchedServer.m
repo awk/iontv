@@ -50,9 +50,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 @end
 
 @interface RecSchedServer(Private)
-- (RSRecording *) addRecordingOfSchedule:(Z2ITSchedule*)schedule error:(NSError**)error;
+- (RSRecording *) addRecordingOfSchedule:(Z2ITSchedule*)schedule addConflictsTo:(NSMutableArray*)conflicts;
 - (void)cancelRecording:(RSRecording*)aRecording;
-- (NSArray*)scheduleFutureRecordingsForSeasonPass:(RSSeasonPass*)aSeasonPass error:(NSError**)error;
+- (BOOL)scheduleFutureRecordingsForSeasonPass:(RSSeasonPass*)aSeasonPass addNewRecordingsTo:(NSMutableArray*)recordings error:(NSError**)error;
+- (void) createRecordingsForAllSeasonPasses;
 @end
 
 @implementation RecSchedServer
@@ -112,10 +113,10 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
       for (RSRecording *aRecording in aTuner.recordings)
       {
         if (([aRecording.status intValue] == RSRecordingNotYetStartedStatus) && ([aRecording.schedule.endTime compare:[NSDate date]] == NSOrderedDescending))
-				{
-					aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
+        {
+          aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
           [aQueue addRecording:aRecording];
-				}
+        }
       }
     }
 }
@@ -410,25 +411,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   [[NSFileManager defaultManager] removeItemAtPath:scheduleUpdatedPath error:nil];
   [[NSFileManager defaultManager] createFileAtPath:scheduleUpdatedPath contents:nil attributes:nil];
 
-  // We need to schedule the future recordings for any season passes we have too
-  NSError *error = nil;
-  NSArray *seasonPasses = [RSSeasonPass fetchSeasonPasses];
-  NSMutableArray *allNewRecordings = [NSMutableArray array];
-  for (RSSeasonPass *aSeasonPass in seasonPasses)
-  {
-    NSArray *newRecordings = [self scheduleFutureRecordingsForSeasonPass:aSeasonPass error:&error];
-    [allNewRecordings addObjectsFromArray:newRecordings];
-  }
-
-  if (![[[NSApp delegate] managedObjectContext] save:&error])
-  {
-    NSLog(@"scheduleUpdateCompleteNotification - error occured during save %@", error);
-  }
-  else
-  {
-    NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:allNewRecordings, RSRecordingAddedRecordingsURIKey, nil];
-    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSRecordingAddedNotification object:RSBackgroundApplication userInfo:info];
-  }
+  [self createRecordingsForAllSeasonPasses];
+  
   // Cleanup any stale data in the database
   [self performCleanup:[aNotification userInfo]];
 }
@@ -544,7 +528,22 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   RSRecording *aRecording = nil;
   if (mySchedule)
   {
-    aRecording = [self addRecordingOfSchedule:mySchedule error:error];
+    NSMutableArray *conflicts = [NSMutableArray array];
+    aRecording = [self addRecordingOfSchedule:mySchedule addConflictsTo:conflicts];
+    if (!aRecording)
+    {
+      // Add the list of conflicts to the error object
+      if (error != nil)
+      {
+        NSString *descriptionStr = [NSString stringWithFormat:@"The recording of %@, cannot be scheduled because it conflicts with %d other program%@",
+                                    mySchedule.program.title, [conflicts count], [conflicts count] > 1 ? @"s." : @"."];
+        NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                               conflicts, @"conflictingSchedules",
+                               descriptionStr, NSLocalizedDescriptionKey,
+                               nil];
+        *error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
+      }
+    }
     if (![[[NSApp delegate] managedObjectContext] save:error])
     {
       NSLog(@"addRecordingOfSchedule - error occured during save %@", *error);
@@ -594,19 +593,22 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   Z2ITProgram *myProgram = nil;
   myProgram = (Z2ITProgram*) [[[NSApp delegate] managedObjectContext] objectWithID:programObjectID];
   Z2ITStation *myStation = nil;
-	myStation = (Z2ITStation*) [[[NSApp delegate] managedObjectContext] objectWithID:stationObjectID];
-	
+  myStation = (Z2ITStation*) [[[NSApp delegate] managedObjectContext] objectWithID:stationObjectID];
+  BOOL successful = NO;
+  
   if (myProgram && myStation)
   {
     NSLog(@"addSeasonPassForSchedule");
     NSLog(@"  My Program title = %@, series ID = %@ channel = %@", myProgram.title, myProgram.series, myStation.callSign);
     RSSeasonPass *aSeasonPass = [RSSeasonPass insertSeasonPassForProgram:myProgram onStation:myStation];
 
-    NSArray *newRecordings = [self scheduleFutureRecordingsForSeasonPass:aSeasonPass error:error];
-    if (![[[NSApp delegate] managedObjectContext] save:error])
+    NSMutableArray *newRecordings = [NSMutableArray array];
+    successful = [self scheduleFutureRecordingsForSeasonPass:aSeasonPass addNewRecordingsTo:newRecordings error:error];
+    NSError *saveError;
+    if (![[[NSApp delegate] managedObjectContext] save:&saveError])
     {
-      NSLog(@"addSeasonPassForProgramWithObjectID - error occured during save %@", *error);
-      return NO;
+      NSLog(@"addSeasonPassForProgramWithObjectID - error occured during save %@", saveError);
+      successful = NO;
     }
     else
     {
@@ -617,7 +619,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
       [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSSeasonPassAddedNotification object:RSBackgroundApplication userInfo:info];
     }
   }
-  return YES;
+  return successful;
 }
 
 - (BOOL) deleteSeasonPassWithObjectID:(NSManagedObjectID*)seasonPassObjectID error:(NSError**)error
@@ -860,7 +862,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 
 @implementation RecSchedServer(Private)
 
-- (RSRecording *) addRecordingOfSchedule:(Z2ITSchedule*)schedule error:(NSError**)error
+- (RSRecording *) addRecordingOfSchedule:(Z2ITSchedule*)schedule addConflictsTo:(NSMutableArray*)conflicts
 {
   NSLog(@"addRecordingOfSchedule");
   NSLog(@"  My Program title = %@, My Schedule start time = %@ channel = %@, %s", schedule.program.title, schedule.time, schedule.station.callSign, 
@@ -922,16 +924,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     else
     {
       // No recording created - probably because of overlaps - we should construct an appropriate error object to return.
-      if (error != nil)
-      {
-        NSString *descriptionStr = [NSString stringWithFormat:@"The recording of %@, cannot be scheduled because it conflicts with %d other program%@",
-                                    schedule.program.title, [conflictingSchedules count], [conflictingSchedules count] > 1 ? @"s." : @"."];
-        NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               conflictingSchedules, @"conflictingSchedules",
-                               descriptionStr, NSLocalizedDescriptionKey,
-                               nil];
-        *error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
-      }
+      [conflicts addObjectsFromArray:conflictingSchedules];
       return nil;
     }
   }
@@ -956,25 +949,64 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
   [[[NSApp delegate] managedObjectContext] deleteObject:aRecording];
 }
 
-- (NSArray*)scheduleFutureRecordingsForSeasonPass:(RSSeasonPass*)aSeasonPass error:(NSError**)error
+- (BOOL)scheduleFutureRecordingsForSeasonPass:(RSSeasonPass*)aSeasonPass addNewRecordingsTo:(NSMutableArray*)newRecordings error:(NSError**)error
 {
   NSArray *futureSchedules = [aSeasonPass fetchFutureSchedules];
-  NSMutableArray *newRecordings = [NSMutableArray arrayWithCapacity:[futureSchedules count]];
   
   NSLog(@"scheduleFutureRecordings for %@ - %@", aSeasonPass.title, aSeasonPass.station.callSign);
   
+  NSMutableArray *conflicts = [NSMutableArray array];
   for (Z2ITSchedule *aSchedule in futureSchedules)
   {
     RSRecording *aRecording = nil;
     NSLog(@"    %@ - %@ at %@", aSchedule.program.title, aSchedule.program.subTitle, aSchedule.time);
-    aRecording = [self addRecordingOfSchedule:aSchedule error:error];
+    aRecording = [self addRecordingOfSchedule:aSchedule addConflictsTo:conflicts];
     if (aRecording)
     {
       [aSeasonPass addRecordingsObject:aRecording];
       [newRecordings addObject:[[[aRecording objectID] URIRepresentation] absoluteString]];
     }
   }
-  return newRecordings;
+
+  if ([conflicts count] > 0)
+  {
+    // Handle reporting conflicts
+    if (error != nil)
+    {
+      NSString *descriptionStr = [NSString stringWithFormat:@"A complete season pass of %@, cannot be scheduled because it conflicts with %d other program%@",
+                                  aSeasonPass.title, [conflicts count], [conflicts count] > 1 ? @"s." : @"."];
+      NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                             conflicts, @"conflictingSchedules",
+                             descriptionStr, NSLocalizedDescriptionKey,
+                             nil];
+      *error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
+    }
+  }
+  return ([conflicts count] == 0);
+}
+
+- (void) createRecordingsForAllSeasonPasses
+{
+  // We need to schedule the future recordings for any season passes we have too
+  NSError *error = nil;
+  NSArray *seasonPasses = [RSSeasonPass fetchSeasonPasses];
+  NSMutableArray *allNewRecordings = [NSMutableArray array];
+  for (RSSeasonPass *aSeasonPass in seasonPasses)
+  {
+    NSMutableArray *newRecordings = [NSMutableArray array];
+    [self scheduleFutureRecordingsForSeasonPass:aSeasonPass addNewRecordingsTo:newRecordings error:&error];
+    [allNewRecordings addObjectsFromArray:newRecordings];
+  }
+
+  if (![[[NSApp delegate] managedObjectContext] save:&error])
+  {
+    NSLog(@"scheduleUpdateCompleteNotification - error occured during save %@", error);
+  }
+  else
+  {
+    NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:allNewRecordings, RSRecordingAddedRecordingsURIKey, nil];
+    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSRecordingAddedNotification object:RSBackgroundApplication userInfo:info];
+  }
 }
 
 @end
