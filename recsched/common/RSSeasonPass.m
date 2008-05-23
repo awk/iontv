@@ -61,7 +61,7 @@
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
 	
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(program.series == %@) AND (station == %@)", self.series, self.station];
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(program.series == %@) AND (station == %@) AND (time > %@)", self.series, self.station, [NSDate date]];
   [request setPredicate:predicate];
 	
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
