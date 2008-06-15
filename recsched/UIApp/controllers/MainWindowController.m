@@ -23,6 +23,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#import "HDHomeRunChannelStationMap.h"
 #import "MainWindowController.h"
 #import "ScheduleView.h"
 #import "Preferences.h"
@@ -432,7 +433,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	HDHomeRunStation *aHDHRStation;
 	for (aHDHRStation in hdhrStations)
 	{
-		if (([aHDHRStation z2itStation] == aStation) && ([[[aHDHRStation channel] tuner] lineup] == aLineup))
+		if ((aHDHRStation.z2itStation == aStation) && (aHDHRStation.channel.channelStationMap.lineup == aLineup))
 		{
 			[[[NSApplication sharedApplication] delegate] launchVLCAction:sender withParentWindow:[self window] startStreaming:aHDHRStation];
 			break;

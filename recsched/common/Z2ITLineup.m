@@ -94,6 +94,7 @@
 @dynamic type;
 @dynamic userLineupName;
 @dynamic lineupMaps;
+@dynamic channelStationMap;
 @dynamic tuners;
 
 @end

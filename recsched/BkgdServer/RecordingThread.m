@@ -21,13 +21,14 @@
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
+#import "HDHomeRunChannelStationMap.h"
 #import "HDHomeRunTuner.h"
 #import "RecSchedServer.h"
 #import "RSActivityDisplayProtocol.h"
 #import "RSRecording.h"
 #import "PreferenceKeys.h"
 
-#define RECORDING_DISABLED 0
+#define RECORDING_DISABLED 1
 
 @implementation RecordingThreadController
 
@@ -88,7 +89,7 @@
 #if RECORDING_DISABLED
 - (void) beginRecording
 {
-  NSLog(@"beginRecording - timer fired for schedule %@ program title %@", mThreadRecording, mThreadRecording.schedule.program.title);
+  NSLog(@"beginRecording - timer fired for schedule start %@ end %@, program title %@", mThreadRecording.schedule.time, mThreadRecording.schedule.endTime, mThreadRecording.schedule.program.title);
   
   Z2ITStation *aStation = mThreadRecording.schedule.station;
   NSSet *hdhrStations = [aStation hdhrStations];
@@ -100,7 +101,7 @@
   
   HDHomeRunStation *anHDHRStation = [hdhrStations anyObject];
 
-  NSLog(@"Recording on HDHRStation %@", anHDHRStation);
+  NSLog(@"Recording on HDHRStation %@.%@ - %@", anHDHRStation.channel.channelNumber, anHDHRStation.programNumber, anHDHRStation.z2itStation.callSign);
 
   mFinishRecording = NO;
   
@@ -148,7 +149,7 @@
 	activityToken = [[mRecSchedServer uiActivity] createActivity];
   
 	activityToken = [[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
-		[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.tuner.lineup],
+		[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.channelStationMap.lineup],
 		anHDHRStation.z2itStation.callSign]];
   }
   
@@ -218,7 +219,7 @@
 				activityToken = [[mRecSchedServer uiActivity] createActivity];
 
 				activityToken = [[mRecSchedServer uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Recording %@ on %@ - %@", mThreadRecording.schedule.program.title, 
-					[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.tuner.lineup],
+					[anHDHRStation.z2itStation channelStringForLineup:anHDHRStation.channel.channelStationMap.lineup],
 					anHDHRStation.z2itStation.callSign]];
 			}
 

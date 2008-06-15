@@ -20,6 +20,7 @@
 #import "Z2ITLineupMap.h"
 #import "Z2ITLineup.h"
 #import "Z2ITProgram.h"
+#import "HDHomeRunChannelStationMap.h"
 #import "HDHomeRunTuner.h"
 
 @implementation Z2ITStation
@@ -110,7 +111,7 @@
 		HDHomeRunStation *aStation;
 		while (((aStation = [anEnumerator nextObject]) != nil) && (validTuner == NO))
 		{
-			if ([[[aStation channel] tuner] lineup] == aLineup)
+			if (aStation.channel.channelStationMap.lineup == aLineup)
 			{
 				validTuner = YES;
 			}

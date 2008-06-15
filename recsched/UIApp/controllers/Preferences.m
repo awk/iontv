@@ -27,6 +27,7 @@
 #import "Preferences.h"
 #import "PreferenceKeys.h"
 #import "hdhomerun.h"
+#import "HDHomeRunChannelStationMap.h"
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
 #import "recsched_AppDelegate.h"
@@ -109,7 +110,7 @@ static void addToolbarItem(NSMutableDictionary *theDict,NSString *identifier,NSS
 @interface Preferences(Private)
 - (void) showPrefsView:(NSView*)inViewToBeShown;
 - (void) sendTunerDetailsWithStations:(BOOL)sendStations;
-- (void) selectedTunerDidChange:(HDHomeRunTuner*)newTuner;
+- (void) selectedLineupDidChange:(Z2ITLineup*)newLineup;
 @end
 
 @implementation Preferences
@@ -303,7 +304,7 @@ static Preferences *sSharedInstance = nil;
 	[aColorCell setAction: @selector (colorClickAction:)];		// when the color well is clicked on
 	[[[mColorsTable tableColumns] objectAtIndex:1] setDataCell: aColorCell];					// sets the columns cell to the color well cell
 
-    [mHDHomeRunTunersArrayController addObserver:self forKeyPath:@"selection" options:0 context:nil];
+    [mLineupsArrayController addObserver:self forKeyPath:@"selectionIndex" options:0 context:nil];
 }
 
 - (void)showPanel:(id)sender
@@ -405,10 +406,10 @@ static Preferences *sSharedInstance = nil;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
-    if ((object == mHDHomeRunTunersArrayController) && ([keyPath isEqual:@"selection"]))
+    if ((object == mLineupsArrayController) && ([keyPath isEqual:@"selectionIndex"]))
     {
-      HDHomeRunTuner *newTuner = [[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0];
-      [self selectedTunerDidChange:newTuner];
+      Z2ITLineup *newLineup = [[mLineupsArrayController selectedObjects] objectAtIndex:0];
+      [self selectedLineupDidChange:newLineup];
     }
     if ((object == [NSUserDefaultsController sharedUserDefaultsController]) && ([keyPath isEqual:@"values.scheduleDownloadDuration"]))
     {
@@ -418,24 +419,20 @@ static Preferences *sSharedInstance = nil;
 
 - (void) sendTunerDetailsWithStations:(BOOL)sendStations
 {
-      // Walk the list of HDHomeRunDevices and send the details to the server
-      NSArray *hdhomerunDevices = [mHDHomeRunDevicesArrayController arrangedObjects];
-      for (HDHomeRun *anHDHomeRunDevice in hdhomerunDevices)
-      {
-              [[[NSApp delegate] recServer] setHDHomeRunDeviceWithID:[anHDHomeRunDevice deviceID]
-                      nameTo:[anHDHomeRunDevice name]
-                      tuner0LineupIDTo:[[[anHDHomeRunDevice tuner0] lineup] lineupID]
-                      tuner1LineupIDTo:[[[anHDHomeRunDevice tuner1] lineup] lineupID]];
+  // Walk the list of HDHomeRunDevices and send the details to the server
+  NSArray *hdhomerunDevices = [mHDHomeRunDevicesArrayController arrangedObjects];
+  for (HDHomeRun *anHDHomeRunDevice in hdhomerunDevices)
+  {
+    [[[NSApp delegate] recServer] setHDHomeRunDeviceWithID:[anHDHomeRunDevice deviceID] nameTo:[anHDHomeRunDevice name]];
 
-              NSArray *tuners = [[anHDHomeRunDevice tuners] allObjects];
-              if (sendStations == YES)
-              {
-                for (HDHomeRunTuner *aTuner in tuners)
-                {
-                        [aTuner pushHDHomeRunStationsToServer];
-                }
-              }
-      }
+    int tunerIndex = 0;
+    for (tunerIndex = 0; tunerIndex < 2; tunerIndex++)
+    {
+      [[[NSApp delegate] recServer] setHDHomeRunLineup:[[[anHDHomeRunDevice tunerWithIndex:tunerIndex] lineup] objectID]
+                                                          onDeviceID:[[anHDHomeRunDevice deviceID] intValue]
+                                                       forTunerIndex:tunerIndex];
+    }
+  }
 }
 
 - (void) savePrefs:(id)sender
@@ -496,10 +493,10 @@ static Preferences *sSharedInstance = nil;
   return sortDescriptors;
 }
 
-- (void) selectedTunerDidChange:(HDHomeRunTuner*)newTuner
+- (void) selectedLineupDidChange:(Z2ITLineup*)newLineup
 {
-      NSMutableArray *stationsOnTuner = [NSMutableArray arrayWithCapacity:[[newTuner channels] count] * 3];   // Start with 3 stations per channel
-      for (HDHomeRunChannel *aChannel in [newTuner channels])
+      NSMutableArray *stationsOnTuner = [NSMutableArray arrayWithCapacity:[newLineup.channelStationMap.channels count] * 3];   // Start with 3 stations per channel
+      for (HDHomeRunChannel *aChannel in newLineup.channelStationMap.channels)
       {
         [stationsOnTuner addObjectsFromArray:[[aChannel stations] allObjects]];
       }
@@ -729,7 +726,8 @@ static Preferences *sSharedInstance = nil;
 
         if ([[mHDHomeRunTunersArrayController selectedObjects] count] >0)
         {
-          [self selectedTunerDidChange:[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0]];
+//          [self selectedTunerDidChange:[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0]];
+          NSLog(@"channelScanCOmpletedNotification - changed lineup/channelStationMap ?");
         }
 	mChannelScanInProgress = NO;
 	[mScanChannelsButton setEnabled:YES];
@@ -777,8 +775,9 @@ static Preferences *sSharedInstance = nil;
 	NSURL *importURL = (NSURL*)contextInfo;
 	if (returnCode == NSAlertDefaultReturn)
 	{
-		[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] importChannelMapFrom:importURL];
-		[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] pushHDHomeRunStationsToServer];
+//		[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] importChannelMapFrom:importURL];
+//		[[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] pushHDHomeRunStationsToServer];
+          NSLog(@"Need to call importChannelMapFrom ?");
 	}
 	[importURL release];	// Copied in the file open panel did end delegate
 }

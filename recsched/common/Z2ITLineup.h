@@ -18,7 +18,7 @@
 #import <CoreData/CoreData.h>
 
 @class Z2ITLineupMap;
-@class HDHomeRunTuner;
+@class HDHomeRunChannelStationMap;
 
 @interface Z2ITLineup : NSManagedObject {
 
@@ -41,6 +41,7 @@
 @property (retain) NSString * type;
 @property (retain) NSString * userLineupName;
 @property (retain) NSSet* lineupMaps;
+@property (retain) HDHomeRunChannelStationMap * channelStationMap;
 @property (retain) NSSet* tuners;
 
 @end
@@ -51,10 +52,5 @@
 - (void)removeLineupMapsObject:(Z2ITLineupMap *)value;
 - (void)addLineupMaps:(NSSet *)value;
 - (void)removeLineupMaps:(NSSet *)value;
-
-- (void)addTunersObject:(HDHomeRunTuner *)value;
-- (void)removeTunersObject:(HDHomeRunTuner *)value;
-- (void)addTuners:(NSSet *)value;
-- (void)removeTuners:(NSSet *)value;
 
 @end

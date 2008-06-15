@@ -11,6 +11,7 @@
 #import "PreferenceKeys.h"
 #import "RecSchedProtocol.h"
 #import "recsched_AppDelegate.h"
+#import "HDHomeRunChannelStationMap.h"
 #import "HDHomeRunTuner.h"
 #import "HDHomeRunMO.h"
 #import "Z2ITLineup.h"
@@ -142,7 +143,10 @@ const NSInteger kFinishedTabViewIndex = 4;
   if (scanLineupSelection)
   {
     if (!scanningTuner)
-      scanningTuner = [scanLineupSelection.tuners anyObject];
+    {
+//      scanningTuner = [scanLineupSelection.channelStationMap.tuners anyObject];
+        NSLog(@"Implement - Need to set scanning tuner? - or Channel Map ?");
+    }
   }
   
   if (scanningTuner)
@@ -181,16 +185,17 @@ const NSInteger kFinishedTabViewIndex = 4;
 
 - (IBAction) channelListFinish:(id)sender
 {
+  NSLog(@"Implement - channelListFinish - what to do ??");
   if (scanningTuner)
   {
-    for (HDHomeRunTuner *aTuner in scanLineupSelection.tuners)
-    {
-      if (aTuner != scanningTuner)
-      {
-        [aTuner copyChannelsAndStationsFrom:scanningTuner];
-      }
-      [aTuner pushHDHomeRunStationsToServer];
-    }
+//    for (HDHomeRunTuner *aTuner in scanLineupSelection.tuners)
+//    {
+//      if (aTuner != scanningTuner)
+//      {
+//        [aTuner copyChannelsAndStationsFrom:scanningTuner];
+//      }
+//      [aTuner pushHDHomeRunStationsToServer];
+//    }
     scanningTuner = nil;
   }
   
@@ -315,22 +320,23 @@ const NSInteger kFinishedTabViewIndex = 4;
   
   if (scanResult > 0)
   {
-    NSManagedObjectContext *moc = [self.scanLineupSelection managedObjectContext];
-    NSTimeInterval currentStalenessInterval = [moc stalenessInterval];
-    [moc setStalenessInterval:0];
-
-    // Refresh the local tuners list channels and stations from the store
-    [[scanningTuner managedObjectContext] refreshObject:scanningTuner mergeChanges:NO];
-    
-    NSMutableArray *stationsOnTuner = [NSMutableArray arrayWithCapacity:[[scanningTuner channels] count] * 3];   // Start with 3 stations per channel
-    for (HDHomeRunChannel *aChannel in [scanningTuner channels])
-    {
-      [stationsOnTuner addObjectsFromArray:[[aChannel stations] allObjects]];
-    }
-    [mHDHRStationsOnLineupController setContent:stationsOnTuner];
-
-    [moc setStalenessInterval:currentStalenessInterval];
-    
+    NSLog(@"Implement - Channel Scan finished - scanResult = %d", scanResult);
+//    NSManagedObjectContext *moc = [self.scanLineupSelection managedObjectContext];
+//    NSTimeInterval currentStalenessInterval = [moc stalenessInterval];
+//    [moc setStalenessInterval:0];
+//
+//    // Refresh the local tuners list channels and stations from the store
+//    [[scanningTuner managedObjectContext] refreshObject:scanningTuner mergeChanges:NO];
+//    
+//    NSMutableArray *stationsOnTuner = [NSMutableArray arrayWithCapacity:[[scanningTuner channels] count] * 3];   // Start with 3 stations per channel
+//    for (HDHomeRunChannel *aChannel in [scanningTuner channels])
+//    {
+//      [stationsOnTuner addObjectsFromArray:[[aChannel stations] allObjects]];
+//    }
+//    [mHDHRStationsOnLineupController setContent:stationsOnTuner];
+//
+//    [moc setStalenessInterval:currentStalenessInterval];
+//    
     [self resetChannelScanControls];
     [mTabView selectTabViewItemAtIndex:kChannelListTabViewIndex];
   }
@@ -468,19 +474,19 @@ const NSInteger kFinishedTabViewIndex = 4;
   [mTabView selectTabViewItemAtIndex:kStartChannelScanTabViewIndex];
   
   // Count the number of lineups in use
-  NSMutableArray *lineupsInUseArray = [NSMutableArray arrayWithCapacity:5];
+  NSMutableArray *channelStationMapsInUseArray = [NSMutableArray arrayWithCapacity:5];
   for (HDHomeRun *aHDHomeRun in [mDevicesArrayController arrangedObjects])
   {
     for (HDHomeRunTuner *aTuner in aHDHomeRun.tuners)
     {
-      if (![lineupsInUseArray containsObject:aTuner.lineup])
+      if (![channelStationMapsInUseArray containsObject:aTuner.lineup.channelStationMap])
       {
-        [lineupsInUseArray addObject:aTuner.lineup];
+        [channelStationMapsInUseArray addObject:aTuner.lineup.channelStationMap];
       }
     }
   }
-  self.scanLineupSelection = [lineupsInUseArray objectAtIndex:0];
-  if ([lineupsInUseArray count] == 1)
+  self.scanLineupSelection = [channelStationMapsInUseArray objectAtIndex:0];
+  if ([channelStationMapsInUseArray count] == 1)
   {
     [mChannelScanLineupSelectionPopupButton setEnabled:NO];
   }
@@ -542,6 +548,8 @@ const NSInteger kFinishedTabViewIndex = 4;
 
 - (void) updateTunerAndStationsForCurrentLineup
 {
+  NSLog(@"Implement updateTunerAndStationsForCurrentLineup");
+#if 0
     HDHomeRunTuner *candidateTuner = nil;
     for (HDHomeRunTuner *aTuner in self.scanLineupSelection.tuners)
     {
@@ -570,6 +578,7 @@ const NSInteger kFinishedTabViewIndex = 4;
     }
     else
       [mHDHRStationsOnLineupController setContent:nil];
+#endif
 }
 
 - (void) updateZ2ITStationsForCurrentLineup

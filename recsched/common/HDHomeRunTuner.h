@@ -22,6 +22,7 @@
 
 @class HDHomeRun;
 @class HDHomeRunChannel;
+@class HDHomeRunChannelStationMap;
 @class HDHomeRunStation;
 @class Z2ITLineup;
 @class Z2ITStation;
@@ -37,17 +38,16 @@
 + (NSArray*) allTunersInManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
 @property (retain) NSNumber * index;
-@property (retain) NSSet* channels;
 @property (retain) HDHomeRun * device;
-@property (retain) Z2ITLineup * lineup;
 @property (retain) NSString * longName;
 @property (retain) NSSet* recordings;
+@property (retain) Z2ITLineup * lineup;
 
 - (void) scanActionReportingProgressTo:(id)progressDisplay;
 - (void) exportChannelMapTo:(NSURL *)inURL;
-- (void) importChannelMapFrom:(NSURL *)inURL;
+//- (void) importChannelMapFrom:(NSURL *)inURL;
 - (void) pushHDHomeRunStationsToServer;
-- (void) copyChannelsAndStationsFrom:(HDHomeRunTuner*)sourceTuner;
+//- (void) copyChannelsAndStationsFrom:(HDHomeRunTuner*)sourceTuner;
 
 #if 0
 - (void) startStreaming;
@@ -63,10 +63,6 @@
 
 // coalesce these into one @interface HDHomeRunTuner (CoreDataGeneratedAccessors) section
 @interface HDHomeRunTuner (CoreDataGeneratedAccessors)
-- (void)addChannelsObject:(HDHomeRunChannel *)value;
-- (void)removeChannelsObject:(HDHomeRunChannel *)value;
-- (void)addChannels:(NSSet *)value;
-- (void)removeChannels:(NSSet *)value;
 
 @end
 
@@ -81,7 +77,7 @@
 @property (retain) NSString * channelType;
 @property (retain) NSString * tuningType;
 @property (retain) NSSet* stations;
-@property (retain) HDHomeRunTuner * tuner;
+@property (retain) HDHomeRunChannelStationMap * channelStationMap;
 
 - (void) importStationsFrom:(NSArray*)inArrayOfStationDictionaries;
 - (void) clearAllStations;
@@ -99,6 +95,7 @@
 
 @interface HDHomeRunStation : NSManagedObject
 {
+  HDHomeRunTuner *mCurrentStreamingTuner;
 }
 
 + (HDHomeRunStation*) createStationWithProgramNumber:(NSNumber*)inProgramNumber forChannel:(HDHomeRunChannel*)inChannel inManagedObjectContext:(NSManagedObjectContext*)inMOC;

@@ -17,6 +17,7 @@
 
 #import "HDHomeRunTuner.h"
 #import "HDHomeRunMO.h"
+#import "HDHomeRunChannelStationMap.h"
 #import "hdhomerun_channelscan.h"
 #import "hdhomerun_video.h"
 #import "RSActivityDisplayProtocol.h"
@@ -69,29 +70,15 @@ const int kCallSignStringLength = 10;
 }
 
 @dynamic index;
-@dynamic channels;
 @dynamic device;
-@dynamic lineup;
 @dynamic longName;
 @dynamic recordings;
+@dynamic lineup;
 
 - (NSString*) longName
 {
-  NSString *name = [NSString stringWithFormat:@"%@:%d %@", [[self device] name], [[self index] intValue]+1, [[self lineup] name]];
+  NSString *name = [NSString stringWithFormat:@"%@:%d %@", self.device.name, [[self index] intValue]+1, self.lineup.name];
   return name;
-}
-
-- (void) deleteAllChannelsInMOC:(NSManagedObjectContext *)inMOC
-{
-  NSArray *channelsArray = [self.channels allObjects];
-  for (HDHomeRunChannel *aChannel in channelsArray)
-  {
-	// We need to be careful here since the MOC that 'self' is in may not be the same as the MOC
-	// we're using - the data will lineup but pointers to objects in relationships will be different.
-	// So use objectWithID: to retrieve the relevant channel object from the other MOC.
-	HDHomeRunChannel *channelInMOC = (HDHomeRunChannel*) [inMOC objectWithID:[aChannel objectID]];
-    [inMOC deleteObject:channelInMOC];
-  }
 }
 
 @dynamic device;
@@ -323,6 +310,7 @@ const int kCallSignStringLength = 10;
 	}
 }
 
+#if 0
 - (void) importChannelMapFrom:(NSURL *)inURL
 {
 	NSData *xmlData = [NSData dataWithContentsOfURL:inURL];
@@ -333,7 +321,7 @@ const int kCallSignStringLength = 10;
 		NSArray *channelsToImport = [NSPropertyListSerialization propertyListFromData:xmlData mutabilityOption:NSPropertyListImmutable format:nil errorDescription:&error];
 		if (channelsToImport)
 		{
-			[self deleteAllChannelsInMOC:[self managedObjectContext]];
+			[self.channelStationMap deleteAllChannelsInMOC:[self managedObjectContext]];
 			NSDictionary *channelInfoDictionary;
 			for (channelInfoDictionary in channelsToImport)
 			{
@@ -350,17 +338,7 @@ const int kCallSignStringLength = 10;
 		}
 	}
 }
-
-- (void)addChannelsObject:(HDHomeRunChannel *)value 
-{    
-    NSSet *changedObjects = [[NSSet alloc] initWithObjects:&value count:1];
-    
-    [self willChangeValueForKey:@"channels" withSetMutation:NSKeyValueUnionSetMutation usingObjects:changedObjects];
-    [[self primitiveChannels] addObject:value];
-    [self didChangeValueForKey:@"channels" withSetMutation:NSKeyValueUnionSetMutation usingObjects:changedObjects];
-    
-    [changedObjects release];
-}
+#endif
 
 - (void) pushHDHomeRunStationsToServer
 { 
@@ -383,6 +361,7 @@ const int kCallSignStringLength = 10;
 	} 
 }
 
+#if 0
 - (void) copyChannelsAndStationsFrom:(HDHomeRunTuner*)sourceTuner
 {
   if (sourceTuner == self)
@@ -412,6 +391,7 @@ const int kCallSignStringLength = 10;
     [self addChannelsObject:newChannel];
   }
 }
+#endif
 
 #pragma mark - Notifications
 
@@ -508,8 +488,8 @@ const int kCallSignStringLength = 10;
 	  // And add it to this tuners list of channels - however we can't just use 'self' here since that object
 	  // may be in a different managed object context. Instead we'll use objectForID to find the matching Tuner in
 	  // the inMoc context
-	  HDHomeRunTuner *tunerInThreadMOC = (HDHomeRunTuner*) [inMOC objectWithID:[self objectID]];
-	  [tunerInThreadMOC addChannelsObject:mCurrentHDHomeRunChannel];
+          HDHomeRunChannelStationMap *channelStationMapInThreadMOC = (HDHomeRunChannelStationMap *) [inMOC objectWithID:[self.lineup.channelStationMap objectID]];
+	  [channelStationMapInThreadMOC addChannelsObject:mCurrentHDHomeRunChannel];
 	}
   }
   
@@ -561,7 +541,7 @@ const int kCallSignStringLength = 10;
                   [aStation setCallSign:[callSignString substringToIndex:kCallSignStringLength+1]];
                 else
                   [aStation setCallSign:callSignString];
-		Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[inMOC objectWithID:[[self lineup] objectID]];
+		Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[inMOC objectWithID:[self.lineup objectID]];
 		Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:callSignString inLineup:lineupInThreadMOC inManagedObjectContext:inMOC];
 		if (aZ2ITStation)
 		  [aStation setZ2itStation:aZ2ITStation];
@@ -597,21 +577,16 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 - (void) performScan
 {
   int scanResult = 0;
-    NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
-    NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-    [managedObjectContext setPersistentStoreCoordinator: psc];
+  NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
+  NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
+  [managedObjectContext setPersistentStoreCoordinator: psc];
 	
-  HDHomeRunTuner *tunerInThreadMOC = (HDHomeRunTuner*) [managedObjectContext objectWithID:[self objectID]];
-
-      // Delete any channels we might currently have - they're going to get replaced in the scan
-      [tunerInThreadMOC deleteAllChannelsInMOC:managedObjectContext];
-      
-	mCurrentActivityToken = 0;
-	if (mCurrentProgressDisplay)
-	{
-		mCurrentActivityToken = [mCurrentProgressDisplay createActivity];
-		mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken progressMaxValue:390.0f];		// There are a maximum of 390 channels to scan per tuner !
-	}
+    mCurrentActivityToken = 0;
+    if (mCurrentProgressDisplay)
+    {
+            mCurrentActivityToken = [mCurrentProgressDisplay createActivity];
+            mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken progressMaxValue:390.0f];		// There are a maximum of 390 channels to scan per tuner !
+    }
 	
     mCurrentHDHomeRunChannel = nil;
     
@@ -761,7 +736,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 			if (!aZ2ITStation)
 			{
 				// No Station ID match - perhaps the callsign ?
-				aZ2ITStation = [Z2ITStation fetchStationWithCallSign:[stationInfo valueForKey:@"Z2ITCallSign"] inLineup:[[self tuner] lineup] inManagedObjectContext:[self managedObjectContext]];
+				aZ2ITStation = [Z2ITStation fetchStationWithCallSign:[stationInfo valueForKey:@"Z2ITCallSign"] inLineup:self.channelStationMap.lineup inManagedObjectContext:[self managedObjectContext]];
 			}
 			if (aZ2ITStation)
 			{
@@ -786,8 +761,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 @dynamic channelType;
 @dynamic tuningType;
 @dynamic stations;
-@dynamic tuner;
-
+@dynamic channelStationMap;
 @end
 
 // coalesce these into one @interface HDHomeRunStation (CoreDataGeneratedPrimitiveAccessors) section
@@ -873,42 +847,59 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 
 - (void) startStreaming
 {
-	// Make sure we have a HDHR Device for the Tuner
-  [[[self channel] tuner] createHDHRDevice];
+  if (mCurrentStreamingTuner)
+  {
+    NSLog(@"startStreaming - already streaming !");
+    [self stopStreaming];
+  }
   
-	// Set our tuner to the channel
-  [[[self channel] tuner] tuneToChannel:[self channel]];
+  mCurrentStreamingTuner = [self.channel.channelStationMap.lineup.tuners anyObject];
+
+  // Make sure we have a HDHR Device for the Tuner
+  [mCurrentStreamingTuner createHDHRDevice];
+  
+  // Set our tuner to the channel
+  [mCurrentStreamingTuner tuneToChannel:[self channel]];
   
   // Set our tuners filter for this program
-  [[[self channel] tuner] setFilterForProgramNumber:[self programNumber]];
+  [mCurrentStreamingTuner setFilterForProgramNumber:[self programNumber]];
   
   // Set our tuner to start streaming
-  [[[self channel] tuner] startStreaming];
+  [mCurrentStreamingTuner startStreaming];
 }
 
 - (void) startStreamingToPort:(int)portNumber
 {
-	// Make sure we have a HDHR Device for the Tuner
-  [[[self channel] tuner] createHDHRDevice];
+  if (mCurrentStreamingTuner)
+  {
+    NSLog(@"startStreamingToPort - already streaming !");
+    [self stopStreaming];
+  }
   
-	// Set our tuner to the channel
-  [[[self channel] tuner] tuneToChannel:[self channel]];
+  mCurrentStreamingTuner = [self.channel.channelStationMap.lineup.tuners anyObject];
+  // Make sure we have a HDHR Device for the Tuner
+  [mCurrentStreamingTuner  createHDHRDevice];
+  
+  // Set our tuner to the channel
+  [mCurrentStreamingTuner  tuneToChannel:[self channel]];
   
   // Set our tuners filter for this program
-  [[[self channel] tuner] setFilterForProgramNumber:[self programNumber]];
+  [mCurrentStreamingTuner  setFilterForProgramNumber:[self programNumber]];
   
   // Set our tuner to start streaming
-  [[[self channel] tuner] startStreamingToPort:portNumber];
+  [mCurrentStreamingTuner  startStreamingToPort:portNumber];
 }
 
 - (void) stopStreaming
 {
-	[[[self channel] tuner] stopStreaming];
+  [mCurrentStreamingTuner stopStreaming];
+  [mCurrentStreamingTuner release];
+  mCurrentStreamingTuner = nil;
 }
 
 - (NSData*) receiveVideoData
 {
-	return [[[self channel] tuner] receiveVideoData];
+  return [mCurrentStreamingTuner receiveVideoData];
 }
 
 - (void) addStationInfoDictionaryTo:(NSMutableArray*)inOutputArray

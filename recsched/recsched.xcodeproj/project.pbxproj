@@ -114,6 +114,10 @@
 		EABE74D00DD156640013310F /* RSSeasonPassCalendarCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE74CF0DD156640013310F /* RSSeasonPassCalendarCell.m */; };
 		EABE76400DD3AD900013310F /* RSCalendarWeekView.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE763F0DD3AD900013310F /* RSCalendarWeekView.m */; };
 		EABE7A290DDB19A30013310F /* RSScheduleCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE7A280DDB19A30013310F /* RSScheduleCell.m */; };
+		EABE7BF30DE73C9B0013310F /* HDHomeRunChannelStationMap.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE7BF20DE73C9B0013310F /* HDHomeRunChannelStationMap.m */; };
+		EABE7BF40DE73C9B0013310F /* HDHomeRunChannelStationMap.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE7BF20DE73C9B0013310F /* HDHomeRunChannelStationMap.m */; };
+		EABE7C480DE831110013310F /* recsched_6_7.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EABE7C470DE831110013310F /* recsched_6_7.xcmappingmodel */; };
+		EABE7C4B0DE8321C0013310F /* recsched6To7Migration.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE7C4A0DE8321C0013310F /* recsched6To7Migration.m */; };
 		EAC3529C0DCD355E00963287 /* RSRecordingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */; };
 		EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */; };
 		EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */; };
@@ -370,6 +374,12 @@
 		EABE763F0DD3AD900013310F /* RSCalendarWeekView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSCalendarWeekView.m; path = UIApp/views/RSCalendarWeekView.m; sourceTree = "<group>"; };
 		EABE7A270DDB19A30013310F /* RSScheduleCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSScheduleCell.h; path = UIApp/views/RSScheduleCell.h; sourceTree = "<group>"; };
 		EABE7A280DDB19A30013310F /* RSScheduleCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSScheduleCell.m; path = UIApp/views/RSScheduleCell.m; sourceTree = "<group>"; };
+		EABE7BEE0DE739AC0013310F /* recsched_DataModel 7.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 7.xcdatamodel"; sourceTree = "<group>"; };
+		EABE7BF10DE73C9B0013310F /* HDHomeRunChannelStationMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HDHomeRunChannelStationMap.h; path = common/HDHomeRunChannelStationMap.h; sourceTree = "<group>"; };
+		EABE7BF20DE73C9B0013310F /* HDHomeRunChannelStationMap.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HDHomeRunChannelStationMap.m; path = common/HDHomeRunChannelStationMap.m; sourceTree = "<group>"; };
+		EABE7C470DE831110013310F /* recsched_6_7.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; path = recsched_6_7.xcmappingmodel; sourceTree = "<group>"; };
+		EABE7C490DE8321C0013310F /* recsched6To7Migration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = recsched6To7Migration.h; sourceTree = "<group>"; };
+		EABE7C4A0DE8321C0013310F /* recsched6To7Migration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = recsched6To7Migration.m; sourceTree = "<group>"; };
 		EAC3529A0DCD355E00963287 /* RSRecordingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecordingAdditions.h; path = UIApp/RSRecordingAdditions.h; sourceTree = "<group>"; };
 		EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecordingAdditions.m; path = UIApp/RSRecordingAdditions.m; sourceTree = "<group>"; };
 		EAC352A50DCD368700963287 /* RSSourceListKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSSourceListKeys.h; path = UIApp/RSSourceListKeys.h; sourceTree = "<group>"; };
@@ -581,6 +591,7 @@
 				EA70E7200CC0164600C3B295 /* recsched.xcmappingmodel */,
 				EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */,
 				EA7133E70DA853B600F93E87 /* recsched_5_6.xcmappingmodel */,
+				EABE7C470DE831110013310F /* recsched_6_7.xcmappingmodel */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -700,6 +711,8 @@
 				EA74F0210DA1CAA500565EA6 /* RSSeasonPass.m */,
 				EA74F0270DA1CC0000565EA6 /* RSRecordingOptions.h */,
 				EA74F0280DA1CC0000565EA6 /* RSRecordingOptions.m */,
+				EABE7BF10DE73C9B0013310F /* HDHomeRunChannelStationMap.h */,
+				EABE7BF20DE73C9B0013310F /* HDHomeRunChannelStationMap.m */,
 			);
 			name = "Managed Objects";
 			sourceTree = "<group>";
@@ -756,6 +769,8 @@
 				EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */,
 				EA6338D80D03527B006F3F64 /* RSRecording4To5MigrationPolicy.h */,
 				EA6338D90D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m */,
+				EABE7C490DE8321C0013310F /* recsched6To7Migration.h */,
+				EABE7C4A0DE8321C0013310F /* recsched6To7Migration.m */,
 			);
 			name = "Background App";
 			sourceTree = "<group>";
@@ -1060,6 +1075,7 @@
 				EABE74D00DD156640013310F /* RSSeasonPassCalendarCell.m in Sources */,
 				EABE76400DD3AD900013310F /* RSCalendarWeekView.m in Sources */,
 				EABE7A290DDB19A30013310F /* RSScheduleCell.m in Sources */,
+				EABE7BF30DE73C9B0013310F /* HDHomeRunChannelStationMap.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1121,6 +1137,9 @@
 				EA74F0220DA1CAA500565EA6 /* RSSeasonPass.m in Sources */,
 				EA74F0290DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */,
 				EA7133E90DA853B600F93E87 /* recsched_5_6.xcmappingmodel in Sources */,
+				EABE7BF40DE73C9B0013310F /* HDHomeRunChannelStationMap.m in Sources */,
+				EABE7C480DE831110013310F /* recsched_6_7.xcmappingmodel in Sources */,
+				EABE7C4B0DE8321C0013310F /* recsched6To7Migration.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1525,8 +1544,9 @@
 				EA70E70F0CC0112200C3B295 /* recsched_DataModel 4.xcdatamodel */,
 				EA6338A30D034814006F3F64 /* recsched_DataModel 5.xcdatamodel */,
 				EA74F01E0D9FD1C500565EA6 /* recsched_DataModel 6.xcdatamodel */,
+				EABE7BEE0DE739AC0013310F /* recsched_DataModel 7.xcdatamodel */,
 			);
-			currentVersion = EA74F01E0D9FD1C500565EA6 /* recsched_DataModel 6.xcdatamodel */;
+			currentVersion = EABE7BEE0DE739AC0013310F /* recsched_DataModel 7.xcdatamodel */;
 			path = recsched_DataModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

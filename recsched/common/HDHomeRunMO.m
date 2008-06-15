@@ -19,6 +19,7 @@
 #import "HDHomeRunTuner.h"
 #import "hdhomerun_os.h"
 #import "hdhomerun_device.h"
+#import "Z2ITLineup.h"
 
 const int kDefaultPortNumber = 1234;
 
@@ -90,13 +91,13 @@ const int kDefaultPortNumber = 1234;
 	HDHomeRunTuner *anHDHomeRunTuner;
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
 	[anHDHomeRunTuner setIndex:[NSNumber numberWithInt:0]];
-	[anHDHomeRunTuner setLineup:aLineup];
+	anHDHomeRunTuner.lineup = aLineup;
 	[anHDHomeRun addTunersObject:anHDHomeRunTuner];
 	[anHDHomeRunTuner release];
 	
 	anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
 	[anHDHomeRunTuner setIndex:[NSNumber numberWithInt:1]];
-	[anHDHomeRunTuner setLineup:aLineup];
+	anHDHomeRunTuner.lineup = aLineup;
 	[anHDHomeRun addTunersObject:anHDHomeRunTuner];
 	[anHDHomeRunTuner release];
 	

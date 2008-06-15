@@ -20,6 +20,7 @@
 #import "RecSchedServer.h"
 #import "recsched_bkgd_AppDelegate.h"
 #import "HDHomeRunMO.h"
+#import "HDHomeRunChannelStationMap.h"
 #import "hdhomerun.h"
 #import "tvDataDelivery.h"
 #import "Z2ITLineup.h"
@@ -543,6 +544,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
                                nil];
         *error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
       }
+      return NO;
     }
     if (![[[NSApp delegate] managedObjectContext] save:error])
     {
@@ -770,19 +772,13 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	[aTuner scanActionReportingProgressTo:[self uiActivity]];
 }
 
-- (void) setHDHomeRunDeviceWithID:(NSNumber*)deviceID nameTo:(NSString*)name tuner0LineupIDTo:(NSString*)tuner0LineupID tuner1LineupIDTo:(NSString*) tuner1LineupID
+- (void) setHDHomeRunDeviceWithID:(NSNumber*)deviceID nameTo:(NSString*)name
 {
 	// See if an entry already exists
 	HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:deviceID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
 	if (anHDHomeRun)
 	{
 		[anHDHomeRun setName:name];
-		
-		Z2ITLineup *aLineup = [Z2ITLineup fetchLineupWithID:tuner0LineupID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-		anHDHomeRun.tuner0.lineup = aLineup;
-		aLineup = [Z2ITLineup fetchLineupWithID:tuner1LineupID inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-		anHDHomeRun.tuner1.lineup = aLineup;
-
 		NSError *error = nil;
 		if (![[[NSApp delegate] managedObjectContext] save:&error])
 		{
@@ -795,6 +791,19 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	}
 }
 
+- (void) setHDHomeRunLineup:(NSManagedObjectID*)lineupObjectID onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex
+{
+  HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:deviceID] inManagedObjectContext:[[NSApp delegate] managedObjectContext]]; 
+  if (anHDHomeRun) 
+  { 
+    HDHomeRunTuner *aTuner = [anHDHomeRun tunerWithIndex:tunerIndex]; 
+    if (aTuner) 
+    { 
+      aTuner.lineup = (Z2ITLineup *)[[[NSApp delegate] managedObjectContext] objectWithID:lineupObjectID];
+    }
+  }
+}
+
 - (oneway void) setHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex
 {
 //	NSLog(@"setHDHomeRunChannelsAndStations deviceID = %d, tunerIndex = %d", deviceID, tunerIndex); 
@@ -805,6 +814,8 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 		HDHomeRunTuner *aTuner = [anHDHomeRun tunerWithIndex:tunerIndex]; 
 		if (aTuner) 
 		{ 
+                  NSLog(@"Implement setHDHomeRunChanelsAndStations for device ID %d tunerIndex %d", deviceID, tunerIndex);
+#if 0
 			// Remove all the channels current on the tuner - we're going to replace them.
 			NSArray *oldChannels = [[aTuner channels] allObjects];
 			for (HDHomeRunChannel *aChannel in oldChannels)
@@ -827,6 +838,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 				// Add all the stations in the array for this channel 
 				[aChannel importStationsFrom:[aChannelDictionary valueForKey:@"stations"]]; 
 			} 
+#endif
 
 			if ([channelsArray count] > 0) 
 			{ 
@@ -879,7 +891,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
       for (RSRecordingQueue *aRecordingQueue in mRecordingQueues)
       {
         NSLog(@"  Checking Queue for tuner %@", aRecordingQueue.tuner.longName);
-        if (aRecordingQueue.tuner == aStation.channel.tuner)
+        if ([aStation.channel.channelStationMap.lineup.tuners containsObject:aRecordingQueue.tuner])
         {
           NSLog(@"  Tuner %@ has the station, there are %d recordings in the queue", aRecordingQueue.tuner.longName, [aRecordingQueue.queue count]);
           // Does the Tuners queue have space/time for this recording ?
@@ -888,7 +900,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
           {
             if ([aPreviouslyScheduledRecording.schedule overlapsWith:schedule])
             {
-              NSLog(@"  Queue for tuner %@ has overlap with schedule title %@", aStation.channel.tuner.longName, aPreviouslyScheduledRecording.schedule.program.title);
+              NSLog(@"  Queue for tuner %@ has overlap with schedule title %@", aRecordingQueue.tuner.longName, aPreviouslyScheduledRecording.schedule.program.title);
               hasOverlaps = YES;
               [conflictingSchedules addObject:[aPreviouslyScheduledRecording.schedule objectID]];
             }
