@@ -142,6 +142,7 @@
 		EAEC0A270C283C7F00C40D5A /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
 		EAEC0A280C283C8100C40D5A /* Z2ITLineupMap.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */; };
 		EAEC0A290C283C8200C40D5A /* Z2ITSchedule.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8867C0B61740300373CEF /* Z2ITSchedule.m */; };
+		EAEC17A20E0589260082544E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAEC17A10E0589260082544E /* SystemConfiguration.framework */; };
 		EAF4EA220C5EB0AB003EC697 /* AKColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */; };
 		EAF4EACF0C5F90B1003EC697 /* AKColorExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */; };
 		EAF883100B5DCE4900373CEF /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
@@ -399,6 +400,7 @@
 		EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = recsched_bkgd_main.m; path = BkgdServer/recsched_bkgd_main.m; sourceTree = "<group>"; };
 		EAEC09560C27422800C40D5A /* recsched_bkgd_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_bkgd_AppDelegate.h; path = BkgdServer/recsched_bkgd_AppDelegate.h; sourceTree = "<group>"; };
 		EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = recsched_bkgd_AppDelegate.m; path = BkgdServer/recsched_bkgd_AppDelegate.m; sourceTree = "<group>"; };
+		EAEC17A10E0589260082544E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
 		EAF4EA0D0C5CC686003EC697 /* AKColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKColorCell.h; path = UIApp/views/AKColorCell.h; sourceTree = "<group>"; };
 		EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AKColorCell.m; path = UIApp/views/AKColorCell.m; sourceTree = "<group>"; };
 		EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKColorExtensions.h; path = UIApp/AKColorExtensions.h; sourceTree = "<group>"; };
@@ -478,6 +480,7 @@
 				EAEC09D80C275BC500C40D5A /* Security.framework in Frameworks */,
 				EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */,
 				EA7002880CC4288500DA9542 /* ScriptingBridge.framework in Frameworks */,
+				EAEC17A20E0589260082544E /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -520,6 +523,7 @@
 		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EAEC17A10E0589260082544E /* SystemConfiguration.framework */,
 				77C82804067257F0000B614F /* CoreData.framework */,
 				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
