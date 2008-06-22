@@ -143,6 +143,8 @@
 		EAEC0A280C283C8100C40D5A /* Z2ITLineupMap.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8850E0B6024A800373CEF /* Z2ITLineupMap.m */; };
 		EAEC0A290C283C8200C40D5A /* Z2ITSchedule.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8867C0B61740300373CEF /* Z2ITSchedule.m */; };
 		EAEC17A20E0589260082544E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAEC17A10E0589260082544E /* SystemConfiguration.framework */; };
+		EAEC183E0E0E8E1F0082544E /* RSError.m in Sources */ = {isa = PBXBuildFile; fileRef = EAEC183D0E0E8E1F0082544E /* RSError.m */; };
+		EAEC183F0E0E8E1F0082544E /* RSError.m in Sources */ = {isa = PBXBuildFile; fileRef = EAEC183D0E0E8E1F0082544E /* RSError.m */; };
 		EAF4EA220C5EB0AB003EC697 /* AKColorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */; };
 		EAF4EACF0C5F90B1003EC697 /* AKColorExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF4EACE0C5F90B1003EC697 /* AKColorExtensions.m */; };
 		EAF883100B5DCE4900373CEF /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
@@ -401,6 +403,8 @@
 		EAEC09560C27422800C40D5A /* recsched_bkgd_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_bkgd_AppDelegate.h; path = BkgdServer/recsched_bkgd_AppDelegate.h; sourceTree = "<group>"; };
 		EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = recsched_bkgd_AppDelegate.m; path = BkgdServer/recsched_bkgd_AppDelegate.m; sourceTree = "<group>"; };
 		EAEC17A10E0589260082544E /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = /System/Library/Frameworks/SystemConfiguration.framework; sourceTree = "<absolute>"; };
+		EAEC183B0E0E8DBA0082544E /* RSError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSError.h; path = common/RSError.h; sourceTree = "<group>"; };
+		EAEC183D0E0E8E1F0082544E /* RSError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSError.m; path = common/RSError.m; sourceTree = "<group>"; };
 		EAF4EA0D0C5CC686003EC697 /* AKColorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKColorCell.h; path = UIApp/views/AKColorCell.h; sourceTree = "<group>"; };
 		EAF4EA0E0C5CC687003EC697 /* AKColorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AKColorCell.m; path = UIApp/views/AKColorCell.m; sourceTree = "<group>"; };
 		EAF4EACD0C5F90B1003EC697 /* AKColorExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKColorExtensions.h; path = UIApp/AKColorExtensions.h; sourceTree = "<group>"; };
@@ -675,6 +679,8 @@
 				EA2339EF0D6BDCC700451694 /* NSStringAdditions.h */,
 				EA74EE8A0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.h */,
 				EA74EE8B0D99EBCA00565EA6 /* NSManagedObjectContextAdditions.m */,
+				EAEC183B0E0E8DBA0082544E /* RSError.h */,
+				EAEC183D0E0E8E1F0082544E /* RSError.m */,
 			);
 			name = common;
 			sourceTree = "<group>";
@@ -1080,6 +1086,7 @@
 				EABE76400DD3AD900013310F /* RSCalendarWeekView.m in Sources */,
 				EABE7A290DDB19A30013310F /* RSScheduleCell.m in Sources */,
 				EABE7BF30DE73C9B0013310F /* HDHomeRunChannelStationMap.m in Sources */,
+				EAEC183F0E0E8E1F0082544E /* RSError.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1144,6 +1151,7 @@
 				EABE7BF40DE73C9B0013310F /* HDHomeRunChannelStationMap.m in Sources */,
 				EABE7C480DE831110013310F /* recsched_6_7.xcmappingmodel in Sources */,
 				EABE7C4B0DE8321C0013310F /* recsched6To7Migration.m in Sources */,
+				EAEC183E0E0E8E1F0082544E /* RSError.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

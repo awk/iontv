@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 #import <Cocoa/Cocoa.h>
+#import <SystemConfiguration/SCNetworkReachability.h>
 
 #import "RecSchedProtocol.h"
 #import "RSActivityDisplayProtocol.h"
@@ -43,6 +44,7 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
   NSCalendarDate *mLastScheduleFetchEndDate;
   
   NSTimer *mFetchFutureScheduleTimer;
+  SCNetworkReachabilityRef mSDServerReachableRef;
 }
 
 - (bool) shouldExit;

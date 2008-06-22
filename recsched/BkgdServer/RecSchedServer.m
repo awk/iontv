@@ -27,6 +27,7 @@
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
+#import "RSError.h"
 #import "RSRecording.h"
 #import "RSSeasonPass.h"
 #import "XTVDParser.h"
@@ -38,6 +39,8 @@
 const int kDefaultUpdateScheduleFetchDurationInHours = 3;
 const int kDefaultFutureScheduleFetchDurationInHours = 12;
 NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailable";
+
+static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConnectionFlags flags, void *info);
 
 @interface RSActivityProxy : NSObject <RSActivityDisplay>
 {
@@ -55,6 +58,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 - (void)cancelRecording:(RSRecording*)aRecording;
 - (BOOL)scheduleFutureRecordingsForSeasonPass:(RSSeasonPass*)aSeasonPass addNewRecordingsTo:(NSMutableArray*)recordings error:(NSError**)error;
 - (void) createRecordingsForAllSeasonPasses;
+- (SCNetworkReachabilityRef) getSDServerReachableRef;
 @end
 
 @implementation RecSchedServer
@@ -294,6 +298,31 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     return NO;
   }
   
+  // Check for network reachability
+  if (mSDServerReachableRef == 0)
+  {
+    mSDServerReachableRef = SCNetworkReachabilityCreateWithName (kCFAllocatorDefault, [kWebServicesSDHostname UTF8String]);
+  }
+  
+  if (mSDServerReachableRef)
+  {
+    SCNetworkConnectionFlags reachabilityFlags = 0;
+    BOOL status;
+    status = SCNetworkReachabilityGetFlags(mSDServerReachableRef, &reachabilityFlags);
+    if (status && (reachabilityFlags != kSCNetworkFlagsReachable))
+    {
+      // Monitor the connection so that when it changes we try again to fetch the schedule
+      SCNetworkReachabilityContext context;
+      memset(&context, 0, sizeof context);
+      context.info = self;
+      if (SCNetworkReachabilitySetCallback(mSDServerReachableRef, SDServerReachabilityChanged, &context) == TRUE)
+      {
+        SCNetworkReachabilityScheduleWithRunLoop(mSDServerReachableRef, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+        return NO; 
+      }
+    }
+  }
+  
   if (mLastScheduleFetchEndDate == nil)
   {
     // We need to determine a reasonable starting time - the best bet is to just take the latest start date in the
@@ -433,6 +462,19 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
 	NSLog(@"downloadError %@", [aNotification userInfo]);
 }
 
+void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConnectionFlags flags, void *info)
+{
+  RecSchedServer *server = (RecSchedServer *)info;
+  if (flags && kSCNetworkFlagsReachable == kSCNetworkFlagsReachable)
+  {
+    // Unschedule/unset the callback so that we don't end up with multiples
+    SCNetworkReachabilitySetCallback([server getSDServerReachableRef], SDServerReachabilityChanged, nil);
+    SCNetworkReachabilityUnscheduleFromRunLoop([server getSDServerReachableRef], CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+    
+    [server performSelectorOnMainThread:@selector(fetchFutureSchedule:) withObject:nil waitUntilDone:NO];
+  }
+}
+
 #pragma mark Activity Protocol Methods
 
 - (size_t) createActivity
@@ -542,7 +584,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
                                conflicts, @"conflictingSchedules",
                                descriptionStr, NSLocalizedDescriptionKey,
                                nil];
-        *error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
+        *error = [[[NSError alloc] initWithDomain:RSErrorDomain code:kRSErrorSchedulingConflict userInfo:eDict] autorelease];
       }
       return NO;
     }
@@ -991,7 +1033,7 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
                              conflicts, @"conflictingSchedules",
                              descriptionStr, NSLocalizedDescriptionKey,
                              nil];
-      *error = [[[NSError alloc] initWithDomain:@"com.iontv-app.error" code:-1 userInfo:eDict] autorelease];
+      *error = [[[NSError alloc] initWithDomain:RSErrorDomain code:kRSErrorSchedulingConflict userInfo:eDict] autorelease];
     }
   }
   return ([conflicts count] == 0);
@@ -1019,6 +1061,11 @@ NSString *RSNotificationUIActivityAvailable = @"RSNotificationUIActivityAvailabl
     NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:allNewRecordings, RSRecordingAddedRecordingsURIKey, nil];
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSRecordingAddedNotification object:RSBackgroundApplication userInfo:info];
   }
+}
+
+- (SCNetworkReachabilityRef) getSDServerReachableRef
+{
+  return mSDServerReachableRef;
 }
 
 @end

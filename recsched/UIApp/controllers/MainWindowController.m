@@ -27,6 +27,7 @@
 #import "MainWindowController.h"
 #import "ScheduleView.h"
 #import "Preferences.h"
+#import "RSError.h"
 #import "RSRecording.h"
 #import "RSNotifications.h"
 #import "RSSeasonPass.h"
@@ -43,7 +44,7 @@
 #import "NSManagedObjectContextAdditions.h"
 
 @interface MainWindowController(Private)
-- (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule;
+- (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule error:(NSError**) error;
 - (BOOL) addSeasonPassForProgram:(Z2ITProgram*)schedule onStation:(Z2ITStation*)station;
 @end
 
@@ -415,7 +416,19 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (IBAction) recordShow:(id)sender
 {
-  [self addRecordingOfSchedule:[mCurrentSchedule content]];
+  NSError *error;
+  BOOL status = [self addRecordingOfSchedule:[mCurrentSchedule content] error:&error];
+  if (status == NO)
+  {
+    if (([[error domain] compare:RSErrorDomain] == NSOrderedSame) && ([error code] == kRSErrorSchedulingConflict))
+    {
+      NSLog(@"IMPLEMENT - present custom scheduling conflict dialog");
+    }
+    else
+    {
+      [[self window] presentError:error];
+    }
+  }
 }
 
 - (IBAction) recordSeasonPass:(id)sender
@@ -820,7 +833,13 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 				NSManagedObjectContext *MOC = [[NSApp delegate] managedObjectContext];
 				
 				Z2ITSchedule *aSchedule = (Z2ITSchedule*) [MOC objectWithID:[storeCoordinator managedObjectIDForURIRepresentation:[NSURL URLWithString:[dragInfoDict valueForKey:@"scheduleObjectURI"]]]];
-                                return [self addRecordingOfSchedule:aSchedule];
+                                NSError *error;
+                                BOOL status = [self addRecordingOfSchedule:aSchedule error:&error];
+                                if (status == NO)
+                                {
+                                  [[self window] presentError:error];
+                                }
+                                return status;
 		}
 		else
 		{
@@ -833,13 +852,31 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 #pragma mark Private Internal Methods
 
-- (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule
+- (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule error:(NSError**)error;
 {
-  NSError *error = nil;
   if ([[NSApp delegate] recServer])
-    return [[[NSApp delegate] recServer] addRecordingOfScheduleWithObjectID:[schedule objectID] error:&error];
+  {
+    if (error)
+    {
+      *error = nil;
+    }
+    return [[[NSApp delegate] recServer] addRecordingOfScheduleWithObjectID:[schedule objectID] error:error];
+  }
   else
+  {
+    if (error)
+    {
+      NSArray *optionsArray = [NSArray arrayWithObjects:@"Continue", @"Quit and Restart", nil];
+      RSNoConnectionErrorRecovery *recoveryAttempter = [[[RSNoConnectionErrorRecovery alloc] init] autorelease];
+      NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:@"There is no connection to the background application.", NSLocalizedDescriptionKey,
+                                                                       @"Quit and restart this application to recreate the connection.",  NSLocalizedRecoverySuggestionErrorKey,
+                                                                       optionsArray, NSLocalizedRecoveryOptionsErrorKey,
+                                                                       recoveryAttempter,  NSRecoveryAttempterErrorKey,
+                                                                       nil];
+      *error = [NSError errorWithDomain:RSErrorDomain code:kRSErrorNoServerConnection userInfo:eDict];
+    }
     return NO;
+  }
 }
 
 - (BOOL) addSeasonPassForProgram:(Z2ITProgram*)program onStation:(Z2ITStation*)station
