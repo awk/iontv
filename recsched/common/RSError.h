@@ -21,6 +21,10 @@
 // Error domain for RecSched errors
 extern NSString *RSErrorDomain;
 
+// User Info Keys for extended error details
+extern NSString *kRSErrorScheduleToBeRecorded;
+extern NSString *kRSErrorConflictingSchedules;
+
 enum {
   kRSErrorNoServerConnection = -1,
   kRSErrorSchedulingConflict = -2

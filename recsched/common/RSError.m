@@ -19,6 +19,8 @@
 
 // Sender for notifications from the Background Server App
 NSString *RSErrorDomain = @"com.iontv-app.error";
+NSString *kRSErrorConflictingSchedules = @"conflictingSchedules";
+NSString *kRSErrorScheduleToBeRecorded = @"scheduleToBeRecorded";
 
 @implementation RSNoConnectionErrorRecovery
 
