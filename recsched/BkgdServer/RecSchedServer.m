@@ -581,7 +581,8 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
         NSString *descriptionStr = [NSString stringWithFormat:@"The recording of %@, cannot be scheduled because it conflicts with %d other program%@",
                                     mySchedule.program.title, [conflicts count], [conflicts count] > 1 ? @"s." : @"."];
         NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                               conflicts, @"conflictingSchedules",
+                               [mySchedule objectID], kRSErrorScheduleToBeRecorded,
+                               conflicts, kRSErrorConflictingSchedules,
                                descriptionStr, NSLocalizedDescriptionKey,
                                nil];
         *error = [[[NSError alloc] initWithDomain:RSErrorDomain code:kRSErrorSchedulingConflict userInfo:eDict] autorelease];
@@ -1030,7 +1031,7 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
       NSString *descriptionStr = [NSString stringWithFormat:@"A complete season pass of %@, cannot be scheduled because it conflicts with %d other program%@",
                                   aSeasonPass.title, [conflicts count], [conflicts count] > 1 ? @"s." : @"."];
       NSDictionary *eDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                             conflicts, @"conflictingSchedules",
+                             conflicts, kRSErrorConflictingSchedules,
                              descriptionStr, NSLocalizedDescriptionKey,
                              nil];
       *error = [[[NSError alloc] initWithDomain:RSErrorDomain code:kRSErrorSchedulingConflict userInfo:eDict] autorelease];
