@@ -98,6 +98,8 @@
 		EA74F0230DA1CAA500565EA6 /* RSSeasonPass.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74F0210DA1CAA500565EA6 /* RSSeasonPass.m */; };
 		EA74F0290DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74F0280DA1CC0000565EA6 /* RSRecordingOptions.m */; };
 		EA74F02A0DA1CC0000565EA6 /* RSRecordingOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA74F0280DA1CC0000565EA6 /* RSRecordingOptions.m */; };
+		EA85BBFF0E0F99EC00264446 /* RSScheduleConflictController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA85BBFE0E0F99EC00264446 /* RSScheduleConflictController.m */; };
+		EA85BC0A0E0F9B5300264446 /* ScheduleConflictWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA85BC080E0F9B5300264446 /* ScheduleConflictWindow.xib */; };
 		EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */; };
 		EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
 		EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
@@ -353,6 +355,9 @@
 		EA74F0210DA1CAA500565EA6 /* RSSeasonPass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSSeasonPass.m; path = common/RSSeasonPass.m; sourceTree = "<group>"; };
 		EA74F0270DA1CC0000565EA6 /* RSRecordingOptions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecordingOptions.h; path = common/RSRecordingOptions.h; sourceTree = "<group>"; };
 		EA74F0280DA1CC0000565EA6 /* RSRecordingOptions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecordingOptions.m; path = common/RSRecordingOptions.m; sourceTree = "<group>"; };
+		EA85BBFD0E0F99EC00264446 /* RSScheduleConflictController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSScheduleConflictController.h; path = UIApp/controllers/RSScheduleConflictController.h; sourceTree = "<group>"; };
+		EA85BBFE0E0F99EC00264446 /* RSScheduleConflictController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSScheduleConflictController.m; path = UIApp/controllers/RSScheduleConflictController.m; sourceTree = "<group>"; };
+		EA85BC090E0F9B5300264446 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ScheduleConflictWindow.xib; sourceTree = "<group>"; };
 		EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreferenceKeys.m; path = common/PreferenceKeys.m; sourceTree = "<group>"; };
 		EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferenceKeys.h; path = common/PreferenceKeys.h; sourceTree = "<group>"; };
 		EA8E1C570CC9408800DD109F /* HardDrive.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HardDrive.tiff; path = Images/HardDrive.tiff; sourceTree = "<group>"; };
@@ -576,6 +581,7 @@
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				EA4909E50CADD0EB00A1DE02 /* Activity.xib */,
+				EA85BC080E0F9B5300264446 /* ScheduleConflictWindow.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -748,6 +754,8 @@
 				EA3090C30C6AB59E0005E89B /* RSWishlistController.m */,
 				EAC8F79F0DCA99E100A289CD /* RSMigrationSheetController.h */,
 				EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */,
+				EA85BBFD0E0F99EC00264446 /* RSScheduleConflictController.h */,
+				EA85BBFE0E0F99EC00264446 /* RSScheduleConflictController.m */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -975,6 +983,7 @@
 				EA23871F0D5E5D0F00343704 /* FirstRun.xib in Resources */,
 				EA39B7CA0D6C8CFC0049CB89 /* assistantBackground.tiff in Resources */,
 				EABE72B00DD0AB1B0013310F /* SeasonPassCalendarView.xib in Resources */,
+				EA85BC0A0E0F9B5300264446 /* ScheduleConflictWindow.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1087,6 +1096,7 @@
 				EABE7A290DDB19A30013310F /* RSScheduleCell.m in Sources */,
 				EABE7BF30DE73C9B0013310F /* HDHomeRunChannelStationMap.m in Sources */,
 				EAEC183F0E0E8E1F0082544E /* RSError.m in Sources */,
+				EA85BBFF0E0F99EC00264446 /* RSScheduleConflictController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1211,6 +1221,14 @@
 				EA490DB90CAF376E00A1DE02 /* English */,
 			);
 			name = ActivityAggregateView.xib;
+			sourceTree = "<group>";
+		};
+		EA85BC080E0F9B5300264446 /* ScheduleConflictWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				EA85BC090E0F9B5300264446 /* English */,
+			);
+			name = ScheduleConflictWindow.xib;
 			sourceTree = "<group>";
 		};
 		EABE72AE0DD0AB1B0013310F /* SeasonPassCalendarView.xib */ = {

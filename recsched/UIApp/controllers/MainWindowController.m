@@ -30,6 +30,7 @@
 #import "RSError.h"
 #import "RSRecording.h"
 #import "RSNotifications.h"
+#import "RSScheduleConflictController.h"
 #import "RSSeasonPass.h"
 #import "RSSeasonPassCalendarViewController.h"
 #import "Z2ITSchedule.h"
@@ -46,6 +47,7 @@
 @interface MainWindowController(Private)
 - (BOOL) addRecordingOfSchedule:(Z2ITSchedule*)schedule error:(NSError**) error;
 - (BOOL) addSeasonPassForProgram:(Z2ITProgram*)schedule onStation:(Z2ITStation*)station;
+- (void) showScheduleConflict:(NSError*)error;
 @end
 
 @implementation MainWindowController
@@ -422,7 +424,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   {
     if (([[error domain] compare:RSErrorDomain] == NSOrderedSame) && ([error code] == kRSErrorSchedulingConflict))
     {
-      NSLog(@"IMPLEMENT - present custom scheduling conflict dialog");
+      [self showScheduleConflict:error];
     }
     else
     {
@@ -898,6 +900,17 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 	{
 		return NO;
 	}
+}
+
+- (void) showScheduleConflict:(NSError*)error
+{
+  RSScheduleConflictController *conflictController = [[RSScheduleConflictController alloc] initWithWindowNibName:@"ScheduleConflictWindow"];
+  [conflictController loadWindow];
+  [conflictController setScheduleToBeRecordedObjectID:[[error userInfo] valueForKey:kRSErrorScheduleToBeRecorded]];
+  [conflictController setConflictingSchedulesObjectIDs:[[error userInfo] valueForKey:kRSErrorConflictingSchedules]];
+  [[conflictController window] center];
+  [[NSApplication sharedApplication] runModalForWindow:[conflictController window]];
+  [conflictController release];
 }
 
 @end
