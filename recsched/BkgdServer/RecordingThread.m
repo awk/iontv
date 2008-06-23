@@ -103,8 +103,7 @@
 
   NSLog(@"Recording on HDHRStation %@.%@ - %@", anHDHRStation.channel.channelNumber, anHDHRStation.programNumber, anHDHRStation.z2itStation.callSign);
 
-  mFinishRecording = NO;
-  
+  mFinishRecording = ([mThreadRecording.schedule.endTime compare:[NSDate date]] == NSOrderedAscending);
 
   uint64_t next_progress = getcurrenttime() + 1000;
   while (!mFinishRecording)
