@@ -33,9 +33,42 @@
 - (void) buildSourceListNodeAndAddTo:(NSMutableArray *)anArray
 {
   NSMutableDictionary *aFutureRecordingNode = [[NSMutableDictionary alloc] init];
+  NSMutableDictionary *aParentNode = nil;
+  NSMutableArray *childrenArray = nil;
+  BOOL foundParent = NO;
   NSDateFormatter *dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+
   [dateFormatter setDateStyle:NSDateFormatterShortStyle];
+  [dateFormatter setTimeStyle:NSDateFormatterNoStyle];
+  NSString *parentLabel = [dateFormatter stringFromDate:self.schedule.time];
+
+  NSEnumerator *anEnumerator = [anArray objectEnumerator];
+  while (!foundParent && ((aParentNode = [anEnumerator nextObject]) != nil))
+  {
+    if ([(NSString*)([aParentNode valueForKey:RSSourceListLabelKey]) compare:parentLabel] == NSOrderedSame)
+    {
+      foundParent = YES;
+    }
+  }
+
+  if (!foundParent)
+  {
+    // Make a new parent node
+    aParentNode = [[NSMutableDictionary alloc] init];
+    [aParentNode setValue:parentLabel forKey:RSSourceListLabelKey];
+    childrenArray = [NSMutableArray arrayWithCapacity:3];
+    [aParentNode setValue:childrenArray forKey:RSSourceListChildrenKey];
+    [anArray addObject:aParentNode];
+    [aParentNode release];
+  }
+  else
+  {
+    // Retrieve the appropriate parent node
+    childrenArray = [aParentNode valueForKey:RSSourceListChildrenKey];
+  }
+
   [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+  [dateFormatter setDateStyle:NSDateFormatterNoStyle];
   NSString *timeStr = [dateFormatter stringFromDate:self.schedule.time];
   NSString *labelStr = [NSString stringWithFormat:@"%@ - %@", timeStr, self.schedule.program.title];
   [aFutureRecordingNode setValue:labelStr forKey:RSSourceListLabelKey];
@@ -44,7 +77,8 @@
   [aFutureRecordingNode setValue:[NSNumber numberWithBool:YES] forKey:RSSourceListDeletableKey];
   [aFutureRecordingNode setValue:@"deleteFutureRecording:" forKey:RSSourceListDeleteMessageNameKey];
   
-  [anArray addObject:aFutureRecordingNode];
+  [childrenArray addObject:aFutureRecordingNode];
+  [aFutureRecordingNode release];
 }
 
 @end
