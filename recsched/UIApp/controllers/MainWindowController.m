@@ -79,26 +79,26 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
 - (void) updateSourceListForRecordings
 {
-	NSArray *treeNodes = [mViewSelectionTreeController content];
-	NSMutableDictionary *aSourceListNode = nil;
-  
+  NSArray *treeNodes = [mViewSelectionTreeController content];
+  NSMutableDictionary *aSourceListNode = nil;
+
   for (aSourceListNode in treeNodes)
-	{
-		if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodeFutureRecordingsType)
-		{
+  {
+    if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodeFutureRecordingsType)
+    {
       NSArray *schedulesToBeRecorded = [NSArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] afterDate:[NSDate date] withStatus:RSRecordingNotYetStartedStatus]];
       NSMutableArray *sourceListNodes = [NSMutableArray arrayWithCapacity:[schedulesToBeRecorded count]];
       [schedulesToBeRecorded makeObjectsPerformSelector:@selector(buildSourceListNodeAndAddTo:) withObject:sourceListNodes];
       [aSourceListNode setValue:sourceListNodes forKey:RSSourceListChildrenKey];
-		}
-		else if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodePastRecordingsType)
-		{
-			NSMutableArray *pastRecordings = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] beforeDate:[NSDate date]]];
+    }
+    else if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodePastRecordingsType)
+    {
+      NSMutableArray *pastRecordings = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] beforeDate:[NSDate date]]];
       NSMutableArray *sourceListNodes = [NSMutableArray arrayWithCapacity:[pastRecordings count]];
       [pastRecordings makeObjectsPerformSelector:@selector(buildSourceListNodeAndAddTo:) withObject:sourceListNodes];
       [aSourceListNode setValue:sourceListNodes forKey:RSSourceListChildrenKey];
-		}
-	}
+    }
+  }
 }
 
 - (void) updateSourceListForSeasonPasses
