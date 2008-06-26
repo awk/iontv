@@ -3,10 +3,10 @@
  *
  * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "hdhomerun.h"
@@ -148,12 +147,6 @@ static int cmd_set(const char *item, const char *value)
 	return 1;
 }
 
-static int cmd_streaminfo(const char *tuner_str)
-{
-	fprintf(stderr, "streaminfo: use \"get /tuner<n>/streaminfo\"\n");
-	return -1;
-}
-
 static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 {
 	FILE *fp = va_arg(ap, FILE *);
@@ -174,6 +167,12 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		return -1;
 	}
 
+	uint32_t channel_map = hdhomerun_device_model_channel_map_all(hd);
+	if (channel_map == 0) {
+		fprintf(stderr, "failed to detect channel_map set\n");
+		return -1;
+	}
+
 	FILE *fp = NULL;
 	if (filename) {
 		fp = fopen(filename, "w");
@@ -183,10 +182,16 @@ static int cmd_scan(const char *tuner_str, const char *filename)
 		}
 	}
 
-	int ret = channelscan_execute_all(hd, HDHOMERUN_CHANNELSCAN_MODE_SCAN, cmd_scan_callback, fp);
+	int ret = channelscan_execute_all(hd, channel_map, cmd_scan_callback, fp);
 
 	if (fp) {
 		fclose(fp);
+	}
+	if (ret < 0) {
+		fprintf(stderr, "communication error sending request to hdhomerun device\n");
+	}
+	if (ret == 0) {
+		fprintf(stderr, "error running channel scan\n");
 	}
 	return ret;
 }
@@ -240,13 +245,36 @@ static int cmd_upgrade(const char *filename)
 		return -1;
 	}
 
+	printf("uploading firmware...\n");
 	if (hdhomerun_device_upgrade(hd, fp) <= 0) {
 		fprintf(stderr, "error sending upgrade file to hdhomerun device\n");
 		fclose(fp);
 		return -1;
 	}
+	sleep(2);
 
-	printf("upgrade complete\n");
+	printf("upgrading firmware...\n");
+	sleep(8);
+
+	printf("rebooting...\n");
+	int count = 0;
+	char *version_str;
+	while (1) {
+		if (hdhomerun_device_get_version(hd, &version_str, NULL) >= 0) {
+			break;
+		}
+
+		count++;
+		if (count > 30) {
+			fprintf(stderr, "error finding device after firmware upgrade\n");
+			fclose(fp);
+			return -1;
+		}
+
+		sleep(1);
+	}
+
+	printf("upgrade complete - now running firmware %s\n", version_str);
 	return 0;
 }
 
@@ -270,13 +298,6 @@ static int main_cmd(int argc, char *argv[])
 			return help();
 		}
 		return cmd_set(argv[0], argv[1]);
-	}
-
-	if (contains(cmd, "streaminfo")) {
-		if (argc < 1) {
-			return help();
-		}
-		return cmd_streaminfo(argv[0]);
 	}
 
 	if (contains(cmd, "scan")) {
@@ -310,7 +331,6 @@ static int main_cmd(int argc, char *argv[])
 static int main_internal(int argc, char *argv[])
 {
 #if defined(__WINDOWS__)
-	// Start WinSock
 	WORD wVersionRequested = MAKEWORD(2, 0);
 	WSADATA wsaData;
 	WSAStartup(wVersionRequested, &wsaData);
@@ -343,19 +363,22 @@ static int main_internal(int argc, char *argv[])
 		return -1;
 	}
 
-	/* Connect to device and check firmware version. */
-	int ret = hdhomerun_device_firmware_version_check(hd, 0);
-	if (ret < 0) {
+	/* Device ID check. */
+	uint32_t device_id_requested = hdhomerun_device_get_device_id_requested(hd);
+	if (!hdhomerun_discover_validate_device_id(device_id_requested)) {
+		fprintf(stderr, "invalid device id: %08lX\n", (unsigned long)device_id_requested);
+	}
+
+	/* Connect to device and check model. */
+	const char *model = hdhomerun_device_get_model_str(hd);
+	if (!model) {
 		fprintf(stderr, "unable to connect to device\n");
 		hdhomerun_device_destroy(hd);
 		return -1;
 	}
-	if (ret == 0) {
-		fprintf(stderr, "WARNING: firmware upgrade needed for all operations to function\n");
-	}
 
 	/* Command. */
-	ret = main_cmd(argc, argv);
+	int ret = main_cmd(argc, argv);
 
 	/* Cleanup. */
 	hdhomerun_device_destroy(hd);

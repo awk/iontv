@@ -1,12 +1,12 @@
 /*
- * hdhomerun_record.c
+ * hdhomerun_device.c
  *
  * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,13 +14,13 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "hdhomerun_os.h"
 #include "hdhomerun_pkt.h"
 #include "hdhomerun_debug.h"
+#include "hdhomerun_channels.h"
 #include "hdhomerun_discover.h"
 #include "hdhomerun_control.h"
 #include "hdhomerun_video.h"
@@ -29,14 +29,31 @@
 struct hdhomerun_device_t {
 	struct hdhomerun_control_sock_t *cs;
 	struct hdhomerun_video_sock_t *vs;
+	struct hdhomerun_debug_t *dbg;
 	unsigned int tuner;
 	char name[32];
-	char result_buffer[1024];
+	char model[32];
 };
 
-static void hdhomerun_device_update_name(struct hdhomerun_device_t *hd)
+static void hdhomerun_device_set_update(struct hdhomerun_device_t *hd)
 {
+	/* Clear cached information. */
+	*hd->model = 0;
+
+	/* New name. */
 	sprintf(hd->name, "%08lX-%u", (unsigned long)hdhomerun_control_get_device_id(hd->cs), hd->tuner);
+}
+
+void hdhomerun_device_set_device(struct hdhomerun_device_t *hd, uint32_t device_id, uint32_t device_ip)
+{
+	hdhomerun_control_set_device(hd->cs, device_id, device_ip);
+	hdhomerun_device_set_update(hd);
+}
+
+void hdhomerun_device_set_tuner(struct hdhomerun_device_t *hd, unsigned int tuner)
+{
+	hd->tuner = tuner;
+	hdhomerun_device_set_update(hd);
 }
 
 struct hdhomerun_device_t *hdhomerun_device_create(uint32_t device_id, uint32_t device_ip, unsigned int tuner)
@@ -46,40 +63,16 @@ struct hdhomerun_device_t *hdhomerun_device_create(uint32_t device_id, uint32_t 
 		return NULL;
 	}
 
-	hd->tuner = tuner;
-
-	hd->cs = hdhomerun_control_create(device_id, device_ip);
+	hd->cs = hdhomerun_control_create(0, 0);
 	if (!hd->cs) {
 		free(hd);
 		return NULL;
 	}
 
-	hdhomerun_device_update_name(hd);
+	hdhomerun_device_set_device(hd, device_id, device_ip);
+	hdhomerun_device_set_tuner(hd, tuner);
 
 	return hd;
-}
-
-struct hdhomerun_device_t *hdhomerun_device_create_from_str(const char *device_str)
-{
-	unsigned long a[4];
-	if (sscanf(device_str, "%lu.%lu.%lu.%lu", &a[0], &a[1], &a[2], &a[3]) == 4) {
-		unsigned long device_ip = (a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0);
-		return hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, 0);
-	}
-
-	unsigned long device_id;
-	unsigned int tuner;
-	if (sscanf(device_str, "%lx:%u", &device_id, &tuner) == 2) {
-		return hdhomerun_device_create((uint32_t)device_id, 0, tuner);
-	}
-	if (sscanf(device_str, "%lx-%u", &device_id, &tuner) == 2) {
-		return hdhomerun_device_create((uint32_t)device_id, 0, tuner);
-	}
-	if (sscanf(device_str, "%lx", &device_id) == 1) {
-		return hdhomerun_device_create((uint32_t)device_id, 0, 0);
-	}
-
-	return NULL;
 }
 
 void hdhomerun_device_destroy(struct hdhomerun_device_t *hd)
@@ -93,16 +86,107 @@ void hdhomerun_device_destroy(struct hdhomerun_device_t *hd)
 	free(hd);
 }
 
-void hdhomerun_device_set_device(struct hdhomerun_device_t *hd, uint32_t device_id, uint32_t device_ip)
+static bool_t is_hex_char(char c)
 {
-	hdhomerun_control_set_device(hd->cs, device_id, device_ip);
-	hdhomerun_device_update_name(hd);
+	if ((c >= '0') && (c <= '9')) {
+		return TRUE;
+	}
+	if ((c >= 'A') && (c <= 'F')) {
+		return TRUE;
+	}
+	if ((c >= 'a') && (c <= 'f')) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
-void hdhomerun_device_set_tuner(struct hdhomerun_device_t *hd, unsigned int tuner)
+static struct hdhomerun_device_t *hdhomerun_device_create_from_str_device_id(const char *device_str)
 {
-	hd->tuner = tuner;
-	hdhomerun_device_update_name(hd);
+	int i;
+	const char *ptr = device_str;
+	for (i = 0; i < 8; i++) {
+		if (!is_hex_char(*ptr++)) {
+			return NULL;
+		}
+	}
+
+	if (*ptr == 0) {
+		unsigned long device_id;
+		if (sscanf(device_str, "%lx", &device_id) != 1) {
+			return NULL;
+		}
+		return hdhomerun_device_create((uint32_t)device_id, 0, 0);
+	}
+
+	if (*ptr == '-') {
+		unsigned long device_id;
+		unsigned int tuner;
+		if (sscanf(device_str, "%lx-%u", &device_id, &tuner) != 2) {
+			return NULL;
+		}
+		return hdhomerun_device_create((uint32_t)device_id, 0, tuner);
+	}
+
+	return NULL;
+}
+
+static struct hdhomerun_device_t *hdhomerun_device_create_from_str_ip(const char *device_str)
+{
+	unsigned long a[4];
+	if (sscanf(device_str, "%lu.%lu.%lu.%lu", &a[0], &a[1], &a[2], &a[3]) != 4) {
+		return NULL;
+	}
+
+	unsigned long device_ip = (a[0] << 24) | (a[1] << 16) | (a[2] << 8) | (a[3] << 0);
+	return hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, 0);
+}
+
+static struct hdhomerun_device_t *hdhomerun_device_create_from_str_dns(const char *device_str)
+{
+#if defined(__CYGWIN__)
+	return NULL;
+#else
+	struct addrinfo hints;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+
+	struct addrinfo *sock_info;
+	if (getaddrinfo(device_str, "65001", &hints, &sock_info) != 0) {
+		return NULL;
+	}
+
+	struct sockaddr_in *sock_addr = (struct sockaddr_in *)sock_info->ai_addr;
+	uint32_t device_ip = ntohl(sock_addr->sin_addr.s_addr);
+	freeaddrinfo(sock_info);
+
+	if (device_ip == 0) {
+		return NULL;
+	}
+
+	return hdhomerun_device_create(HDHOMERUN_DEVICE_ID_WILDCARD, (uint32_t)device_ip, 0);
+#endif
+}
+
+struct hdhomerun_device_t *hdhomerun_device_create_from_str(const char *device_str)
+{
+	struct hdhomerun_device_t *device = hdhomerun_device_create_from_str_device_id(device_str);
+	if (device) {
+		return device;
+	}
+
+	device = hdhomerun_device_create_from_str_ip(device_str);
+	if (device) {
+		return device;
+	}
+
+	device = hdhomerun_device_create_from_str_dns(device_str);
+	if (device) {
+		return device;
+	}
+
+	return NULL;
 }
 
 int hdhomerun_device_set_tuner_from_str(struct hdhomerun_device_t *hd, const char *tuner_str)
@@ -120,6 +204,16 @@ int hdhomerun_device_set_tuner_from_str(struct hdhomerun_device_t *hd, const cha
 	return -1;
 }
 
+void hdhomerun_device_set_debug(struct hdhomerun_device_t *hd, struct hdhomerun_debug_t *dbg)
+{
+	hd->dbg = dbg;
+	hdhomerun_control_set_debug(hd->cs, dbg);
+
+	if (hd->vs) {
+		hdhomerun_video_set_debug(hd->vs, dbg);
+	}
+}
+
 uint32_t hdhomerun_device_get_device_id(struct hdhomerun_device_t *hd)
 {
 	return hdhomerun_control_get_device_id(hd->cs);
@@ -128,6 +222,16 @@ uint32_t hdhomerun_device_get_device_id(struct hdhomerun_device_t *hd)
 uint32_t hdhomerun_device_get_device_ip(struct hdhomerun_device_t *hd)
 {
 	return hdhomerun_control_get_device_ip(hd->cs);
+}
+
+uint32_t hdhomerun_device_get_device_id_requested(struct hdhomerun_device_t *hd)
+{
+	return hdhomerun_control_get_device_id_requested(hd->cs);
+}
+
+uint32_t hdhomerun_device_get_device_ip_requested(struct hdhomerun_device_t *hd)
+{
+	return hdhomerun_control_get_device_ip_requested(hd->cs);
 }
 
 unsigned int hdhomerun_device_get_tuner(struct hdhomerun_device_t *hd)
@@ -142,9 +246,16 @@ struct hdhomerun_control_sock_t *hdhomerun_device_get_control_sock(struct hdhome
 
 struct hdhomerun_video_sock_t *hdhomerun_device_get_video_sock(struct hdhomerun_device_t *hd)
 {
-	if (!hd->vs) {
-		hd->vs = hdhomerun_video_create(0, VIDEO_DATA_BUFFER_SIZE_1S);
+	if (hd->vs) {
+		return hd->vs;
 	}
+
+	hd->vs = hdhomerun_video_create(0, VIDEO_DATA_BUFFER_SIZE_1S * 2);
+	if (!hd->vs) {
+		return NULL;
+	}
+
+	hdhomerun_video_set_debug(hd->vs, hd->dbg);
 	return hd->vs;
 }
 
@@ -164,6 +275,55 @@ static uint32_t hdhomerun_device_get_status_parse(const char *status_str, const 
 	sscanf(ptr + strlen(tag), "%lu", &value);
 
 	return (uint32_t)value;
+}
+
+uint32_t hdhomerun_device_get_tuner_status_ss_color(struct hdhomerun_tuner_status_t *status)
+{
+	unsigned int ss_yellow_min;
+	unsigned int ss_green_min;
+
+	if (strstr(status->lock_str, "8vsb")) {
+		ss_yellow_min = 50;	/* -30dBmV */
+		ss_green_min = 75;	/* -15dBmV */
+	} else if (strstr(status->lock_str, "qam64")) {
+		ss_yellow_min = 80;	/* -12dBmV */
+		ss_green_min = 90;	/* -6dBmV */
+	} else if (strstr(status->lock_str, "qam256")) {
+		ss_yellow_min = 80;	/* -12dBmV */
+		ss_green_min = 90;	/* -6dBmV */
+	} else {
+		return HDHOMERUN_STATUS_COLOR_NEUTRAL;
+	}
+
+	if (status->signal_strength >= ss_green_min) {
+		return HDHOMERUN_STATUS_COLOR_GREEN;
+	}
+	if (status->signal_strength >= ss_yellow_min) {
+		return HDHOMERUN_STATUS_COLOR_YELLOW;
+	}
+
+	return HDHOMERUN_STATUS_COLOR_RED;
+}
+
+uint32_t hdhomerun_device_get_tuner_status_snq_color(struct hdhomerun_tuner_status_t *status)
+{
+	if (status->signal_to_noise_quality >= 60) {
+		return HDHOMERUN_STATUS_COLOR_GREEN;
+	}
+	if (status->signal_to_noise_quality >= 40) {
+		return HDHOMERUN_STATUS_COLOR_YELLOW;
+	}
+
+	return HDHOMERUN_STATUS_COLOR_RED;
+}
+
+uint32_t hdhomerun_device_get_tuner_status_seq_color(struct hdhomerun_tuner_status_t *status)
+{
+	if (status->symbol_error_quality >= 100) {
+		return HDHOMERUN_STATUS_COLOR_GREEN;
+	}
+
+	return HDHOMERUN_STATUS_COLOR_RED;
 }
 
 int hdhomerun_device_get_tuner_status(struct hdhomerun_device_t *hd, struct hdhomerun_tuner_status_t *status)
@@ -248,6 +408,55 @@ int hdhomerun_device_get_tuner_target(struct hdhomerun_device_t *hd, char **ptar
 	char name[32];
 	sprintf(name, "/tuner%u/target", hd->tuner);
 	return hdhomerun_control_get(hd->cs, name, ptarget, NULL);
+}
+
+int hdhomerun_device_get_tuner_plotsample(struct hdhomerun_device_t *hd, struct hdhomerun_plotsample_t **psamples, size_t *pcount)
+{
+	char name[32];
+	sprintf(name, "/tuner%u/plotsample", hd->tuner);
+
+	char *result;
+	int ret = hdhomerun_control_get(hd->cs, name, &result, NULL);
+	if (ret <= 0) {
+		return ret;
+	}
+
+	struct hdhomerun_plotsample_t *samples = (struct hdhomerun_plotsample_t *)result;
+	*psamples = samples;
+	size_t count = 0;
+
+	while (1) {
+		char *ptr = strchr(result, ' ');
+		if (!ptr) {
+			break;
+		}
+		*ptr++ = 0;
+
+		unsigned long raw;
+		if (sscanf(result, "%lx", &raw) != 1) {
+			break;
+		}
+
+		uint16_t real = (raw >> 12) & 0x0FFF;
+		if (real & 0x0800) {
+			real |= 0xF000;
+		}
+
+		uint16_t imag = (raw >> 0) & 0x0FFF;
+		if (imag & 0x0800) {
+			imag |= 0xF000;
+		}
+
+		samples->real = (int16_t)real;
+		samples->imag = (int16_t)imag;
+		samples++;
+		count++;
+
+		result = ptr;
+	}
+
+	*pcount = count;
+	return 1;
 }
 
 int hdhomerun_device_get_ir_target(struct hdhomerun_device_t *hd, char **ptarget)
@@ -430,9 +639,9 @@ int hdhomerun_device_set_var(struct hdhomerun_device_t *hd, const char *name, co
 
 int hdhomerun_device_wait_for_lock(struct hdhomerun_device_t *hd, struct hdhomerun_tuner_status_t *status)
 {
-	/* Wait for up to 1.5 seconds for lock. */
+	/* Wait for up to 2.5 seconds for lock. */
 	int i;
-	for (i = 0; i < 6; i++) {
+	for (i = 0; i < 10; i++) {
 		usleep(250000);
 
 		/* Get status to check for lock. Quality numbers will not be valid yet. */
@@ -500,6 +709,63 @@ int hdhomerun_device_firmware_version_check(struct hdhomerun_device_t *hd, uint3
 	return 1;
 }
 
+const char *hdhomerun_device_get_model_str(struct hdhomerun_device_t *hd)
+{
+	if (*hd->model) {
+		return hd->model;
+	}
+
+	char *model_str;
+	int ret = hdhomerun_control_get(hd->cs, "/sys/model", &model_str, NULL);
+	if (ret < 0) {
+		return NULL;
+	}
+	if (ret == 0) {
+		strcpy(hd->model, "hdhomerun_atsc");
+		return hd->model;
+	}
+
+	strcpy(hd->model, model_str);
+	return hd->model;
+}
+
+uint32_t hdhomerun_device_model_channel_map_all(struct hdhomerun_device_t *hd)
+{
+	return hdhomerun_device_model_channel_map_antenna(hd) | hdhomerun_device_model_channel_map_cable(hd);
+}
+
+uint32_t hdhomerun_device_model_channel_map_antenna(struct hdhomerun_device_t *hd)
+{
+	const char *model = hdhomerun_device_get_model_str(hd);
+	if (!model) {
+		return 0;
+	}
+
+	if (strstr(model, "atsc")) {
+		return CHANNEL_MAP_US_BCAST;
+	}
+
+	if (strstr(model, "dvbt")) {
+		return CHANNEL_MAP_UK_BCAST | CHANNEL_MAP_NZ_BCAST;
+	}
+
+	return 0;
+}
+
+uint32_t hdhomerun_device_model_channel_map_cable(struct hdhomerun_device_t *hd)
+{
+	const char *model = hdhomerun_device_get_model_str(hd);
+	if (!model) {
+		return 0;
+	}
+
+	if (strstr(model, "atsc")) {
+		return CHANNEL_MAP_US_CABLE | CHANNEL_MAP_US_HRC | CHANNEL_MAP_US_IRC;
+	}
+
+	return 0;
+}
+
 int hdhomerun_device_upgrade(struct hdhomerun_device_t *hd, FILE *upgrade_file)
 {
 	hdhomerun_control_set(hd->cs, "/tuner0/channel", "none", NULL, NULL);
@@ -507,9 +773,9 @@ int hdhomerun_device_upgrade(struct hdhomerun_device_t *hd, FILE *upgrade_file)
 	return hdhomerun_control_upgrade(hd->cs, upgrade_file);
 }
 
-void hdhomerun_device_debug_print_video_stats(struct hdhomerun_device_t *hd, struct hdhomerun_debug_t *dbg)
+void hdhomerun_device_debug_print_video_stats(struct hdhomerun_device_t *hd)
 {
-	if (!hdhomerun_debug_enabled(dbg)) {
+	if (!hdhomerun_debug_enabled(hd->dbg)) {
 		return;
 	}
 
@@ -520,17 +786,17 @@ void hdhomerun_device_debug_print_video_stats(struct hdhomerun_device_t *hd, str
 	char *error_str;
 	int ret = hdhomerun_control_get(hd->cs, name, &debug_str, &error_str);
 	if (ret < 0) {
-		hdhomerun_debug_printf(dbg, "%s video dev: communication error getting debug stats\n", hd->name);
+		hdhomerun_debug_printf(hd->dbg, "video dev: communication error getting debug stats\n");
 		return;
 	}
 
 	if (error_str) {
-		hdhomerun_debug_printf(dbg, "%s video dev: %s\n", hd->name, error_str);
+		hdhomerun_debug_printf(hd->dbg, "video dev: %s\n", error_str);
 	} else {
-		hdhomerun_debug_printf(dbg, "%s video dev: %s\n", hd->name, debug_str);
+		hdhomerun_debug_printf(hd->dbg, "video dev: %s\n", debug_str);
 	}
 
 	if (hd->vs) {
-		hdhomerun_video_debug_print_stats(hd->vs, dbg, hd->name);
+		hdhomerun_video_debug_print_stats(hd->vs);
 	}
 }

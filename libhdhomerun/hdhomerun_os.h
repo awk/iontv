@@ -3,10 +3,10 @@
  *
  * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,11 +14,10 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if defined(WIN32)
+#if defined(_WIN32) || defined(_WIN64)
 #define __WINDOWS__
 #endif
 
@@ -27,6 +26,7 @@
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <wspiapi.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -64,6 +64,10 @@
 #if defined(__WINDOWS__)
 
 typedef int bool_t;
+typedef signed __int8 int8_t;
+typedef signed __int16 int16_t;
+typedef signed __int32 int32_t;
+typedef signed __int64 int64_t;
 typedef unsigned __int8 uint8_t;
 typedef unsigned __int16 uint16_t;
 typedef unsigned __int32 uint32_t;

@@ -1,7 +1,7 @@
 /*
- * libhdhomerun
+ * hdhomerun_dhcp.h
  *
- * Copyright © 2005-2006 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -17,12 +17,15 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-Top level include file: hdhomerun.h
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-Top level API: hdhomerun_device. See hdhomerun_device.h for documentation.
+struct hdhomerun_dhcp_t;
 
-The hdhomerun_device API should be used rather than the low level control and video APIs required with previous versions.
+extern struct hdhomerun_dhcp_t *hdhomerun_dhcp_create(uint32_t bind_address);
+extern void hdhomerun_dhcp_destroy(struct hdhomerun_dhcp_t *dhcp);
 
-Additional libraries required:
-- pthread
-- iphlpapi (windows only)
+#ifdef __cplusplus
+}
+#endif

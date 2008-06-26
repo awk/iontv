@@ -3,10 +3,10 @@
  *
  * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifdef __cplusplus
 extern "C" {
@@ -48,11 +47,6 @@ extern void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs);
 extern uint16_t hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs);
 
 /*
- * Get the low-level socket handle.
- */
-extern int hdhomerun_video_get_sock(struct hdhomerun_video_sock_t *vs);
-
-/*
  * Read data from buffer.
  *
  * size_t max_size: The maximum amount of data to be returned.
@@ -79,7 +73,8 @@ extern void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs);
 /*
  * Debug print internal stats.
  */
-extern void hdhomerun_video_debug_print_stats(struct hdhomerun_video_sock_t *vs, struct hdhomerun_debug_t *dbg, char *prefix);
+extern void hdhomerun_video_set_debug(struct hdhomerun_video_sock_t *vs, struct hdhomerun_debug_t *dbg);
+extern void hdhomerun_video_debug_print_stats(struct hdhomerun_video_sock_t *vs);
 
 #ifdef __cplusplus
 }

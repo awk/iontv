@@ -3,10 +3,10 @@
  *
  * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +45,9 @@ extern void hdhomerun_control_destroy(struct hdhomerun_control_sock_t *cs);
  */
 extern uint32_t hdhomerun_control_get_device_id(struct hdhomerun_control_sock_t *cs);
 extern uint32_t hdhomerun_control_get_device_ip(struct hdhomerun_control_sock_t *cs);
+extern uint32_t hdhomerun_control_get_device_id_requested(struct hdhomerun_control_sock_t *cs);
+extern uint32_t hdhomerun_control_get_device_ip_requested(struct hdhomerun_control_sock_t *cs);
+
 extern void hdhomerun_control_set_device(struct hdhomerun_control_sock_t *cs, uint32_t device_id, uint32_t device_ip);
 
 /*
@@ -58,9 +60,9 @@ extern void hdhomerun_control_set_device(struct hdhomerun_control_sock_t *cs, ui
 extern uint32_t hdhomerun_control_get_local_addr(struct hdhomerun_control_sock_t *cs);
 
 /*
- * Get the low-level socket handle.
+ * Low-level communication.
  */
-extern int hdhomerun_control_get_sock(struct hdhomerun_control_sock_t *cs);
+extern int hdhomerun_control_send_recv(struct hdhomerun_control_sock_t *cs, struct hdhomerun_pkt_t *tx_pkt, struct hdhomerun_pkt_t *rx_pkt, uint16_t type);
 
 /*
  * Get/set a control variable on the device.
@@ -92,6 +94,11 @@ extern int hdhomerun_control_set(struct hdhomerun_control_sock_t *cs, const char
  * Returns -1 if an error occurs.
  */
 extern int hdhomerun_control_upgrade(struct hdhomerun_control_sock_t *cs, FILE *upgrade_file);
+
+/*
+ * Debug logging.
+ */
+extern void hdhomerun_control_set_debug(struct hdhomerun_control_sock_t *cs, struct hdhomerun_debug_t *dbg);
 
 #ifdef __cplusplus
 }

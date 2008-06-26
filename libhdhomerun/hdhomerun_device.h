@@ -3,10 +3,10 @@
  *
  * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifdef __cplusplus
@@ -25,6 +24,11 @@ extern "C" {
 #define HDHOMERUN_DEVICE_MAX_TUNE_TO_LOCK_TIME 1500
 #define HDHOMERUN_DEVICE_MAX_LOCK_TO_DATA_TIME 2000
 #define HDHOMERUN_DEVICE_MAX_TUNE_TO_DATA_TIME (HDHOMERUN_DEVICE_MAX_TUNE_TO_LOCK_TIME + HDHOMERUN_DEVICE_MAX_LOCK_TO_DATA_TIME)
+
+#define HDHOMERUN_STATUS_COLOR_NEUTRAL	0xFFFFFFFF
+#define HDHOMERUN_STATUS_COLOR_RED		0xFFFF0000
+#define HDHOMERUN_STATUS_COLOR_YELLOW	0xFFFFFF00
+#define HDHOMERUN_STATUS_COLOR_GREEN	0xFF008000
 
 struct hdhomerun_device_t;
 
@@ -39,6 +43,11 @@ struct hdhomerun_tuner_status_t {
 	unsigned int symbol_error_quality;
 	uint32_t raw_bits_per_second;
 	uint32_t packets_per_second;
+};
+
+struct hdhomerun_plotsample_t {
+	int16_t real;
+	int16_t imag;
 };
 
 /*
@@ -65,7 +74,6 @@ struct hdhomerun_tuner_status_t {
  * The hdhomerun_device_create_from_str function creates a device object from the given device_str.
  * The device_str parameter can be any of the following forms:
  *     <device id>
- *     <device id>:<tuner index>
  *     <device id>-<tuner index>
  *     <ip address>
  * If the tuner index is not included in the device_str then it is set to zero.
@@ -85,7 +93,10 @@ extern void hdhomerun_device_destroy(struct hdhomerun_device_t *hd);
  */
 extern uint32_t hdhomerun_device_get_device_id(struct hdhomerun_device_t *hd);
 extern uint32_t hdhomerun_device_get_device_ip(struct hdhomerun_device_t *hd);
+extern uint32_t hdhomerun_device_get_device_id_requested(struct hdhomerun_device_t *hd);
+extern uint32_t hdhomerun_device_get_device_ip_requested(struct hdhomerun_device_t *hd);
 extern unsigned int hdhomerun_device_get_tuner(struct hdhomerun_device_t *hd);
+
 extern void hdhomerun_device_set_device(struct hdhomerun_device_t *hd, uint32_t device_id, uint32_t device_ip);
 extern void hdhomerun_device_set_tuner(struct hdhomerun_device_t *hd, unsigned int tuner);
 extern int hdhomerun_device_set_tuner_from_str(struct hdhomerun_device_t *hd, const char *tuner_str);
@@ -117,9 +128,19 @@ extern int hdhomerun_device_get_tuner_channelmap(struct hdhomerun_device_t *hd, 
 extern int hdhomerun_device_get_tuner_filter(struct hdhomerun_device_t *hd, char **pfilter);
 extern int hdhomerun_device_get_tuner_program(struct hdhomerun_device_t *hd, char **pprogram);
 extern int hdhomerun_device_get_tuner_target(struct hdhomerun_device_t *hd, char **ptarget);
+extern int hdhomerun_device_get_tuner_plotsample(struct hdhomerun_device_t *hd, struct hdhomerun_plotsample_t **psamples, size_t *pcount);
 extern int hdhomerun_device_get_ir_target(struct hdhomerun_device_t *hd, char **ptarget);
 extern int hdhomerun_device_get_lineup_location(struct hdhomerun_device_t *hd, char **plocation);
 extern int hdhomerun_device_get_version(struct hdhomerun_device_t *hd, char **pversion_str, uint32_t *pversion_num);
+
+extern uint32_t hdhomerun_device_get_tuner_status_ss_color(struct hdhomerun_tuner_status_t *status);
+extern uint32_t hdhomerun_device_get_tuner_status_snq_color(struct hdhomerun_tuner_status_t *status);
+extern uint32_t hdhomerun_device_get_tuner_status_seq_color(struct hdhomerun_tuner_status_t *status);
+
+extern const char *hdhomerun_device_get_model_str(struct hdhomerun_device_t *hd);
+extern uint32_t hdhomerun_device_model_channel_map_all(struct hdhomerun_device_t *hd);
+extern uint32_t hdhomerun_device_model_channel_map_antenna(struct hdhomerun_device_t *hd);
+extern uint32_t hdhomerun_device_model_channel_map_cable(struct hdhomerun_device_t *hd);
 
 /*
  * Set operations.
@@ -224,7 +245,8 @@ extern struct hdhomerun_video_sock_t *hdhomerun_device_get_video_sock(struct hdh
 /*
  * Debug print internal stats.
  */
-extern void hdhomerun_device_debug_print_video_stats(struct hdhomerun_device_t *hd, struct hdhomerun_debug_t *dbg);
+extern void hdhomerun_device_set_debug(struct hdhomerun_device_t *hd, struct hdhomerun_debug_t *dbg);
+extern void hdhomerun_device_debug_print_video_stats(struct hdhomerun_device_t *hd);
 
 #ifdef __cplusplus
 }

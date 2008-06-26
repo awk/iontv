@@ -1,28 +1,40 @@
-
 LIBSRCS += hdhomerun_pkt.c
 LIBSRCS += hdhomerun_debug.c
 LIBSRCS += hdhomerun_discover.c
-LIBSRCS += hdhomerun_control.c
+LIBSRCS += hdhomerun_channels.c
 LIBSRCS += hdhomerun_channelscan.c
+LIBSRCS += hdhomerun_control.c
 LIBSRCS += hdhomerun_video.c
 LIBSRCS += hdhomerun_device.c
 
 CFLAGS += -Wall -O2 -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith
-CPPFLAGS += -Wall -O2
+LDFLAGS += -lpthread
 
-hdhomerun_config : $(LIBSRCS) hdhomerun_config.c
-	gcc $(CFLAGS) $(LIBSRCS) hdhomerun_config.c -lpthread -o $@
+ifeq ($(OS),Windows_NT)
+  BINEXT := .exe
+  LIBEXT := .dll
+  LDFLAGS += -liphlpapi
+else
+  LIBEXT := .so
+  ifneq ($(findstring solaris,$(OSTYPE)),)
+    LDFLAGS += -lns -lsocket
+  endif
+endif
+
+
+hdhomerun_config$(BINEXT) : hdhomerun_config.c $(LIBSRCS)
+	$(CC) $(CFLAGS) $+ $(LDFLAGS) -o $@
 	strip $@
 
-hdhomerun_config.exe : $(LIBSRCS) hdhomerun_config.c
-	gcc $(CFLAGS) $(LIBSRCS) hdhomerun_config.c -lpthread -liphlpapi -o $@
-	strip $@
+libhdhomerun$(LIBEXT) : $(LIBSRCS)
+	$(CC) -shared -Wl,-soname,libhdhomerun$(LIBEXT) $+ $(LDFLAGS) -o $@
 
-hdhomerun_mythconfig : $(LIBSRCS) hdhomerun_mythconfig.cpp
-	g++ $(CPPFLAGS) $(LIBSRCS) hdhomerun_mythconfig.cpp -lpthread -lmysqlclient -o $@
-	strip $@
+list :
+	@echo hdhomerun_config$(BINEXT)
+	@echo libhdhomerun$(LIBEXT)
 
 clean :
-	rm -f hdhomerun_config
-	rm -f hdhomerun_config.exe
-	rm -f hdhomerun_mythconfig
+	-rm -f hdhomerun_config$(BINEXT)
+	-rm -f libhdhomerun$(LIBEXT)
+
+.PHONY: list clean

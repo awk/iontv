@@ -3,10 +3,10 @@
  *
  * Copyright © 2006 Silicondust Engineering Ltd. <www.silicondust.com>.
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,8 +14,7 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "hdhomerun_os.h"
@@ -32,10 +31,12 @@ struct hdhomerun_video_sock_t {
 	volatile bool_t terminate;
 	pthread_t thread;
 	int sock;
-	uint32_t packet_count;
-	uint32_t transport_error_count;
-	uint32_t sequence_error_count;
-	uint8_t sequence[0x2000];
+	struct hdhomerun_debug_t *dbg;
+	volatile uint32_t packet_count;
+	volatile uint32_t transport_error_count;
+	volatile uint32_t sequence_error_count;
+	volatile uint32_t overflow_error_count;
+	volatile uint8_t sequence[0x2000];
 };
 
 static THREAD_FUNC_PREFIX hdhomerun_video_thread_execute(void *arg);
@@ -85,7 +86,7 @@ struct hdhomerun_video_sock_t *hdhomerun_video_create(uint16_t listen_port, size
 	}
 
 	/* Reset sequence tracking. */
-	memset(vs->sequence, 0xFF, sizeof(vs->sequence));
+	hdhomerun_video_flush(vs);
 
 	/* Buffer size. */
 	vs->buffer_size = (buffer_size / VIDEO_DATA_PACKET_SIZE) * VIDEO_DATA_PACKET_SIZE;
@@ -149,19 +150,20 @@ void hdhomerun_video_destroy(struct hdhomerun_video_sock_t *vs)
 	free(vs);
 }
 
+void hdhomerun_video_set_debug(struct hdhomerun_video_sock_t *vs, struct hdhomerun_debug_t *dbg)
+{
+	vs->dbg = dbg;
+}
+
 uint16_t hdhomerun_video_get_local_port(struct hdhomerun_video_sock_t *vs)
 {
 	struct sockaddr_in sock_addr;
 	socklen_t sockaddr_size = sizeof(sock_addr);
 	if (getsockname(vs->sock, (struct sockaddr*)&sock_addr, &sockaddr_size) != 0) {
+		hdhomerun_debug_printf(vs->dbg, "hdhomerun_video_get_local_port: getsockname failed (%d)\n", sock_getlasterror);
 		return 0;
 	}
 	return ntohs(sock_addr.sin_port);
-}
-
-int hdhomerun_video_get_sock(struct hdhomerun_video_sock_t *vs)
-{
-	return vs->sock;
 }
 
 static void hdhomerun_video_stats_ts_pkt(struct hdhomerun_video_sock_t *vs, uint8_t *ptr)
@@ -179,16 +181,17 @@ static void hdhomerun_video_stats_ts_pkt(struct hdhomerun_video_sock_t *vs, uint
 	}
 
 	uint8_t continuity_counter = ptr[3] & 0x0F;
+	uint8_t previous_sequence = vs->sequence[packet_identifier];
 
-	if (continuity_counter == ((vs->sequence[packet_identifier] + 1) & 0x0F)) {
+	if (continuity_counter == ((previous_sequence + 1) & 0x0F)) {
 		vs->sequence[packet_identifier] = continuity_counter;
 		return;
 	}
-	if (vs->sequence[packet_identifier] == 0xFF) {
+	if (previous_sequence == 0xFF) {
 		vs->sequence[packet_identifier] = continuity_counter;
 		return;
 	}
-	if (continuity_counter == vs->sequence[packet_identifier]) {
+	if (continuity_counter == previous_sequence) {
 		return;
 	}
 
@@ -237,6 +240,7 @@ static THREAD_FUNC_PREFIX hdhomerun_video_thread_execute(void *arg)
 
 		/* Check for buffer overflow. */
 		if (head == vs->tail) {
+			vs->overflow_error_count++;
 			continue;
 		}
 
@@ -295,13 +299,18 @@ void hdhomerun_video_flush(struct hdhomerun_video_sock_t *vs)
 	vs->tail = vs->head;
 	vs->advance = 0;
 
-	memset(vs->sequence, 0xFF, sizeof(vs->sequence));
+	int i;
+	for (i = 0; i < 8192; i++) {
+		vs->sequence[i] = 0xFF;
+	}
+
 	vs->packet_count = 0;
 	vs->transport_error_count = 0;
 	vs->sequence_error_count = 0;
+	vs->overflow_error_count = 0;
 }
 
-void hdhomerun_video_debug_print_stats(struct hdhomerun_video_sock_t *vs, struct hdhomerun_debug_t *dbg, char *prefix)
+void hdhomerun_video_debug_print_stats(struct hdhomerun_video_sock_t *vs)
 {
-	hdhomerun_debug_printf(dbg, "%s video sock: pkt=%ld te=%ld miss=%ld\n", prefix, vs->packet_count, vs->transport_error_count, vs->sequence_error_count);
+	hdhomerun_debug_printf(vs->dbg, "video sock: pkt=%ld te=%ld miss=%ld drop=%ld\n", vs->packet_count, vs->transport_error_count, vs->sequence_error_count, vs->overflow_error_count);
 }
