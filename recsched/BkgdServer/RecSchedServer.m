@@ -745,7 +745,7 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
 	[[self uiActivity] setActivity:activityToken infoString:[NSString stringWithFormat:@"Looking for HDHomeRun Devices"]]; 
 	[[self uiActivity] setActivity:activityToken progressIndeterminate:YES];
 	
-	int count = hdhomerun_discover_find_devices(HDHOMERUN_DEVICE_TYPE_TUNER, result_list, 64);
+	int count = hdhomerun_discover_find_devices_custom(0, HDHOMERUN_DEVICE_TYPE_TUNER, HDHOMERUN_DEVICE_ID_WILDCARD, result_list, 64);
 	
 	if (count > 0)
 	{

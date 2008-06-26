@@ -18,6 +18,7 @@
 #import "HDHomeRunTuner.h"
 #import "HDHomeRunMO.h"
 #import "HDHomeRunChannelStationMap.h"
+#import "hdhomerun_channels.h"
 #import "hdhomerun_channelscan.h"
 #import "hdhomerun_video.h"
 #import "RSActivityDisplayProtocol.h"
@@ -580,30 +581,34 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
   NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
   [managedObjectContext setPersistentStoreCoordinator: psc];
-	
-    mCurrentActivityToken = 0;
-    if (mCurrentProgressDisplay)
-    {
-            mCurrentActivityToken = [mCurrentProgressDisplay createActivity];
-            mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken progressMaxValue:390.0f];		// There are a maximum of 390 channels to scan per tuner !
-    }
-	
-    mCurrentHDHomeRunChannel = nil;
-    
-  @try
-  {
-    @synchronized(self)  
-    {
-      NSLog(@"HDHomeRunTuner - scanAction for %@", [self longName]);
 
-      scanResult = channelscan_execute_all(mHDHomeRunDevice, HDHOMERUN_CHANNELSCAN_MODE_SCAN, cmd_scan_callback, self, managedObjectContext);
+  mCurrentActivityToken = 0;
+  if (mCurrentProgressDisplay)
+  {
+    mCurrentActivityToken = [mCurrentProgressDisplay createActivity];
+    mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken progressMaxValue:390.0f];		// There are a maximum of 390 channels to scan per tuner !
+  }
+
+  mCurrentHDHomeRunChannel = nil;
+
+  uint32_t channelMap = hdhomerun_device_model_channel_map_all(mHDHomeRunDevice);
+  if (channelMap >= 0) 
+  {
+    @try
+    {
+      @synchronized(self)  
+      {
+        NSLog(@"HDHomeRunTuner - scanAction for %@", [self longName]);
+
+        scanResult = channelscan_execute_all(mHDHomeRunDevice, channelMap, cmd_scan_callback, self, managedObjectContext);
+      }
+    }
+    @catch (NSException *anException)
+    {
+      NSLog(@"Exception during scan = %@, reason: %@", [anException name], [anException reason]); 
     }
   }
-  @catch (NSException *anException)
-  {
-    NSLog(@"Exception during scan = %@, reason: %@", [anException name], [anException reason]); 
-  }
-  
+
   if (mCurrentActivityToken)
 	[mCurrentProgressDisplay endActivity:mCurrentActivityToken];
   
