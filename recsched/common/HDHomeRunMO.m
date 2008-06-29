@@ -22,12 +22,16 @@
 #import "Z2ITLineup.h"
 
 const int kDefaultPortNumber = 1234;
+NSString *kLatestFirmwareFilename = @"hdhomerun_firmware_20080427";
+const int kLatestFirmwareVersion = 20080427;
 
 @implementation HDHomeRun
 
 @dynamic deviceID;
 @dynamic name;
 @dynamic tuners;
+@synthesize newFirmwareAvailable = mNewFirmwareAvailable;
+@synthesize deviceOnline = mDeviceOnline;
 
 // Fetch the HDHomeRun with the given ID from the Managed Object Context
 + (HDHomeRun *) fetchHDHomeRunWithID:(NSNumber *)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC
@@ -133,7 +137,30 @@ const int kDefaultPortNumber = 1234;
   uint32_t deviceID = [[self deviceID] intValue];
   if ((deviceID != 0) && (mHDHomeRunDevice == nil))
   {
+    uint32_t version;
     mHDHomeRunDevice = hdhomerun_device_create(deviceID, 0, 0);
+
+    int versionCheck = hdhomerun_device_get_version(mHDHomeRunDevice, NULL, &version);
+    if (versionCheck > 0)
+    {
+      mDeviceOnline = YES;
+      if (version < kLatestFirmwareVersion)
+      {
+        mNewFirmwareAvailable = YES;
+      }
+    }
+    else
+    {
+      // Device offline - exit
+      return;
+    }
+
+    int firmwareCheck =  hdhomerun_device_firmware_version_check(mHDHomeRunDevice, 0);
+    if (firmwareCheck == 0)
+    {
+      // Check succeeded but the firmware is out of date for our purposes, upgrade it
+      [self upgradeFirmware];
+    }
   }
 }
 
@@ -161,6 +188,51 @@ const int kDefaultPortNumber = 1234;
 - (void) willTurnIntoFault
 {
   [self releaseHDHRDevice];
+}
+
+- (BOOL) upgradeFirmware
+{
+  NSString *firmwareFilename = [[NSBundle mainBundle] pathForResource:kLatestFirmwareFilename ofType:@"bin"];
+  FILE *upgradeFile = NULL;
+
+  upgradeFile = fopen([firmwareFilename UTF8String], "rb");
+  if (upgradeFile == NULL)
+  {
+    NSAlert *upgradeAlert = [[NSAlert alloc] init];
+    [upgradeAlert setMessageText:@"Unable to find firmware image."];
+    [upgradeAlert setInformativeText:@"The firmware on the HDHomeRun needs to be upgraded but the appropriate firmware file cannot be found."];
+    [upgradeAlert addButtonWithTitle:@"OK"];
+    [upgradeAlert runModal];
+    [upgradeAlert release];
+    return NO;
+  }
+
+  int upgradeResult = hdhomerun_device_upgrade(mHDHomeRunDevice, upgradeFile);
+  if (upgradeResult == 0)
+  {
+    // Upload rejected
+    NSAlert *upgradeAlert = [[NSAlert alloc] init];
+    [upgradeAlert setMessageText:@"Unable to apply firmware upgrade."];
+    [upgradeAlert setInformativeText:@"The firmware image was rejected by the HDHomeRun it may be corrupt or incompatible with the device."];
+    [upgradeAlert addButtonWithTitle:@"OK"];
+    [upgradeAlert runModal];
+    [upgradeAlert release];
+  }
+  else if (upgradeResult == 1)
+  {
+    // Upgrade successful
+    return YES;
+  }
+  else
+  {
+    NSAlert *upgradeAlert = [[NSAlert alloc] init];
+    [upgradeAlert setMessageText:@"Unable to upgrade firmware."];
+    [upgradeAlert setInformativeText:@"The firmware on the HDHomeRun could not be upgraded."];
+    [upgradeAlert addButtonWithTitle:@"OK"];
+    [upgradeAlert runModal];
+    [upgradeAlert release];
+  }
+  return NO;
 }
 
 @end

@@ -99,5 +99,6 @@ extern NSString *kSchedulesDirectURL;
 - (IBAction) viewHDHRStation:(id)sender;
 - (IBAction) exportHDHomeRunChannelMap:(id)sender;
 - (IBAction) importHDHomeRunChannelMap:(id)sender;
-- (IBAction)setPathAction:(id)sender;
+- (IBAction) setPathAction:(id)sender;
+- (IBAction) upgradeFirmware:(id)sender;
 @end

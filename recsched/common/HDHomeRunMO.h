@@ -27,11 +27,15 @@ extern const int kDefaultPortNumber;
 @interface HDHomeRun : NSManagedObject
 {
   struct hdhomerun_device_t *mHDHomeRunDevice;
+  BOOL mNewFirmwareAvailable;
+  BOOL mDeviceOnline;
 }
 
 @property (retain) NSNumber * deviceID;
 @property (retain) NSString * name;
 @property (retain) NSSet* tuners;
+@property (readonly) BOOL newFirmwareAvailable;
+@property (readonly) BOOL deviceOnline;
 
 // Fetch the HDHomeRun with the given ID from the Managed Object Context
 + (HDHomeRun *) fetchHDHomeRunWithID:(NSNumber*)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
@@ -41,6 +45,8 @@ extern const int kDefaultPortNumber;
 - (HDHomeRunTuner*) tuner0;
 - (HDHomeRunTuner*) tuner1;
 - (HDHomeRunTuner*) tunerWithIndex:(int)index;
+
+- (BOOL) upgradeFirmware;
 @end
 
 // coalesce these into one @interface HDHomeRun (CoreDataGeneratedAccessors) section

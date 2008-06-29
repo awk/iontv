@@ -102,6 +102,8 @@
 		EA85BC0A0E0F9B5300264446 /* ScheduleConflictWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA85BC080E0F9B5300264446 /* ScheduleConflictWindow.xib */; };
 		EA85BE750E13F81500264446 /* hdhomerun_channels.c in Sources */ = {isa = PBXBuildFile; fileRef = EA85BE710E13F81000264446 /* hdhomerun_channels.c */; };
 		EA85BE760E13F81700264446 /* hdhomerun_dhcp.c in Sources */ = {isa = PBXBuildFile; fileRef = EA85BE730E13F81000264446 /* hdhomerun_dhcp.c */; };
+		EA85BF380E1598D200264446 /* hdhomerun_firmware_20080427.bin in Resources */ = {isa = PBXBuildFile; fileRef = EA85BF370E1598D200264446 /* hdhomerun_firmware_20080427.bin */; };
+		EA85BF390E1598D200264446 /* hdhomerun_firmware_20080427.bin in Resources */ = {isa = PBXBuildFile; fileRef = EA85BF370E1598D200264446 /* hdhomerun_firmware_20080427.bin */; };
 		EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */; };
 		EA8E1C210CC92ED700DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
 		EA8E1C240CC92F6500DD109F /* PreferenceKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */; };
@@ -364,6 +366,7 @@
 		EA85BE720E13F81000264446 /* hdhomerun_channels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hdhomerun_channels.h; path = ../libhdhomerun/hdhomerun_channels.h; sourceTree = SOURCE_ROOT; };
 		EA85BE730E13F81000264446 /* hdhomerun_dhcp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hdhomerun_dhcp.c; path = ../libhdhomerun/hdhomerun_dhcp.c; sourceTree = SOURCE_ROOT; };
 		EA85BE740E13F81000264446 /* hdhomerun_dhcp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hdhomerun_dhcp.h; path = ../libhdhomerun/hdhomerun_dhcp.h; sourceTree = SOURCE_ROOT; };
+		EA85BF370E1598D200264446 /* hdhomerun_firmware_20080427.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = hdhomerun_firmware_20080427.bin; path = ../hdhr_firmware/hdhomerun_firmware_20080427.bin; sourceTree = SOURCE_ROOT; };
 		EA8E1C200CC92ED700DD109F /* PreferenceKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreferenceKeys.m; path = common/PreferenceKeys.m; sourceTree = "<group>"; };
 		EA8E1C220CC92F0600DD109F /* PreferenceKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferenceKeys.h; path = common/PreferenceKeys.h; sourceTree = "<group>"; };
 		EA8E1C570CC9408800DD109F /* HardDrive.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HardDrive.tiff; path = Images/HardDrive.tiff; sourceTree = "<group>"; };
@@ -576,6 +579,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				EA85BF370E1598D200264446 /* hdhomerun_firmware_20080427.bin */,
 				EABE72AE0DD0AB1B0013310F /* SeasonPassCalendarView.xib */,
 				EA23871D0D5E5D0F00343704 /* FirstRun.xib */,
 				EAF923F20CCEE15000CEBD73 /* Credits.html */,
@@ -994,6 +998,7 @@
 				EA39B7CA0D6C8CFC0049CB89 /* assistantBackground.tiff in Resources */,
 				EABE72B00DD0AB1B0013310F /* SeasonPassCalendarView.xib in Resources */,
 				EA85BC0A0E0F9B5300264446 /* ScheduleConflictWindow.xib in Resources */,
+				EA85BF380E1598D200264446 /* hdhomerun_firmware_20080427.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1003,6 +1008,7 @@
 			files = (
 				EAD024280CE246FF002B7C37 /* UserPresets.plist in Resources */,
 				EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */,
+				EA85BF390E1598D200264446 /* hdhomerun_firmware_20080427.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

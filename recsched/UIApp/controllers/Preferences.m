@@ -691,6 +691,12 @@ static Preferences *sSharedInstance = nil;
 		   contextInfo:sender];
 }
 
+- (IBAction) upgradeFirmware:(id)sender
+{
+  HDHomeRun *selectedDevice = [[mHDHomeRunDevicesArrayController selectedObjects] objectAtIndex:0];
+  [selectedDevice upgradeFirmware];
+}
+
 #pragma mark Callback & Notification Methods
 
 - (void) parsingCompleteNotification:(NSNotification *)aNotification
