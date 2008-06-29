@@ -42,6 +42,9 @@ extern NSString *kTVDataDeliveryReportProgressToKey;
 extern NSString *kTVDataDeliveryDataRecipientKey;
 
 @interface tvDataDelivery : WSGeneratedObj
+{
+  WSMethodInvocationRef fAuthorizedRef;
+}
 
 // We just override some SOAP processing messages to perform authentication
 @end;

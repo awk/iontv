@@ -146,8 +146,8 @@ static void __async_callback(WSMethodInvocationRef invocation, void* info, CFDic
 	// Utility function to set the parameter list for the invocation
 - (void) setParameters:(int) count values:(id*) values names:(NSString**) names
 {
-	fParams = [NSDictionary dictionaryWithObjects:values forKeys: names count: count];
-	fParamOrder = [NSArray arrayWithObjects: names count: count];
+	fParams = [[NSDictionary alloc] initWithObjects:values forKeys: names count: count];
+	fParamOrder = [[NSArray alloc] initWithObjects: names count: count];
 }
 
 - (NSDictionary*) copyHeaderDictionary:(int) count extraVals: (NSString**) extraVals extraKeys: (NSString**) extraKeys
@@ -169,7 +169,6 @@ static void __async_callback(WSMethodInvocationRef invocation, void* info, CFDic
 		[self handleError: @"NSURL URLWithString failed in createInvocationRef" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber: paramErr];
 	} else {
 		ref = WSMethodInvocationCreate((CFURLRef) url, (CFStringRef) methodName, (CFStringRef) protocol);
-		[url release];
 		
 		if (ref == NULL)
 			[self handleError: @"WSMethodInvocationCreate failed in createInvocationRef" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber: paramErr];

@@ -101,6 +101,25 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   return returnedDict;
 }
 
+- (id) init
+{
+  self = [super init];
+  if (self != nil) {
+    fAuthorizedRef = nil;
+  }
+  return self;
+}
+
+- (void) dealloc
+{
+  if (fAuthorizedRef)
+  {
+    CFRelease(fAuthorizedRef);
+    fAuthorizedRef = nil;
+  }
+  [super dealloc];
+}
+
 	// Return the Result object.  If it hasn't
 	// been fetched yet, this will asynchronously block
 - (NSDictionary*) getResultDictionary
@@ -122,7 +141,8 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                         
 			WSMethodInvocationUnscheduleFromRunLoop(invocation, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedMode);
 		}
-		
+                WSMethodInvocationSetCallBack(fRef, NULL, NULL);
+
 		if (fResult == NULL) {
 			[self handleError:@"WSMethodInvocationInvoke failed in getResultDictionary" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
 		}
@@ -139,7 +159,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                 if (msgCode == 401)
                 {
                   // We're not authorized - we need to go through a little dance to resend the request with the authorization
-                  WSMethodInvocationRef authorizedInvocation = [self genCreateInvocationRef];
+                  fAuthorizedRef = [self genCreateInvocationRef];
                   CFHTTPMessageRef authInvocationMsgRef;
                   CFURLRef theURL = CFHTTPMessageCopyRequestURL(responseMessage);
                   authInvocationMsgRef =  CFHTTPMessageCreateRequest(NULL, CFSTR("POST"), theURL, kCFHTTPVersion1_1);
@@ -171,25 +191,17 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                   }
 
                   CFHTTPMessageAddAuthentication(authInvocationMsgRef, responseMessage, (CFStringRef)accountName, (CFStringRef) password, NULL, false);
-                  WSMethodInvocationSetProperty(authorizedInvocation,kWSHTTPMessage,authInvocationMsgRef);
-                  [fResult autorelease];
+                  WSMethodInvocationSetProperty(fAuthorizedRef,kWSHTTPMessage,authInvocationMsgRef);
                   fResult = NULL;
                   
-                  WSClientContext context = { 0, 
-                                                                          (void*) self, 
-                                                                          (WSClientContextRetainCallBackProcPtr) CFRetain,
-                                                                          (WSClientContextReleaseCallBackProcPtr) CFRelease, 
-                                                                          (WSClientContextCopyDescriptionCallBackProcPtr) CFCopyDescription
-                  };
-
                   CFStringRef wsGeneratedAuthMode = CFSTR("NS-WSSYNCAUTH");
-                  WSMethodInvocationAddDeserializationOverride(authorizedInvocation,CFSTR("urn:TMSWebServices"),CFSTR("xtvd"),deserializationCallback,&context);
-                  WSMethodInvocationScheduleWithRunLoop(authorizedInvocation, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
+                  WSMethodInvocationAddDeserializationOverride(fAuthorizedRef,CFSTR("urn:TMSWebServices"),CFSTR("xtvd"),deserializationCallback,NULL);
+                  WSMethodInvocationScheduleWithRunLoop(fAuthorizedRef, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
 
                   while (fResult == NULL)
                     [[NSRunLoop currentRunLoop] runMode:(NSString *)wsGeneratedAuthMode beforeDate:[NSDate distantFuture]];
                   
-                  WSMethodInvocationUnscheduleFromRunLoop(authorizedInvocation, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
+                  WSMethodInvocationUnscheduleFromRunLoop(fAuthorizedRef, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
 
                   if (fResult == NULL) 
                   {
@@ -197,6 +209,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                   }
             
                   CFRelease(authInvocationMsgRef);
+                  WSMethodInvocationSetCallBack(fAuthorizedRef, NULL, NULL);
                 }
                 CFRelease(responseMessage);
 	}
