@@ -33,7 +33,7 @@ const int kCallSignStringLength = 10;
 
 @interface HDHomeRunTunerChannelScanThread : NSObject
 
-+ (void) performScan:(HDHomeRunTuner*)aTuner;
++ (void) performScan:(NSManagedObjectID*)aTunerObjectID;
 
 @end;
 
@@ -125,7 +125,7 @@ const int kCallSignStringLength = 10;
 - (void) scanActionReportingProgressTo:(id)progressDisplay
 {
   mCurrentProgressDisplay = progressDisplay;
-    [NSThread detachNewThreadSelector:@selector(performScan:) toTarget:[HDHomeRunTunerChannelScanThread class] withObject:self];
+    [NSThread detachNewThreadSelector:@selector(performScan:) toTarget:[HDHomeRunTunerChannelScanThread class] withObject:[self objectID]];
 }
 
 - (void) startStreaming
@@ -574,13 +574,19 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
         return [theTuner scanCallBackForType:[NSString stringWithCString:type] andData:[NSString stringWithCString:str] withMOC:theMOC];
 }
 
-// Typically called from a seperate thread to carry out the scanning
+// Typically called from a seperate thread to carry out the scanning - the caller must make sure that the instance is
+// in a valid MOC for this thread.
 - (void) performScan
 {
   int scanResult = 0;
-  NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
-  NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-  [managedObjectContext setPersistentStoreCoordinator: psc];
+
+  // Delete the old channel station map
+  [[self managedObjectContext] deleteObject:self.lineup.channelStationMap];
+
+  // Create a new empty channel station map
+  HDHomeRunChannelStationMap *anHDHomeRunChannelStationMap = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunChannelStationMap" inManagedObjectContext:[self managedObjectContext]];
+  [anHDHomeRunChannelStationMap setLineup:self.lineup];
+  [anHDHomeRunChannelStationMap setLastUpdateDate:[NSDate date]];
 
   mCurrentActivityToken = 0;
   if (mCurrentProgressDisplay)
@@ -600,7 +606,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
       {
         NSLog(@"HDHomeRunTuner - scanAction for %@", [self longName]);
 
-        scanResult = channelscan_execute_all(mHDHomeRunDevice, channelMap, cmd_scan_callback, self, managedObjectContext);
+        scanResult = channelscan_execute_all(mHDHomeRunDevice, channelMap, cmd_scan_callback, self, [self managedObjectContext]);
       }
     }
     @catch (NSException *anException)
@@ -615,7 +621,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   if (mCurrentHDHomeRunChannel && [[mCurrentHDHomeRunChannel stations] count] == 0)
   {
     // Destroy the current and channel and make sure it's not in the database
-    [managedObjectContext deleteObject:mCurrentHDHomeRunChannel];
+    [[self managedObjectContext] deleteObject:mCurrentHDHomeRunChannel];
   }
   
   mCurrentHDHomeRunChannel = nil;
@@ -625,14 +631,17 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
     // when we save, we want to update the same object in the UI's MOC. 
     // So listen for the did save notification from the retrieval/parsing thread MOC
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(threadContextDidSave:) 
-        name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
+        name:NSManagedObjectContextDidSaveNotification object:[self managedObjectContext]];
     
     NSError *error = nil;
-    if (![managedObjectContext save:&error])
+
+    // This save should overwrite whats in the store
+    [[self managedObjectContext] setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
+    if (![[self managedObjectContext] save:&error])
     {
       NSLog(@"Channel scan - save returned an error %@", error);
     }
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:[self managedObjectContext]];
   }
   NSLog(@"HDHomeRunTuner - performScan complete - sending notification");
   [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:RSBackgroundApplication userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:scanResult], @"scanResult", nil] deliverImmediately:NO];
@@ -689,9 +698,13 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 
 @implementation HDHomeRunTunerChannelScanThread
 
-+ (void) performScan:(HDHomeRunTuner*)aTuner
++ (void) performScan:(NSManagedObjectID*)aTunerObjectID
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
+  NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
+  [managedObjectContext setPersistentStoreCoordinator: psc];
+  HDHomeRunTuner *aTuner = (HDHomeRunTuner *) [managedObjectContext objectWithID:aTunerObjectID];
   
   [aTuner performScan];
   
