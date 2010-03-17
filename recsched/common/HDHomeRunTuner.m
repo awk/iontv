@@ -82,9 +82,6 @@ const int kCallSignStringLength = 10;
   return name;
 }
 
-@dynamic device;
-
-
 - (HDHomeRun *)device 
 {
     id tmpObject;
@@ -341,27 +338,6 @@ const int kCallSignStringLength = 10;
 }
 #endif
 
-- (void) pushHDHomeRunStationsToServer
-{ 
-	if ([[NSApp delegate] recServer]) 
-	{ 
-		// Start by adding all the channels on this tuner to an array 
-		NSMutableSet *channelsSet = [self mutableSetValueForKey:@"channels"]; 
-
-		// Create an array to hold the dictionaries of channel info 
-		NSMutableArray *channelsOnTuner = [NSMutableArray arrayWithCapacity:[channelsSet count]]; 
-
-		// Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array 
-		[channelsSet makeObjectsPerformSelector:@selector(addChannelInfoDictionaryTo:) withObject:channelsOnTuner]; 
-
-		NSSortDescriptor *channelDescriptor =[[[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES] autorelease]; 
-		NSArray *sortDescriptors=[NSArray arrayWithObject:channelDescriptor]; 
-		NSArray *sortedArray=[channelsOnTuner sortedArrayUsingDescriptors:sortDescriptors]; 
-
-		[[[NSApp delegate] recServer] setHDHomeRunChannelsAndStations:sortedArray onDeviceID:[self.device.deviceID intValue] forTunerIndex:[self.index intValue]]; 
-	} 
-}
-
 #if 0
 - (void) copyChannelsAndStationsFrom:(HDHomeRunTuner*)sourceTuner
 {
@@ -581,8 +557,11 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
   int scanResult = 0;
 
   // Delete the old channel station map
-  [[self managedObjectContext] deleteObject:self.lineup.channelStationMap];
-
+  if (self.lineup.channelStationMap != nil)
+  {
+    [[self managedObjectContext] deleteObject:self.lineup.channelStationMap];
+  }
+  
   // Create a new empty channel station map
   HDHomeRunChannelStationMap *anHDHomeRunChannelStationMap = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunChannelStationMap" inManagedObjectContext:[self managedObjectContext]];
   [anHDHomeRunChannelStationMap setLineup:self.lineup];

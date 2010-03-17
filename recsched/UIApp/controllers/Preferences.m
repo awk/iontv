@@ -111,6 +111,7 @@ static void addToolbarItem(NSMutableDictionary *theDict,NSString *identifier,NSS
 - (void) showPrefsView:(NSView*)inViewToBeShown;
 - (void) sendTunerDetailsWithStations:(BOOL)sendStations;
 - (void) selectedLineupDidChange:(Z2ITLineup*)newLineup;
+- (void) savePrefs:(id)sender;
 @end
 
 @implementation Preferences
@@ -209,44 +210,6 @@ static Preferences *sSharedInstance = nil;
   }
   
   return okToLeave;
-}
-
-- (void) showPrefsView:(NSView*)inViewToBeShown
-{
-	if (mCurrentPrefsView == inViewToBeShown)
-		return;	// Nothing to do - we're already showing the right view
-	
-        if ([self aboutToLeavePrefsView:mCurrentPrefsView toShow:inViewToBeShown] == NO)
-        {
-          return;   // Cannot switch preferences at this time
-        }
-  
-        
-	// Get the containers current size
-	NSSize sizeChange;
-	sizeChange.width = [inViewToBeShown frame].size.width - [mPrefsContainerView frame].size.width ;
-	sizeChange.height = [inViewToBeShown frame].size.height - [mPrefsContainerView frame].size.height;
-	
-	// Animate the window to the new size (and location - remember the co-ordinate system is zero,zero bottom left
-	// so we have to move the top of the window as well as changing it's size)
-	NSRect newFrame = [mPanel frame];
-	newFrame.size.height += sizeChange.height;
-	newFrame.size.width += sizeChange.width;
-	newFrame.origin.y -= sizeChange.height;
-
-	[mPanel setFrame:newFrame display:YES animate:YES];
-
-	if (mCurrentPrefsView)
-	{
-		[mPrefsContainerView replaceSubview:mCurrentPrefsView with:inViewToBeShown];
-	}
-	else
-		[mPrefsContainerView addSubview:inViewToBeShown];
-	
-	mCurrentPrefsView = inViewToBeShown;
-	[inViewToBeShown setFrameOrigin:NSMakePoint(0,0)];
-	[inViewToBeShown setNeedsDisplay:YES];
-	[mPrefsContainerView setFrameSize:[inViewToBeShown frame].size];
 }
 
 // When we launch, we have to get our NSToolbar set up.  This involves creating a new one, adding the NSToolbarItems,
@@ -417,74 +380,6 @@ static Preferences *sSharedInstance = nil;
     }
 }
 
-- (void) sendTunerDetailsWithStations:(BOOL)sendStations
-{
-  // Walk the list of HDHomeRunDevices and send the details to the server
-  NSArray *hdhomerunDevices = [mHDHomeRunDevicesArrayController arrangedObjects];
-  for (HDHomeRun *anHDHomeRunDevice in hdhomerunDevices)
-  {
-    [[[NSApp delegate] recServer] setHDHomeRunDeviceWithID:[anHDHomeRunDevice deviceID] nameTo:[anHDHomeRunDevice name]];
-
-    int tunerIndex = 0;
-    for (tunerIndex = 0; tunerIndex < 2; tunerIndex++)
-    {
-      [[[NSApp delegate] recServer] setHDHomeRunLineup:[[[anHDHomeRunDevice tunerWithIndex:tunerIndex] lineup] objectID]
-                                                          onDeviceID:[[anHDHomeRunDevice deviceID] intValue]
-                                                       forTunerIndex:tunerIndex];
-    }
-  }
-}
-
-- (void) savePrefs:(id)sender
-{
-  NSUserDefaultsController *theDefaultsController  = [NSUserDefaultsController sharedUserDefaultsController];
-  if ([mSDUsernameField stringValue])
-  {
-	NSUserDefaultsController *theDefaultsController  = [NSUserDefaultsController sharedUserDefaultsController];
-	[[theDefaultsController values] setValue:[mSDUsernameField stringValue] forKey:kWebServicesSDUsernameKey];
-    const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
-    const char *accountNameUTF8 = [[mSDUsernameField stringValue] UTF8String];
-    const char *pathUTF8 = [kWebServicesSDPath UTF8String];
-    UInt32 passwordLength;
-    const void *passwordData;
-
-	NSString *passwordString = [mSDPasswordField stringValue];
-	passwordData = [passwordString UTF8String];
-	passwordLength = strlen(passwordData);
-    
-    // Call AddInternetPassword - if it's already in the keychain then update it
-    OSStatus status;
-    if (mSDKeychainItemRef == nil)
-    {
-      status = SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mSDKeychainItemRef);
-    }
-    else
-    {
-      // The item already exists - we just need to change the password.
-      // And the Account name
-      void *accountNameAttributeData = malloc(strlen([[mSDUsernameField stringValue] UTF8String]));
-      memcpy(accountNameAttributeData, [[mSDUsernameField stringValue] UTF8String], strlen([[mSDUsernameField stringValue] UTF8String]));
-      
-      SecKeychainAttribute accountNameAttribute;
-      accountNameAttribute.tag = kSecAccountItemAttr;
-      accountNameAttribute.data = accountNameAttributeData;
-      accountNameAttribute.length = strlen([[mSDUsernameField stringValue] UTF8String]);
-      SecKeychainAttributeList attrList;
-      attrList.count = 1;
-      attrList.attr = &accountNameAttribute;
-      status = SecKeychainItemModifyAttributesAndData(mSDKeychainItemRef, &attrList, passwordLength, passwordData);
-      free(accountNameAttributeData);
-	}
-  }
-  
-  [[theDefaultsController values] setValue:[recordedProgramsLocation absoluteString] forKey:kRecordedProgramsLocationKey];
-  [[theDefaultsController values] setValue:[transcodedProgramsLocation absoluteString] forKey:kTranscodedProgramsLocationKey];
-  [theDefaultsController save:sender];
-  
-  // Tell the background server to reload it's preferences
-  [[[NSApp delegate] recServer] reloadPreferences:self];
-}
-
 - (NSArray *) z2itStationSortDescriptors
 {
   NSSortDescriptor* callSignDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"callSign" ascending:YES] autorelease];
@@ -493,17 +388,6 @@ static Preferences *sSharedInstance = nil;
   return sortDescriptors;
 }
 
-- (void) selectedLineupDidChange:(Z2ITLineup*)newLineup
-{
-      NSMutableArray *stationsOnTuner = [NSMutableArray arrayWithCapacity:[newLineup.channelStationMap.channels count] * 3];   // Start with 3 stations per channel
-      for (HDHomeRunChannel *aChannel in newLineup.channelStationMap.channels)
-      {
-        [stationsOnTuner addObjectsFromArray:[[aChannel stations] allObjects]];
-      }
-      NSLog(@"Tuner changed - %d stations on new tuner", [stationsOnTuner count]);
-      [mVisibleStationsArrayController setContent:stationsOnTuner];
-}
-	
 #pragma mark Action Methods
 
 - (void) showSDPrefs:(id)sender
@@ -863,3 +747,133 @@ static Preferences *sSharedInstance = nil;
 }
 
 @end
+
+@implementation Preferences (Private)
+
+- (void) sendTunerDetailsWithStations:(BOOL)sendStations
+{
+  // Walk the list of HDHomeRunDevices and send the details to the server
+  NSArray *hdhomerunDevices = [mHDHomeRunDevicesArrayController arrangedObjects];
+  for (HDHomeRun *anHDHomeRunDevice in hdhomerunDevices)
+  {
+    [[[NSApp delegate] recServer] setHDHomeRunDeviceWithID:[anHDHomeRunDevice deviceID] nameTo:[anHDHomeRunDevice name]];
+
+    int tunerIndex = 0;
+    for (tunerIndex = 0; tunerIndex < 2; tunerIndex++)
+    {
+      [[[NSApp delegate] recServer] setHDHomeRunLineup:[[[anHDHomeRunDevice tunerWithIndex:tunerIndex] lineup] objectID]
+                                                          onDeviceID:[[anHDHomeRunDevice deviceID] intValue]
+                                                       forTunerIndex:tunerIndex];
+    }
+  }
+  if (sendStations)
+  {
+    NSArray *allMaps = [HDHomeRunChannelStationMap allChannelStationsMapsInManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+    for (HDHomeRunChannelStationMap *aMap in allMaps)
+    {
+      [aMap pushMapContentsToServer];
+    }
+  }
+}
+
+- (void) savePrefs:(id)sender
+{
+  NSUserDefaultsController *theDefaultsController  = [NSUserDefaultsController sharedUserDefaultsController];
+  if ([mSDUsernameField stringValue])
+  {
+	NSUserDefaultsController *theDefaultsController  = [NSUserDefaultsController sharedUserDefaultsController];
+	[[theDefaultsController values] setValue:[mSDUsernameField stringValue] forKey:kWebServicesSDUsernameKey];
+    const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
+    const char *accountNameUTF8 = [[mSDUsernameField stringValue] UTF8String];
+    const char *pathUTF8 = [kWebServicesSDPath UTF8String];
+    UInt32 passwordLength;
+    const void *passwordData;
+
+	NSString *passwordString = [mSDPasswordField stringValue];
+	passwordData = [passwordString UTF8String];
+	passwordLength = strlen(passwordData);
+    
+    // Call AddInternetPassword - if it's already in the keychain then update it
+    OSStatus status;
+    if (mSDKeychainItemRef == nil)
+    {
+      status = SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mSDKeychainItemRef);
+    }
+    else
+    {
+      // The item already exists - we just need to change the password.
+      // And the Account name
+      void *accountNameAttributeData = malloc(strlen([[mSDUsernameField stringValue] UTF8String]));
+      memcpy(accountNameAttributeData, [[mSDUsernameField stringValue] UTF8String], strlen([[mSDUsernameField stringValue] UTF8String]));
+      
+      SecKeychainAttribute accountNameAttribute;
+      accountNameAttribute.tag = kSecAccountItemAttr;
+      accountNameAttribute.data = accountNameAttributeData;
+      accountNameAttribute.length = strlen([[mSDUsernameField stringValue] UTF8String]);
+      SecKeychainAttributeList attrList;
+      attrList.count = 1;
+      attrList.attr = &accountNameAttribute;
+      status = SecKeychainItemModifyAttributesAndData(mSDKeychainItemRef, &attrList, passwordLength, passwordData);
+      free(accountNameAttributeData);
+	}
+  }
+  
+  [[theDefaultsController values] setValue:[recordedProgramsLocation absoluteString] forKey:kRecordedProgramsLocationKey];
+  [[theDefaultsController values] setValue:[transcodedProgramsLocation absoluteString] forKey:kTranscodedProgramsLocationKey];
+  [theDefaultsController save:sender];
+  
+  // Tell the background server to reload it's preferences
+  [[[NSApp delegate] recServer] reloadPreferences:self];
+}
+
+- (void) selectedLineupDidChange:(Z2ITLineup*)newLineup
+{
+      NSMutableArray *stationsOnTuner = [NSMutableArray arrayWithCapacity:[newLineup.channelStationMap.channels count] * 3];   // Start with 3 stations per channel
+      for (HDHomeRunChannel *aChannel in newLineup.channelStationMap.channels)
+      {
+        [stationsOnTuner addObjectsFromArray:[[aChannel stations] allObjects]];
+      }
+      NSLog(@"Tuner changed - %d stations on new tuner", [stationsOnTuner count]);
+      [mVisibleStationsArrayController setContent:stationsOnTuner];
+}
+	
+- (void) showPrefsView:(NSView*)inViewToBeShown
+{
+	if (mCurrentPrefsView == inViewToBeShown)
+		return;	// Nothing to do - we're already showing the right view
+	
+        if ([self aboutToLeavePrefsView:mCurrentPrefsView toShow:inViewToBeShown] == NO)
+        {
+          return;   // Cannot switch preferences at this time
+        }
+  
+        
+	// Get the containers current size
+	NSSize sizeChange;
+	sizeChange.width = [inViewToBeShown frame].size.width - [mPrefsContainerView frame].size.width ;
+	sizeChange.height = [inViewToBeShown frame].size.height - [mPrefsContainerView frame].size.height;
+	
+	// Animate the window to the new size (and location - remember the co-ordinate system is zero,zero bottom left
+	// so we have to move the top of the window as well as changing it's size)
+	NSRect newFrame = [mPanel frame];
+	newFrame.size.height += sizeChange.height;
+	newFrame.size.width += sizeChange.width;
+	newFrame.origin.y -= sizeChange.height;
+
+	[mPanel setFrame:newFrame display:YES animate:YES];
+
+	if (mCurrentPrefsView)
+	{
+		[mPrefsContainerView replaceSubview:mCurrentPrefsView with:inViewToBeShown];
+	}
+	else
+		[mPrefsContainerView addSubview:inViewToBeShown];
+	
+	mCurrentPrefsView = inViewToBeShown;
+	[inViewToBeShown setFrameOrigin:NSMakePoint(0,0)];
+	[inViewToBeShown setNeedsDisplay:YES];
+	[mPrefsContainerView setFrameSize:[inViewToBeShown frame].size];
+}
+
+@end
+

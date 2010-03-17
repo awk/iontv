@@ -847,53 +847,42 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
   }
 }
 
-- (oneway void) setHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex
+- (oneway void) updateChannelStationMap:(NSManagedObjectID*)anObjectID withChannelsAndStations:(NSArray*)channelsArray; 
 {
-//	NSLog(@"setHDHomeRunChannelsAndStations deviceID = %d, tunerIndex = %d", deviceID, tunerIndex); 
+  NSLog(@"updateChannelStationMap objectID = %@, channels = %@", anObjectID, channelsArray); 
+  HDHomeRunChannelStationMap *aChannelStationMap = (HDHomeRunChannelStationMap*) [[[NSApp delegate] managedObjectContext] objectWithID:anObjectID];
+  if (aChannelStationMap) 
+  { 
+    // Remove all the channels currently on the map - we're going to replace them.
+    NSMutableSet *channelsSet = [aChannelStationMap mutableSetValueForKey:@"channels"];
+    for (HDHomeRunChannel *aChannel in channelsSet)
+    {
+      [[[NSApp delegate] managedObjectContext] deleteObject:aChannel];
+    }
+//    [channelsSet removeAllObjects];
+    
+    for (NSDictionary *aChannelDictionary in channelsArray) 
+    { 
+      NSLog(@"setHDHomeRunChannelsAndStations new channel number %d type %@ stations %@", [[aChannelDictionary valueForKey:@"channelNumber"] intValue], [aChannelDictionary valueForKey:@"channelType"], [aChannelDictionary valueForKey:@"stations"]);
+      // Create a new channel for this tuner
+      HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:[aChannelDictionary valueForKey:@"channelType"] andNumber:[aChannelDictionary valueForKey:@"channelNumber"] inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+      [aChannelStationMap addChannelsObject:aChannel];
 
-	HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:deviceID] inManagedObjectContext:[[NSApp delegate] managedObjectContext]]; 
-	if (anHDHomeRun) 
-	{ 
-		HDHomeRunTuner *aTuner = [anHDHomeRun tunerWithIndex:tunerIndex]; 
-		if (aTuner) 
-		{ 
-                  NSLog(@"Implement setHDHomeRunChanelsAndStations for device ID %d tunerIndex %d", deviceID, tunerIndex);
-#if 0
-			// Remove all the channels current on the tuner - we're going to replace them.
-			NSArray *oldChannels = [[aTuner channels] allObjects];
-			for (HDHomeRunChannel *aChannel in oldChannels)
-			{
-				[[[NSApp delegate] managedObjectContext] deleteObject:aChannel];
-			}
-			[aTuner removeChannels:[aTuner channels]];
-			
-			for (NSDictionary *aChannelDictionary in channelsArray) 
-			{ 
-//				NSLog(@"setHDHomeRunChannelsAndStations new channel number %d type %@ stations %@", [aChannelDictionary valueForKey:@"channelNumber"], [aChannelDictionary valueForKey:@"channelType"], [aChannelDictionary valueForKey:@"stations"]);
-				// Create a new channel for this tuner
-				HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:[aChannelDictionary valueForKey:@"channelType"] andNumber:[aChannelDictionary valueForKey:@"channelNumber"] inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-				[aTuner addChannelsObject:aChannel];
-				aChannel.tuner = aTuner;
-				
-				// Remove all the stations on the given channel - they'll be replaced with the data from the array 
-				[aChannel clearAllStations]; 
+      // Add all the stations in the array for this channel 
+      [aChannel importStationsFrom:[aChannelDictionary valueForKey:@"stations"]]; 
+    } 
 
-				// Add all the stations in the array for this channel 
-				[aChannel importStationsFrom:[aChannelDictionary valueForKey:@"stations"]]; 
-			} 
-#endif
-
-			if ([channelsArray count] > 0) 
-			{ 
-				// processed some stations - save the MOC 
-				NSError *error = nil;
-				if (![[[NSApp delegate] managedObjectContext] save:&error])
-					NSLog(@"setHDHomeRunChannelsAndStations - error occured during save %@", error);
-				
-                                [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:RSBackgroundApplication userInfo:nil deliverImmediately:NO];
-			} 
-		} 
-	} 
+    if ([channelsArray count] > 0) 
+    { 
+      // processed some stations - save the MOC 
+      NSError *error = nil;
+      if (![[[NSApp delegate] managedObjectContext] save:&error])
+      {
+        NSLog(@"setHDHomeRunChannelsAndStations - error occured during save %@, userInfo = %@", error, [error userInfo]);
+      }
+      [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:RSBackgroundApplication userInfo:nil deliverImmediately:NO];
+    } 
+  } 
 }
 
 - (void) quitServer:(id)sender

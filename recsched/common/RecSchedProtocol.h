@@ -50,5 +50,5 @@ extern NSString *kRecServerConnectionName;
 
 - (void) setHDHomeRunDeviceWithID:(NSNumber*)deviceID nameTo:(NSString*)name;
 - (void) setHDHomeRunLineup:(NSManagedObjectID*)channelStationMapID onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex;
-- (oneway void) setHDHomeRunChannelsAndStations:(NSArray*)channelsArray onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex; 
+- (oneway void) updateChannelStationMap:(NSManagedObjectID*)anObjectID withChannelsAndStations:(NSArray*)channelsArray; 
 @end

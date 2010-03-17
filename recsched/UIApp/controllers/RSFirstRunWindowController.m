@@ -185,7 +185,7 @@ const NSInteger kFinishedTabViewIndex = 4;
 
 - (IBAction) channelListFinish:(id)sender
 {
-  NSLog(@"Implement - channelListFinish - what to do ??");
+  NSLog(@"Implement - channelListFinish - what to do  - probably call [HDHomeRunChannelStationMap pushMapContentsToServer] ??");
   if (scanningTuner)
   {
 //    for (HDHomeRunTuner *aTuner in scanLineupSelection.tuners)
