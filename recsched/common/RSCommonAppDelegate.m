@@ -24,6 +24,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "RSCommonAppDelegate.h"
+#import "PreferenceKeys.h"
 
 NSString *kRecServerConnectionName = @"recsched_bkgd_server";
 NSString *kRecUIActivityConnectionName = @"recsched_ui_activity";
@@ -142,6 +143,11 @@ NSString *kRSStoreUpdateConnectionName = @"resched_store_update";
 }
 
 
+- (NSDictionary *) persistentStoreMetadata
+{
+   return [[self persistentStoreCoordinator] metadataForPersistentStore:[self persistentStore]];
+}
+
 - (BOOL) storeNeedsMigrating
 {
   NSURL *url = [self urlForPersistentStore];
@@ -235,6 +241,37 @@ NSString *kRSStoreUpdateConnectionName = @"resched_store_update";
     return reply;
 }
 
+- (NSString *) SDPasswordForUsername:(NSString *)username
+{
+   const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
+   const char *accountNameUTF8 = [username UTF8String];
+   const char *pathUTF8 = [kWebServicesSDPath UTF8String];
+   UInt32 passwordLength;
+   void *passwordData;
+   SecKeychainItemRef SDKeychainItemRef;
+   OSStatus status = SecKeychainFindInternetPassword(NULL,
+                                                     strlen(serverNameUTF8),
+                                                     serverNameUTF8,
+                                                     0, NULL,
+                                                     strlen(accountNameUTF8), accountNameUTF8,
+                                                     strlen(pathUTF8), pathUTF8,
+                                                     80, kSecProtocolTypeHTTP,
+                                                     kSecAuthenticationTypeDefault,
+                                                     &passwordLength, &passwordData,
+                                                     &SDKeychainItemRef);
+   NSString *passwordString = nil;
+   
+   if (status == noErr)
+   {
+      char *utf8String = malloc(passwordLength+1);
+      memset(utf8String, 0, passwordLength+1);
+      memcpy(utf8String, passwordData, passwordLength);
+		passwordString = [NSString stringWithUTF8String:utf8String];
+      free(utf8String);
+      SecKeychainItemFreeContent(NULL, passwordData);
+   }
+   return passwordString;
+}
 
 /**
     Implementation of dealloc, to release the retained variables.

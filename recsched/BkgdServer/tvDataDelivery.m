@@ -173,23 +173,10 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 						return nil;
 					}
                   NSString *password;
-                  const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
-                  const char *accountNameUTF8 = [accountName UTF8String];
-                  const char *pathUTF8 = [kWebServicesSDPath UTF8String];
-                  UInt32 passwordLength;
-                  void *passwordData;
-                  OSStatus status = SecKeychainFindInternetPassword(NULL,strlen(serverNameUTF8),serverNameUTF8, 0, NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, &passwordLength, &passwordData, NULL);
-                  
-                  if (status == noErr)
-                  {
-                    password = [NSString stringWithCString:passwordData length:passwordLength];
-                    SecKeychainItemFreeContent(NULL, passwordData);
-                  }
-                  else
-                  {
-                    password = @"";
-                  }
-
+                  password = [[NSApp delegate] SDPasswordForUsername:accountName];
+                   if (!password) {
+                      password = @"";
+                   }
                   CFHTTPMessageAddAuthentication(authInvocationMsgRef, responseMessage, (CFStringRef)accountName, (CFStringRef) password, NULL, false);
                   WSMethodInvocationSetProperty(fAuthorizedRef,kWSHTTPMessage,authInvocationMsgRef);
                   fResult = NULL;

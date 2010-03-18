@@ -72,7 +72,10 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 {
 	for (RSRecording *aRecording in inArray)
 	{
-		NSLog(@"updateForCompleted Recordings Recording ID = %@ title = %@ status = %@ %@", aRecording.schedule.program.programID, aRecording.schedule.program.title, aRecording.status, aRecording.schedule.transcoding == nil ? @"No Transcoding" : aRecording.schedule.transcoding);
+		NSLog(@"updateForCompleted Recordings Recording ID = %@ title = %@ status = %@ %@",
+            aRecording.schedule.program.programID,
+            aRecording.schedule.program.title,
+            aRecording.status, aRecording.schedule.transcoding == nil ? @"No Transcoding" : aRecording.schedule.transcoding.mediaFile);
 		if (aRecording.schedule.transcoding == NULL)
 		{
 			// Create a new transcoding entity
@@ -279,9 +282,10 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
 	theTrack.objectDescription = aTranscoding.schedule.program.descriptionStr;
 }
 
-- (void)eventDidFail:(const AppleEvent *)event withError:(NSError *)error
+- (id)eventDidFail:(const AppleEvent *)event withError:(NSError *)error
 {
 	NSLog(@"ScriptingBridge eventDidFail error = %@", error);
+   return nil;
 }
 
 - (void) transcodingFinishedNotification:(NSNotification*)aNotification

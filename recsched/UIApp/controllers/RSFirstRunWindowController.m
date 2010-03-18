@@ -57,20 +57,7 @@ const NSInteger kFinishedTabViewIndex = 4;
   if (SDUsernameString)
   {
     [mSDUsernameField setStringValue:SDUsernameString];
-
-    const char *serverNameUTF8 = [kWebServicesSDHostname UTF8String];
-    const char *accountNameUTF8 = [SDUsernameString UTF8String];
-    const char *pathUTF8 = [kWebServicesSDPath UTF8String];
-    UInt32 passwordLength;
-    void *passwordData;
-    OSStatus status = SecKeychainFindInternetPassword(NULL,strlen(serverNameUTF8),serverNameUTF8, 0, NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, &passwordLength, &passwordData, &mSDKeychainItemRef);
-    
-    if (status == noErr)
-    {
-              NSString *passwordString = [NSString stringWithCString:passwordData length:passwordLength];
-      [mSDPasswordField setStringValue:passwordString];
-      SecKeychainItemFreeContent(NULL, passwordData);
-    }
+    [mSDPasswordField setStringValue:[[NSApp delegate] SDPasswordForUsername:SDUsernameString]];
   }
   
   mScanInProgress = NO;
@@ -201,7 +188,7 @@ const NSInteger kFinishedTabViewIndex = 4;
   
   // Write the key to the metadata store to show that we're done
   NSError *error = nil;
-  NSMutableDictionary *storeMetadata = [NSMutableDictionary dictionaryWithDictionary:[NSPersistentStoreCoordinator metadataForPersistentStoreWithURL:[[NSApp delegate] urlForPersistentStore] error:&error]];
+  NSMutableDictionary *storeMetadata = [NSMutableDictionary dictionaryWithDictionary:[[NSApp delegate] persistentStoreMetadata]];
   [storeMetadata setValue:[NSNumber numberWithBool:YES] forKey:kFirstRunAssistantCompletedKey];
   [NSPersistentStoreCoordinator setMetadata:storeMetadata forPersistentStoreOfType:nil URL:[[NSApp delegate] urlForPersistentStore] error:&error];
   

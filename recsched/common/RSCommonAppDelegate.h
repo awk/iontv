@@ -36,8 +36,10 @@
 - (NSString *)applicationSupportFolder;
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
 - (NSPersistentStore *)persistentStore;
+- (NSDictionary *) persistentStoreMetadata;
 - (NSManagedObjectModel *)managedObjectModel;
 - (NSManagedObjectContext *)managedObjectContext;
 - (NSURL *)urlForPersistentStore;
 - (BOOL) storeNeedsMigrating;
+- (NSString *) SDPasswordForUsername:(NSString*)username;
 @end

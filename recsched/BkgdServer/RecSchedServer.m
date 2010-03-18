@@ -235,8 +235,7 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
 // schedule data and update the database.
 - (void) autoUpdateSchedule
 {
-  NSError *error = nil;
-  NSDictionary *storeMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreWithURL:[[NSApp delegate] urlForPersistentStore] error:&error];
+  NSDictionary *storeMetadata = [[NSApp delegate] persistentStoreMetadata];
   BOOL firstRunAlreadyCompleted = [[storeMetadata valueForKey:kFirstRunAssistantCompletedKey] boolValue];
   if (firstRunAlreadyCompleted == NO)
   {
@@ -280,8 +279,7 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
 // up into chunks lessers the load on the data servers and also breaks the parsing up into slightly more managed portions.
 - (BOOL) fetchFutureSchedule:(id)info
 {
-  NSError *error = nil;
-  NSDictionary *storeMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreWithURL:[[NSApp delegate] urlForPersistentStore] error:&error];
+  NSDictionary *storeMetadata = [[NSApp delegate] persistentStoreMetadata];
   BOOL firstRunAlreadyCompleted = [[storeMetadata valueForKey:kFirstRunAssistantCompletedKey] boolValue];
   
   // If there's a pending timer to issue a fetchFutureSchedule call invalidate it now - we'll start a new one later.

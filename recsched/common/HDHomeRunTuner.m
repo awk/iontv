@@ -303,7 +303,7 @@ const int kCallSignStringLength = 10;
 	}
 	else
 	{
-		NSLog(error);
+		NSLog(@"Error creating XML Data %@", error);
 		[error release];
 	}
 }
@@ -547,7 +547,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str)
 	HDHomeRunTuner *theTuner = va_arg(ap, HDHomeRunTuner *);
         NSManagedObjectContext *theMOC = va_arg(ap, NSManagedObjectContext*);
         
-        return [theTuner scanCallBackForType:[NSString stringWithCString:type] andData:[NSString stringWithCString:str] withMOC:theMOC];
+        return [theTuner scanCallBackForType:[NSString stringWithUTF8String:type] andData:[NSString stringWithUTF8String:str] withMOC:theMOC];
 }
 
 // Typically called from a seperate thread to carry out the scanning - the caller must make sure that the instance is

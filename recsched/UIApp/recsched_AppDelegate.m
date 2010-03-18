@@ -205,8 +205,7 @@
         }
         
         // Launch the first run assistant if the key is not present in the store metadata
-        NSError *error = nil;
-        NSDictionary *storeMetadata = [NSPersistentStoreCoordinator metadataForPersistentStoreWithURL:[[NSApp delegate] urlForPersistentStore] error:&error];
+        NSDictionary *storeMetadata = [[[NSApp delegate] persistentStoreCoordinator] metadataForPersistentStore:[[NSApp delegate] persistentStore]];
         BOOL firstRunAlreadyCompleted = [[storeMetadata valueForKey:kFirstRunAssistantCompletedKey] boolValue];
         if (firstRunAlreadyCompleted == NO)
         {
