@@ -114,7 +114,7 @@ const int kLatestFirmwareVersion = 20080427;
   HDHomeRunTuner *aTuner = nil;
   for (aTuner in tuners)
   {
-	if ([aTuner index] == [NSNumber numberWithInt:inIndex])
+	if ([[aTuner index] intValue] == inIndex)
 		break;
   }
   return aTuner;

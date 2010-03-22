@@ -36,14 +36,14 @@ extern const int kDefaultPortNumber;
 @property (retain) NSSet* tuners;
 @property (readonly) BOOL newFirmwareAvailable;
 @property (readonly) BOOL deviceOnline;
+@property (readonly) HDHomeRunTuner *tuner0;
+@property (readonly) HDHomeRunTuner *tuner1;
 
 // Fetch the HDHomeRun with the given ID from the Managed Object Context
 + (HDHomeRun *) fetchHDHomeRunWithID:(NSNumber*)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
 + (HDHomeRun *) createHDHomeRunWithID:(NSNumber*)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
 
-- (HDHomeRunTuner*) tuner0;
-- (HDHomeRunTuner*) tuner1;
 - (HDHomeRunTuner*) tunerWithIndex:(int)index;
 
 - (BOOL) upgradeFirmware;
