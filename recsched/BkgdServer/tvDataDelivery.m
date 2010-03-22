@@ -190,15 +190,32 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
                   
                   WSMethodInvocationUnscheduleFromRunLoop(fAuthorizedRef, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
 
-                  if (fResult == NULL) 
-                  {
-                    [self handleError:@"WSMethodInvocationInvoke failed in getResultDictionary" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
-                  }
-            
+                   if (fResult == NULL) 
+                   {
+                      [self handleError:@"WSMethodInvocationInvoke failed in getResultDictionary" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
+                   }
+                   
+                   responseMessage = (CFHTTPMessageRef) [fResult valueForKey:(id)kWSHTTPResponseMessage];
+                   if (!responseMessage)
+                   {
+                      [self handleError:@"WSMethodInvocationInvoke failed in get response message" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
+                      return nil;
+                   }
+                   msgCode = CFHTTPMessageGetResponseStatusCode(responseMessage);
+  
+// Example Error Returns:                                    
+//                   "/FaultCode" = -1;
+//                   "/FaultString" = "Your subscription has expired. Please renew your subscription.";
+//                   "/kWSHTTPResponseMessage" = <CFHTTPMessage 0x962fc0>{url = http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService; status = HTTP/1.1 500 Internal Server Error};
+//                      "/kWSResultIsFault" = 1;
+                   if (msgCode == 500)
+                   {
+                      [self handleError:@"WSMethodInvocationInvoke returned internal server error" errorString:[fResult valueForKey:@"/FaultString"] errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:[[fResult valueForKey:@"/FaultCode"] intValue]];
+                   }
+
                   CFRelease(authInvocationMsgRef);
                   WSMethodInvocationSetCallBack(fAuthorizedRef, NULL, NULL);
                 }
-                CFRelease(responseMessage);
 	}
 	return fResult;
 }
