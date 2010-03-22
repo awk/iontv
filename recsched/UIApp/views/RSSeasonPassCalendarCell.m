@@ -29,6 +29,12 @@
   return self;
 }
 
+- (void) dealloc
+{
+   [self removeObserver:self forKeyPath:@"scheduleList"];
+   [super dealloc];
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath
 			ofObject:(id)object 
 			change:(NSDictionary *)change
