@@ -20,16 +20,14 @@
 
 @implementation RSTranscoding
 
-- (void) dealloc
-{
-	[transcodingImp release];
-	[super dealloc];
+- (void)dealloc {
+  [transcodingImp release];
+  [super dealloc];
 }
 
-- (void) finishedTranscode
-{
-	[self setStatus:[NSNumber numberWithInt:RSRecordingFinishedStatus]];
-	[self setTranscodingImp:nil];
+- (void)finishedTranscode {
+  [self setStatus:[NSNumber numberWithInt:RSRecordingFinishedStatus]];
+  [self setTranscodingImp:nil];
 }
 
 @dynamic mediaFile;

@@ -1,16 +1,16 @@
 //  Copyright (c) 2007, Andrew Kimpton
-//  
+//
 //  All rights reserved.
-//  
+//
 //  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
 //  conditions are met:
-//  
+//
 //  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 //  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
 //  in the documentation and/or other materials provided with the distribution.
 //  The names of its contributors may not be used to endorse or promote products derived from this software without specific prior
 //  written permission.
-//  
+//
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -31,15 +31,12 @@
 // The Channel TableView has a button in the 3rd column to launch VLC to watch the selected
 // program. However the selection is not updated until after the button action message has
 // been dispatch so we override mouseDown for this class so that clicks in the 3rd column
-// update the selection before calling into the super-class which will in turn dispatch the 
+// update the selection before calling into the super-class which will in turn dispatch the
 // click to the cell.
-- (void)mouseDown:(NSEvent *)theEvent
-{
-  if ([theEvent type] == NSLeftMouseDown)
-  {
+- (void)mouseDown:(NSEvent *)theEvent {
+  if ([theEvent type] == NSLeftMouseDown)   {
     NSPoint localPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    if ([self columnAtPoint:localPoint] == 3)
-    {
+    if ([self columnAtPoint:localPoint] == 3)     {
       [self selectRow:[self rowAtPoint:localPoint] byExtendingSelection:NO];
     }
   }

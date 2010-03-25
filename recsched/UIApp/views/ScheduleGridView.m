@@ -1,16 +1,16 @@
 //  Copyright (c) 2007, Andrew Kimpton
-//  
+//
 //  All rights reserved.
-//  
+//
 //  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
 //  conditions are met:
-//  
+//
 //  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 //  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
 //  in the documentation and/or other materials provided with the distribution.
 //  The names of its contributors may not be used to endorse or promote products derived from this software without specific prior
 //  written permission.
-//  
+//
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -43,8 +43,7 @@ const float kScheduleDetailsPopUpTime = 3.0;
 - (BOOL) scheduleIsVisible:(Z2ITSchedule*)inSchedule;
 @end
 
-@interface ScheduleGridLine : NSObject
-{
+@interface ScheduleGridLine : NSObject {
   NSMutableArray *mCellsInLineArray;
   NSArray        *mSchedulesInLineArray;
   Z2ITStation    *mStation;
@@ -53,132 +52,119 @@ const float kScheduleDetailsPopUpTime = 3.0;
   ScheduleGridView *mGridView;
 }
 
-- (id) initWithGridView:(ScheduleGridView*)inGridView;
-- (void) setStation:(Z2ITStation*)inStation;
-- (Z2ITStation*) station;
-- (void) setStartTime:(CFAbsoluteTime)inDate andDuration:(float)inMinutes;
-- (void) drawCellsWithFrame:(NSRect) inFrame inView:(NSView *)inView;
-- (Z2ITSchedule*) scheduleAtLocation:(NSPoint)localPoint withFrame:(NSRect)inFrame;
-- (void) mouseDown:(NSEvent *)theEvent withFrame:(NSRect)inFrame;
-- (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute;
-- (NSCell*) cellForSchedule:(Z2ITSchedule*)inSchedule;
-- (NSImage*) cellImageAtLocation:(NSPoint)localPoint withFrame:(NSRect) inFrame  inView:(NSView*)inView;
-- (NSPoint) dragImageLocFor:(NSPoint)localPoint withFrame:(NSRect) inFrame;
+- (id)initWithGridView:(ScheduleGridView *)inGridView;
+- (void)setStation:(Z2ITStation *)inStation;
+- (Z2ITStation *)station;
+- (void)setStartTime:(CFAbsoluteTime)inDate andDuration:(float)inMinutes;
+- (void)drawCellsWithFrame:(NSRect)inFrame inView:(NSView *)inView;
+- (Z2ITSchedule *)scheduleAtLocation:(NSPoint)localPoint withFrame:(NSRect)inFrame;
+- (void)mouseDown:(NSEvent *)theEvent withFrame:(NSRect)inFrame;
+- (NSRect)cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute;
+- (NSCell *)cellForSchedule:(Z2ITSchedule *)inSchedule;
+- (NSImage *)cellImageAtLocation:(NSPoint)localPoint withFrame:(NSRect) inFrame  inView:(NSView *)inView;
+- (NSPoint)dragImageLocFor:(NSPoint)localPoint withFrame:(NSRect)inFrame;
 
-@property (retain,getter=station) Z2ITStation    *mStation;
+@property (retain,getter=station) Z2ITStation *mStation;
 @end
 
 @implementation ScheduleGridView
 
 - (id)initWithFrame:(NSRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code here.
-        int numStationsInView = frame.size.height / kScheduleStationColumnViewCellHeight;
-        mStationsInViewArray = [[NSMutableArray alloc] initWithCapacity:numStationsInView];
-        mStartStationIndex = 0;
-        mStartTime = CFAbsoluteTimeGetCurrent();
+  self = [super initWithFrame:frame];
+  if (self) {
+    // Initialization code here.
+    int numStationsInView = frame.size.height / kScheduleStationColumnViewCellHeight;
+    mStationsInViewArray = [[NSMutableArray alloc] initWithCapacity:numStationsInView];
+    mStartStationIndex = 0;
+    mStartTime = CFAbsoluteTimeGetCurrent();
 
-        [[NSNotificationCenter defaultCenter]  addObserver: self
-          selector: @selector(frameDidChange:)
-          name: NSViewFrameDidChangeNotification
-          object: self];
+    [[NSNotificationCenter defaultCenter]  addObserver: self
+      selector: @selector(frameDidChange:)
+      name: NSViewFrameDidChangeNotification
+      object: self];
 
-    	[[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingAdded:) name:RSRecordingAddedNotification object:RSBackgroundApplication];
-			[[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingRemoved:) name:RSRecordingRemovedNotification object:RSBackgroundApplication];
-		}
-    return self;
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingAdded:) name:RSRecordingAddedNotification object:RSBackgroundApplication];
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(recordingRemoved:) name:RSRecordingRemovedNotification object:RSBackgroundApplication];
+  }
+  return self;
 }
 
-- (void) dealloc 
-{
-	[[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSRecordingAddedNotification object:RSBackgroundApplication];
-	[[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSRecordingRemovedNotification object:RSBackgroundApplication];
+- (void)dealloc {
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSRecordingAddedNotification object:RSBackgroundApplication];
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSRecordingRemovedNotification object:RSBackgroundApplication];
 
   [delegate release];
   [mSelectedSchedule release];
   [super dealloc];
 }
 
-- (id) delegate
-{
+- (id)delegate {
   return delegate;
 }
 
-- (void) setDelegate:(id)inDelegate
-{
-  if (delegate != inDelegate)
-  {
+- (void)setDelegate:(id)inDelegate {
+  if (delegate != inDelegate) {
     [delegate release];
     delegate = [inDelegate retain];
   }
 }
- 
-- (BOOL) acceptsFirstResponder
-{
+
+- (BOOL)acceptsFirstResponder {
   return YES;
 }
 
-- (BOOL) isFlipped
-{
-	// We need to be flipped in order for the layout manager to draw text correctly
-	return YES;
+- (BOOL)isFlipped {
+  // We need to be flipped in order for the layout manager to draw text correctly
+  return YES;
 }
 
-- (void) restartPopupTimer
-{
-	if (mScheduleCellPopupTimer)
-	{
-		[mScheduleCellPopupTimer invalidate];
-		mScheduleCellPopupTimer  = nil;
-	}
-	mScheduleCellPopupTimer = [NSTimer scheduledTimerWithTimeInterval:kScheduleDetailsPopUpTime target:self selector:@selector(showScheduleDetails:) userInfo:nil repeats:NO];
+- (void)restartPopupTimer {
+  if (mScheduleCellPopupTimer) {
+    [mScheduleCellPopupTimer invalidate];
+    mScheduleCellPopupTimer  = nil;
+  }
+  mScheduleCellPopupTimer = [NSTimer scheduledTimerWithTimeInterval:kScheduleDetailsPopUpTime target:self selector:@selector(showScheduleDetails:) userInfo:nil repeats:NO];
 }
 
-- (void)drawRect:(NSRect)rect 
-{
-    NSRect cellFrameRect;
-    cellFrameRect.origin.x = 0;
-    cellFrameRect.origin.y = ([mStationsInViewArray count]-1) * kScheduleStationColumnViewCellHeight;
-    cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
-    cellFrameRect.size.width = [self bounds].size.width;
+- (void)drawRect:(NSRect)rect {
+  NSRect cellFrameRect;
+  cellFrameRect.origin.x = 0;
+  cellFrameRect.origin.y = ([mStationsInViewArray count]-1) * kScheduleStationColumnViewCellHeight;
+  cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+  cellFrameRect.size.width = [self bounds].size.width;
 
-	// We draw from the bottom up so that the shadow below the selected cell is not 'covered' by the 
-	// cell contents drawn beneath it.
-    int i=0;
-    for (i = [mStationsInViewArray count]-1; i >= 0; i--)
-    {
-      ScheduleGridLine *aGridLine = [mStationsInViewArray objectAtIndex:i];
-      if (aGridLine)
-      {
-		[[NSColor colorWithDeviceRed:0.85 green:0.85 blue:0.85 alpha:1.0] setFill];
-		NSRectFill(cellFrameRect);
+  // We draw from the bottom up so that the shadow below the selected cell is not 'covered' by the
+  // cell contents drawn beneath it.
+  int i=0;
+  for (i = [mStationsInViewArray count]-1; i >= 0; i--)   {
+    ScheduleGridLine *aGridLine = [mStationsInViewArray objectAtIndex:i];
+    if (aGridLine) {
+      [[NSColor colorWithDeviceRed:0.85 green:0.85 blue:0.85 alpha:1.0] setFill];
+      NSRectFill(cellFrameRect);
 
-        [aGridLine drawCellsWithFrame:cellFrameRect inView:self];
+      [aGridLine drawCellsWithFrame:cellFrameRect inView:self];
 
-        cellFrameRect.origin.y -= kScheduleStationColumnViewCellHeight;
-      }
+      cellFrameRect.origin.y -= kScheduleStationColumnViewCellHeight;
     }
-	
-    // Draw a shadow down the left edge to look as though it was 'cast' by the station column
-	if ([mStationsInViewArray count] > 0)
-	{
-		[NSGraphicsContext saveGraphicsState];
-		NSShadow *aShadow = [[NSShadow alloc] init];
-		[aShadow setShadowOffset:NSMakeSize(0.0, 0.0)];
-		[aShadow setShadowBlurRadius:5.0f];
-		[aShadow setShadowColor:[NSColor blackColor]];
-		[aShadow set];
+  }
 
-		[[NSColor blackColor] set];
-		[NSBezierPath strokeLineFromPoint:NSMakePoint([self bounds].origin.x-0.5, [self bounds].origin.y) toPoint:NSMakePoint([self bounds].origin.x-0.5, [self bounds].origin.y + [self bounds].size.height)];
-		[aShadow release];
-		[NSGraphicsContext restoreGraphicsState];
-	}
+  // Draw a shadow down the left edge to look as though it was 'cast' by the station column
+  if ([mStationsInViewArray count] > 0)   {
+    [NSGraphicsContext saveGraphicsState];
+    NSShadow *aShadow = [[NSShadow alloc] init];
+    [aShadow setShadowOffset:NSMakeSize(0.0, 0.0)];
+    [aShadow setShadowBlurRadius:5.0f];
+    [aShadow setShadowColor:[NSColor blackColor]];
+    [aShadow set];
+
+    [[NSColor blackColor] set];
+    [NSBezierPath strokeLineFromPoint:NSMakePoint([self bounds].origin.x-0.5, [self bounds].origin.y) toPoint:NSMakePoint([self bounds].origin.x-0.5, [self bounds].origin.y + [self bounds].size.height)];
+    [aShadow release];
+    [NSGraphicsContext restoreGraphicsState];
+  }
 }
 
-- (void)mouseDown:(NSEvent *)theEvent
-{
+- (void)mouseDown:(NSEvent *)theEvent {
   NSPoint eventLocation = [theEvent locationInWindow];
   NSPoint localPoint = [self convertPoint:eventLocation fromView:nil];
   NSRect cellFrameRect;
@@ -186,155 +172,139 @@ const float kScheduleDetailsPopUpTime = 3.0;
   cellFrameRect.origin.y = 0;
   cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
   cellFrameRect.size.width = [self bounds].size.width;
-  
-  if ([self acceptsFirstResponder])
+
+  if ([self acceptsFirstResponder]) {
     [[self window] makeFirstResponder:self];
-  
+  }
   int scheduleGridLineIndex = localPoint.y / kScheduleStationColumnViewCellHeight;
-  if (scheduleGridLineIndex < [mStationsInViewArray count])
-  {
-	cellFrameRect.origin.y = kScheduleStationColumnViewCellHeight * scheduleGridLineIndex;
-	[[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] mouseDown:theEvent withFrame:cellFrameRect];
+  if (scheduleGridLineIndex < [mStationsInViewArray count]) {
+    cellFrameRect.origin.y = kScheduleStationColumnViewCellHeight * scheduleGridLineIndex;
+    [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] mouseDown:theEvent withFrame:cellFrameRect];
   }
 }
 
-- (void) mouseDragged:(NSEvent *)theEvent
-{
-	NSPoint eventLocation = [theEvent locationInWindow];
-	NSPoint localPoint = [self convertPoint:eventLocation fromView:nil];
-	NSRect cellFrameRect;
-	NSImage *scheduleCellImage = nil;
-	NSPoint dragImageLoc = NSMakePoint(0.0, 0.0);
-	Z2ITSchedule* aSchedule = nil;
-	Z2ITStation* theStation = nil;
-	
-	cellFrameRect.origin.x = 0;
-	cellFrameRect.origin.y = 0;
-	cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
-	cellFrameRect.size.width = [self bounds].size.width;
+- (void) mouseDragged:(NSEvent *)theEvent {
+  NSPoint eventLocation = [theEvent locationInWindow];
+  NSPoint localPoint = [self convertPoint:eventLocation fromView:nil];
+  NSRect cellFrameRect;
+  NSImage *scheduleCellImage = nil;
+  NSPoint dragImageLoc = NSMakePoint(0.0, 0.0);
+  Z2ITSchedule* aSchedule = nil;
+  Z2ITStation* theStation = nil;
 
-	int scheduleGridLineIndex = localPoint.y / kScheduleStationColumnViewCellHeight;
-	if (scheduleGridLineIndex < [mStationsInViewArray count])
-	{
-		cellFrameRect.origin.y = kScheduleStationColumnViewCellHeight * scheduleGridLineIndex;
-		NSImage *anImage = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] cellImageAtLocation:localPoint withFrame:cellFrameRect inView:self];
-		dragImageLoc = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] dragImageLocFor:localPoint withFrame:cellFrameRect];
-		aSchedule = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] scheduleAtLocation:localPoint withFrame:cellFrameRect];
-		theStation = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] station];
-		
-		// Take the returned image and composite it into a new one with some transparency
-		scheduleCellImage = [[NSImage alloc] initWithSize:[anImage size]];
-		[scheduleCellImage lockFocus];
-		[anImage compositeToPoint:NSMakePoint(0, 0) operation:NSCompositeSourceOver fraction:0.5];
-		[scheduleCellImage unlockFocus];
-	}
-	
-	if (aSchedule && theStation && scheduleCellImage)
-	{
-		NSDictionary *dragInfoDict = [NSDictionary dictionaryWithObjectsAndKeys:
-			[[[aSchedule objectID] URIRepresentation] absoluteString], @"scheduleObjectURI",
-			[[[theStation objectID] URIRepresentation] absoluteString], @"stationObjectURI",
-			[[[mCurrentLineup objectID] URIRepresentation] absoluteString], @"currentLineupObjectURI",
-			nil];
-		
-		NSPasteboard *pboard;
-	 
-		pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
-		[pboard declareTypes:[NSArray arrayWithObject:RSSSchedulePBoardType]  owner:self];
-		[pboard setPropertyList:dragInfoDict forType:RSSSchedulePBoardType];
-	 
-		[self dragImage:scheduleCellImage at:dragImageLoc offset:NSMakeSize(0, 0) event:theEvent pasteboard:pboard source:self slideBack:YES];
-	}
-    return;
+  cellFrameRect.origin.x = 0;
+  cellFrameRect.origin.y = 0;
+  cellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+  cellFrameRect.size.width = [self bounds].size.width;
+
+  int scheduleGridLineIndex = localPoint.y / kScheduleStationColumnViewCellHeight;
+  if (scheduleGridLineIndex < [mStationsInViewArray count]) {
+    cellFrameRect.origin.y = kScheduleStationColumnViewCellHeight * scheduleGridLineIndex;
+    NSImage *anImage = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] cellImageAtLocation:localPoint withFrame:cellFrameRect inView:self];
+    dragImageLoc = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] dragImageLocFor:localPoint withFrame:cellFrameRect];
+    aSchedule = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] scheduleAtLocation:localPoint withFrame:cellFrameRect];
+    theStation = [[mStationsInViewArray objectAtIndex:scheduleGridLineIndex] station];
+
+    // Take the returned image and composite it into a new one with some transparency
+    scheduleCellImage = [[NSImage alloc] initWithSize:[anImage size]];
+    [scheduleCellImage lockFocus];
+    [anImage compositeToPoint:NSMakePoint(0, 0) operation:NSCompositeSourceOver fraction:0.5];
+    [scheduleCellImage unlockFocus];
+  }
+
+  if (aSchedule && theStation && scheduleCellImage) {
+    NSDictionary *dragInfoDict = [NSDictionary dictionaryWithObjectsAndKeys:
+      [[[aSchedule objectID] URIRepresentation] absoluteString], @"scheduleObjectURI",
+      [[[theStation objectID] URIRepresentation] absoluteString], @"stationObjectURI",
+      [[[mCurrentLineup objectID] URIRepresentation] absoluteString], @"currentLineupObjectURI",
+      nil];
+
+    NSPasteboard *pboard;
+
+    pboard = [NSPasteboard pasteboardWithName:NSDragPboard];
+    [pboard declareTypes:[NSArray arrayWithObject:RSSSchedulePBoardType]  owner:self];
+    [pboard setPropertyList:dragInfoDict forType:RSSSchedulePBoardType];
+
+    [self dragImage:scheduleCellImage at:dragImageLoc offset:NSMakeSize(0, 0) event:theEvent pasteboard:pboard source:self slideBack:YES];
+  }
+  return;
 }
 
-- (void) mouseEntered:(NSEvent*) theEvent
-{
-	[self restartPopupTimer];
+- (void)mouseEntered:(NSEvent *)theEvent {
+  [self restartPopupTimer];
 }
 
-- (void) mouseExited:(NSEvent*) theEvent
-{
-//	NSPoint localPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-	if (mScheduleCellPopupTimer)
-	{
-		[mScheduleCellPopupTimer invalidate];
-		mScheduleCellPopupTimer  = nil;
-	}
+- (void)mouseExited:(NSEvent *)theEvent {
+//  NSPoint localPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
+  if (mScheduleCellPopupTimer) {
+    [mScheduleCellPopupTimer invalidate];
+    mScheduleCellPopupTimer  = nil;
+  }
 }
 
-- (NSMenu*) menuForEvent:(NSEvent*) theEvent
-{
-	NSMenu *theMenu = [self menu];
-	
-	// Handle the mouse down to select a cell.
-	[self mouseDown:theEvent];
-	return theMenu;
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent {
+  NSMenu *theMenu = [self menu];
+
+  // Handle the mouse down to select a cell.
+  [self mouseDown:theEvent];
+  return theMenu;
 }
 
-- (void) updateStationsInViewArray
-{
+- (void)updateStationsInViewArray {
   // Update the stations in view array
   int i=0;
   [mStationsInViewArray removeAllObjects];
-  
+
   int maxStationIndex = [mSortedStationsArray count];
-  
+
   // We add one here to accomodate the potentially 'partial' display of the station at the bottom of the scroll area
-  if (maxStationIndex > (mStartStationIndex + [self frame].size.height/kScheduleStationColumnViewCellHeight)+1)
+  if (maxStationIndex > (mStartStationIndex + [self frame].size.height/kScheduleStationColumnViewCellHeight)+1) {
     maxStationIndex = (mStartStationIndex + [self frame].size.height/kScheduleStationColumnViewCellHeight)+1;
-  for (i=mStartStationIndex; i < maxStationIndex; i++)
-  {
+  }
+  for (i=mStartStationIndex; i < maxStationIndex; i++) {
     ScheduleGridLine *aGridLine = [[ScheduleGridLine alloc] initWithGridView:self];
     [aGridLine setStation:[mSortedStationsArray objectAtIndex:i]];
-    
+
     [mStationsInViewArray addObject:aGridLine];
     [aGridLine release];
   }
   [self setNeedsDisplay:YES];
 }
 
-- (void) updateForNewStartTime
-{
-    for (ScheduleGridLine *aGridLine in mStationsInViewArray)
-    {
-      [aGridLine setStartTime:mStartTime andDuration:mVisibleTimeSpan];
+- (void)updateForNewStartTime {
+  for (ScheduleGridLine *aGridLine in mStationsInViewArray) {
+    [aGridLine setStartTime:mStartTime andDuration:mVisibleTimeSpan];
+  }
+  [self setNeedsDisplay:YES];
+}
+
+- (void)updateSelectedScheduleCellTrackingArea {
+  // Remove any current tracking area
+  if (mScheduleCellTrackingArea) {
+    [self removeTrackingArea:mScheduleCellTrackingArea];
+    [mScheduleCellTrackingArea release];
+    mScheduleCellTrackingArea = nil;
+  }
+
+  // start tracking the mouse in the cell area - we use this to popup the larger program details window
+  int gridLineIndex = 0;
+  for (ScheduleGridLine *aGridLine in mStationsInViewArray) {
+    if ([aGridLine station] == [mSelectedSchedule station]) {
+      float pixelsPerMinute = [self frame].size.width / mVisibleTimeSpan ;
+      NSRect cellRect = [aGridLine cellFrameRectForSchedule:mSelectedSchedule withPixelsPerMinute:pixelsPerMinute];
+      cellRect.origin.y = gridLineIndex * kScheduleStationColumnViewCellHeight;
+      mScheduleCellTrackingArea = [[NSTrackingArea alloc] initWithRect:cellRect
+        options:(NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow)
+         owner:self userInfo:nil];
+      [self addTrackingArea:mScheduleCellTrackingArea];
+      [self restartPopupTimer];
+      break;
     }
-    [self setNeedsDisplay:YES];
+    gridLineIndex++;
+  }
 }
 
-- (void) updateSelectedScheduleCellTrackingArea
-{
-	// Remove any current tracking area
-	if (mScheduleCellTrackingArea)
-	{
-		[self removeTrackingArea:mScheduleCellTrackingArea];
-		[mScheduleCellTrackingArea release];
-		mScheduleCellTrackingArea = nil;
-	}
-	
-	// start tracking the mouse in the cell area - we use this to popup the larger program details window
-	int gridLineIndex = 0;
-	for (ScheduleGridLine *aGridLine in mStationsInViewArray)
-	{
-		if ([aGridLine station] == [mSelectedSchedule station])
-		{
-			float pixelsPerMinute = [self frame].size.width / mVisibleTimeSpan ;
-			NSRect cellRect = [aGridLine cellFrameRectForSchedule:mSelectedSchedule withPixelsPerMinute:pixelsPerMinute];
-			cellRect.origin.y = gridLineIndex * kScheduleStationColumnViewCellHeight;
-			mScheduleCellTrackingArea = [[NSTrackingArea alloc] initWithRect:cellRect 
-				options:(NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow)
-				 owner:self userInfo:nil];
-			[self addTrackingArea:mScheduleCellTrackingArea];
-			[self restartPopupTimer];
-			break;
-		}
-		gridLineIndex++;
-	}
-}
-
-- (void) setSortedStationsArray:(NSArray*)inArray forLineup:(Z2ITLineup*)inLineup;
-{
+- (void)setSortedStationsArray:(NSArray *)inArray forLineup:(Z2ITLineup *)inLineup {
   [mCurrentLineup autorelease];
   mCurrentLineup = [inLineup retain];
   [mSortedStationsArray autorelease];
@@ -343,29 +313,25 @@ const float kScheduleDetailsPopUpTime = 3.0;
   [self updateForNewStartTime];
 }
 
-- (void) setStartStationIndex:(unsigned)inIndex
-{
+- (void)setStartStationIndex:(unsigned)inIndex {
   mStartStationIndex = inIndex;
   [self updateStationsInViewArray];
   [self updateForNewStartTime];
   [self updateSelectedScheduleCellTrackingArea];
 }
 
-- (void) setStartTime:(CFAbsoluteTime)inStartTime
-{
+- (void)setStartTime:(CFAbsoluteTime)inStartTime {
   mStartTime = inStartTime;
   [self updateForNewStartTime];
   [self updateSelectedScheduleCellTrackingArea];
 }
 
-- (void) setVisibleTimeSpan:(float)inTimeSpan
-{
+- (void)setVisibleTimeSpan:(float)inTimeSpan {
   mVisibleTimeSpan = inTimeSpan;
   [self updateForNewStartTime];
 }
 
-- (void) setSelectedCell:(NSCell*)inCell
-{
+- (void)setSelectedCell:(NSCell *)inCell {
   [mSelectedCell setHighlighted:NO];
   [mSelectedCell autorelease];
   mSelectedCell = [inCell retain];
@@ -373,15 +339,12 @@ const float kScheduleDetailsPopUpTime = 3.0;
   [self setNeedsDisplay:YES];
 }
 
-- (void) setSelectedSchedule:(Z2ITSchedule*)inSchedule
-{
-  for (ScheduleGridLine *aGridLine in mStationsInViewArray)
-  {
-    if ([aGridLine station] == [inSchedule station])
-    {
+- (void)setSelectedSchedule:(Z2ITSchedule *)inSchedule {
+  for (ScheduleGridLine *aGridLine in mStationsInViewArray) {
+    if ([aGridLine station] == [inSchedule station]) {
       NSCell *aCell = [aGridLine cellForSchedule:inSchedule];
       [self setSelectedCell:aCell];
-	  break;
+      break;
     }
   }
   [mSelectedSchedule autorelease];
@@ -389,92 +352,76 @@ const float kScheduleDetailsPopUpTime = 3.0;
   [self updateSelectedScheduleCellTrackingArea];
 }
 
-- (Z2ITSchedule*) selectedSchedule
-{
+- (Z2ITSchedule *)selectedSchedule {
   return mSelectedSchedule;
 }
 
-- (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule
-{
-  if (delegate && ([delegate respondsToSelector:@selector(setCurrentSchedule:)]))
-  {
+- (void) setCurrentSchedule:(Z2ITSchedule *)inSchedule {
+  if (delegate && ([delegate respondsToSelector:@selector(setCurrentSchedule:)])) {
     [delegate setCurrentSchedule:inSchedule];
   }
-  if (delegate && ([delegate respondsToSelector:@selector(setCurrentStation:)]))
-  {
-	[delegate setCurrentStation:[inSchedule station]];
+  if (delegate && ([delegate respondsToSelector:@selector(setCurrentStation:)])) {
+    [delegate setCurrentStation:[inSchedule station]];
   }
 }
 
-- (void)updateTrackingAreas
-{
-	[self updateSelectedScheduleCellTrackingArea];
+- (void)updateTrackingAreas {
+  [self updateSelectedScheduleCellTrackingArea];
 }
 
-- (void) showScheduleDetails:(NSTimer*) theTimer
-{
-	[mScheduleCellPopupTimer invalidate];
-	mScheduleCellPopupTimer = nil;
-	// Is the mouse inside the tracking area ? Only show the schedule details popup if it is
-	NSPoint mousePoint = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
-	if ([self mouse:mousePoint inRect:[mScheduleCellTrackingArea rect]])
-	{
-		if (delegate && ([delegate respondsToSelector:@selector(showScheduleDetailsWithStartingFrame:)]))
-		{
-			NSRect frameInScreenCoords = [self convertRect:[mScheduleCellTrackingArea rect] toView:nil];
-			frameInScreenCoords.origin = [[self window] convertBaseToScreen:frameInScreenCoords.origin];
-			[delegate showScheduleDetailsWithStartingFrame:frameInScreenCoords];
-		}
-	}
+- (void)showScheduleDetails:(NSTimer *)theTimer {
+  [mScheduleCellPopupTimer invalidate];
+  mScheduleCellPopupTimer = nil;
+  // Is the mouse inside the tracking area ? Only show the schedule details popup if it is
+  NSPoint mousePoint = [self convertPoint:[[self window] mouseLocationOutsideOfEventStream] fromView:nil];
+  if ([self mouse:mousePoint inRect:[mScheduleCellTrackingArea rect]]) {
+    if (delegate && ([delegate respondsToSelector:@selector(showScheduleDetailsWithStartingFrame:)])) {
+      NSRect frameInScreenCoords = [self convertRect:[mScheduleCellTrackingArea rect] toView:nil];
+      frameInScreenCoords.origin = [[self window] convertBaseToScreen:frameInScreenCoords.origin];
+      [delegate showScheduleDetailsWithStartingFrame:frameInScreenCoords];
+    }
+  }
 }
 
 #pragma mark Drag and Drop
 
-- (NSDragOperation)draggingSourceOperationMask
-{
-	return NSDragOperationGeneric;
+- (NSDragOperation)draggingSourceOperationMask {
+  return NSDragOperationGeneric;
 }
 
-- (BOOL)ignoreModifierKeysWhileDragging
-{
-	// No copy/link semantics when dragging
-	return YES;
+- (BOOL)ignoreModifierKeysWhileDragging{
+  // No copy/link semantics when dragging
+  return YES;
 }
 
 #pragma mark View Notifications
 
-- (void)frameDidChange: (NSNotification *)notification
-{
+- (void)frameDidChange:(NSNotification *)notification {
   [self updateStationsInViewArray];
   [self updateForNewStartTime];
 }
 
-- (void)recordingAdded: (NSNotification *)notification
-{
+- (void)recordingAdded:(NSNotification *)notification {
   NSArray *newRecordings = [[notification userInfo] valueForKey:RSRecordingAddedRecordingsURIKey];
-  for (NSString *newRecordingURIString in newRecordings)
-  {
+  for (NSString *newRecordingURIString in newRecordings)   {
     NSURL *newRecordingURI = [NSURL URLWithString:newRecordingURIString];
     NSManagedObjectID *newRecordingID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:newRecordingURI];
     RSRecording *newRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:newRecordingID];
-    if ([self scheduleIsVisible:newRecording.schedule])
-    {
+    if ([self scheduleIsVisible:newRecording.schedule]) {
       [[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:newRecording.schedule mergeChanges:YES];
       [self setNeedsDisplay:YES];
     }
   }
 }
 
-- (void)recordingRemoved: (NSNotification *)notification
-{
-	NSURL *removedRecordingOfScheduleURI = [NSURL URLWithString:[[notification userInfo] valueForKey:RSRecordingRemovedRecordingOfScheduleURIKey]];
-	NSManagedObjectID *removedRecordingOfScheduleID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:removedRecordingOfScheduleURI];
-	Z2ITSchedule *removedRecordingOfSchedule = (Z2ITSchedule *) [[[NSApp delegate] managedObjectContext] objectWithID:removedRecordingOfScheduleID];
-	if ([self scheduleIsVisible:removedRecordingOfSchedule])
-	{
-		[[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:removedRecordingOfSchedule mergeChanges:YES];
-		[self setNeedsDisplay:YES];
-	}
+- (void)recordingRemoved:(NSNotification *)notification {
+  NSURL *removedRecordingOfScheduleURI = [NSURL URLWithString:[[notification userInfo] valueForKey:RSRecordingRemovedRecordingOfScheduleURIKey]];
+  NSManagedObjectID *removedRecordingOfScheduleID = [[[NSApp delegate] persistentStoreCoordinator] managedObjectIDForURIRepresentation:removedRecordingOfScheduleURI];
+  Z2ITSchedule *removedRecordingOfSchedule = (Z2ITSchedule *) [[[NSApp delegate] managedObjectContext] objectWithID:removedRecordingOfScheduleID];
+  if ([self scheduleIsVisible:removedRecordingOfSchedule]) {
+    [[[NSApp delegate] managedObjectContext] refreshObjectWithoutCache:removedRecordingOfSchedule mergeChanges:YES];
+    [self setNeedsDisplay:YES];
+  }
 }
 
 @synthesize mStartTime;
@@ -485,84 +432,72 @@ const float kScheduleDetailsPopUpTime = 3.0;
 
 @implementation ScheduleGridView(Private)
 
-- (BOOL) scheduleIsVisible:(Z2ITSchedule*)inSchedule
-{
-	BOOL isVisible = NO;
-	
-	NSDate *gridStartDate = [NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime];
-	NSDate *gridEndDate = [NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime+mVisibleTimeSpan];
-	// Schedule starts between grid start and end times
-	if (([gridStartDate compare:inSchedule.time] == NSOrderedAscending) && ([inSchedule.time compare:gridEndDate] == NSOrderedDescending))
-	{
-		isVisible = YES;
-	}
-	
-	// Schedule ends between grid start and end times
-	if (([gridStartDate compare:inSchedule.endTime] == NSOrderedAscending) && ([inSchedule.endTime compare:gridEndDate] == NSOrderedDescending))
-	{
-		isVisible = YES;
-	}
-	
-	if (isVisible)
-	{
-		for (ScheduleGridLine *aGridLine in mStationsInViewArray)
-		{
-			if ([aGridLine station] == [inSchedule station])
-			{
-				isVisible = YES;
-				break;
-			}
-		}
-	}
-	return isVisible;
+- (BOOL)scheduleIsVisible:(Z2ITSchedule *)inSchedule {
+  BOOL isVisible = NO;
+
+  NSDate *gridStartDate = [NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime];
+  NSDate *gridEndDate = [NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime+mVisibleTimeSpan];
+  // Schedule starts between grid start and end times
+  if (([gridStartDate compare:inSchedule.time] == NSOrderedAscending) && ([inSchedule.time compare:gridEndDate] == NSOrderedDescending)) {
+    isVisible = YES;
+  }
+
+  // Schedule ends between grid start and end times
+  if (([gridStartDate compare:inSchedule.endTime] == NSOrderedAscending) && ([inSchedule.endTime compare:gridEndDate] == NSOrderedDescending)) {
+    isVisible = YES;
+  }
+
+  if (isVisible) {
+    for (ScheduleGridLine *aGridLine in mStationsInViewArray) {
+      if ([aGridLine station] == [inSchedule station]) {
+        isVisible = YES;
+        break;
+      }
+    }
+  }
+  return isVisible;
 }
 
 @end
 
 @implementation ScheduleGridLine
 
-- (id) initWithGridView:(ScheduleGridView*)inGridView
-{
+- (id)initWithGridView:(ScheduleGridView *)inGridView {
   self = [super init];
   if (self != nil) {
     mGridView = inGridView;
-	mCellsInLineArray = nil;
+    mCellsInLineArray = nil;
   }
   return self;
 }
 
-- (void) setStation:(Z2ITStation*)inStation
-{
+- (void)setStation:(Z2ITStation *)inStation {
   [mStation autorelease];
   mStation = [inStation retain];
 }
 
-- (Z2ITStation*)station
-{
+- (Z2ITStation *)station {
   return mStation;
 }
 
-- (void) setStartTime:(CFAbsoluteTime)inTime andDuration:(float)inMinutes
-{
+- (void)setStartTime:(CFAbsoluteTime)inTime andDuration:(float)inMinutes {
   mStartTime = inTime;
   mEndTime = mStartTime + (inMinutes * 60);
-  
+
   // Get all the schedules for the specified range
   [mSchedulesInLineArray release];
   mSchedulesInLineArray = [[mStation schedulesBetweenStartTime:mStartTime andEndTime:mEndTime] retain];
-  
+
   // Remove and reallocate all the display cells
   [mCellsInLineArray release];
   mCellsInLineArray = [[NSMutableArray alloc] initWithCapacity:[mSchedulesInLineArray count]];
 
-  for (id loopItem in mSchedulesInLineArray)
-  {
+  for (id loopItem in mSchedulesInLineArray) {
     RSScheduleGridCell *aTextCell = [[RSScheduleGridCell alloc] initTextCell:@"--"];
     [aTextCell setBordered:YES];
     [aTextCell setRepresentedObject:loopItem];
     [aTextCell setStringValue:[[loopItem program] title]];
-    if ([mGridView selectedSchedule] == loopItem)
-    {
+    if ([mGridView selectedSchedule] == loopItem) {
       [mGridView setSelectedCell:aTextCell];
     }
     [mCellsInLineArray addObject:aTextCell];
@@ -570,30 +505,27 @@ const float kScheduleDetailsPopUpTime = 3.0;
   }
 }
 
-- (void) scheduleCellClicked:(id)sender
-{
+- (void) scheduleCellClicked:(id)sender {
   NSLog(@"scheduleCellClicked - sender = %@", sender);
 }
 
-- (NSCell*) cellForSchedule:(Z2ITSchedule*)inSchedule
-{
+- (NSCell *) cellForSchedule:(Z2ITSchedule *)inSchedule {
   NSCell *theCell = nil;
-  for (theCell in mCellsInLineArray)
-  {
-    if ([theCell representedObject] == inSchedule)
+  for (theCell in mCellsInLineArray) {
+    if ([theCell representedObject] == inSchedule) {
       break;
+    }
   }
   return theCell;
 }
 
-- (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute
-{
+- (NSRect) cellFrameRectForSchedule:(Z2ITSchedule *)inSchedule withPixelsPerMinute:(float)pixelsPerMinute {
   NSRect cellFrameRect;
   NSTimeInterval durationRemaining;
   NSTimeInterval offsetFromStart = [[inSchedule time] timeIntervalSinceDate:[NSDate dateWithTimeIntervalSinceReferenceDate:mStartTime]];
 
-	durationRemaining = [[inSchedule endTime] timeIntervalSinceDate:[inSchedule time]];
-	cellFrameRect.origin.x = (offsetFromStart / 60.0) * pixelsPerMinute;
+  durationRemaining = [[inSchedule endTime] timeIntervalSinceDate:[inSchedule time]];
+  cellFrameRect.origin.x = (offsetFromStart / 60.0) * pixelsPerMinute;
 
   float programRunTime = durationRemaining / 60.0;
   cellFrameRect.size.width = programRunTime * pixelsPerMinute;
@@ -601,67 +533,60 @@ const float kScheduleDetailsPopUpTime = 3.0;
   return cellFrameRect;
 }
 
-- (void) drawCellsWithFrame:(NSRect) inFrame inView:(NSView *)inView
-{
-    NSRect cellFrameRect;
-    cellFrameRect = inFrame;  // Start with the input dimensions
-        
-    int i=0;
+- (void) drawCellsWithFrame:(NSRect)inFrame inView:(NSView *)inView {
+  NSRect cellFrameRect;
+  cellFrameRect = inFrame;  // Start with the input dimensions
+
+  int i=0;
   // Calculate the pixels per minute value
-    float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
+  float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
 
   // Iterate over all the cells drawing them with the correct size rect for the duration
-    for (i=0; i < [mCellsInLineArray count]; i++)
-    {
-      Z2ITSchedule *aSchedule = [mSchedulesInLineArray objectAtIndex:i];
-      if (aSchedule)
-      {
-        cellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
-        cellFrameRect.origin.y = inFrame.origin.y;
-        cellFrameRect.size.height = inFrame.size.height;
-        
-        // Draw the cell
-        [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView];
+  for (i=0; i < [mCellsInLineArray count]; i++) {
+    Z2ITSchedule *aSchedule = [mSchedulesInLineArray objectAtIndex:i];
+    if (aSchedule) {
+      cellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+      cellFrameRect.origin.y = inFrame.origin.y;
+      cellFrameRect.size.height = inFrame.size.height;
+
+      // Draw the cell
+      [[mCellsInLineArray objectAtIndex:i] drawWithFrame:cellFrameRect inView:inView];
+    }
+  }
+}
+
+- (Z2ITSchedule *) scheduleAtLocation:(NSPoint)localPoint withFrame:(NSRect)inFrame {
+  // Calculate the pixels per minute value
+  float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
+
+  BOOL foundCell = NO;
+  int i=0;
+  Z2ITSchedule *aSchedule = nil;
+  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
+  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++) {
+    aSchedule = [mSchedulesInLineArray objectAtIndex:i];
+    if (aSchedule) {
+      aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+      aCellFrameRect.origin.y = 0;
+      aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+      // We always make the click to be in the middle of the cell vertically
+      localPoint.y = kScheduleStationColumnViewCellHeight / 2;
+      if (NSPointInRect(localPoint, aCellFrameRect)) {
+        foundCell = YES;
       }
     }
-}
-
-- (Z2ITSchedule*) scheduleAtLocation:(NSPoint)localPoint withFrame:(NSRect)inFrame
-{
-  // Calculate the pixels per minute value
-  float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
-
-  BOOL foundCell = NO;
-  int i=0;
-  Z2ITSchedule *aSchedule = nil;
-  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
-  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++)
-  {
-      aSchedule = [mSchedulesInLineArray objectAtIndex:i];
-      if (aSchedule)
-      {
-        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
-        aCellFrameRect.origin.y = 0;
-        aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
-        // We always make the click to be in the middle of the cell vertically
-        localPoint.y = kScheduleStationColumnViewCellHeight / 2;
-        if (NSPointInRect(localPoint, aCellFrameRect))
-        {
-          foundCell = YES;
-        }
-      }
   }
-  if (foundCell)
-	return aSchedule;
-  else
-	return nil;
+  if (foundCell) {
+    return aSchedule;
+  } else {
+    return nil;
+  }
 }
 
-- (void)mouseDown:(NSEvent *)theEvent withFrame:(NSRect)inFrame
-{
+- (void)mouseDown:(NSEvent *)theEvent withFrame:(NSRect)inFrame {
   NSPoint eventLocation = [theEvent locationInWindow];
   NSPoint localPoint = [mGridView convertPoint:eventLocation fromView:nil];
-  
+
   // Calculate the pixels per minute value
   float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
 
@@ -669,91 +594,79 @@ const float kScheduleDetailsPopUpTime = 3.0;
   int i=0;
   Z2ITSchedule *aSchedule = nil;
   NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
-  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++)
-  {
-      aSchedule = [mSchedulesInLineArray objectAtIndex:i];
-      if (aSchedule)
-      {
-        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
-        aCellFrameRect.origin.y = 0;
-        aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
-        // We always make the click to be in the middle of the cell vertically
-        localPoint.y = kScheduleStationColumnViewCellHeight / 2;
-        if (NSPointInRect(localPoint, aCellFrameRect))
-        {
-          foundCell = YES;
-          [mGridView setSelectedCell:[mCellsInLineArray objectAtIndex:i]];
-        }
+  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++) {
+    aSchedule = [mSchedulesInLineArray objectAtIndex:i];
+    if (aSchedule) {
+      aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+      aCellFrameRect.origin.y = 0;
+      aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+      // We always make the click to be in the middle of the cell vertically
+      localPoint.y = kScheduleStationColumnViewCellHeight / 2;
+      if (NSPointInRect(localPoint, aCellFrameRect)) {
+        foundCell = YES;
+        [mGridView setSelectedCell:[mCellsInLineArray objectAtIndex:i]];
       }
+    }
   }
-  if (foundCell)
-  {
+  if (foundCell) {
     [mGridView setCurrentSchedule:aSchedule];
     [mGridView setNeedsDisplay:YES];
   }
 }
 
-- (NSImage*) cellImageAtLocation:(NSPoint)localPoint withFrame:(NSRect) inFrame inView:(NSView*)inView
-{
+- (NSImage *)cellImageAtLocation:(NSPoint)localPoint withFrame:(NSRect) inFrame inView:(NSView *)inView {
   // Calculate the pixels per minute value
   float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
 
   NSImage *cellImage = nil;
-  
+
   BOOL foundCell = NO;
   int i=0;
   Z2ITSchedule *aSchedule = nil;
   NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
-  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++)
-  {
-      aSchedule = [mSchedulesInLineArray objectAtIndex:i];
-      if (aSchedule)
-      {
-        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
-        aCellFrameRect.origin.y = 0;
-        aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
-        // We always make the click to be in the middle of the cell vertically
-        localPoint.y = kScheduleStationColumnViewCellHeight / 2;
-        if (NSPointInRect(localPoint, aCellFrameRect))
-        {
-          foundCell = YES;
-          cellImage  = [[mCellsInLineArray objectAtIndex:i] cellImageWithFrame:aCellFrameRect inView:inView];
-        }
+  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++) {
+    aSchedule = [mSchedulesInLineArray objectAtIndex:i];
+    if (aSchedule) {
+      aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+      aCellFrameRect.origin.y = 0;
+      aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
+      // We always make the click to be in the middle of the cell vertically
+      localPoint.y = kScheduleStationColumnViewCellHeight / 2;
+      if (NSPointInRect(localPoint, aCellFrameRect)) {
+        foundCell = YES;
+        cellImage  = [[mCellsInLineArray objectAtIndex:i] cellImageWithFrame:aCellFrameRect inView:inView];
       }
+    }
   }
   return cellImage;
 }
 
-- (NSPoint) dragImageLocFor:(NSPoint)localPoint withFrame:(NSRect) inFrame
-{
+- (NSPoint)dragImageLocFor:(NSPoint)localPoint withFrame:(NSRect)inFrame {
   // Calculate the pixels per minute value
   float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
 
   NSPoint dragImageLoc = NSMakePoint(0.0, 0.0);
-  
+
   BOOL foundCell = NO;
   int i=0;
   Z2ITSchedule *aSchedule = nil;
   NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
-  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++)
-  {
-      aSchedule = [mSchedulesInLineArray objectAtIndex:i];
-      if (aSchedule)
-      {
-        aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
-		aCellFrameRect.origin.y = inFrame.origin.y + aCellFrameRect.size.height;
-		NSRect hitRect = aCellFrameRect;
-		hitRect.origin.y = 0;
-        hitRect.size.height = kScheduleStationColumnViewCellHeight;
-        // We always make the click to be in the middle of the cell vertically
-		localPoint.y = kScheduleStationColumnViewCellHeight / 2;
-        if (NSPointInRect(localPoint, hitRect))
-        {
-          foundCell = YES;
-	      dragImageLoc.x = aCellFrameRect.origin.x;
-	      dragImageLoc.y = aCellFrameRect.origin.y;
-        }
+  for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++) {
+    aSchedule = [mSchedulesInLineArray objectAtIndex:i];
+    if (aSchedule) {
+      aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
+      aCellFrameRect.origin.y = inFrame.origin.y + aCellFrameRect.size.height;
+      NSRect hitRect = aCellFrameRect;
+      hitRect.origin.y = 0;
+      hitRect.size.height = kScheduleStationColumnViewCellHeight;
+      // We always make the click to be in the middle of the cell vertically
+      localPoint.y = kScheduleStationColumnViewCellHeight / 2;
+      if (NSPointInRect(localPoint, hitRect)) {
+        foundCell = YES;
+        dragImageLoc.x = aCellFrameRect.origin.x;
+        dragImageLoc.y = aCellFrameRect.origin.y;
       }
+    }
   }
   return dragImageLoc;
 }

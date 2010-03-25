@@ -17,7 +17,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSManagedObjectContext ( RecschedAdditions )
+@interface NSManagedObjectContext(RecschedAdditions)
 
 - (void)refreshObjectWithoutCache:(NSManagedObject *)object mergeChanges:(BOOL)flag;
 

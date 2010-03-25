@@ -31,28 +31,26 @@
 @synthesize recordingThreadController;
 @synthesize recordingQueue;
 
-+ (RSRecording*) insertRecordingOfSchedule:(Z2ITSchedule*)aSchedule
-{
-	RSRecording *aRecording = [NSEntityDescription insertNewObjectForEntityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-	[aRecording setSchedule:aSchedule];
-	[aSchedule setRecording:aRecording];
-	[aRecording setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
++ (RSRecording *)insertRecordingOfSchedule:(Z2ITSchedule *)aSchedule {
+  RSRecording *aRecording = [NSEntityDescription insertNewObjectForEntityForName:@"Recording" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+  [aRecording setSchedule:aSchedule];
+  [aSchedule setRecording:aRecording];
+  [aRecording setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
 
-	RSRecordingOptions *options = [NSEntityDescription insertNewObjectForEntityForName:@"RecordingOptions" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-	options.keepUntil = kRSRecordingOptionsKeepUntilSpaceNeeded;
+  RSRecordingOptions *options = [NSEntityDescription insertNewObjectForEntityForName:@"RecordingOptions" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+  options.keepUntil = kRSRecordingOptionsKeepUntilSpaceNeeded;
   aRecording.recordingOptions = options;
-	return aRecording;
+  return aRecording;
 }
 
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)aDate withStatus:(int)status
-{
++ (NSArray *)fetchRecordingsInManagedObjectContext:(NSManagedObjectContext *)inMOC afterDate:(NSDate *)aDate withStatus:(int)status {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
-   
+
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.endTime > %@ and status == %@", aDate, [NSNumber numberWithInt:status]];
   [request setPredicate:predicate];
-  
+
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:YES];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
   [sortDescriptor release];
@@ -62,15 +60,14 @@
   return array;
 }
 
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC beforeDate:(NSDate*)aDate
-{
++ (NSArray *)fetchRecordingsInManagedObjectContext:(NSManagedObjectContext *)inMOC beforeDate:(NSDate *)aDate {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
-   
+
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.time < %@", aDate];
   [request setPredicate:predicate];
-  
+
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:NO];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
   [sortDescriptor release];
@@ -80,15 +77,14 @@
   return array;
 }
 
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)afterDate beforeDate:(NSDate*)beforeDate
-{
++ (NSArray *)fetchRecordingsInManagedObjectContext:(NSManagedObjectContext *)inMOC afterDate:(NSDate*)afterDate beforeDate:(NSDate *)beforeDate {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
-   
+
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(schedule.time < %@ AND schedule.time > %@) OR (schedule.endTime < %@ AND schedule.endTime > %@)", beforeDate, afterDate, beforeDate, afterDate];
   [request setPredicate:predicate];
-  
+
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:NO];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
   [sortDescriptor release];

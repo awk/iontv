@@ -1,18 +1,18 @@
 //  recsched_bkgd - Background server application retrieves schedule data, performs recordings,
 //  transcodes recordings in to H.264 format for iTunes, iPod etc.
-//  
+//
 //  Copyright (C) 2007 Andrew Kimpton
-//  
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -41,8 +41,7 @@ extern NSString *kTVDataDeliveryEndDateKey;
 extern NSString *kTVDataDeliveryReportProgressToKey;
 extern NSString *kTVDataDeliveryDataRecipientKey;
 
-@interface tvDataDelivery : WSGeneratedObj
-{
+@interface tvDataDelivery : WSGeneratedObj {
   WSMethodInvocationRef fAuthorizedRef;
 }
 
@@ -63,7 +62,7 @@ extern NSString *kTVDataDeliveryDataRecipientKey;
 // No parameters for this method
 
 // result returns an id from the reply dictionary as specified by the WSDL.
-- (id) resultValue;
+- (id)resultValue;
 
 @end; /* acknowledge */
 
@@ -76,10 +75,10 @@ extern NSString *kTVDataDeliveryDataRecipientKey;
 @interface download : tvDataDelivery
 
 // update the parameter list for the invocation.
-- (void) setParameters:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */) in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */) in_endTime;
+- (void)setParameters:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_endTime;
 
 // result returns an id from the reply dictionary as specified by the WSDL.
-- (id) resultValue;
+- (id)resultValue;
 
 @end; /* download */
 
@@ -87,16 +86,16 @@ extern NSString *kTVDataDeliveryDataRecipientKey;
 /*-
  * Web Service:  xtvdWebService
  */
-@interface xtvdWebService : NSObject 
+@interface xtvdWebService : NSObject
 
-+ (id) acknowledge;
-+ (id) download:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */) in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */) in_endTime;
++ (id)acknowledge;
++ (id)download:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_endTime;
 
 @end;
 
 @interface xtvdDownloadThread : NSObject
 
-- (void) performDownload:(id)downloadInfo;
+- (void)performDownload:(id)downloadInfo;
 
 @end;
 

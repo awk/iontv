@@ -10,7 +10,6 @@
 
 
 @interface RSSeasonPassCalendarCell : NSTextFieldCell {
-
   NSArray *scheduleList;
   NSMutableAttributedString *mEventString;
 }

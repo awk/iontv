@@ -25,10 +25,10 @@
 @class RSSeasonPass;
 
 enum {
-	RSRecordingNotYetStartedStatus = 0,
-	RSRecordingInProgressStatus = 1,
-	RSRecordingFinishedStatus = 2,
-	RSRecordingErrorStatus = 3,
+  RSRecordingNotYetStartedStatus = 0,
+  RSRecordingInProgressStatus = 1,
+  RSRecordingFinishedStatus = 2,
+  RSRecordingErrorStatus = 3,
 };
 
 @interface RSRecording : NSManagedObject {
@@ -45,10 +45,10 @@ enum {
 @property (retain) RSRecordingOptions *recordingOptions;
 @property (retain) RSSeasonPass* seasonPass;
 
-+ (RSRecording*) insertRecordingOfSchedule:(Z2ITSchedule*)aSchedule;
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)date withStatus:(int)status; 
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC beforeDate:(NSDate*)date; 
-+ (NSArray*) fetchRecordingsInManagedObjectContext:(NSManagedObjectContext*)inMOC afterDate:(NSDate*)afterDate beforeDate:(NSDate*)beforeDate; 
++ (RSRecording *)insertRecordingOfSchedule:(Z2ITSchedule *)aSchedule;
++ (NSArray *)fetchRecordingsInManagedObjectContext:(NSManagedObjectContext *)inMOC afterDate:(NSDate *)date withStatus:(int)status;
++ (NSArray *)fetchRecordingsInManagedObjectContext:(NSManagedObjectContext *)inMOC beforeDate:(NSDate *)date;
++ (NSArray *)fetchRecordingsInManagedObjectContext:(NSManagedObjectContext *)inMOC afterDate:(NSDate *)afterDate beforeDate:(NSDate *)beforeDate;
 
 @end
 

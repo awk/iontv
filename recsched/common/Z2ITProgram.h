@@ -27,23 +27,22 @@
 }
 
 // Fetch the Program with the given ID from the Managed Object Context
-+ (Z2ITProgram *) fetchProgramWithID:(NSString*)inProgramID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
++ (Z2ITProgram *)fetchProgramWithID:(NSString *)inProgramID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
 // Fetch all the programs present with supplied IDs
-+ (NSArray *) fetchProgramsWithIDS:(NSArray*)inProgramIDS inManagedObjectContext:(NSManagedObjectContext*)inMOC;
++ (NSArray *)fetchProgramsWithIDS:(NSArray *)inProgramIDS inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
-- (void) addToSchedule:(Z2ITSchedule *)inSchedule;
+- (void)addToSchedule:(Z2ITSchedule *)inSchedule;
 
-- (void) addProductionCrewWithXMLElement:(NSXMLElement *)inXMLElement;
-- (void) addGenreWithXMLElement:(NSXMLElement *)inXMLElement;
-- (void) addScheduleWithXMLElement:(NSXMLElement *)inXMLElement;
+- (void)addProductionCrewWithXMLElement:(NSXMLElement *)inXMLElement;
+- (void)addGenreWithXMLElement:(NSXMLElement *)inXMLElement;
+- (void)addScheduleWithXMLElement:(NSXMLElement *)inXMLElement;
+- (void)initializeWithXMLElement:(NSXMLElement *)inXMLElement;
 
-- (void) initializeWithXMLElement:(NSXMLElement *)inXMLElement;
-
-- (BOOL) isMovie;
+- (BOOL)isMovie;
 
 - (void)addAdvisory:(NSString *)value;
-- (Z2ITGenre*) genreWithRelevance:(int)inRelevance;
+- (Z2ITGenre *)genreWithRelevance:(int)inRelevance;
 
 @property (retain) NSString * colorCode;
 @property (retain) NSString * descriptionStr;
@@ -95,7 +94,7 @@
 
 
 // Fetch the CrewRole Object with the given string from the Managed Object Context
-+ (NSManagedObject *) fetchCrewRoleWithName:(NSString*)inCrewRoleNameString inManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (NSManagedObject *)fetchCrewRoleWithName:(NSString *)inCrewRoleNameString inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
 @property (retain) NSString * givenname;
 @property (retain) NSString * surname;
@@ -112,8 +111,8 @@
 @interface Z2ITGenre : NSManagedObject {
 };
 
-+ (Z2ITGenre *) createGenreWithClassName:(NSString*)inGenreClassNameString andRelevance:(NSNumber*)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC;
-+ (Z2ITGenre *) fetchGenreWithClassName:(NSString*)inGenreClassNameString andRelevance:(NSNumber*)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (Z2ITGenre *)createGenreWithClassName:(NSString *)inGenreClassNameString andRelevance:(NSNumber *)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (Z2ITGenre *)fetchGenreWithClassName:(NSString *)inGenreClassNameString andRelevance:(NSNumber *)inRelevance inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
 @property (retain) NSNumber * relevance;
 @property (retain) NSManagedObject * genreClass;

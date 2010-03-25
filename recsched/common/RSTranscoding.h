@@ -21,7 +21,7 @@
 @class RSTranscodingImp;
 
 @interface RSTranscoding : NSManagedObject {
-	RSTranscodingImp *transcodingImp;
+   RSTranscodingImp *transcodingImp;
 }
 
 @property (retain) NSString * mediaFile;
@@ -29,7 +29,7 @@
 @property (retain) Z2ITSchedule * schedule;
 @property (retain) RSTranscodingImp * transcodingImp;
 
-- (void) finishedTranscode;
+- (void)finishedTranscode;
 
 @end
 

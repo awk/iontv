@@ -22,6 +22,6 @@
 
 }
 
-+ (NSDictionary *) colorDictionaryNamed:(NSString*)dictionaryName;
++(NSDictionary *)colorDictionaryNamed:(NSString*)dictionaryName;
 
 @end

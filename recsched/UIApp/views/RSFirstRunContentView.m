@@ -12,17 +12,17 @@
 @implementation RSFirstRunContentView
 
 - (id)initWithFrame:(NSRect)frame {
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code here.
-    }
-    return self;
+  self = [super initWithFrame:frame];
+  if (self) {
+    // Initialization code here.
+  }
+  return self;
 }
 
 - (void)drawRect:(NSRect)rect {
-    // Drawing code here.
-    NSImage *bkgdImage = [NSImage imageNamed:@"assistantBackground.tiff"];
-    [bkgdImage drawAtPoint:NSMakePoint(0, 0) fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
+  // Drawing code here.
+  NSImage *bkgdImage = [NSImage imageNamed:@"assistantBackground.tiff"];
+  [bkgdImage drawAtPoint:NSMakePoint(0, 0) fromRect:NSZeroRect operation:NSCompositeCopy fraction:1.0f];
 }
 
 @end

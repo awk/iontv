@@ -24,10 +24,8 @@ NSString *kRSErrorScheduleToBeRecorded = @"scheduleToBeRecorded";
 
 @implementation RSNoConnectionErrorRecovery
 
-- (BOOL)attemptRecoveryFromError:(NSError *)error optionIndex:(NSUInteger)recoveryOptionIndex
-{
-  if (recoveryOptionIndex == 1)
-  {
+- (BOOL)attemptRecoveryFromError:(NSError *)error optionIndex:(NSUInteger)recoveryOptionIndex {
+  if (recoveryOptionIndex == 1) {
     NSLog(@"IMPLEMENT - Need to restart the app.");
   }
   return YES;

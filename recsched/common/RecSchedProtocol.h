@@ -1,16 +1,16 @@
 //  Copyright (c) 2007, Andrew Kimpton
-//  
+//
 //  All rights reserved.
-//  
+//
 //  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
 //  conditions are met:
-//  
+//
 //  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 //  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
 //  in the documentation and/or other materials provided with the distribution.
 //  The names of its contributors may not be used to endorse or promote products derived from this software without specific prior
 //  written permission.
-//  
+//
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -29,26 +29,26 @@ extern NSString *kRecServerConnectionName;
 
 @protocol RecSchedServerProto
 
-- (void) activityDisplayAvailable;
-- (void) activityDisplayUnavailable;
+- (void)activityDisplayAvailable;
+- (void)activityDisplayUnavailable;
 
-- (BOOL) addRecordingOfScheduleWithObjectID:(NSManagedObjectID*)scheduleObjectID error:(NSError**)error;
-- (BOOL) cancelRecordingWithObjectID:(NSManagedObjectID*)recordingObjectID error:(NSError**)error;
-- (BOOL) addSeasonPassForProgramWithObjectID:(NSManagedObjectID*)programObjectID onStation:(NSManagedObjectID*)stationObjectID error:(NSError**)error;
-- (BOOL) deleteSeasonPassWithObjectID:(NSManagedObjectID*)seasonPassObjectID error:(NSError**)error;
+- (BOOL)addRecordingOfScheduleWithObjectID:(NSManagedObjectID *)scheduleObjectID error:(NSError **)error;
+- (BOOL)cancelRecordingWithObjectID:(NSManagedObjectID *)recordingObjectID error:(NSError **)error;
+- (BOOL)addSeasonPassForProgramWithObjectID:(NSManagedObjectID *)programObjectID onStation:(NSManagedObjectID *)stationObjectID error:(NSError **)error;
+- (BOOL)deleteSeasonPassWithObjectID:(NSManagedObjectID *)seasonPassObjectID error:(NSError **)error;
 
-- (void) reloadPreferences:(id)sender;
+- (void)reloadPreferences:(id)sender;
 
-- (oneway void) quitServer:(id)sender;
+- (oneway void)quitServer:(id)sender;
 
 // Schedule Retrieval
-- (oneway void) updateLineups;
+- (oneway void)updateLineups;
 
 // HDHomeRun Device Management
-- (oneway void) scanForHDHomeRunDevices:(id)sender;
-- (void) scanForChannelsOnHDHomeRunDeviceID:(NSNumber*)deviceID tunerIndex:(NSNumber*)tunerIndex;
+- (oneway void)scanForHDHomeRunDevices:(id)sender;
+- (void)scanForChannelsOnHDHomeRunDeviceID:(NSNumber *)deviceID tunerIndex:(NSNumber *)tunerIndex;
 
-- (void) setHDHomeRunDeviceWithID:(NSNumber*)deviceID nameTo:(NSString*)name;
-- (void) setHDHomeRunLineup:(NSManagedObjectID*)channelStationMapID onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex;
-- (oneway void) updateChannelStationMap:(NSManagedObjectID*)anObjectID withChannelsAndStations:(NSArray*)channelsArray; 
+- (void)setHDHomeRunDeviceWithID:(NSNumber *)deviceID nameTo:(NSString *)name;
+- (void)setHDHomeRunLineup:(NSManagedObjectID *)channelStationMapID onDeviceID:(int)deviceID forTunerIndex:(int)tunerIndex;
+- (oneway void)updateChannelStationMap:(NSManagedObjectID *)anObjectID withChannelsAndStations:(NSArray *)channelsArray;
 @end

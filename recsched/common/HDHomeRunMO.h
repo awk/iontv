@@ -24,8 +24,7 @@ extern const int kDefaultPortNumber;
 
 @class HDHomeRunTuner;
 
-@interface HDHomeRun : NSManagedObject
-{
+@interface HDHomeRun : NSManagedObject {
   struct hdhomerun_device_t *mHDHomeRunDevice;
   BOOL mNewFirmwareAvailable;
   BOOL mDeviceOnline;
@@ -33,18 +32,18 @@ extern const int kDefaultPortNumber;
 
 @property (retain) NSNumber * deviceID;
 @property (retain) NSString * name;
-@property (retain) NSSet* tuners;
+@property (retain) NSSet * tuners;
 @property (readonly) BOOL newFirmwareAvailable;
 @property (readonly) BOOL deviceOnline;
-@property (readonly) HDHomeRunTuner *tuner0;
-@property (readonly) HDHomeRunTuner *tuner1;
+@property (readonly) HDHomeRunTuner * tuner0;
+@property (readonly) HDHomeRunTuner * tuner1;
 
 // Fetch the HDHomeRun with the given ID from the Managed Object Context
-+ (HDHomeRun *) fetchHDHomeRunWithID:(NSNumber*)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
++ (HDHomeRun *)fetchHDHomeRunWithID:(NSNumber *)inDeviceID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
-+ (HDHomeRun *) createHDHomeRunWithID:(NSNumber*)inDeviceID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
++ (HDHomeRun *)createHDHomeRunWithID:(NSNumber *)inDeviceID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
-- (HDHomeRunTuner*) tunerWithIndex:(int)index;
+- (HDHomeRunTuner *)tunerWithIndex:(int)index;
 
 - (BOOL) upgradeFirmware;
 @end

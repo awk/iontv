@@ -20,103 +20,93 @@
 
 @implementation Z2ITSchedule
 
-+ (void) clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC
-{
++ (void)clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC {
   NSFetchRequest *fetchRequest = [[[NSFetchRequest alloc] init] autorelease];
   [fetchRequest setEntity:
-          [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:inMOC]];
-   
+    [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:inMOC]];
+
   // Execute the fetch
   NSError *error;
   NSArray *allSchedules = [inMOC executeFetchRequest:fetchRequest error:&error];
   Z2ITSchedule *aSchedule;
-  for (aSchedule in allSchedules)
-  {
+  for (aSchedule in allSchedules) {
     [inMOC deleteObject:aSchedule];
   }
 }
 
-+ (Z2ITSchedule*) fetchScheduleWithLatestStartDateInMOC:(NSManagedObjectContext*)inMOC
-{
++ (Z2ITSchedule *)fetchScheduleWithLatestStartDateInMOC:(NSManagedObjectContext *)inMOC {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
   [request setFetchLimit:1];
-   
+
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:NO];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
   [sortDescriptor release];
   [request setFetchLimit:1];    // Only need the single last item
-  
+
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
-  if (array == nil)
-  {
-      NSLog(@"Error executing fetch request to find schedule with latest start date");
-      return nil;
-  }
-  if ([array count] == 0)
-  {
+  if (array == nil) {
+    NSLog(@"Error executing fetch request to find schedule with latest start date");
     return nil;
   }
-  else
-  {
+  if ([array count] == 0) {
+    return nil;
+  } else {
     return [array objectAtIndex:0];
   }
 }
 
-- (BOOL) overlapsWith:(Z2ITSchedule*)anotherSchedule
-{
+- (BOOL)overlapsWith:(Z2ITSchedule *)anotherSchedule {
   // This schedule ends before anotherSchedule starts or this schedule ends exactly as the other schedule starts - no overlap
-  if (([[self endTime] compare:anotherSchedule.time] == NSOrderedAscending) || ([[self endTime] compare:anotherSchedule.time] == NSOrderedSame))
+  if (([[self endTime] compare:anotherSchedule.time] == NSOrderedAscending) || ([[self endTime] compare:anotherSchedule.time] == NSOrderedSame)) {
     return NO;
-  // This schedule starts after anotherSchedule ends - no overlap
-  else if ([[self time] compare:anotherSchedule.endTime] == NSOrderedDescending)
+  } else if ([[self time] compare:anotherSchedule.endTime] == NSOrderedDescending) {
+    // This schedule starts after anotherSchedule ends - no overlap
     return NO;
-  // If none of the above are true - there's some amount of overlap
-  else
+  } else {
+    // If none of the above are true - there's some amount of overlap
     return YES;
+  }
 }
 
-- (void) setDurationHours:(int)inHours minutes:(int)inMinutes
-{
+- (void)setDurationHours:(int)inHours minutes:(int)inMinutes {
   NSDate *startDate = [self time];
-  if (startDate == nil)
+  if (startDate == nil) {
     NSLog(@"setDuration - no valid start time for program %@", [[self program] title]);
+  }
   NSDate *endDate = [self endTime];
-  if (endDate != nil)
+  if (endDate != nil) {
     NSLog(@"setDuration - program %@ already has an end time", [[self program] title]);
-  
+  }
+
   endDate = [startDate addTimeInterval:(inHours * 60 * 60) + (inMinutes * 60)];
   [self setEndTime:endDate];
 }
 
-- (NSString *) partNumberString
-{
-  if (([self partNumber] == nil) || ([self totalNumberParts] == nil))
+- (NSString *)partNumberString {
+  if (([self partNumber] == nil) || ([self totalNumberParts] == nil)) {
     return nil;
-  if (([[self partNumber] intValue] == 0) || ([[self totalNumberParts] intValue] == 0))
+  }
+  if (([[self partNumber] intValue] == 0) || ([[self totalNumberParts] intValue] == 0)) {
     return nil;
-    
+  }
+
   return [NSString stringWithFormat:@"Part %@ of %@", [self partNumber], [self totalNumberParts]];
 }
 
-- (NSString *) programDetailsStr
-{
+- (NSString *)programDetailsStr {
   NSString *aString = nil;
-  if ([[self program] descriptionStr] != nil)
-  {
+  if ([[self program] descriptionStr] != nil) {
     NSMutableString *detailsString = [[NSMutableString alloc] initWithString:[[self program] descriptionStr]];
-    if (![self new])
-    {
+    if (![self new]) {
       [detailsString appendString:@" Repeat."];
     }
-    if ([self dolby] != nil)
-    {
+    if ([self dolby] != nil) {
       [detailsString appendFormat:@" %@.", [self dolby]];
     }
-    if ([self subtitled])
-    {
+    if ([self subtitled]) {
       [detailsString appendFormat:@" Subtitled."];
     }
     aString = [NSString stringWithString:detailsString];
@@ -143,18 +133,18 @@
 @dynamic recording;
 @dynamic transcoding;
 
-- (NSString *) tvRatingImageName
-{
-  if ([self tvRating] == nil)
+- (NSString *)tvRatingImageName {
+  if ([self tvRating] == nil) {
     return nil;
-  else
+  } else {
     return [NSString stringWithFormat:@"%@.png", [self tvRating]];
+  }
 }
 
-- (NSString *) tvRatingImagePath
-{
-  if ([self tvRatingImageName] == nil)
+- (NSString *)tvRatingImagePath {
+  if ([self tvRatingImageName] == nil) {
     return nil;
+  }
   NSString *imagePath = [[NSBundle mainBundle] pathForImageResource:[self tvRatingImageName]];
   return imagePath;
 }

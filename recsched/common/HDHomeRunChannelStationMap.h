@@ -25,12 +25,12 @@
 
 }
 
-+ (NSArray *) allChannelStationsMapsInManagedObjectContext:(NSManagedObjectContext*)inMOC;
-- (void) deleteAllChannelsInMOC:(NSManagedObjectContext *)inMOC;
-- (void) pushMapContentsToServer;
++ (NSArray *)allChannelStationsMapsInManagedObjectContext:(NSManagedObjectContext *)inMOC;
+- (void)deleteAllChannelsInMOC:(NSManagedObjectContext *)inMOC;
+- (void)pushMapContentsToServer;
 
 @property (retain) NSDate * lastUpdateDate;
-@property (retain) NSSet* channels;
+@property (retain) NSSet * channels;
 @property (retain) Z2ITLineup * lineup;
 
 @end

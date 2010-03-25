@@ -38,7 +38,7 @@ extern NSString *kRSSeasonPassOptionsShowTypeAllWithDuplicates;
 @end
 
 @interface RSSeasonPassOptions : RSRecordingOptions {
-	
+
 }
 
 @property (retain) NSNumber * keepAtMost;

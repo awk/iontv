@@ -25,10 +25,10 @@
 }
 
 // Fetch the station with the given ID from the Managed Object Context
-+ (Z2ITLineup *) fetchLineupWithID:(NSString*)inLineupID inManagedObjectContext:(NSManagedObjectContext*)inMOC;
++ (Z2ITLineup *)fetchLineupWithID:(NSString *)inLineupID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
 // Fetch the lineup map for the given station ID from the relationships in this Lineup
-- (Z2ITLineupMap *) fetchLineupMapWithStationID:(NSNumber*)inStationID;
+- (Z2ITLineupMap *)fetchLineupMapWithStationID:(NSNumber *)inStationID;
 
 // Return an array of all the stations in this lineup
 - (NSArray *)stations;

@@ -29,55 +29,49 @@
 @dynamic title;
 @dynamic recordings;
 
-+ (RSSeasonPass*) insertSeasonPassForProgram:(Z2ITProgram*)aProgram onStation:(Z2ITStation*)aStation
-{
-	RSSeasonPass *aSeasonPass = [NSEntityDescription insertNewObjectForEntityForName:@"SeasonPass" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-	[aSeasonPass setStation:aStation];
-	[aSeasonPass setSeries:aProgram.series];
-	[aSeasonPass setTitle:aProgram.title];
-        
-	RSSeasonPassOptions *options = [NSEntityDescription insertNewObjectForEntityForName:@"SeasonPassOptions" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
-	options.keepUntil = kRSRecordingOptionsKeepUntilSpaceNeeded;
-	options.showType = kRSSeasonPassOptionsShowTypeRepeatsAndFirstRuns;
-	[aSeasonPass setOptions:options];
-	
-	return aSeasonPass;
++ (RSSeasonPass *)insertSeasonPassForProgram:(Z2ITProgram *)aProgram onStation:(Z2ITStation *)aStation {
+  RSSeasonPass *aSeasonPass = [NSEntityDescription insertNewObjectForEntityForName:@"SeasonPass" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+  [aSeasonPass setStation:aStation];
+  [aSeasonPass setSeries:aProgram.series];
+  [aSeasonPass setTitle:aProgram.title];
+
+  RSSeasonPassOptions *options = [NSEntityDescription insertNewObjectForEntityForName:@"SeasonPassOptions" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
+  options.keepUntil = kRSRecordingOptionsKeepUntilSpaceNeeded;
+  options.showType = kRSSeasonPassOptionsShowTypeRepeatsAndFirstRuns;
+  [aSeasonPass setOptions:options];
+
+  return aSeasonPass;
 }
 
-+ (NSArray *) fetchSeasonPasses
-{
++ (NSArray *)fetchSeasonPasses {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"SeasonPass" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
-  
+
   NSError *error = nil;
   NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
   return array;
 }
 
-- (NSArray *)fetchFutureSchedules
-{
+- (NSArray *)fetchFutureSchedules {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Schedule" inManagedObjectContext:[self managedObjectContext]];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
-	
+
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"(program.series == %@) AND (station == %@) AND (time > %@)", self.series, self.station, [NSDate date]];
   [request setPredicate:predicate];
-	
+
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time" ascending:YES];
   [request setSortDescriptors:[NSArray arrayWithObject:sortDescriptor]];
   [sortDescriptor release];
-	
+
   NSError *error = nil;
   NSArray *array = [[self managedObjectContext] executeFetchRequest:request error:&error];
-  if (array == nil)
-  {
-		NSLog(@"Error executing fetch request to find schedules for series ID %@", self.series);
-		return nil;
-  }
-  else
-  {
-		return array;
+  if (array == nil) {
+    NSLog(@"Error executing fetch request to find schedules for series ID %@", self.series);
+    return nil;
+  } else {
+    return array;
   }
 }
 

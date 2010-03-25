@@ -26,10 +26,10 @@
 
 }
 
-+ (void) clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC;
-+ (Z2ITSchedule*) fetchScheduleWithLatestStartDateInMOC:(NSManagedObjectContext*)inMOC;
-- (void) setDurationHours:(int)inHours minutes:(int)inMinutes;
-- (BOOL) overlapsWith:(Z2ITSchedule*)anotherSchedule;
++ (void)clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (Z2ITSchedule *)fetchScheduleWithLatestStartDateInMOC:(NSManagedObjectContext *)inMOC;
+- (void)setDurationHours:(int)inHours minutes:(int)inMinutes;
+- (BOOL)overlapsWith:(Z2ITSchedule *)anotherSchedule;
 
 @property (retain) NSNumber * closeCaptioned;
 @property (retain) NSString * dolby;
@@ -49,8 +49,8 @@
 @property (retain) RSRecording * recording;
 @property (retain) RSTranscoding * transcoding;
 
-- (NSString *) programDetailsStr;
-- (NSString *) tvRatingImageName;
+- (NSString *)programDetailsStr;
+- (NSString *)tvRatingImageName;
 
 @end
 

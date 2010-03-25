@@ -10,14 +10,14 @@
 
 
 @interface PolishedWindow : NSWindow {
-    BOOL _flat;
-    BOOL forceDisplay;
+ BOOL _flat;
+ BOOL forceDisplay;
 }
 
-- (id)initWithContentRect:(NSRect)contentRect 
-                styleMask:(unsigned int)styleMask 
-                  backing:(NSBackingStoreType)bufferingType 
-                    defer:(BOOL)flag 
+- (id)initWithContentRect:(NSRect)contentRect
+                styleMask:(unsigned int)styleMask
+                  backing:(NSBackingStoreType)bufferingType
+                    defer:(BOOL)flag
                      flat:(BOOL)flat;
 
 - (NSColor *)sizedPolishedBackground;

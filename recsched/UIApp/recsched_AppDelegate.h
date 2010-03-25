@@ -1,16 +1,16 @@
 //  Copyright (c) 2007, Andrew Kimpton
-//  
+//
 //  All rights reserved.
-//  
+//
 //  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
 //  conditions are met:
-//  
+//
 //  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 //  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
 //  in the documentation and/or other materials provided with the distribution.
 //  The names of its contributors may not be used to endorse or promote products derived from this software without specific prior
 //  written permission.
-//  
+//
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -30,17 +30,16 @@
 @class RSActivityWindowController;
 @class RSMigrationSheetController;
 
-@interface recsched_AppDelegate : RSCommonAppDelegate
-{
+@interface recsched_AppDelegate : RSCommonAppDelegate {
   IBOutlet NSWindow *window;
-  
+
   IBOutlet NSMenuItem *mServerMenuItem;
-  
+
   NSTask      *mVLCTask;
   NSTimer     *mVLCTerminateTimer;
 
   id mRecServer;
-	
+
   RSActivityWindowController *mActivityWindowController;
   RSFirstRunWindowController *mFirstRunWindowController;
   RSMigrationSheetController *mMigrationSheetController;
@@ -48,13 +47,13 @@
 
 - (id) recServer;
 
-- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow;
-- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow*)inParentWindow startStreaming:(HDHomeRunStation*)inStation;
+- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow *)inParentWindow;
+- (IBAction)launchVLCAction:(id)sender withParentWindow:(NSWindow *)inParentWindow startStreaming:(HDHomeRunStation *)inStation;
 - (IBAction)showActivityWindow:(id)sender;
 - (IBAction)launchFirstRunWizard:(id)sender;
 - (IBAction) quitServer:(id)sender;
 
-- (RSActivityWindowController*) activityWindowController;
+- (RSActivityWindowController *) activityWindowController;
 
 @property (retain,getter=recServer) id mRecServer;
 @end

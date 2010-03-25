@@ -15,13 +15,13 @@
   IBOutlet NSArrayController *mConflictsArrayController;
   IBOutlet NSMatrix *mResolutionRadioMatrix;
   IBOutlet NSTextField *mConflictMessageField;
-  
+
   Z2ITSchedule *mScheduleToBeRecorded;
 }
 
-- (IBAction) okAction:(id)sender;
-- (IBAction) cancelAction:(id)sender;
-- (void) setScheduleToBeRecordedObjectID:(NSManagedObjectID*)aScheduleID;
-- (void) setConflictingSchedulesObjectIDs:(NSArray*)conflicts;
+- (IBAction)okAction:(id)sender;
+- (IBAction)cancelAction:(id)sender;
+- (void)setScheduleToBeRecordedObjectID:(NSManagedObjectID *)aScheduleID;
+- (void)setConflictingSchedulesObjectIDs:(NSArray *)conflicts;
 
 @end

@@ -21,9 +21,9 @@ extern NSString *kScheduleDownloadDurationKey;
 extern NSString *kRecordedProgramsLocationKey;
 extern NSString *kTranscodedProgramsLocationKey;
 
-extern NSString	*kTranscodeProgramsKey;
-extern NSString	*kDeleteRecordingsAfterTranscodeKey;
-extern NSString	*kAddTranscodingsToiTunesKey;
+extern NSString *kTranscodeProgramsKey;
+extern NSString *kDeleteRecordingsAfterTranscodeKey;
+extern NSString *kAddTranscodingsToiTunesKey;
 extern NSString *kDeleteTranscodingsAfterAddKey;
 
 extern NSString *kCurrentLineupURIKey;

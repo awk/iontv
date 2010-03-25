@@ -1,16 +1,16 @@
 //  Copyright (c) 2007, Andrew Kimpton
-//  
+//
 //  All rights reserved.
-//  
+//
 //  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
 //  conditions are met:
-//  
+//
 //  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 //  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
 //  in the documentation and/or other materials provided with the distribution.
 //  The names of its contributors may not be used to endorse or promote products derived from this software without specific prior
 //  written permission.
-//  
+//
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -28,23 +28,20 @@
 
 @implementation RSUIApplication
 
-- (void)sendEvent:(NSEvent *)theEvent
-{
+- (void)sendEvent:(NSEvent *)theEvent {
   // If we get a Key down for Cmd-Alt-4 try to launch the 'first run wizard'
   if (([theEvent type] == NSKeyDown) && ([theEvent keyCode] == 21) &&
-    (([theEvent modifierFlags] & (NSShiftKeyMask|NSAlternateKeyMask|NSCommandKeyMask)) == (NSShiftKeyMask|NSAlternateKeyMask|NSCommandKeyMask)) && 
-    (([theEvent modifierFlags] & (NSControlKeyMask)) == 0))
-  {
-    if ([[NSApp delegate] respondsToSelector:@selector(launchFirstRunWizard:)])
-    {
+    (([theEvent modifierFlags] & (NSShiftKeyMask|NSAlternateKeyMask|NSCommandKeyMask)) == (NSShiftKeyMask|NSAlternateKeyMask|NSCommandKeyMask)) &&
+    (([theEvent modifierFlags] & (NSControlKeyMask)) == 0)) {
+    if ([[NSApp delegate] respondsToSelector:@selector(launchFirstRunWizard:)]) {
       NSMethodSignature *aSignature = [[NSApp delegate] methodSignatureForSelector:@selector(launchFirstRunWizard:)];
       NSInvocation *anInvocation = [NSInvocation invocationWithMethodSignature:aSignature];
       [anInvocation setSelector:@selector(launchFirstRunWizard:)];
       [anInvocation setArgument:&self atIndex:0];
       [anInvocation invokeWithTarget:[NSApp delegate]];
     }
-  }
-  else
+  } else {
     return [super sendEvent:theEvent];
+  }
 }
 @end

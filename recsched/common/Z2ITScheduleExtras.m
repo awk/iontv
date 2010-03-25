@@ -20,13 +20,11 @@
 
 @implementation Z2ITScheduleExtras
 
-- (NSImage *) tvRatingImage
-{
+- (NSImage *)tvRatingImage {
   NSImage *image = nil;
-  
+
   [NSImage imageNamed:[self tvRatingImageName]];
-  if (image == nil)
-  {
+  if (image == nil) {
     NSLog(@"tvRatingImage no image for %@", [self tvRatingImageName]);
   }
   return image;

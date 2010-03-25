@@ -1,16 +1,16 @@
 //  Copyright (c) 2007, Andrew Kimpton
-//  
+//
 //  All rights reserved.
-//  
+//
 //  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
 //  conditions are met:
-//  
+//
 //  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 //  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
 //  in the documentation and/or other materials provided with the distribution.
 //  The names of its contributors may not be used to endorse or promote products derived from this software without specific prior
 //  written permission.
-//  
+//
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -31,43 +31,42 @@
 extern NSString *kSchedulesDirectURL;
 
 @interface Preferences : NSObject {
+   IBOutlet NSTextField *mDurationTextField;
+   IBOutlet DiscreteDurationSlider *mDurationSlider;
+   IBOutlet id mPanel;
+   IBOutlet NSView *mPrefsContainerView;
+   IBOutlet NSView *mSDPrefsView;
+   IBOutlet NSView *mTunerPrefsView;
+   IBOutlet NSView *mChannelPrefsView;
+   IBOutlet NSView *mColorPrefsView;
+   IBOutlet NSView *mStorageTranscodingPrefsView;
+   IBOutlet NSView *mAdvancedPrefsView;
+   IBOutlet NSTextField *mSDUsernameField;
+   IBOutlet NSTextField *mSDPasswordField;
+   IBOutlet NSProgressIndicator *mParsingProgressIndicator;
+   IBOutlet NSButton *mRetrieveLineupsButton;
+   IBOutlet NSButton *mScanTunersButton;
+   IBOutlet NSButton *mScanChannelsButton;
+   IBOutlet NSTableView *mColorsTable;
 
-    IBOutlet NSTextField *mDurationTextField;
-    IBOutlet DiscreteDurationSlider *mDurationSlider;
-    IBOutlet id mPanel;
-    IBOutlet NSView* mPrefsContainerView;
-    IBOutlet NSView* mSDPrefsView;
-    IBOutlet NSView* mTunerPrefsView;
-    IBOutlet NSView* mChannelPrefsView;
-	IBOutlet NSView* mColorPrefsView;
-	IBOutlet NSView* mStorageTranscodingPrefsView;
-	IBOutlet NSView* mAdvancedPrefsView;
-    IBOutlet NSTextField *mSDUsernameField;
-    IBOutlet NSTextField *mSDPasswordField;
-    IBOutlet NSProgressIndicator *mParsingProgressIndicator;
-    IBOutlet NSButton *mRetrieveLineupsButton;
-    IBOutlet NSButton *mScanTunersButton;
-    IBOutlet NSButton *mScanChannelsButton;
-    IBOutlet NSTableView *mColorsTable;
-	
-    IBOutlet NSArrayController *mHDHomeRunDevicesArrayController;
-    IBOutlet NSArrayController *mHDHomeRunTunersArrayController;
-	IBOutlet NSArrayController *mLineupsArrayController;
-    IBOutlet NSArrayController *mGenreArrayController;
-    IBOutlet NSArrayController *mVisibleStationsArrayController;    // This is the subset of station entities that correspond to the selected HDHR Device/Tuner combo.
-	
-	IBOutlet NSView *mExportChannelTunerSelectionView;
-	
-	NSView* mCurrentPrefsView;			// Currently display preferences subview
-	
-    NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
-    SecKeychainItemRef mSDKeychainItemRef;
+   IBOutlet NSArrayController *mHDHomeRunDevicesArrayController;
+   IBOutlet NSArrayController *mHDHomeRunTunersArrayController;
+   IBOutlet NSArrayController *mLineupsArrayController;
+   IBOutlet NSArrayController *mGenreArrayController;
+   IBOutlet NSArrayController *mVisibleStationsArrayController;    // This is the subset of station entities that correspond to the selected HDHR Device/Tuner combo.
 
-	NSURL *recordedProgramsLocation;
-	NSURL *transcodedProgramsLocation;
-	NSArrayController *handbrakePresetsArrayController;
-	
-    BOOL mChannelScanInProgress;
+   IBOutlet NSView *mExportChannelTunerSelectionView;
+
+   NSView *mCurrentPrefsView;      // Currently display preferences subview
+
+   NSMutableDictionary *mToolbarItems; //The dictionary that holds all our "master" copies of the NSToolbarItems
+   SecKeychainItemRef mSDKeychainItemRef;
+
+   NSURL *recordedProgramsLocation;
+   NSURL *transcodedProgramsLocation;
+   NSArrayController *handbrakePresetsArrayController;
+
+   BOOL mChannelScanInProgress;
 }
 
 @property (retain) NSURL *recordedProgramsLocation;
@@ -80,25 +79,25 @@ extern NSString *kSchedulesDirectURL;
 - (NSManagedObjectContext *)managedObjectContext;
 
 //Required NSToolbar delegate methods
-- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag;    
+- (NSToolbarItem *)toolbar:(NSToolbar *)toolbar itemForItemIdentifier:(NSString *)itemIdentifier willBeInsertedIntoToolbar:(BOOL)flag;
 - (NSArray *)toolbarDefaultItemIdentifiers:(NSToolbar*)toolbar;
 - (NSArray *)toolbarAllowedItemIdentifiers:(NSToolbar*)toolbar;
 
 
-- (void)showPanel:(id)sender;	/* Shows the panel */
+- (void)showPanel:(id)sender; /* Shows the panel */
 
-- (void)updateUI;		/* Updates the displayed values in the UI */
+- (void)updateUI;   /* Updates the displayed values in the UI */
 
-- (IBAction) durationSliderChanged:(NSSlider *)inSlider;
-- (IBAction) okButtonAction:(id)sender;
-- (IBAction) cancelButtonAction:(id)sender;
-- (IBAction) getAccountButtonAction:(id)sender;
-- (IBAction) retrieveLineupsButtonAction:(id)sender;
-- (IBAction) scanDevicesButtonAction:(id)sender;
-- (IBAction) scanChannelsButtonAction:(id)sender;
-- (IBAction) viewHDHRStation:(id)sender;
-- (IBAction) exportHDHomeRunChannelMap:(id)sender;
-- (IBAction) importHDHomeRunChannelMap:(id)sender;
-- (IBAction) setPathAction:(id)sender;
-- (IBAction) upgradeFirmware:(id)sender;
+- (IBAction)durationSliderChanged:(NSSlider *)inSlider;
+- (IBAction)okButtonAction:(id)sender;
+- (IBAction)cancelButtonAction:(id)sender;
+- (IBAction)getAccountButtonAction:(id)sender;
+- (IBAction)retrieveLineupsButtonAction:(id)sender;
+- (IBAction)scanDevicesButtonAction:(id)sender;
+- (IBAction)scanChannelsButtonAction:(id)sender;
+- (IBAction)viewHDHRStation:(id)sender;
+- (IBAction)exportHDHomeRunChannelMap:(id)sender;
+- (IBAction)importHDHomeRunChannelMap:(id)sender;
+- (IBAction)setPathAction:(id)sender;
+- (IBAction)upgradeFirmware:(id)sender;
 @end

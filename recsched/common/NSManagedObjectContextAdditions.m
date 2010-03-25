@@ -21,12 +21,11 @@
 
 @implementation NSManagedObjectContext ( RecschedAdditions )
 
-- (void)refreshObjectWithoutCache:(NSManagedObject *)object mergeChanges:(BOOL)flag
-{
-	NSTimeInterval currentStaleness = [self stalenessInterval];
-	[self setStalenessInterval:0];
-	[self refreshObject:object mergeChanges:flag];
-	[self setStalenessInterval:currentStaleness];
+- (void)refreshObjectWithoutCache:(NSManagedObject *)object mergeChanges:(BOOL)flag {
+  NSTimeInterval currentStaleness = [self stalenessInterval];
+  [self setStalenessInterval:0];
+  [self refreshObject:object mergeChanges:flag];
+  [self setStalenessInterval:currentStaleness];
 }
 
 @end

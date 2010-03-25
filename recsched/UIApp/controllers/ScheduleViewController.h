@@ -1,16 +1,16 @@
 //  Copyright (c) 2007, Andrew Kimpton
-//  
+//
 //  All rights reserved.
-//  
+//
 //  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
 //  conditions are met:
-//  
+//
 //  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 //  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
 //  in the documentation and/or other materials provided with the distribution.
 //  The names of its contributors may not be used to endorse or promote products derived from this software without specific prior
 //  written permission.
-//  
+//
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -30,27 +30,28 @@
 @class Z2ITStation;
 
 @interface ScheduleViewController : NSObject {
-    IBOutlet ScheduleView *mScheduleView;
-    IBOutlet NSSegmentedControl *mScheduleTimeSegmentedControl;
-    IBOutlet NSObjectController *mCurrentSchedule;
-    IBOutlet NSObjectController *mCurrentStation;
-    IBOutlet NSObjectController *mCurrentLineup;
-	
-	IBOutlet NSView *mScheduleDetailsContentView;
-	IBOutlet NSWindow *mScheduleDetailsParentWindow;
-	
-	NSWindow *mScheduleDetailsPopupWindow;
-    CFAbsoluteTime mStartTime;
+  IBOutlet ScheduleView *mScheduleView;
+  IBOutlet NSSegmentedControl *mScheduleTimeSegmentedControl;
+  IBOutlet NSObjectController *mCurrentSchedule;
+  IBOutlet NSObjectController *mCurrentStation;
+  IBOutlet NSObjectController *mCurrentLineup;
+
+  IBOutlet NSView *mScheduleDetailsContentView;
+  IBOutlet NSWindow *mScheduleDetailsParentWindow;
+
+  NSWindow *mScheduleDetailsPopupWindow;
+  CFAbsoluteTime mStartTime;
 }
 
-- (void) updateSegmentDisplay;
-- (void) updateSegmentMenus;
-- (CFAbsoluteTime) startTime;
-- (void) setStartTime:(CFAbsoluteTime)inStartTime;
-- (IBAction) scheduleControlClicked:(id)sender;
-- (void) setCurrentSchedule:(Z2ITSchedule*)inSchedule;
-- (void) setCurrentStation:(Z2ITStation*)inStation;
+- (void)updateSegmentDisplay;
+- (void)updateSegmentMenus;
+- (CFAbsoluteTime)startTime;
+- (void)setStartTime:(CFAbsoluteTime)inStartTime;
+- (IBAction)scheduleControlClicked:(id)sender;
+- (void)setCurrentSchedule:(Z2ITSchedule *)inSchedule;
+- (void)setCurrentStation:(Z2ITStation *)inStation;
 
-- (void) showScheduleDetailsWithStartingFrame:(NSRect)startingFrame;
+- (void)showScheduleDetailsWithStartingFrame:(NSRect)startingFrame;
+
 @property (getter=startTime,setter=setStartTime:) CFAbsoluteTime mStartTime;
 @end

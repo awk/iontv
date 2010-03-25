@@ -22,6 +22,6 @@
 
 }
 
-- (NSImage *) tvRatingImage;
+- (NSImage *)tvRatingImage;
 
 @end

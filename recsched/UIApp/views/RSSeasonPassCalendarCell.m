@@ -20,8 +20,7 @@
 
 @implementation RSSeasonPassCalendarCell
 
-- (id) init
-{
+- (id)init {
   self = [super init];
   if (self != nil) {
     [self addObserver:self forKeyPath:@"scheduleList" options:0 context:nil];
@@ -29,25 +28,21 @@
   return self;
 }
 
-- (void) dealloc
-{
+- (void)dealloc {
    [self removeObserver:self forKeyPath:@"scheduleList"];
    [super dealloc];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
-			ofObject:(id)object 
-			change:(NSDictionary *)change
-			context:(void *)context
-{
-  if ((object == self) && ([keyPath isEqual:@"scheduleList"]))
-  {
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+  if ((object == self) && ([keyPath isEqual:@"scheduleList"]))   {
     [self updateDisplayedList];
   }
 }
 
-- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
-{
+- (void)drawInteriorWithFrame:(NSRect)cellFrame inView:(NSView *)controlView {
   [super drawInteriorWithFrame:cellFrame inView:controlView];
   cellFrame.size.height -= 12;
   cellFrame = NSInsetRect(cellFrame, 1, 2);
@@ -60,28 +55,23 @@
 
 @implementation RSSeasonPassCalendarCell (Private)
 
-- (void) updateDisplayedList
-{
+- (void)updateDisplayedList {
   [mEventString release];
   mEventString = [[NSMutableAttributedString alloc] init];
   NSFont *font = [NSFont fontWithName:@"Lucida Grande" size:10.0];
-  for (RSRecording *aRecording in scheduleList)
-  {
+  for (RSRecording *aRecording in scheduleList) {
     NSColor *genreColor;
     NSData *genreColorData = [[aRecording.schedule.program genreWithRelevance:0] valueForKeyPath:@"genreClass.color"];
-    if (genreColorData)
-    {
+    if (genreColorData) {
       genreColor = [NSUnarchiver unarchiveObjectWithData:genreColorData];
       genreColor = [genreColor darkerColorBy:0.15];
-    }
-    else
-    {
+    } else {
       genreColor = [NSColor colorWithDeviceRed:0.95 green:0.95 blue:0.95 alpha:1.0];
     }
-    
+
     NSDictionary *attrsDictionary = [NSDictionary dictionaryWithObjectsAndKeys:font, NSFontAttributeName,
-                                                                               genreColor, NSForegroundColorAttributeName,
-                                                                               nil];
+                                           genreColor, NSForegroundColorAttributeName,
+                                           nil];
     NSAttributedString *label = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"•%@\n", aRecording.schedule.program.title] attributes:attrsDictionary];
     [mEventString appendAttributedString:label];
   }

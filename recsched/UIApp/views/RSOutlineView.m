@@ -1,16 +1,16 @@
 //  Copyright (c) 2007, Andrew Kimpton
-//  
+//
 //  All rights reserved.
-//  
+//
 //  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
 //  conditions are met:
-//  
+//
 //  Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
 //  Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
 //  in the documentation and/or other materials provided with the distribution.
 //  The names of its contributors may not be used to endorse or promote products derived from this software without specific prior
 //  written permission.
-//  
+//
 //  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 //  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 //  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -28,79 +28,66 @@
 
 @implementation RSOutlineView
 
-- (void) keyDown:(NSEvent *) theEvent
-{
-	NSString * tString;
-	unsigned int stringLength;
-	unsigned int i;
-	unichar tChar;
+- (void)keyDown:(NSEvent *)theEvent {
+  NSString *tString;
+  unsigned int stringLength;
+  unsigned int i;
+  unichar tChar;
 
-	tString= [theEvent characters];
+  tString= [theEvent characters];
 
-	stringLength=[tString length];
+  stringLength=[tString length];
 
-	for(i=0;i<stringLength;i++)
-	{
-		tChar=[tString characterAtIndex:i];
+  for(i=0;i<stringLength;i++)   {
+    tChar=[tString characterAtIndex:i];
 
-		if (tChar==0x7F)
-		{
-			NSMenuItem * tMenuItem;
+    if (tChar==0x7F) {
+      NSMenuItem * tMenuItem;
 
-			tMenuItem=[[NSMenuItem alloc] initWithTitle:@"" action:@selector(delete:) keyEquivalent:@""];
+      tMenuItem=[[NSMenuItem alloc] initWithTitle:@"" action:@selector(delete:) keyEquivalent:@""];
 
-			if ([self validateUserInterfaceItem:tMenuItem]==YES)
-			{
-				[self delete:nil];
-			}
-			else
-			{
-				NSBeep();
-			}
+      if ([self validateUserInterfaceItem:tMenuItem]==YES) {
+        [self delete:nil];
+      } else {
+        NSBeep();
+      }
 
-			return;
-		}
-	}
+      return;
+    }
+  }
 
-	[super keyDown:theEvent];
+  [super keyDown:theEvent];
 }
 
-- (BOOL)validateUserInterfaceItem:(id < NSValidatedUserInterfaceItem >)anItem
-{
-	if ([anItem action]==@selector(delete:))
-	{
-		if ([self numberOfSelectedRows]>0)
-		{
-			return [[self dataSource] validateUserInterfaceItem:anItem];
-		}
+- (BOOL)validateUserInterfaceItem:(id < NSValidatedUserInterfaceItem >)anItem {
+  if ([anItem action]==@selector(delete:)) {
+    if ([self numberOfSelectedRows]>0) {
+      return [[self dataSource] validateUserInterfaceItem:anItem];
+    }
 
-		return NO;
-	}
+    return NO;
+  }
 
-	return YES;
+  return YES;
 }
 
-- (IBAction) delete:(id) sender
-{
-	if ([[self dataSource] respondsToSelector:@selector(deleteSelectedRowsOfOutlineView:)]==YES)
-	{
-		[[self dataSource] performSelector:@selector(deleteSelectedRowsOfOutlineView:) withObject:self];
-	}
+- (IBAction)delete:(id) sender {
+  if ([[self dataSource] respondsToSelector:@selector(deleteSelectedRowsOfOutlineView:)]==YES) {
+    [[self dataSource] performSelector:@selector(deleteSelectedRowsOfOutlineView:) withObject:self];
+  }
 }
 
-- (NSRect)frameOfOutlineCellAtRow:(NSInteger)row
-{
-	id anItem = [self itemAtRow:row];
-	if (anItem && ([[self delegate] respondsToSelector:@selector(outlineView:shouldShowDisclosureTriangleForItem:)] == YES))
-	{
-		if ([[self delegate] outlineView:self shouldShowDisclosureTriangleForItem:anItem] == YES)
-			return [super frameOfOutlineCellAtRow:row];
-		else
-			return NSZeroRect;
-		
-	}
-	else
-		return [super frameOfOutlineCellAtRow:row];
+- (NSRect)frameOfOutlineCellAtRow:(NSInteger)row {
+  id anItem = [self itemAtRow:row];
+  if (anItem && ([[self delegate] respondsToSelector:@selector(outlineView:shouldShowDisclosureTriangleForItem:)] == YES))   {
+    if ([[self delegate] outlineView:self shouldShowDisclosureTriangleForItem:anItem] == YES) {
+      return [super frameOfOutlineCellAtRow:row];
+    } else {
+      return NSZeroRect;
+    }
+  } else {
+    return [super frameOfOutlineCellAtRow:row];
+  }
 }
 
 @end

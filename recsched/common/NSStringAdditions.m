@@ -19,11 +19,10 @@
 
 
 
-@implementation NSString ( ComparisonAdditions )
+@implementation NSString(ComparisonAdditions)
 
--(NSComparisonResult) numericCompare: (NSString *) aString
-{
-	return [self compare: aString options: NSNumericSearch];
+-(NSComparisonResult)numericCompare:(NSString *)aString {
+  return [self compare: aString options: NSNumericSearch];
 }
 
 @end

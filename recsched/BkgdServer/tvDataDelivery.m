@@ -1,18 +1,18 @@
 //  recsched_bkgd - Background server application retrieves schedule data, performs recordings,
 //  transcodes recordings in to H.264 format for iTunes, iPod etc.
-//  
+//
 //  Copyright (C) 2007 Andrew Kimpton
-//  
+//
 //  This program is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation; either version 2 of the License, or
 //  (at your option) any later version.
-//  
+//
 //  This program is distributed in the hope that it will be useful,
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //  GNU General Public License for more details.
-//  
+//
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
@@ -53,7 +53,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   char *tmpXMLFilePath = tempnam(NULL,"recsched.");
   NSString *xmlFilePath = [[NSString alloc] initWithCString:tmpXMLFilePath];
   free(tmpXMLFilePath);
-  
+
   // Find the <xtvd ..> portion of the input XML - that's all we need to write out
   CFDataRef dataRef = CFXMLTreeCreateXMLData(kCFAllocatorDefault, deserializeRoot);
   NSError *anXMLParserError = [NSError alloc];
@@ -63,21 +63,18 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 
   NSXMLNode *currentNode = [anXMLDoc rootElement];
   bool foundXTVD = false;
-  while (currentNode && !foundXTVD)
-  {
+  while (currentNode && !foundXTVD) {
     NSString *nodeName = [currentNode name];
-    if (nodeName && ([nodeName compare:@"xtvd" options:NSCaseInsensitiveSearch] == NSOrderedSame))
-    {
+    if (nodeName && ([nodeName compare:@"xtvd" options:NSCaseInsensitiveSearch] == NSOrderedSame)) {
       foundXTVD = true;
-    }
-    else
+    } else {
       currentNode = [currentNode nextNode];
+    }
   }
-  
+
   bool success = false;
   // Write out the piece if found
-  if (foundXTVD)
-  {
+  if (foundXTVD) {
     [currentNode detach];
     NSXMLElement *xtvdElement = [[NSXMLElement alloc] initWithName:@"xtvd"];
     NSXMLDocument *xtvdXMLDoc = [[NSXMLDocument alloc] initWithRootElement:xtvdElement];
@@ -89,20 +86,20 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
     [xtvdXMLDoc release];
   }
   [anXMLDoc release];
-  
+
   // If the write was successful return a dictionary with the output file path as our 'deserialized' response
   NSDictionary *returnedDict;
-  if (success)
+  if (success) {
     returnedDict = [[NSDictionary alloc] initWithObjects:[NSArray arrayWithObject:xmlFilePath] forKeys:[NSArray arrayWithObject:@"xmlFilePath"]];
-  else
+  } else {
     returnedDict = [[NSDictionary alloc] init];
-    
+  }
+
   [xmlFilePath release];
   return returnedDict;
 }
 
-- (id) init
-{
+- (id)init {
   self = [super init];
   if (self != nil) {
     fAuthorizedRef = nil;
@@ -110,114 +107,106 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   return self;
 }
 
-- (void) dealloc
-{
-  if (fAuthorizedRef)
-  {
+- (void) dealloc {
+  if (fAuthorizedRef) {
     CFRelease(fAuthorizedRef);
     fAuthorizedRef = nil;
   }
   [super dealloc];
 }
 
-	// Return the Result object.  If it hasn't
-	// been fetched yet, this will asynchronously block
-- (NSDictionary*) getResultDictionary
-{
-	if (fResult == NULL) {
-		if (fAsyncTarget != NULL) {
-			fAsyncTarget = NULL;
-			fAsyncSelector = NULL;
-		}
+  // Return the Result object.  If it hasn't
+  // been fetched yet, this will asynchronously block
+- (NSDictionary *)getResultDictionary {
+  if (fResult == NULL) {
+    if (fAsyncTarget != NULL) {
+      fAsyncTarget = NULL;
+      fAsyncSelector = NULL;
+    }
 
-                WSMethodInvocationRef invocation = [self getRef];
-                CFStringRef wsGeneratedMode = CFSTR("NS-WSSYNC");
+    WSMethodInvocationRef invocation = [self getRef];
+    CFStringRef wsGeneratedMode = CFSTR("NS-WSSYNC");
 
-		if (fResult == NULL) {
-			WSMethodInvocationScheduleWithRunLoop(invocation, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedMode);
+    if (fResult == NULL) {
+      WSMethodInvocationScheduleWithRunLoop(invocation, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedMode);
 
-			while (fResult == NULL)
-                          [[NSRunLoop currentRunLoop] runMode:(NSString *)wsGeneratedMode beforeDate:[NSDate distantFuture]];
-                        
-			WSMethodInvocationUnscheduleFromRunLoop(invocation, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedMode);
-		}
-                WSMethodInvocationSetCallBack(fRef, NULL, NULL);
+      while (fResult == NULL) {
+        [[NSRunLoop currentRunLoop] runMode:(NSString *)wsGeneratedMode beforeDate:[NSDate distantFuture]];
+      }
 
-		if (fResult == NULL) {
-			[self handleError:@"WSMethodInvocationInvoke failed in getResultDictionary" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
-		}
-                
-                // Check to see if we got an unauthorized error
-                CFHTTPMessageRef responseMessage = (CFHTTPMessageRef) [fResult valueForKey:(id)kWSHTTPResponseMessage];
-                if (!responseMessage)
-                {
-                    [self handleError:@"WSMethodInvocationInvoke failed in get response message" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
-                    return nil;
-                }
-                int msgCode = CFHTTPMessageGetResponseStatusCode(responseMessage);
+      WSMethodInvocationUnscheduleFromRunLoop(invocation, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedMode);
+    }
+    WSMethodInvocationSetCallBack(fRef, NULL, NULL);
 
-                if (msgCode == 401)
-                {
-                  // We're not authorized - we need to go through a little dance to resend the request with the authorization
-                  fAuthorizedRef = [self genCreateInvocationRef];
-                  CFHTTPMessageRef authInvocationMsgRef;
-                  CFURLRef theURL = CFHTTPMessageCopyRequestURL(responseMessage);
-                  authInvocationMsgRef =  CFHTTPMessageCreateRequest(NULL, CFSTR("POST"), theURL, kCFHTTPVersion1_1);
-                  CFRelease(theURL);
-                  
-                  // Fetch the account name from the prefs file, and the password from the keychain
-                  NSString *accountName = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernameKey];
-					if ((accountName == nil) || ([accountName length] == 0))
-					{
-						NSLog(@"No SchedulesDirect username in the application prefs !");
-						return nil;
-					}
-                  NSString *password;
-                  password = [[NSApp delegate] SDPasswordForUsername:accountName];
-                   if (!password) {
-                      password = @"";
-                   }
-                  CFHTTPMessageAddAuthentication(authInvocationMsgRef, responseMessage, (CFStringRef)accountName, (CFStringRef) password, NULL, false);
-                  WSMethodInvocationSetProperty(fAuthorizedRef,kWSHTTPMessage,authInvocationMsgRef);
-                  fResult = NULL;
-                  
-                  CFStringRef wsGeneratedAuthMode = CFSTR("NS-WSSYNCAUTH");
-                  WSMethodInvocationAddDeserializationOverride(fAuthorizedRef,CFSTR("urn:TMSWebServices"),CFSTR("xtvd"),deserializationCallback,NULL);
-                  WSMethodInvocationScheduleWithRunLoop(fAuthorizedRef, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
+    if (fResult == NULL) {
+      [self handleError:@"WSMethodInvocationInvoke failed in getResultDictionary" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
+    }
 
-                  while (fResult == NULL)
-                    [[NSRunLoop currentRunLoop] runMode:(NSString *)wsGeneratedAuthMode beforeDate:[NSDate distantFuture]];
-                  
-                  WSMethodInvocationUnscheduleFromRunLoop(fAuthorizedRef, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
+    // Check to see if we got an unauthorized error
+    CFHTTPMessageRef responseMessage = (CFHTTPMessageRef) [fResult valueForKey:(id)kWSHTTPResponseMessage];
+    if (!responseMessage) {
+        [self handleError:@"WSMethodInvocationInvoke failed in get response message" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
+        return nil;
+    }
+    int msgCode = CFHTTPMessageGetResponseStatusCode(responseMessage);
 
-                   if (fResult == NULL) 
-                   {
-                      [self handleError:@"WSMethodInvocationInvoke failed in getResultDictionary" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
-                   }
-                   
-                   responseMessage = (CFHTTPMessageRef) [fResult valueForKey:(id)kWSHTTPResponseMessage];
-                   if (!responseMessage)
-                   {
-                      [self handleError:@"WSMethodInvocationInvoke failed in get response message" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
-                      return nil;
-                   }
-                   msgCode = CFHTTPMessageGetResponseStatusCode(responseMessage);
-  
-// Example Error Returns:                                    
-//                   "/FaultCode" = -1;
-//                   "/FaultString" = "Your subscription has expired. Please renew your subscription.";
-//                   "/kWSHTTPResponseMessage" = <CFHTTPMessage 0x962fc0>{url = http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService; status = HTTP/1.1 500 Internal Server Error};
-//                      "/kWSResultIsFault" = 1;
-                   if (msgCode == 500)
-                   {
-                      [self handleError:@"WSMethodInvocationInvoke returned internal server error" errorString:[fResult valueForKey:@"/FaultString"] errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:[[fResult valueForKey:@"/FaultCode"] intValue]];
-                   }
+    if (msgCode == 401) {
+      // We're not authorized - we need to go through a little dance to resend the request with the authorization
+      fAuthorizedRef = [self genCreateInvocationRef];
+      CFHTTPMessageRef authInvocationMsgRef;
+      CFURLRef theURL = CFHTTPMessageCopyRequestURL(responseMessage);
+      authInvocationMsgRef =  CFHTTPMessageCreateRequest(NULL, CFSTR("POST"), theURL, kCFHTTPVersion1_1);
+      CFRelease(theURL);
 
-                  CFRelease(authInvocationMsgRef);
-                  WSMethodInvocationSetCallBack(fAuthorizedRef, NULL, NULL);
-                }
-	}
-	return fResult;
+      // Fetch the account name from the prefs file, and the password from the keychain
+      NSString *accountName = [[[NSUserDefaultsController sharedUserDefaultsController] values] valueForKey:kWebServicesSDUsernameKey];
+      if ((accountName == nil) || ([accountName length] == 0)) {
+        NSLog(@"No SchedulesDirect username in the application prefs !");
+        return nil;
+      }
+      NSString *password;
+      password = [[NSApp delegate] SDPasswordForUsername:accountName];
+      if (!password) {
+        password = @"";
+      }
+      CFHTTPMessageAddAuthentication(authInvocationMsgRef, responseMessage, (CFStringRef)accountName, (CFStringRef) password, NULL, false);
+      WSMethodInvocationSetProperty(fAuthorizedRef,kWSHTTPMessage,authInvocationMsgRef);
+      fResult = NULL;
+
+      CFStringRef wsGeneratedAuthMode = CFSTR("NS-WSSYNCAUTH");
+      WSMethodInvocationAddDeserializationOverride(fAuthorizedRef,CFSTR("urn:TMSWebServices"),CFSTR("xtvd"),deserializationCallback,NULL);
+      WSMethodInvocationScheduleWithRunLoop(fAuthorizedRef, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
+
+      while (fResult == NULL) {
+        [[NSRunLoop currentRunLoop] runMode:(NSString *)wsGeneratedAuthMode beforeDate:[NSDate distantFuture]];
+      }
+      WSMethodInvocationUnscheduleFromRunLoop(fAuthorizedRef, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
+
+      if (fResult == NULL) {
+        [self handleError:@"WSMethodInvocationInvoke failed in getResultDictionary" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
+      }
+
+      responseMessage = (CFHTTPMessageRef) [fResult valueForKey:(id)kWSHTTPResponseMessage];
+      if (!responseMessage) {
+        [self handleError:@"WSMethodInvocationInvoke failed in get response message" errorString:NULL errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:paramErr];
+        return nil;
+      }
+      msgCode = CFHTTPMessageGetResponseStatusCode(responseMessage);
+
+// Example Error Returns:
+//    "/FaultCode" = -1;
+//    "/FaultString" = "Your subscription has expired. Please renew your subscription.";
+//    "/kWSHTTPResponseMessage" = <CFHTTPMessage 0x962fc0>{url = http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService; status = HTTP/1.1 500 Internal Server Error};
+//    "/kWSResultIsFault" = 1;
+      if (msgCode == 500) {
+        [self handleError:@"WSMethodInvocationInvoke returned internal server error" errorString:[fResult valueForKey:@"/FaultString"] errorDomain:kCFStreamErrorDomainMacOSStatus errorNumber:[[fResult valueForKey:@"/FaultCode"] intValue]];
+      }
+
+      CFRelease(authInvocationMsgRef);
+      WSMethodInvocationSetCallBack(fAuthorizedRef, NULL, NULL);
+    }
+  }
+  return fResult;
 }
 
 @end; /* tvDataDelivery */
@@ -227,22 +216,18 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
  * Documentation:  <no documentation>
  */
 @implementation acknowledge
-- (id) resultValue
-{
-    return [[super getResultDictionary] objectForKey: @"downloadTimes"];    
+- (id)resultValue {
+    return [[super getResultDictionary] objectForKey: @"downloadTimes"];
 }
 
-- (WSMethodInvocationRef) genCreateInvocationRef
-{
+- (WSMethodInvocationRef)genCreateInvocationRef {
     NSString *endpointURL = [NSString stringWithFormat:@"http://%@%@", kWebServicesSDHostname,kWebServicesSDPath];
-    return [self createInvocationRef    
-               /*endpoint*/: endpointURL //@"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService"            
-                 methodName: @"acknowledge"            
-                 protocol: (NSString*) kWSSOAP2001Protocol            
-                      style: (NSString*) kWSSOAPStyleRPC            
-                 soapAction: @"urn:TMSWebServices:xtvdWebService#acknowledge"            
-            methodNamespace: @"urn:TMSWebServices"            
-        ];        
+    return [self createInvocationRef: endpointURL //@"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService"
+                          methodName: @"acknowledge"
+                            protocol: (NSString*) kWSSOAP2001Protocol
+                               style: (NSString*) kWSSOAPStyleRPC
+                          soapAction: @"urn:TMSWebServices:xtvdWebService#acknowledge"
+                     methodNamespace: @"urn:TMSWebServices"];
 }
 
 @end; /* acknowledge */
@@ -253,37 +238,34 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
  * Documentation:  <no documentation>
  */
 @implementation download
-- (void) setParameters:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */) in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */) in_endTime
+
+- (void)setParameters:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_endTime
 {
-    id _paramValues[] = {    
-        (id)in_startTime,        
-        (id)in_endTime,        
-    };    
-    NSString* _paramNames[] = {    
-        @"startTime",        
-        @"endTime",        
-    };    
-    [super setParameters:2 values: _paramValues names: _paramNames];    
+  id _paramValues[] = {
+    (id)in_startTime,
+    (id)in_endTime,
+  };
+  NSString* _paramNames[] = {
+    @"startTime",
+    @"endTime",
+  };
+  [super setParameters:2 values: _paramValues names: _paramNames];
 }
 
-- (id) resultValue
-{
-    return [[super getResultDictionary] objectForKey: @"xtvdResponse"];    
+- (id)resultValue {
+    return [[super getResultDictionary] objectForKey: @"xtvdResponse"];
 }
 
-- (WSMethodInvocationRef) genCreateInvocationRef
-{
-    NSString *endpointURL = [NSString stringWithFormat:@"http://%@%@", kWebServicesSDHostname,kWebServicesSDPath];
-    WSMethodInvocationRef anInvocationRef = [self createInvocationRef    
-               /*endpoint*/: endpointURL //@"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService"            
-                 methodName: @"download"            
-                 protocol: (NSString*) kWSSOAP2001Protocol            
-                      style: (NSString*) kWSSOAPStyleRPC            
-                 soapAction: @"urn:TMSWebServices:xtvdWebService#download"            
-            methodNamespace: @"urn:TMSWebServices"            
-        ];        
-	WSMethodInvocationSetParameters(anInvocationRef, (CFDictionaryRef) fParams, (CFArrayRef) fParamOrder);
-        return(anInvocationRef);
+- (WSMethodInvocationRef) genCreateInvocationRef {
+  NSString *endpointURL = [NSString stringWithFormat:@"http://%@%@", kWebServicesSDHostname,kWebServicesSDPath];
+  WSMethodInvocationRef anInvocationRef = [self createInvocationRef: endpointURL //@"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService"
+                                                         methodName: @"download"
+                                                           protocol: (NSString*) kWSSOAP2001Protocol
+                                                              style: (NSString*) kWSSOAPStyleRPC
+                                                         soapAction: @"urn:TMSWebServices:xtvdWebService#download"
+                                                    methodNamespace: @"urn:TMSWebServices"];
+  WSMethodInvocationSetParameters(anInvocationRef, (CFDictionaryRef) fParams, (CFArrayRef) fParamOrder);
+  return(anInvocationRef);
 }
 
 @end; /* download */
@@ -292,24 +274,22 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 
 @implementation xtvdWebService
 
-+ (id) acknowledge
-{
-    id result = NULL;    
-    acknowledge* _invocation = [[acknowledge alloc] init];    
-    result = [[_invocation resultValue] retain];    
-    [_invocation release];    
-    return result;    
++ (id)acknowledge {
+  id result = NULL;
+  acknowledge* _invocation = [[acknowledge alloc] init];
+  result = [[_invocation resultValue] retain];
+  [_invocation release];
+  return result;
 }
 
 
-+ (id) download:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */) in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */) in_endTime
-{
-    id result = NULL;    
-    download* _invocation = [[download alloc] init];    
-    [_invocation setParameters: in_startTime in_endTime:in_endTime];    
-    result = [[_invocation resultValue] retain];    
-    [_invocation release];    
-    return result;    
++ (id)download:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_endTime {
+  id result = NULL;
+  download* _invocation = [[download alloc] init];
+  [_invocation setParameters: in_startTime in_endTime:in_endTime];
+  result = [[_invocation resultValue] retain];
+  [_invocation release];
+  return result;
 }
 
 @end;
@@ -317,57 +297,50 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 
 @implementation xtvdDownloadThread
 
-- (void) performDownload:(id)downloadInfo
-{
+- (void)performDownload:(id)downloadInfo {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   size_t activityToken;
-  
+
   NSDictionary *xtvdDownloadData = (NSDictionary*)downloadInfo;
-  
+
   id reportProgressTo = [xtvdDownloadData valueForKey:kTVDataDeliveryReportProgressToKey];
   BOOL reportProgress = [reportProgressTo conformsToProtocol:@protocol(RSActivityDisplay)];
-  
-  if (reportProgress)
-  {
-	activityToken = [reportProgressTo createActivity];
-	activityToken = [reportProgressTo setActivity:activityToken infoString:@"Downloading Schedule Data"];
-	activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:YES];
+
+  if (reportProgress) {
+    activityToken = [reportProgressTo createActivity];
+    activityToken = [reportProgressTo setActivity:activityToken infoString:@"Downloading Schedule Data"];
+    activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:YES];
   }
-	
+
   NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:kTVDataDeliveryStartDateKey] in_endTime:[xtvdDownloadData valueForKey:kTVDataDeliveryEndDateKey]];
 
-  if ((downloadResult == nil) || ([downloadResult valueForKey:@"xtvd"] == nil))
-  {
-		// Error during the download - notify the other side and return
-		[[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:RSBackgroundApplication userInfo:downloadResult];
-		if (reportProgress)
-		{
-			activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
-			[reportProgressTo endActivity:activityToken];
-		}
-		[pool release];
-		return;
+  if ((downloadResult == nil) || ([downloadResult valueForKey:@"xtvd"] == nil)) {
+    // Error during the download - notify the other side and return
+    [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:RSBackgroundApplication userInfo:downloadResult];
+    if (reportProgress) {
+      activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
+      [reportProgressTo endActivity:activityToken];
+    }
+    [pool release];
+    return;
   }
-  
+
   NSMutableDictionary *parserCallData = [[NSMutableDictionary alloc] initWithDictionary:downloadResult];
-  if ([xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] != nil)
-  {
-		[parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] forKey:kTVDataDeliveryLineupsOnlyKey];
+  if ([xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] != nil) {
+    [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] forKey:kTVDataDeliveryLineupsOnlyKey];
   }
-  if ([xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil)
-  {
-		[parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
+  if ([xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil) {
+    [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
     [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
   }
-  
-  if (reportProgress)
-  {
-	activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
-	[reportProgressTo endActivity:activityToken];
-  }
-  if ([[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] respondsToSelector:@selector(handleDownloadData:)])
-    [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelector:@selector(handleDownloadData:) withObject:parserCallData];
 
+  if (reportProgress) {
+    activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
+    [reportProgressTo endActivity:activityToken];
+  }
+  if ([[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] respondsToSelector:@selector(handleDownloadData:)]) {
+    [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelector:@selector(handleDownloadData:) withObject:parserCallData];
+  }
   [pool release];
 }
 

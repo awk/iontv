@@ -28,31 +28,31 @@
 }
 
 // Fetch the station with the given ID from the Managed Object Context
-+ (Z2ITStation *) fetchStationWithID:(NSNumber*)inStationID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
-+ (Z2ITStation *) fetchStationWithCallSign:(NSString*)callSignString inLineup:(Z2ITLineup*)inLineup inManagedObjectContext:(NSManagedObjectContext*)inMOC;
++ (Z2ITStation *)fetchStationWithID:(NSNumber *)inStationID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (Z2ITStation *)fetchStationWithCallSign:(NSString *)callSignString inLineup:(Z2ITLineup *)inLineup inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
 // Fetch the program object for the program on air at the specified time
-- (Z2ITProgram*)programAtTime:(CFAbsoluteTime) inAirTime;
-- (Z2ITSchedule*)scheduleAtTime:(CFAbsoluteTime) inAirTime;
-- (NSArray *)schedulesBetweenStartTime:(CFAbsoluteTime) inStartTime andEndTime:(CFAbsoluteTime) inEndTime;
+- (Z2ITProgram *)programAtTime:(CFAbsoluteTime)inAirTime;
+- (Z2ITSchedule *)scheduleAtTime:(CFAbsoluteTime)inAirTime;
+- (NSArray *)schedulesBetweenStartTime:(CFAbsoluteTime)inStartTime andEndTime:(CFAbsoluteTime)inEndTime;
 
 // Is there a valid tuner for this station and lineup ?
-- (BOOL) hasValidTunerForLineup:(Z2ITLineup*)aLineup;
+- (BOOL)hasValidTunerForLineup:(Z2ITLineup *)aLineup;
 
-- (BOOL)addScheduleIfNew:(Z2ITSchedule*)value;
+- (BOOL)addScheduleIfNew:(Z2ITSchedule *)value;
 
-- (Z2ITLineupMap*)lineupMapForLineupID:(NSString*) inLineupID;
-- (NSString *)channelStringForLineup:(Z2ITLineup*) inLineup;
+- (Z2ITLineupMap *)lineupMapForLineupID:(NSString *)inLineupID;
+- (NSString *)channelStringForLineup:(Z2ITLineup *)inLineup;
 
 @property (retain) NSString * affiliate;
 @property (retain) NSString * callSign;
 @property (retain) NSNumber * fccChannelNumber;
 @property (retain) NSString * name;
 @property (retain) NSNumber * stationID;
-@property (retain) NSSet* hdhrStations;
-@property (retain) NSSet* lineupMaps;
-@property (retain) NSSet* schedules;
-@property (retain) NSSet* seasonPasses;
+@property (retain) NSSet * hdhrStations;
+@property (retain) NSSet * lineupMaps;
+@property (retain) NSSet * schedules;
+@property (retain) NSSet * seasonPasses;
 
 @end
 
