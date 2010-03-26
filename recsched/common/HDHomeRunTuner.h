@@ -76,6 +76,8 @@
 @property (retain) NSString * tuningType;
 @property (retain) NSSet * stations;
 @property (retain) HDHomeRunChannelStationMap * channelStationMap;
+@property (retain) NSNumber * transportStreamID;
+@property (retain) NSNumber * frequency;
 
 - (void)importStationsFrom:(NSArray *)inArrayOfStationDictionaries;
 - (void)clearAllStations;

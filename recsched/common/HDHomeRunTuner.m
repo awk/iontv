@@ -237,24 +237,62 @@ const int kCallSignStringLength = 10;
 
 - (void)exportChannelMapTo:(NSURL *)inURL {
   // Start by adding all the channels on this tuner to an array
-  NSMutableSet *channelsSet = [self mutableSetValueForKey:@"channels"];
+  NSSet *channelsSet = [[[self lineup] channelStationMap] channels];
+  //[self mutableSetValueForKey:@"lineup.channelStationMap.channels"];
 
-  // Create an array to hold the dictionaries of channel info
-  NSMutableArray *channelsOnTuner = [NSMutableArray arrayWithCapacity:[channelsSet count]];
+  NSXMLElement *root = (NSXMLElement *)[NSXMLNode elementWithName:@"LineupUIRequest"];
+  NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithRootElement:root];
+  [xmlDoc setVersion:@"1.0"];
+  [xmlDoc setCharacterEncoding:@"UTF-8"];
+  [xmlDoc setStandalone:YES];
+  
+  // The first part of the document should look like:
+  // <Vendor>iontv-app.com</Vendor>
+  // <Application>iOnTV v1.0 (Mac OS X)</Application>
+  // <Command>IdentifyPrograms2</Command>
+  // <UserID>ION:1</UserID>
+  // <DeviceID>0x10100b88</DeviceID>
+  // <Location>US:01890</Location>
+  
+  NSXMLElement *anElement = nil;
 
+  anElement = [[NSXMLElement alloc] initWithName:@"Vendor"];
+  [anElement setStringValue:@"iontv-app.com"];
+  [root addChild:anElement];
+  [anElement release];
+
+  anElement = [[NSXMLElement alloc] initWithName:@"Application"];
+  [anElement setStringValue:@"iOnTV v1.0 (Mac OS X)"];
+  [root addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"Command"];
+  [anElement setStringValue:@"IdentifyPrograms2"];
+  [root addChild:anElement];
+  [anElement release];
+
+  anElement = [[NSXMLElement alloc] initWithName:@"UserID"];
+  [anElement setStringValue:@"ION:1"];
+  [root addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"DeviceID"];
+  [anElement setStringValue:[NSString stringWithFormat:@"0x%x", [self.device.deviceID intValue]]];
+  [root addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"Location"];
+  [anElement setStringValue:[NSString stringWithFormat:@"US:%@", self.lineup.postalCode]];
+  [root addChild:anElement];
+  [anElement release];
+  
   // Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array
-  [channelsSet makeObjectsPerformSelector:@selector(addChannelInfoDictionaryTo:) withObject:channelsOnTuner];
-
-  NSSortDescriptor *channelDescriptor =[[[NSSortDescriptor alloc] initWithKey:@"channelNumber" ascending:YES] autorelease];
-  NSArray *sortDescriptors=[NSArray arrayWithObject:channelDescriptor];
-  NSArray *sortedArray=[channelsOnTuner sortedArrayUsingDescriptors:sortDescriptors];
+  [channelsSet makeObjectsPerformSelector:@selector(addChannelInfoTo:) withObject:root];
 
   NSData *xmlData;
-  NSString *error;
+  NSString *error = NULL;
 
-  xmlData = [NSPropertyListSerialization dataFromPropertyList:sortedArray
-                                                       format:NSPropertyListXMLFormat_v1_0
-                                             errorDescription:&error];
+  xmlData = [xmlDoc XMLDataWithOptions:NSXMLDocumentTidyXML];
   if(xmlData) {
     NSLog(@"No error creating XML data.");
     [xmlData writeToURL:inURL atomically:YES];
@@ -277,6 +315,8 @@ const int kCallSignStringLength = 10;
       for (channelInfoDictionary in channelsToImport) {
         HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:[channelInfoDictionary valueForKey:@"channelType"] andNumber:[channelInfoDictionary valueForKey:@"channelNumber"] inManagedObjectContext:[self managedObjectContext]];
         [aChannel setTuningType:[channelInfoDictionary valueForKey:@"tuningType"]];
+        [aChannel setFrequency:[channelInfoDictionary valueForKey:@"frequency"]];
+        [aChannel setTransportStreamID:[channelInfoDictionary valueForKey:@"transportStreamID"]];
         [aChannel importStationsFrom:[channelInfoDictionary valueForKey:@"stations"]];
         [self addChannelsObject:aChannel];
       }
@@ -356,20 +396,24 @@ const int kCallSignStringLength = 10;
     // Parse the channel type and number details from the data string
     NSString *channelTypeStr;
     NSNumber *channelNumber;
-
+    NSNumber *frequencyNumber;
+    
     // Channel scanning data has the form : 489000000 (us-cable:68, us-irc:68)  -OR- 485000000 (us-bcast:16)
     // We need to take the data after the opening bracket and use it to create the channel type and number
     NSRange openingBracket = [data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"("]];
     NSString *typeNumberStr = [data substringFromIndex:openingBracket.location+1];
+    NSString *frequencyStr = [data substringToIndex:openingBracket.location];
     NSRange colon = [typeNumberStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]];
     channelTypeStr = [typeNumberStr substringToIndex:colon.location];
     NSString *channelNumberStr = [typeNumberStr substringFromIndex:colon.location+1];
     NSRange endOfNumber = [channelNumberStr rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@",)"]];
     channelNumber = [NSNumber numberWithInt:[[channelNumberStr substringToIndex:endOfNumber.location] intValue]];
-
+    frequencyNumber = [NSNumber numberWithInt:[frequencyStr intValue]];
+    
     // Create a HDHomeRunChannel to match
     HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:channelTypeStr andNumber:channelNumber inManagedObjectContext:inMOC];
-
+    [aChannel setFrequency:frequencyNumber];
+    
     // Set the 'current' scanning channel to the one we just created - if there's no lock or programs on this channel we'll delete
     // it later.
     mCurrentHDHomeRunChannel = aChannel;
@@ -402,16 +446,22 @@ const int kCallSignStringLength = 10;
 
   if ([type compare:@"PROGRAM"] == NSOrderedSame) {
     // We have a program - is it encrypted ?
-    if (([data rangeOfString:@"(encrypted)"].location == NSNotFound)
+    // The data line will look like :
+    //    30103: 2.2 WGBH-HD
+    // or
+    //    13668: 0.0
+    // or
+    //    tsid=0x742
+    // if there's no encoded FCC Channel details or callsign. We need to break up the details add build an HDHomeRunStation object
+    if ([data rangeOfString:@"tsid"].location != NSNotFound) {
+      const char *srcString = [data UTF8String];
+      int tsid;
+      sscanf(srcString, "tsid=0x%x\n", &tsid);
+      [mCurrentHDHomeRunChannel setTransportStreamID:[NSNumber numberWithInt:tsid]];
+    } else if (([data rangeOfString:@"(encrypted)"].location == NSNotFound)
         && ([data rangeOfString:@"(no data)"].location == NSNotFound)
         && ([data rangeOfString:@"internet"].location == NSNotFound)
-        && ([data rangeOfString:@"none"].location == NSNotFound)
-        && ([data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]].location != NSNotFound)) {
-      // The data line will look like :
-      //    30103: 2.2 WGBH-HD
-      // or
-      //    13668: 0.0
-      // if there's no encoded FCC Channel details or callsign. We need to break up the details add build an HDHomeRunStation object
+        && ([data rangeOfString:@"none"].location == NSNotFound)) {
       NSRange colonRange = [data rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@":"]];
       NSString *programNumberString = [data substringToIndex:colonRange.location];
       NSString *channelNumberAndCallsignString = [data substringFromIndex:colonRange.location+2];
@@ -615,6 +665,11 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str) {
   return anHDHomeRunChannel;
 }
 
+- (void)addChannelInfoTo:(NSXMLElement *)parentElement {
+  // Call each station in turn to add their details to the array
+  [[self stations] makeObjectsPerformSelector:@selector(addStationInfoTo:) withObject:parentElement];
+}
+
 - (void)addChannelInfoDictionaryTo:(NSMutableArray *)inOutputArray {
   // Create an array and use it to hold serialized info for each station on this channel
   NSMutableArray *stationsOnChannelArray = [NSMutableArray arrayWithCapacity:[[self stations] count]];
@@ -623,7 +678,13 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str) {
   [[self stations] makeObjectsPerformSelector:@selector(addStationInfoDictionaryTo:) withObject:stationsOnChannelArray];
 
   // Add the station array and other channel info to a dictionary and add that to the output array
-  NSDictionary *infoDictionary = [NSDictionary dictionaryWithObjectsAndKeys:[self channelType], @"channelType", [self channelNumber], @"channelNumber", [self tuningType], @"tuningType", stationsOnChannelArray, @"stations", nil];
+  NSDictionary *infoDictionary = [NSDictionary dictionaryWithObjectsAndKeys:[self channelType], @"channelType",
+                                    [self channelNumber], @"channelNumber",
+                                    [self tuningType], @"tuningType",
+                                    [self frequency], @"frequency",
+                                    [self transportStreamID], @"transportStreamID",
+                                    stationsOnChannelArray, @"stations",
+                                    nil];
   [inOutputArray addObject:infoDictionary];
 }
 
@@ -663,6 +724,8 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str) {
 @dynamic tuningType;
 @dynamic stations;
 @dynamic channelStationMap;
+@dynamic transportStreamID;
+@dynamic frequency;
 @end
 
 // coalesce these into one @interface HDHomeRunStation (CoreDataGeneratedPrimitiveAccessors) section
@@ -788,6 +851,48 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str) {
 
 - (NSData *)receiveVideoData {
   return [mCurrentStreamingTuner receiveVideoData];
+}
+
+- (void)addStationInfoTo:(NSXMLElement *)parentElement {
+  NSXMLElement *programElement = [[NSXMLElement alloc] initWithName:@"Program"];
+  
+  // Build an XMLElement that looks like :
+  // <Program>
+  // <Modulation>qam256</Modulation>
+  // <Frequency>519000000</Frequency>
+  // <TransportStreamID>0x743</TransportStreamID>
+  // <ProgramNumber>11801</ProgramNumber>
+  // <SeenTimestamp>2010-03-24 20:00:00</SeenTimestamp>
+  // </Program>
+  
+  NSXMLElement *anElement = nil;
+  anElement = [[NSXMLElement alloc] initWithName:@"Modulation"];
+  [anElement setStringValue:[[self channel] tuningType]];
+  [programElement addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"Frequency"];
+  [anElement setStringValue:[[[self channel] frequency] stringValue]];
+  [programElement addChild:anElement];
+  [anElement release];
+
+  anElement = [[NSXMLElement alloc] initWithName:@"TransportStreamID"];
+  [anElement setStringValue:[[[self channel] transportStreamID] stringValue]];
+  [programElement addChild:anElement];
+  [anElement release];
+
+  anElement = [[NSXMLElement alloc] initWithName:@"ProgramNumber"];
+  [anElement setStringValue:[[self programNumber] stringValue]];
+  [programElement addChild:anElement];
+  [anElement release];
+
+  anElement = [[NSXMLElement alloc] initWithName:@"SeenTimestamp"];
+  [anElement setStringValue:[[NSDate date] descriptionWithCalendarFormat:@"%Y-%m-%d %H:%M:%S" timeZone:nil locale:nil]];
+  [programElement addChild:anElement];
+  [anElement release];
+
+  [parentElement addChild:programElement];
+  [programElement release];
 }
 
 - (void)addStationInfoDictionaryTo:(NSMutableArray *)inOutputArray {
