@@ -887,7 +887,8 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str) {
   [anElement release];
 
   anElement = [[NSXMLElement alloc] initWithName:@"SeenTimestamp"];
-  [anElement setStringValue:[[NSDate date] descriptionWithCalendarFormat:@"%Y-%m-%d %H:%M:%S" timeZone:nil locale:nil]];
+  NSDate *lastUpdateDate = [[[self channel] channelStationMap] lastUpdateDate];
+  [anElement setStringValue:[lastUpdateDate descriptionWithCalendarFormat:@"%Y-%m-%d %H:%M:%S" timeZone:nil locale:nil]];
   [programElement addChild:anElement];
   [anElement release];
 
