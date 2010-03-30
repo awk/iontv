@@ -78,6 +78,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
     [currentNode detach];
     NSXMLElement *xtvdElement = [[NSXMLElement alloc] initWithName:@"xtvd"];
     NSXMLDocument *xtvdXMLDoc = [[NSXMLDocument alloc] initWithRootElement:xtvdElement];
+    [xtvdElement release];
     [xtvdXMLDoc setCharacterEncoding:@"UTF-8"];
     [xtvdXMLDoc setVersion:@"1.0"];
     [xtvdXMLDoc setRootElement:currentNode];
@@ -341,6 +342,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   if ([[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] respondsToSelector:@selector(handleDownloadData:)]) {
     [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelector:@selector(handleDownloadData:) withObject:parserCallData];
   }
+  [parserCallData release];
   [pool release];
 }
 

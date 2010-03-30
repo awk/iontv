@@ -187,7 +187,7 @@ NSString *kPersistentStoreCoordinatorKey = @"persistentStoreCoordinator";
         NSString *postalCodeString = [[childElement attributeForName:@"postalCode"] stringValue];
 
         // If the lineup already exists we might need to update it's info
-        Z2ITLineup *aLineup = [Z2ITLineup fetchLineupWithID:lineupIDString inManagedObjectContext:mManagedObjectContext];
+        Z2ITLineup *aLineup = [Z2ITLineup allocLineupWithID:lineupIDString inManagedObjectContext:mManagedObjectContext];
         if (aLineup == nil) {
           // Otherwise we just create a new one
           aLineup = [NSEntityDescription insertNewObjectForEntityForName:@"Lineup"
@@ -275,7 +275,8 @@ NSString *kPersistentStoreCoordinatorKey = @"persistentStoreCoordinator";
         [subPool release];
       }
 
-      aLineup = NULL;
+      [aLineup release];
+      aLineup = nil;
       }
     }
     [subPool release];
@@ -339,7 +340,7 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
         Z2ITProgram *aProgram  = nil;
 
         if ((existingProgramIndex < existingProgramCount) && ([programIDString compare:[[existingProgramsArray objectAtIndex:existingProgramIndex] programID]] == NSOrderedSame)) {
-          aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
+//          aProgram = [existingProgramsArray objectAtIndex:existingProgramIndex];
           // We should check and update the program details here - they may have changed.
           existingProgramIndex++;
         } else {
@@ -486,7 +487,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
 - (void) updateSchedules:(NSXMLNode *)inSchedulesNode {
   NSArray *childNodes = nil;
-  int i, count = [childNodes count];
+  int i, count;
   if (mReportProgressTo) {
     mActivityToken = [mReportProgressTo setActivity:mActivityToken infoString:@"Updating Schedules"];
   } else {

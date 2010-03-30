@@ -157,7 +157,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
   NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
   NSString *presetsPath = [basePath stringByAppendingPathComponent:@"HandBrake/UserPresets.plist"];
 
-  NSMutableArray *presetsArray = [[NSMutableArray alloc] initWithContentsOfFile:presetsPath];
+  NSMutableArray *presetsArray = [[[NSMutableArray alloc] initWithContentsOfFile:presetsPath] autorelease];
   if (nil == presetsArray) {
     // No presets found - just return a default iPod preset
     return [self createIpodLowPreset];

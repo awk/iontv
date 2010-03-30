@@ -76,7 +76,7 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
   // Set up the default location for the recorded (and transcoded) programs location.
   NSString *homeDir = NSHomeDirectory();
   NSString *moviesDir = [homeDir stringByAppendingPathComponent:@"Movies"];
-  NSURL *moviesFolderURL = [[NSURL alloc] initFileURLWithPath:moviesDir isDirectory:YES];
+  NSURL *moviesFolderURL = [[[NSURL alloc] initFileURLWithPath:moviesDir isDirectory:YES] autorelease];
   NSString *moviesFolder = [moviesFolderURL absoluteString];
   [userDefaultsValuesDict setValue:moviesFolder forKey:kRecordedProgramsLocationKey];
   [userDefaultsValuesDict setValue:moviesFolder forKey:kTranscodedProgramsLocationKey];
@@ -176,8 +176,8 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
     return NO;
   }
 
-  NSMigrationManager *migrationManager = [[NSMigrationManager alloc] initWithSourceModel:sourceModel
-                                                                        destinationModel:destinationModel];
+  NSMigrationManager *migrationManager = [[[NSMigrationManager alloc] initWithSourceModel:sourceModel
+                                                                        destinationModel:destinationModel] autorelease];
 
   NSArray *bundlesForMappingModel = nil;
 
