@@ -227,6 +227,7 @@ const float kScheduleDetailsPopUpTime = 3.0;
 
     [self dragImage:scheduleCellImage at:dragImageLoc offset:NSMakeSize(0, 0) event:theEvent pasteboard:pboard source:self slideBack:YES];
   }
+  [scheduleCellImage release];
   return;
 }
 
@@ -534,9 +535,6 @@ const float kScheduleDetailsPopUpTime = 3.0;
 }
 
 - (void) drawCellsWithFrame:(NSRect)inFrame inView:(NSView *)inView {
-  NSRect cellFrameRect;
-  cellFrameRect = inFrame;  // Start with the input dimensions
-
   int i=0;
   // Calculate the pixels per minute value
   float pixelsPerMinute = inFrame.size.width / ((mEndTime - mStartTime) / 60);
@@ -545,6 +543,7 @@ const float kScheduleDetailsPopUpTime = 3.0;
   for (i=0; i < [mCellsInLineArray count]; i++) {
     Z2ITSchedule *aSchedule = [mSchedulesInLineArray objectAtIndex:i];
     if (aSchedule) {
+      NSRect cellFrameRect;
       cellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
       cellFrameRect.origin.y = inFrame.origin.y;
       cellFrameRect.size.height = inFrame.size.height;
@@ -562,10 +561,10 @@ const float kScheduleDetailsPopUpTime = 3.0;
   BOOL foundCell = NO;
   int i=0;
   Z2ITSchedule *aSchedule = nil;
-  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
   for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++) {
     aSchedule = [mSchedulesInLineArray objectAtIndex:i];
     if (aSchedule) {
+      NSRect aCellFrameRect;
       aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
       aCellFrameRect.origin.y = 0;
       aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
@@ -593,10 +592,10 @@ const float kScheduleDetailsPopUpTime = 3.0;
   BOOL foundCell = NO;
   int i=0;
   Z2ITSchedule *aSchedule = nil;
-  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
   for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++) {
     aSchedule = [mSchedulesInLineArray objectAtIndex:i];
     if (aSchedule) {
+      NSRect aCellFrameRect;
       aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
       aCellFrameRect.origin.y = 0;
       aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
@@ -623,10 +622,10 @@ const float kScheduleDetailsPopUpTime = 3.0;
   BOOL foundCell = NO;
   int i=0;
   Z2ITSchedule *aSchedule = nil;
-  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
   for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++) {
     aSchedule = [mSchedulesInLineArray objectAtIndex:i];
     if (aSchedule) {
+      NSRect aCellFrameRect;
       aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
       aCellFrameRect.origin.y = 0;
       aCellFrameRect.size.height = kScheduleStationColumnViewCellHeight;
@@ -650,10 +649,10 @@ const float kScheduleDetailsPopUpTime = 3.0;
   BOOL foundCell = NO;
   int i=0;
   Z2ITSchedule *aSchedule = nil;
-  NSRect aCellFrameRect = NSMakeRect(0, 0, 0, 0);
   for (i=0; (i < [mCellsInLineArray count]) && (!foundCell); i++) {
     aSchedule = [mSchedulesInLineArray objectAtIndex:i];
     if (aSchedule) {
+      NSRect aCellFrameRect;
       aCellFrameRect = [self cellFrameRectForSchedule:aSchedule withPixelsPerMinute:pixelsPerMinute];
       aCellFrameRect.origin.y = inFrame.origin.y + aCellFrameRect.size.height;
       NSRect hitRect = aCellFrameRect;

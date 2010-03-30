@@ -111,6 +111,7 @@
   RSActivityAggregateViewController *anAggregateViewController = [[RSActivityAggregateViewController alloc] init];
   if (![NSBundle loadNibNamed:@"ActivityAggregateView" owner:anAggregateViewController]) {
     NSLog(@"Error loading aggregate activity view NIB");
+    [anAggregateViewController release];
     return 0;
   }
 

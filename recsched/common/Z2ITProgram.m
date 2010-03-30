@@ -37,7 +37,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
 }
 
 // Fetch the Program with the given ID from the Managed Object Context
-+ (Z2ITProgram *)fetchProgramWithID:(NSString *)inProgramID inManagedObjectContext:(NSManagedObjectContext *)inMOC {
++ (Z2ITProgram *)allocProgramWithID:(NSString *)inProgramID inManagedObjectContext:(NSManagedObjectContext *)inMOC {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Program" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
@@ -123,7 +123,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   nodes = [inXMLElement nodesForXPath:@"./starRating" error:&err];
   if ([nodes count] > 0 ) {
     NSString *tmpStr = [[nodes objectAtIndex:0] stringValue];
-    NSNumber *theStarRating;
+    NSNumber *theStarRating = nil;
     if ([tmpStr compare:@"+"] == NSOrderedSame) {
       theStarRating = [NSNumber numberWithFloat:0.5];
     }
@@ -364,7 +364,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   if (aStation) {
     [aSchedule setTime:timeDate];
     [aSchedule setDurationHours:durationHours minutes:durationMins];
-    [aSchedule setNew:newProgram];
+    [aSchedule setNewProgram:newProgram];
     [aSchedule setStereo:stereo];
     [aSchedule setSubtitled:subtitled];
     [aSchedule setHdtv:hdtv];
@@ -529,7 +529,7 @@ BOOL boolValueForAttribute(NSXMLElement *inXMLElement, NSString *inAttributeName
   NSError *error = nil;
   NSArray *array = [inMOC executeFetchRequest:request error:&error];
   if (array == nil) {
-    NSLog(@"Error executing fetch request to find genreClass %@ error = %@", inGenreClassNameString, *error);
+    NSLog(@"Error executing fetch request to find genreClass %@ error = %@", inGenreClassNameString, error);
     return nil;
   }
   NSManagedObject *aGenreClass = nil;

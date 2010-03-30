@@ -27,7 +27,7 @@
 }
 
 // Fetch the Program with the given ID from the Managed Object Context
-+ (Z2ITProgram *)fetchProgramWithID:(NSString *)inProgramID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
++ (Z2ITProgram *)allocProgramWithID:(NSString *)inProgramID inManagedObjectContext:(NSManagedObjectContext *)inMOC;
 
 // Fetch all the programs present with supplied IDs
 + (NSArray *)fetchProgramsWithIDS:(NSArray *)inProgramIDS inManagedObjectContext:(NSManagedObjectContext *)inMOC;

@@ -164,7 +164,7 @@ enum {
   NSError *error = nil;
   NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:request error:&error];
   if ([array count] > 0) {
-    return [array autorelease];
+    return array;
   } else {
     return nil;
   }

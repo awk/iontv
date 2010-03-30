@@ -100,7 +100,8 @@
   NSString *aString = nil;
   if ([[self program] descriptionStr] != nil) {
     NSMutableString *detailsString = [[NSMutableString alloc] initWithString:[[self program] descriptionStr]];
-    if (![self new]) {
+    NSNumber *isNewProgram = [[self newProgram] autorelease];
+    if (![isNewProgram boolValue]) {
       [detailsString appendString:@" Repeat."];
     }
     if ([self dolby] != nil) {
@@ -115,11 +116,23 @@
   return aString;
 }
 
+- (NSNumber *) newProgram {
+  [self willAccessValueForKey:@"new"];
+  NSNumber *newProg = [self primitiveValueForKey:@"new"];
+  [self didAccessValueForKey:@"new"];
+  return newProg;
+}
+
+- (void) setNewProgram:(NSNumber *) newProg {
+  [self willChangeValueForKey:@"new"];
+  [self setPrimitiveValue:newProg forKey:@"new"];
+  [self didChangeValueForKey:@"new"];
+}
+
 @dynamic closeCaptioned;
 @dynamic dolby;
 @dynamic endTime;
 @dynamic hdtv;
-@dynamic new;
 @dynamic partNumber;
 @dynamic recordedMediaPath;
 @dynamic recordingStatus;

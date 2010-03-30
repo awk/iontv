@@ -53,7 +53,7 @@
 - (id)initWithFrame:(NSRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
-    NSRect subViewFrame = NSMakeRect(0, 0, frame.size.width, frame.size.height);
+    NSRect subViewFrame;
 
     // Add the station scroller to the right side
     subViewFrame  = NSMakeRect(0, 0, frame.size.width, frame.size.height);
@@ -96,17 +96,19 @@
     [self addSubview:mGridView];
 
     mSortedStationsArray = nil;
-    CFGregorianDate previousHour = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(),CFTimeZoneCopySystem());
+    CFTimeZoneRef systemTimeZone = CFTimeZoneCopySystem();
+    CFGregorianDate previousHour = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(), systemTimeZone);
     if (previousHour.minute > 30) {
       previousHour.minute = 30;
     } else {
       previousHour.minute = 0;
     }
     previousHour.second = 0;
-    mStartTime = CFGregorianDateGetAbsoluteTime(previousHour,CFTimeZoneCopySystem());
+    mStartTime = CFGregorianDateGetAbsoluteTime(previousHour, systemTimeZone);
     [mHeaderView setStartTime:mStartTime];
     [mGridView setStartTime:mStartTime];
     [mGridView setVisibleTimeSpan:[self visibleTimeSpan]];
+    CFRelease(systemTimeZone);
   }
   return self;
 }

@@ -74,6 +74,7 @@
                                            nil];
     NSAttributedString *label = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"•%@\n", aRecording.schedule.program.title] attributes:attrsDictionary];
     [mEventString appendAttributedString:label];
+    [label release];
   }
 }
 

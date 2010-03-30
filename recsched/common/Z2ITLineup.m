@@ -23,7 +23,7 @@
 @implementation Z2ITLineup
 
 // Fetch the station with the given ID from the Managed Object Context
-+ (Z2ITLineup *)fetchLineupWithID:(NSString *)inLineupID inManagedObjectContext:(NSManagedObjectContext *)inMOC {
++ (Z2ITLineup *)allocLineupWithID:(NSString *)inLineupID inManagedObjectContext:(NSManagedObjectContext *)inMOC {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Lineup" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];

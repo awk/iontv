@@ -13,8 +13,10 @@
 static NSGradient *siTableColumnHeaderCellSharedGradient = nil;
 
 + (NSGradient*)sharedGradient {
-  if (!siTableColumnHeaderCellSharedGradient) {
-    siTableColumnHeaderCellSharedGradient = [NSGradient alloc];
+  @synchronized(self) {
+    if (!siTableColumnHeaderCellSharedGradient) {
+      siTableColumnHeaderCellSharedGradient = [NSGradient alloc];
+    }
   }
   return siTableColumnHeaderCellSharedGradient;
 }
@@ -40,9 +42,12 @@ static NSGradient *siTableColumnHeaderCellSharedGradient = nil;
 - (void)drawWithFrame:(NSRect)inFrame inView:(NSView *)inView {
   NSGradient *headerGradient;
   if ([inView isFlipped]) {
-    headerGradient = [[iTableColumnHeaderCell sharedGradient] initWithStartingColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0]];
+    headerGradient = [iTableColumnHeaderCell sharedGradient];
+    [headerGradient initWithStartingColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0]];
+
   } else {
-    headerGradient = [[iTableColumnHeaderCell sharedGradient] initWithStartingColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0]];
+    headerGradient = [iTableColumnHeaderCell sharedGradient];
+    [headerGradient initWithStartingColor:[NSColor colorWithDeviceHue:1.0 saturation:0.0071 brightness:0.5490 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0.0 saturation:0.0 brightness:0.9137 alpha:1.0]];
   }
   [headerGradient drawInRect:inFrame angle:90.0];
 
@@ -69,13 +74,6 @@ static NSGradient *siTableColumnHeaderCellSharedGradient = nil;
   [[NSColor darkGrayColor] set];
   NSRect dividerRect = NSMakeRect(inFrame.origin.x + inFrame.size.width - 1, 0, 1,inFrame.size.height);
   NSRectFill(dividerRect);
-}
-
-
-- (id)copyWithZone:(NSZone *)zone {
-  id newCopy = [super copyWithZone:zone];
-  [attrs retain];
-  return newCopy;
 }
 
 

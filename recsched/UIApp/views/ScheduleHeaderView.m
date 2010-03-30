@@ -40,8 +40,10 @@ const int kScheduleHeaderViewDefaultNumberOfCells = 6;
 static NSGradient *sScheduleHeaderCellSharedGradient = nil;
 
 + (NSGradient*) sharedGradient {
-  if (!sScheduleHeaderCellSharedGradient) {
-    sScheduleHeaderCellSharedGradient = [NSGradient alloc];
+  @synchronized(self) {
+    if (!sScheduleHeaderCellSharedGradient) {
+      sScheduleHeaderCellSharedGradient = [NSGradient alloc];
+    }
   }
   return sScheduleHeaderCellSharedGradient;
 }
@@ -51,7 +53,8 @@ static NSGradient *sScheduleHeaderCellSharedGradient = nil;
   [NSBezierPath setDefaultLineWidth:0.0];
 
   // Draw background
-  NSGradient *aGradient = [[ScheduleHeaderCell sharedGradient] initWithStartingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:187.0/255.0 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:219.0/255.0 alpha:1.0]];
+  NSGradient *aGradient = [ScheduleHeaderCell sharedGradient];
+  [aGradient initWithStartingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:187.0/255.0 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:219.0/255.0 alpha:1.0]];
   [aGradient drawInRect:cellFrame angle:90.0];
 
   // Draw top/bottom lines
@@ -169,15 +172,17 @@ static NSGradient *sScheduleHeaderCellSharedGradient = nil;
   memset(&thirtyMinutes,0,sizeof(thirtyMinutes));
   thirtyMinutes.minutes = 30;
   for (id loopItem in mLabelCellArray) {
-    cellEndTime = CFAbsoluteTimeAddGregorianUnits(cellStartTime,CFTimeZoneCopySystem(),thirtyMinutes);
-    CFGregorianDate cellStartDate = CFAbsoluteTimeGetGregorianDate(cellStartTime,CFTimeZoneCopySystem());
-    CFGregorianDate cellEndDate = CFAbsoluteTimeGetGregorianDate(cellEndTime, CFTimeZoneCopySystem());
+    CFTimeZoneRef systemTimeZone = CFTimeZoneCopySystem();
+    cellEndTime = CFAbsoluteTimeAddGregorianUnits(cellStartTime, systemTimeZone,thirtyMinutes);
+    CFGregorianDate cellStartDate = CFAbsoluteTimeGetGregorianDate(cellStartTime, systemTimeZone);
+    CFGregorianDate cellEndDate = CFAbsoluteTimeGetGregorianDate(cellEndTime, systemTimeZone);
 
     NSString *cellStr = [NSString stringWithFormat:@"%02d:%02d - %02d:%02d", cellStartDate.hour, cellStartDate.minute, cellEndDate.hour, cellEndDate.minute];
     // Set the cell label
     [loopItem setStringValue:cellStr];
     // incremement the start date
-    cellStartTime = CFAbsoluteTimeAddGregorianUnits(cellStartTime,CFTimeZoneCopySystem(),thirtyMinutes);
+    cellStartTime = CFAbsoluteTimeAddGregorianUnits(cellStartTime, systemTimeZone,thirtyMinutes);
+    CFRelease(systemTimeZone);
   }
   [self setNeedsDisplay:YES];
 }

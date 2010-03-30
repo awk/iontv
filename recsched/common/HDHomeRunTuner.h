@@ -109,7 +109,7 @@
 - (void)startStreaming;
 - (void)startStreamingToPort:(int)portNumber;
 - (void)stopStreaming;
-- (NSData *)receiveVideoData;
+- (NSData *)copyVideoData;
 
 @end
 

@@ -450,9 +450,8 @@ const NSInteger kFinishedTabViewIndex = 4;
     passwordLength = strlen(passwordData);
 
     // Call AddInternetPassword - if it's already in the keychain then update it
-    OSStatus status;
     if (mSDKeychainItemRef == nil) {
-      status = SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mSDKeychainItemRef);
+      SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mSDKeychainItemRef);
     } else {
       // The item already exists - we just need to change the password.
       // And the Account name
@@ -466,7 +465,7 @@ const NSInteger kFinishedTabViewIndex = 4;
       SecKeychainAttributeList attrList;
       attrList.count = 1;
       attrList.attr = &accountNameAttribute;
-      status = SecKeychainItemModifyAttributesAndData(mSDKeychainItemRef, &attrList, passwordLength, passwordData);
+      SecKeychainItemModifyAttributesAndData(mSDKeychainItemRef, &attrList, passwordLength, passwordData);
       free(accountNameAttributeData);
     }
   }

@@ -178,7 +178,7 @@ const int kCallSignStringLength = 10;
 
 // Note that this method allocates and initializes a new NSData object. It's the callers responsiblity to release
 // the object when the caller has finished with it in order to avoid leaks.
-- (NSData *)receiveVideoData {
+- (NSData *)copyVideoData {
   size_t numBytesReceived;
   uint8* bytesReceived = NULL;
   bytesReceived = hdhomerun_device_stream_recv(mHDHomeRunDevice, VIDEO_DATA_BUFFER_SIZE_1S, &numBytesReceived);
@@ -300,6 +300,7 @@ const int kCallSignStringLength = 10;
     NSLog(@"Error creating XML Data %@", error);
     [error release];
   }
+  [xmlDoc release];
 }
 
 #if 0
@@ -650,7 +651,7 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str) {
   HDHomeRunTuner *aTuner = (HDHomeRunTuner *) [managedObjectContext objectWithID:aTunerObjectID];
 
   [aTuner performScan];
-
+  [managedObjectContext release];
   [pool release];
 }
 
@@ -849,8 +850,8 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str) {
   mCurrentStreamingTuner = nil;
 }
 
-- (NSData *)receiveVideoData {
-  return [mCurrentStreamingTuner receiveVideoData];
+- (NSData *)copyVideoData {
+  return [mCurrentStreamingTuner copyVideoData];
 }
 
 - (void)addStationInfoTo:(NSXMLElement *)parentElement {

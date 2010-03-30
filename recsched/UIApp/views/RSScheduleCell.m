@@ -23,8 +23,10 @@
 static NSGradient *sScheduleCellSharedGradient = nil;
 
 + (NSGradient *)sharedGradient {
-  if (!sScheduleCellSharedGradient) {
-    sScheduleCellSharedGradient = [NSGradient alloc];
+  @synchronized(self) {
+    if (!sScheduleCellSharedGradient) {
+      sScheduleCellSharedGradient = [NSGradient alloc];
+    }
   }
   return sScheduleCellSharedGradient;
 }
@@ -110,12 +112,14 @@ static NSGradient *sScheduleCellSharedGradient = nil;
       [aShadow release];
       [NSGraphicsContext restoreGraphicsState];
 
-      NSGradient *aGradient = [[RSScheduleCell sharedGradient] initWithStartingColor:topColor endingColor:bottomColor];
+      NSGradient *aGradient = [RSScheduleCell sharedGradient];
+      [aGradient initWithStartingColor:topColor endingColor:bottomColor];
       [aGradient drawInBezierPath:framePath angle:90.0];
     } else {
       NSColor *bottomColor = [genreColor darkerColorBy:0.15];
       NSColor *topColor = [genreColor lighterColorBy:0.15];
-      NSGradient *aGradient = [[RSScheduleCell sharedGradient] initWithStartingColor:topColor endingColor:bottomColor];
+      NSGradient *aGradient = [RSScheduleCell sharedGradient];
+      [aGradient initWithStartingColor:topColor endingColor:bottomColor];
       [aGradient drawInBezierPath:framePath angle:90.0];
 
       // Set the base genre color for the outline

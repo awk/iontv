@@ -45,15 +45,18 @@ const int kScheduleStationColumnViewCellHeight = 40;
 static NSGradient *sScheduleStationColumnCellSharedGradient = nil;
 
 + (NSGradient*) sharedGradient {
-  if (!sScheduleStationColumnCellSharedGradient) {
-    sScheduleStationColumnCellSharedGradient = [NSGradient alloc];
+  @synchronized(self) {
+    if (!sScheduleStationColumnCellSharedGradient) {
+      sScheduleStationColumnCellSharedGradient = [NSGradient alloc];
+    }
   }
   return sScheduleStationColumnCellSharedGradient;
 }
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView *)controlView {
   // Fill with the dark gray gradient
-  NSGradient *aGradient = [[ScheduleStationColumnCell sharedGradient] initWithStartingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.3922 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.4980 alpha:1.0]];
+  NSGradient *aGradient = [ScheduleStationColumnCell sharedGradient];
+  [aGradient initWithStartingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.3922 alpha:1.0] endingColor:[NSColor colorWithDeviceHue:0 saturation:0 brightness:0.4980 alpha:1.0]];
   [aGradient drawInRect:cellFrame angle:90.0];
 
   // Draw the frame

@@ -90,13 +90,11 @@ const int kLatestFirmwareVersion = 20080427;
   [anHDHomeRunTuner setIndex:[NSNumber numberWithInt:0]];
   anHDHomeRunTuner.lineup = aLineup;
   [anHDHomeRun addTunersObject:anHDHomeRunTuner];
-  [anHDHomeRunTuner release];
 
   anHDHomeRunTuner = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
   [anHDHomeRunTuner setIndex:[NSNumber numberWithInt:1]];
   anHDHomeRunTuner.lineup = aLineup;
   [anHDHomeRun addTunersObject:anHDHomeRunTuner];
-  [anHDHomeRunTuner release];
 
   return anHDHomeRun;
 }

@@ -40,14 +40,16 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
 - (id)init {
   self = [super init];
   if (self != nil) {
+    CFTimeZoneRef defaultTimeZone = CFTimeZoneCopyDefault();
     [self addObserver:self forKeyPath:@"startTime" options:0x0 context:nil];
-    CFGregorianDate previousHour = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(),CFTimeZoneCopyDefault());
+    CFGregorianDate previousHour = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(), defaultTimeZone);
     if (previousHour.minute > 30)
       previousHour.minute = 30;
     else
       previousHour.minute = 0;
     previousHour.second = 0;
-    [self setStartTime:CFGregorianDateGetAbsoluteTime(previousHour,CFTimeZoneCopyDefault())];
+    [self setStartTime:CFGregorianDateGetAbsoluteTime(previousHour, defaultTimeZone)];
+    CFRelease(defaultTimeZone);
   }
   return self;
 }
@@ -80,7 +82,9 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
   CFGregorianUnits increment;
   memset(&increment, 0, sizeof(increment));
   increment.minutes = -30;
-  CFAbsoluteTime aStartTime = CFAbsoluteTimeAddGregorianUnits([self startTime],CFTimeZoneCopyDefault(),increment);
+  CFTimeZoneRef defaultTimeZone = CFTimeZoneCopyDefault();
+  CFAbsoluteTime aStartTime = CFAbsoluteTimeAddGregorianUnits([self startTime], defaultTimeZone, increment);
+  CFRelease(defaultTimeZone);
   [self setStartTime:aStartTime];
 }
 
@@ -88,7 +92,9 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
   CFGregorianUnits increment;
   memset(&increment, 0, sizeof(increment));
   increment.minutes = 30;
-  CFAbsoluteTime aStartTime = CFAbsoluteTimeAddGregorianUnits([self startTime],CFTimeZoneCopyDefault(),increment);
+  CFTimeZoneRef defaultTimeZone = CFTimeZoneCopyDefault();
+  CFAbsoluteTime aStartTime = CFAbsoluteTimeAddGregorianUnits([self startTime], defaultTimeZone, increment);
+  CFRelease(defaultTimeZone);
   [self setStartTime:aStartTime];
 }
 
@@ -203,23 +209,28 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
  }
 
 - (IBAction)daysMenuItemAction:(NSMenuItem *)sender {
-  CFGregorianDate newDate = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(),CFTimeZoneCopyDefault());
-  CFGregorianDate currentDate = CFAbsoluteTimeGetGregorianDate([self startTime],CFTimeZoneCopyDefault());
+  CFTimeZoneRef defaultTimeZone = CFTimeZoneCopyDefault();
+  CFGregorianDate newDate = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(), defaultTimeZone);
+  CFGregorianDate currentDate = CFAbsoluteTimeGetGregorianDate([self startTime], defaultTimeZone);
   newDate.hour = currentDate.hour;
   newDate.minute = currentDate.minute;
   newDate.second = currentDate.second;
   newDate.day += [sender tag];
-  [self setStartTime:CFGregorianDateGetAbsoluteTime(newDate,CFTimeZoneCopyDefault())];
+  [self setStartTime:CFGregorianDateGetAbsoluteTime(newDate, defaultTimeZone)];
+  CFRelease(defaultTimeZone);
 }
 
 - (IBAction)hoursMenuItemAction:(NSMenuItem *)sender {
-  CFGregorianDate newDate = CFAbsoluteTimeGetGregorianDate([self startTime],CFTimeZoneCopyDefault());
+  CFTimeZoneRef defaultTimeZone = CFTimeZoneCopyDefault();
+  CFGregorianDate newDate = CFAbsoluteTimeGetGregorianDate([self startTime], defaultTimeZone);
   newDate.hour = [sender tag] / 60;
   newDate.minute = [sender tag] % 60;
-  [self setStartTime:CFGregorianDateGetAbsoluteTime(newDate,CFTimeZoneCopyDefault())];
+  [self setStartTime:CFGregorianDateGetAbsoluteTime(newDate, defaultTimeZone)];
+  CFRelease(defaultTimeZone);
 }
 
 - (IBAction)scheduleControlClicked:(id)sender {
+  CFTimeZoneRef defaultTimeZone = CFTimeZoneCopyDefault();
   int clickedSegment = [sender selectedSegment];
   switch (clickedSegment)   {
     case kPreviousTimeSegment:
@@ -230,18 +241,19 @@ enum { kPreviousTimeSegment = 0, kDaySegment, kHourSegment, kNextTimeSegment };
       break;
     case kHourSegment:
     case kDaySegment: {
-        CFGregorianDate previousHour = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(),CFTimeZoneCopyDefault());
+        CFGregorianDate previousHour = CFAbsoluteTimeGetGregorianDate(CFAbsoluteTimeGetCurrent(), defaultTimeZone);
         if (previousHour.minute > 30)
           previousHour.minute = 30;
         else
           previousHour.minute = 0;
         previousHour.second = 0;
-        [self setStartTime:CFGregorianDateGetAbsoluteTime(previousHour,CFTimeZoneCopyDefault())];
+        [self setStartTime:CFGregorianDateGetAbsoluteTime(previousHour, defaultTimeZone)];
       }
       break;
     default:
       break;
   }
+  CFRelease(defaultTimeZone);
 }
 
 - (void)showScheduleDetailsWithStartingFrame:(NSRect)startingFrame {
