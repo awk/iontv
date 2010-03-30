@@ -122,7 +122,43 @@ static void addToolbarItem(NSMutableDictionary *theDict,NSString *identifier,NSS
 static Preferences *sSharedInstance = nil;
 
 + (Preferences *)sharedInstance {
-  return sSharedInstance ? sSharedInstance : [[self alloc] init];
+  @synchronized(self) {
+    if (sSharedInstance == nil) {
+      sSharedInstance = [[Preferences alloc] init];
+    }
+  }
+  return sSharedInstance;
+}
+
++ (id)allocWithZone:(NSZone *)zone {
+  @synchronized(self) {
+    if (sSharedInstance == nil) {
+      sSharedInstance = [super allocWithZone:zone];
+      return sSharedInstance;  // assignment and return on first allocation
+    }
+  }
+  return nil; // on subsequent allocation attempts return nil
+}
+
+- (id)copyWithZone:(NSZone *)zone
+{
+  return self;
+}
+
+- (id)retain {
+  return self;
+}
+
+- (unsigned)retainCount {
+  return UINT_MAX;  // denotes an object that cannot be released
+}
+
+- (void)release {
+  //do nothing
+}
+
+- (id)autorelease {
+  return self;
 }
 
 + (void)setupDefaults {
@@ -139,7 +175,7 @@ static Preferences *sSharedInstance = nil;
   // Set up the default location for the recorded (and transcoded) programs location.
   NSString *homeDir = NSHomeDirectory();
   NSString *moviesDir = [homeDir stringByAppendingPathComponent:@"Movies"];
-  NSURL *moviesFolderURL = [[NSURL alloc] initFileURLWithPath:moviesDir isDirectory:YES];
+  NSURL *moviesFolderURL = [[[NSURL alloc] initFileURLWithPath:moviesDir isDirectory:YES] autorelease];
   NSString *moviesFolder = [moviesFolderURL absoluteString];
   [userDefaultsValuesDict setValue:moviesFolder forKey:kRecordedProgramsLocationKey];
   [userDefaultsValuesDict setValue:moviesFolder forKey:kTranscodedProgramsLocationKey];
@@ -595,6 +631,12 @@ static Preferences *sSharedInstance = nil;
                                                 otherButton:nil
                                   informativeTextWithFormat:@"Importing channels will clear all channels currently present on Tuner: %@", [[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] longName]];
       [confirmAlert beginSheetModalForWindow:mPanel modalDelegate:self didEndSelector:@selector(confirmImportAlertDidEnd: returnCode: contextInfo:) contextInfo:[[panel URL] copy]];
+    } else {
+      NSData *xmlData = [NSData dataWithContentsOfURL:[panel URL]];
+      NSManagedObjectID *stationMapId = nil;
+      HDHomeRunTuner *theTuner = [[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0];
+      stationMapId = [[[theTuner lineup] channelStationMap] objectID];
+      [[[NSApp delegate] recServer] importChannelsFrom:xmlData toChannelStationMap:stationMapId];
     }
   }
 }
@@ -602,9 +644,11 @@ static Preferences *sSharedInstance = nil;
 - (void)confirmImportAlertDidEnd:(NSAlert *)alert returnCode:(int)returnCode contextInfo:(void *)contextInfo {
   NSURL *importURL = (NSURL*)contextInfo;
   if (returnCode == NSAlertDefaultReturn) {
-//    [[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] importChannelMapFrom:importURL];
-//    [[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0] pushHDHomeRunStationsToServer];
-    NSLog(@"Need to call importChannelMapFrom ?");
+    NSData *xmlData = [NSData dataWithContentsOfURL:importURL]; 
+    NSManagedObjectID *stationMapId = nil;
+    HDHomeRunTuner *theTuner = [[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0];
+    stationMapId = [[[theTuner lineup] channelStationMap] objectID];
+    [[[NSApp delegate] recServer] importChannelsFrom:xmlData toChannelStationMap:stationMapId];
   }
   [importURL release];  // Copied in the file open panel did end delegate
 }
@@ -716,9 +760,8 @@ static Preferences *sSharedInstance = nil;
     passwordLength = strlen(passwordData);
 
     // Call AddInternetPassword - if it's already in the keychain then update it
-    OSStatus status;
     if (mSDKeychainItemRef == nil) {
-      status = SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mSDKeychainItemRef);
+      SecKeychainAddInternetPassword(NULL, strlen(serverNameUTF8), serverNameUTF8,0 , NULL, strlen(accountNameUTF8), accountNameUTF8, strlen(pathUTF8), pathUTF8, 80, kSecProtocolTypeHTTP, kSecAuthenticationTypeDefault, passwordLength, passwordData, &mSDKeychainItemRef);
     } else {
       // The item already exists - we just need to change the password.
       // And the Account name
@@ -732,7 +775,7 @@ static Preferences *sSharedInstance = nil;
       SecKeychainAttributeList attrList;
       attrList.count = 1;
       attrList.attr = &accountNameAttribute;
-      status = SecKeychainItemModifyAttributesAndData(mSDKeychainItemRef, &attrList, passwordLength, passwordData);
+      SecKeychainItemModifyAttributesAndData(mSDKeychainItemRef, &attrList, passwordLength, passwordData);
       free(accountNameAttributeData);
     }
   }

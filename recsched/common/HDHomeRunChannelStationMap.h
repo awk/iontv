@@ -28,6 +28,7 @@
 + (NSArray *)allChannelStationsMapsInManagedObjectContext:(NSManagedObjectContext *)inMOC;
 - (void)deleteAllChannelsInMOC:(NSManagedObjectContext *)inMOC;
 - (void)pushMapContentsToServer;
+- (void)importLineupResponse:(NSData*)xmlData;
 
 @property (retain) NSDate * lastUpdateDate;
 @property (retain) NSSet * channels;

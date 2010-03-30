@@ -528,7 +528,7 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
       return NO;
     }
     if (![[[NSApp delegate] managedObjectContext] save:error]) {
-      NSLog(@"addRecordingOfSchedule - error occured during save %@", *error);
+      NSLog(@"addRecordingOfSchedule - error occured during save %@", error ? *error : nil);
       return NO;
     } else {
       NSArray *newRecordings = [NSArray arrayWithObject:[[[aRecording objectID] URIRepresentation] absoluteString]];
@@ -551,7 +551,7 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
 
     [self cancelRecording:myRecording];
     if (![[[NSApp delegate] managedObjectContext] save:error]) {
-      NSLog(@"cancelRecordingWithObjectID - error occured during save %@", *error);
+      NSLog(@"cancelRecordingWithObjectID - error occured during save %@", error ? *error : nil);
       return NO;
     } else {
       NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[scheduleBeingRecorded objectID] URIRepresentation] absoluteString], RSRecordingRemovedRecordingOfScheduleURIKey, nil];
@@ -611,7 +611,7 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
     [[[NSApp delegate] managedObjectContext] deleteObject:mySeasonPass];
 
     if (![[[NSApp delegate] managedObjectContext] save:error]) {
-      NSLog(@"deleteSeasonPassWithObjectID - error occured during save %@", *error);
+      NSLog(@"deleteSeasonPassWithObjectID - error occured during save %@", error ? *error : nil);
       return NO;
     } else {
       NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[[[mySeasonPass objectID] URIRepresentation] absoluteString], RSSeasonPassRemovedSeasonPassURIKey,
@@ -775,6 +775,13 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
       }
       [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:RSBackgroundApplication userInfo:nil deliverImmediately:NO];
     }
+  }
+}
+
+- (oneway void)importChannelsFrom:(NSData *)xmlData toChannelStationMap:(NSManagedObjectID *)channelStationMapID{
+  HDHomeRunChannelStationMap *aChannelStationMap = (HDHomeRunChannelStationMap*) [[[NSApp delegate] managedObjectContext] objectWithID:channelStationMapID];
+  if (aChannelStationMap) {
+    [aChannelStationMap importLineupResponse:xmlData];
   }
 }
 

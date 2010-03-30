@@ -11,6 +11,26 @@
 #import "RecSchedProtocol.h"
 #import "recsched_bkgd_AppDelegate.h"
 
+@interface LineUpResponseParser : NSObject {
+  NSMutableString *currentStringValue;
+  
+  NSString *modulation;
+  NSString *frequency;
+  NSString *transportStreamID;
+  NSString *programNumber;
+  NSString *guideName;
+  NSString *guideNumber;
+  
+  BOOL foundLineUpResponse;
+  BOOL foundCommand;
+}
+
+- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict;
+- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string;
+- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName;
+
+@end
+
 @implementation HDHomeRunChannelStationMap
 
 @dynamic lastUpdateDate;
@@ -59,5 +79,126 @@
     }
   }
 }
+
+- (void)importLineupResponse:(NSData*)xmlData {
+  NSXMLParser *parser = [[NSXMLParser alloc] initWithData:xmlData];
+  LineUpResponseParser *parserDelegate = [[LineUpResponseParser alloc] init];
+  [parser setDelegate:parserDelegate];
+  [parser parse];
+  [parserDelegate release];
+  [parser release];
+  
+  NSError *error = nil;
+  if (![[[NSApp delegate] managedObjectContext] save:&error]) {
+    NSLog(@"importLineupResponse - saving context reported error %@, info = %@", error, [error userInfo]);
+  }
+}
+
+@end
+
+@implementation LineUpResponseParser
+
+- (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict{
+  if ([elementName isEqualToString:@"LineupUIResponse"]) {
+    foundLineUpResponse = YES;
+  }
+
+  [currentStringValue release];
+  currentStringValue = nil;
+  // All other elements get handled at the end of the element.
+}
+
+- (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string {
+  if (!currentStringValue) {
+    currentStringValue = [[NSMutableString alloc] initWithCapacity:50];
+  }
+  [currentStringValue appendString:string];
+}
+
+- (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName{
+  if ([elementName isEqualToString:@"Command"]) {
+    if ([currentStringValue isEqualToString:@"IdentifyPrograms2"]) {
+      foundCommand = YES;
+    }
+  }
+  if (foundLineUpResponse && foundCommand) {
+    if ([elementName isEqualToString:@"Modulation"]) {
+      modulation = [[NSString alloc] initWithString:currentStringValue];
+    } else if ([elementName isEqualToString:@"Frequency"]) {
+      frequency = [[NSString alloc] initWithString:currentStringValue];
+    } else if ([elementName isEqualToString:@"TransportStreamID"]) {
+      transportStreamID = [[NSString alloc] initWithString:currentStringValue];
+    } else if ([elementName isEqualToString:@"ProgramNumber"]) {
+      programNumber = [[NSString alloc] initWithString:currentStringValue];
+    } else if ([elementName isEqualToString:@"GuideName"]) {
+      guideName = [[NSString alloc] initWithString:currentStringValue];
+    } else if ([elementName isEqualToString:@"GuideNumber"]) {
+      guideNumber = [[NSString alloc] initWithString:currentStringValue];
+    } else if ([elementName isEqualToString:@"Program"]) {
+      NSManagedObjectContext *moc = [[NSApp delegate] managedObjectContext];
+      NSEntityDescription *HDHRStationEntityDescription = [NSEntityDescription entityForName:@"HDHomeRunStation" inManagedObjectContext:moc];
+      NSFetchRequest *request = [[NSFetchRequest alloc] init];
+      [request setEntity:HDHRStationEntityDescription];
+      
+      NSPredicate *hdhrStationPredicate = [NSPredicate predicateWithFormat:
+        @"(programNumber== %@) AND (channel.tuningType = %@) AND (channel.frequency == %@) AND (channel.transportStreamID == %@)",
+        programNumber, modulation, frequency, transportStreamID];
+      [request setPredicate:hdhrStationPredicate];
+      
+      NSError *error = nil;
+      NSArray *hdhrStationArray = [moc executeFetchRequest:request error:&error];
+      [request release];
+      
+      NSEntityDescription *guideStationEntityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:moc];
+      request = [[NSFetchRequest alloc] init];
+      [request setEntity:guideStationEntityDescription];
+      
+      NSPredicate *guideStationPredicate = [NSPredicate predicateWithFormat:
+                                              @"(callSign == %@)",
+                                              guideName];
+      [request setPredicate:guideStationPredicate];
+      
+      NSArray *guideStationArray = [moc executeFetchRequest:request error:&error];
+      [request release];
+      HDHomeRunStation *theHDHRStation = nil;
+      Z2ITStation *theGuideStation = nil;
+      if ([hdhrStationArray count] > 1) {
+        NSLog(@"matched multiple HDHR stations = %@\n", hdhrStationArray);
+      }
+      if ([hdhrStationArray count] > 0) {
+        theHDHRStation = [hdhrStationArray objectAtIndex:0];
+      }
+      if ([guideStationArray count] > 1) {
+        NSLog(@"matched multiple Guide stations = %@\n", guideStationArray);
+      }
+      if ([guideStationArray count] > 0) {
+        theGuideStation = [guideStationArray objectAtIndex:0];
+      } else {
+        NSLog(@"Could not find %@ in the guide data !\n", guideName);
+      }
+      if (theHDHRStation && theGuideStation) {
+        [theHDHRStation setZ2itStation:theGuideStation];
+      }
+      
+      [modulation release];
+      modulation = nil;
+      [frequency release];
+      frequency = nil;
+      [transportStreamID release];
+      transportStreamID = nil;
+      [programNumber release];
+      programNumber = nil;
+      [guideName release];
+      guideName = nil;
+      [guideNumber release];
+      guideNumber = nil;
+    } else {
+//      NSLog(@"didEndElement:%@\n", elementName);
+    }
+  }
+  [currentStringValue release];
+  currentStringValue = nil;
+}
+
 
 @end
