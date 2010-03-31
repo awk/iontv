@@ -120,7 +120,7 @@
   [self willAccessValueForKey:@"new"];
   NSNumber *newProg = [self primitiveValueForKey:@"new"];
   [self didAccessValueForKey:@"new"];
-  return newProg;
+  return [newProg retain];
 }
 
 - (void) setNewProgram:(NSNumber *) newProg {
