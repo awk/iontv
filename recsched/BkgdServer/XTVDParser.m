@@ -620,6 +620,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
 - (void)performParse:(id)parseInfo {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSError *error = nil;
 
   NSDictionary *xtvdParserData = (NSDictionary*)parseInfo;
 
@@ -653,7 +654,6 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 
     [mManagedObjectContext processPendingChanges];
 
-    NSError *error = nil;
     NSLog(@"performParse - saving");
     if (![mManagedObjectContext save:&error]) {
       NSLog(@"performParse - save returned an error %@", error);
@@ -664,7 +664,7 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
   [mManagedObjectContext reset];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
 
-  [[NSFileManager defaultManager] removeFileAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] handler:nil];
+  [[NSFileManager defaultManager] removeItemAtPath:[xtvdParserData valueForKey:@"xmlFilePath"] error:&error];
 
   // Only certain standard types of data can be passed through a distributed notification - so we build a new userInfo dictionary containing just the
   // important valid details.
@@ -691,8 +691,9 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 */
 
 - (void)threadContextDidSave:(NSNotification *)notification {
-  if ([[[NSApplication sharedApplication] delegate] respondsToSelector:@selector(updateForSavedContext:)]) {
-    [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
+  RSCommonAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
+  if ([appDelegate respondsToSelector:@selector(updateForSavedContext:)]) {
+    [appDelegate performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
   }
 }
 
@@ -795,8 +796,9 @@ int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNo
 */
 
 - (void)threadContextDidSave:(NSNotification *)notification {
-  if ([[[NSApplication sharedApplication] delegate] respondsToSelector:@selector(updateForSavedContext:)]) {
-    [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
+  RSCommonAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
+  if ([appDelegate respondsToSelector:@selector(updateForSavedContext:)]) {
+    [appDelegate performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
   }
 }
 

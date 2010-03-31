@@ -11,7 +11,7 @@
 #import "RecSchedProtocol.h"
 #import "recsched_bkgd_AppDelegate.h"
 
-@interface LineUpResponseParser : NSObject {
+@interface LineUpResponseParser : NSObject <NSXMLParserDelegate> {
   NSMutableString *currentStringValue;
   
   NSString *modulation;

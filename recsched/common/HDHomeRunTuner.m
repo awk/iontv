@@ -55,9 +55,12 @@ const int kCallSignStringLength = 10;
 @implementation HDHomeRunTuner
 
 + (void)initialize {
-    [self setKeys:[NSArray arrayWithObjects:@"device",@"index", @"lineup", nil]
-      triggerChangeNotificationsForDependentKey:@"longName"];
 }
+
++ (NSSet *)keyPathsForValuesAffectingLongName:(NSString *)key {
+  return [NSSet setWithObjects:@"device",@"index", @"lineup", nil];
+}
+
 
 + (NSArray *) allTunersInManagedObjectContext:(NSManagedObjectContext *)inMOC {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"HDHomeRunTuner" inManagedObjectContext:inMOC];
@@ -371,7 +374,8 @@ const int kCallSignStringLength = 10;
 */
 
 - (void)threadContextDidSave:(NSNotification *)notification {
-  [[[NSApplication sharedApplication] delegate] performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
+  RSCommonAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
+  [appDelegate performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
 }
 
 #pragma mark - Thread Functions
@@ -747,8 +751,10 @@ static int cmd_scan_callback(va_list ap, const char *type, const char *str) {
 }
 
 + (void)initialize {
-    [self setKeys:[NSArray arrayWithObjects:@"programNumber", nil]
-      triggerChangeNotificationsForDependentKey:@"channelAndProgramNumber"];
+}
+
++ (NSSet *)keyPathsForValuesAffectingChannelAndProgramNumber {
+  return [NSSet setWithObject:@"programNumber"];
 }
 
 - (void)awakeFromFetch {

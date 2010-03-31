@@ -91,7 +91,7 @@ NSString *kRecSchedServerBundleID = @"org.awkward.recsched-server";
     // Now register the server
     NSConnection *theConnection;
 
-    theConnection = [NSConnection defaultConnection];
+    theConnection = [[NSConnection new] autorelease];
     mRecSchedServer = [[RecSchedServer alloc] init];
     [theConnection setRootObject:mRecSchedServer];
     if ([theConnection registerName:kRecServerConnectionName] == NO)  {

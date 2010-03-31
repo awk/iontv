@@ -81,7 +81,7 @@
     NSLog(@"setDuration - program %@ already has an end time", [[self program] title]);
   }
 
-  endDate = [startDate addTimeInterval:(inHours * 60 * 60) + (inMinutes * 60)];
+  endDate = [startDate dateByAddingTimeInterval:(inHours * 60 * 60) + (inMinutes * 60)];
   [self setEndTime:endDate];
 }
 

@@ -377,8 +377,6 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
       [callData setValue:[downloadResult valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
     }
 
-    [downloadResult release];
-
     // Start our local parsing
     xtvdParseThread *aParseThread = [[xtvdParseThread alloc] init];
 
@@ -667,11 +665,12 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
   if (count > 0) {
     int i=0;
     for (i=0; i < count; i++) {
+      RSCommonAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
       // See if an entry already exists
-      HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+      HDHomeRun *anHDHomeRun = [HDHomeRun fetchHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[appDelegate managedObjectContext]];
       if (!anHDHomeRun) {
         // Otherwise we just create a new one
-        anHDHomeRun = [HDHomeRun createHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[[[NSApplication sharedApplication] delegate] managedObjectContext]];
+        anHDHomeRun = [HDHomeRun createHDHomeRunWithID:[NSNumber numberWithInt:result_list[i].device_id] inManagedObjectContext:[appDelegate managedObjectContext]];
         [newHDHomeRuns addObject:anHDHomeRun];
         [anHDHomeRun setName:[NSString stringWithFormat:@"Tuner 0x%x", result_list[i].device_id]];
 

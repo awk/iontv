@@ -36,8 +36,8 @@
 - (void)mouseDown:(NSEvent *)theEvent {
   if ([theEvent type] == NSLeftMouseDown)   {
     NSPoint localPoint = [self convertPoint:[theEvent locationInWindow] fromView:nil];
-    if ([self columnAtPoint:localPoint] == 3)     {
-      [self selectRow:[self rowAtPoint:localPoint] byExtendingSelection:NO];
+    if ([self columnAtPoint:localPoint] == 3) {
+      [self selectRowIndexes:[NSIndexSet indexSetWithIndex:[self rowAtPoint:localPoint]] byExtendingSelection:NO];
     }
   }
   [super mouseDown:theEvent];

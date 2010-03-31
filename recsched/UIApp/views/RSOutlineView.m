@@ -24,7 +24,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #import "RSOutlineView.h"
-
+#import "MainWindowController.h"
 
 @implementation RSOutlineView
 
@@ -62,7 +62,11 @@
 - (BOOL)validateUserInterfaceItem:(id < NSValidatedUserInterfaceItem >)anItem {
   if ([anItem action]==@selector(delete:)) {
     if ([self numberOfSelectedRows]>0) {
-      return [[self dataSource] validateUserInterfaceItem:anItem];
+      MainWindowController *mwc = nil;
+      if ([[self dataSource] class] == [MainWindowController class]) {
+        mwc = (MainWindowController *)[self dataSource];
+      }
+      return [mwc validateUserInterfaceItem:anItem];
     }
 
     return NO;
@@ -80,7 +84,8 @@
 - (NSRect)frameOfOutlineCellAtRow:(NSInteger)row {
   id anItem = [self itemAtRow:row];
   if (anItem && ([[self delegate] respondsToSelector:@selector(outlineView:shouldShowDisclosureTriangleForItem:)] == YES))   {
-    if ([[self delegate] outlineView:self shouldShowDisclosureTriangleForItem:anItem] == YES) {
+    NSObject *mwc = [self delegate];
+    if ([mwc outlineView:self shouldShowDisclosureTriangleForItem:anItem] == YES) {
       return [super frameOfOutlineCellAtRow:row];
     } else {
       return NSZeroRect;

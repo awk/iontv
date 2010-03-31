@@ -224,7 +224,8 @@ static Preferences *sSharedInstance = nil;
 }
 
 - (NSManagedObjectContext *)managedObjectContext {
-  return [[[NSApplication sharedApplication] delegate] managedObjectContext];
+  RSCommonAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
+  return [appDelegate managedObjectContext];
 }
 
 - (BOOL)aboutToLeavePrefsView:(NSView *)inView toShow:(NSView *)inViewToBeShown {
@@ -495,7 +496,8 @@ static Preferences *sSharedInstance = nil;
 - (IBAction)viewHDHRStation:(id)sender {
   HDHomeRunStation *selectedStation = [[mVisibleStationsArrayController selectedObjects] objectAtIndex:0];
   NSLog(@"viewHDHRStation selection = %@", [selectedStation callSign]);
-  [[[NSApplication sharedApplication] delegate] launchVLCAction:sender withParentWindow:mPanel startStreaming:selectedStation];
+  recsched_AppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
+  [appDelegate launchVLCAction:sender withParentWindow:mPanel startStreaming:selectedStation];
 }
 
 - (IBAction)exportHDHomeRunChannelMap:(id)sender {

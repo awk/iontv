@@ -153,7 +153,8 @@ const NSInteger kFinishedTabViewIndex = 4;
 
 - (IBAction)viewHDHRStation:(id)sender {
   HDHomeRunStation *selectedStation = [[mHDHRStationsOnLineupController selectedObjects] objectAtIndex:0];
-  [[[NSApplication sharedApplication] delegate] launchVLCAction:sender withParentWindow:[self window] startStreaming:selectedStation];
+  recsched_AppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
+  [appDelegate launchVLCAction:sender withParentWindow:[self window] startStreaming:selectedStation];
 }
 
 - (IBAction)channelListFinish:(id)sender {

@@ -30,7 +30,7 @@
 
 extern NSString *kSchedulesDirectURL;
 
-@interface Preferences : NSObject {
+@interface Preferences : NSObject <NSToolbarDelegate> {
    IBOutlet NSTextField *mDurationTextField;
    IBOutlet DiscreteDurationSlider *mDurationSlider;
    IBOutlet id mPanel;

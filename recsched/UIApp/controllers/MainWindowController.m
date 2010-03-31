@@ -426,7 +426,8 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   HDHomeRunStation *aHDHRStation;
   for (aHDHRStation in hdhrStations) {
     if ((aHDHRStation.z2itStation == aStation) && (aHDHRStation.channel.channelStationMap.lineup == aLineup)) {
-      [[[NSApplication sharedApplication] delegate] launchVLCAction:sender withParentWindow:[self window] startStreaming:aHDHRStation];
+      recsched_AppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
+      [appDelegate launchVLCAction:sender withParentWindow:[self window] startStreaming:aHDHRStation];
       break;
     }
   }

@@ -69,4 +69,6 @@ extern NSString *RSSSchedulePBoardType;
 
 - (void)setCurrentSchedule:(Z2ITSchedule*)inSchedule;
 - (Z2ITSchedule *)currentSchedule;
+
+- (BOOL)validateUserInterfaceItem:(id < NSValidatedUserInterfaceItem >)anItem;
 @end

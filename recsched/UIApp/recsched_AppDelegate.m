@@ -165,7 +165,7 @@
   fileManager = [NSFileManager defaultManager];
   applicationSupportFolder = [self applicationSupportFolder];
   if ( ![fileManager fileExistsAtPath:applicationSupportFolder isDirectory:NULL] ) {
-      [fileManager createDirectoryAtPath:applicationSupportFolder attributes:nil];
+    [fileManager createDirectoryAtPath:applicationSupportFolder withIntermediateDirectories:YES attributes:nil error:&error];
   }
 
   url = [self urlForPersistentStore]; //[NSURL fileURLWithPath: [applicationSupportFolder stringByAppendingPathComponent: @"recsched_bkgd.dat"]];

@@ -50,7 +50,8 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
     scrollerFrame.origin.x = NSMaxX(frame) - scrollerFrame.size.width;
     mVertScroller = [[NSScroller alloc] initWithFrame:scrollerFrame];
     [self addSubview:mVertScroller];
-    [mVertScroller setFloatValue:0.0 knobProportion:kHoursPerPage / kHoursPerDay];
+    [mVertScroller setDoubleValue:0.0];
+    [mVertScroller setKnobProportion:kHoursPerPage / kHoursPerDay];
     [mVertScroller setAutoresizingMask:NSViewMinXMargin | NSViewHeightSizable];
     [mVertScroller setEnabled:YES];
     [mVertScroller setAction:@selector(scrollerChanged:)];
@@ -433,7 +434,7 @@ NSString *kEventsArrayCellsKey = @"eventsArrayCellsKey";
       scheduleFrameRect.origin.x = kHoursColumnWidth + dayIndex * (([self frame].size.width - kHoursColumnWidth - [NSScroller scrollerWidth]) / 7);
 
       // We draw 'up' from the events end time. We must also take into account the height of the page and the offset for the bottom of the page.
-      NSDate *timeAtBottomOfPage = [aDay addTimeInterval:(kHoursPerPage * 60.0 * 60.0) + ((kHoursPerDay - kHoursPerPage) * 60.0 * 60.0 * [mVertScroller floatValue])];
+      NSDate *timeAtBottomOfPage = [aDay dateByAddingTimeInterval:(kHoursPerPage * 60.0 * 60.0) + ((kHoursPerDay - kHoursPerPage) * 60.0 * 60.0 * [mVertScroller floatValue])];
       NSTimeInterval timeIntervalFromBottomOfPage = [timeAtBottomOfPage timeIntervalSinceDate:eventEndTime];
 
       scheduleFrameRect.origin.y = ([self frame].size.height - kHeaderHeight) / (kHoursPerPage * 60.0 * 60.0) * timeIntervalFromBottomOfPage;

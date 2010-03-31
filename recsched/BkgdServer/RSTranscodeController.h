@@ -18,6 +18,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 #import <Cocoa/Cocoa.h>
+#import <ScriptingBridge/ScriptingBridge.h>
 
 #include "hb.h"
 
@@ -25,7 +26,7 @@ extern NSString *RSNotificationTranscodingFinished;
 
 @class RSTranscoding;
 
-@interface RSTranscodeController : NSObject {
+@interface RSTranscodeController : NSObject <SBApplicationDelegate> {
   hb_handle_t    *mHandbrakeHandle;   // Connection to the Handbrake libraries
 
   NSArrayController *mRecordingsArrayController;
