@@ -60,6 +60,7 @@
 }
 
 - (void)pushMapContentsToServer {
+#if 0
   if ([[NSApp delegate] recServer]) {
     // Start by adding all the channels on this tuner to an array
     NSMutableSet *channelsSet = [self mutableSetValueForKey:@"channels"];
@@ -78,6 +79,7 @@
       [[[NSApp delegate] recServer] updateChannelStationMap:[self objectID] withChannelsAndStations:sortedArray];
     }
   }
+#endif
 }
 
 - (void)importLineupResponse:(NSData*)xmlData {
