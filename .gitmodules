@@ -1,0 +1,3 @@
+[submodule "recsched/opensource/asi-http-request"]
+	path = recsched/opensource/asi-http-request
+	url = git://github.com/pokeb/asi-http-request.git
