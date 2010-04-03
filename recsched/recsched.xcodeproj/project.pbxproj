@@ -39,6 +39,12 @@
 		EA2387330D5E5E4900343704 /* RSFirstRunContentView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2387320D5E5E4900343704 /* RSFirstRunContentView.m */; };
 		EA23A509115BD97A004F67B9 /* recsched_7_8.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA23A508115BD97A004F67B9 /* recsched_7_8.xcmappingmodel */; };
 		EA23A50A115BD97A004F67B9 /* recsched_7_8.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = EA23A508115BD97A004F67B9 /* recsched_7_8.xcmappingmodel */; };
+		EA23A8F711660A4A004F67B9 /* ASIFormDataRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23A8ED11660A4A004F67B9 /* ASIFormDataRequest.m */; };
+		EA23A8F811660A4A004F67B9 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23A8EF11660A4A004F67B9 /* ASIHTTPRequest.m */; };
+		EA23A8F911660A4A004F67B9 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23A8F211660A4A004F67B9 /* ASIInputStream.m */; };
+		EA23A8FA11660A4A004F67B9 /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23A8F411660A4A004F67B9 /* ASINetworkQueue.m */; };
+		EA23A8FB11660A4A004F67B9 /* ASINSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA23A8F611660A4A004F67B9 /* ASINSStringAdditions.m */; };
+		EA23A90A11660AAD004F67B9 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EA23A90711660A9E004F67B9 /* libz.dylib */; };
 		EA289D160C720FCE00D2EE7B /* HDHomeRunTuner.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE1050C07DCC70002420F /* HDHomeRunTuner.m */; };
 		EA289D170C720FCF00D2EE7B /* HDHomeRunMO.m in Sources */ = {isa = PBXBuildFile; fileRef = EA2EE0770C07D57A0002420F /* HDHomeRunMO.m */; };
 		EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EA2EE03E0C07D2250002420F /* libhdhomerun.a */; };
@@ -103,7 +109,6 @@
 		EA85BBFF0E0F99EC00264446 /* RSScheduleConflictController.m in Sources */ = {isa = PBXBuildFile; fileRef = EA85BBFE0E0F99EC00264446 /* RSScheduleConflictController.m */; };
 		EA85BC0A0E0F9B5300264446 /* ScheduleConflictWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA85BC080E0F9B5300264446 /* ScheduleConflictWindow.xib */; };
 		EA85BE750E13F81500264446 /* hdhomerun_channels.c in Sources */ = {isa = PBXBuildFile; fileRef = EA85BE710E13F81000264446 /* hdhomerun_channels.c */; };
-		EA85BE760E13F81700264446 /* hdhomerun_dhcp.c in Sources */ = {isa = PBXBuildFile; fileRef = EA85BE730E13F81000264446 /* hdhomerun_dhcp.c */; };
 		EA85BF380E1598D200264446 /* hdhomerun_firmware_20080427.bin in Resources */ = {isa = PBXBuildFile; fileRef = EA85BF370E1598D200264446 /* hdhomerun_firmware_20080427.bin */; };
 		EA85BF390E1598D200264446 /* hdhomerun_firmware_20080427.bin in Resources */ = {isa = PBXBuildFile; fileRef = EA85BF370E1598D200264446 /* hdhomerun_firmware_20080427.bin */; };
 		EA8E1BF60CC84F8800DD109F /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */; };
@@ -113,6 +118,13 @@
 		EA93F3990C922E53004788CF /* iOnTV.icns in Resources */ = {isa = PBXBuildFile; fileRef = EA93F3980C922E53004788CF /* iOnTV.icns */; };
 		EA93F8190C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
 		EA93F81A0C9C4A6E004788CF /* RSRecording.m in Sources */ = {isa = PBXBuildFile; fileRef = EA93F8180C9C4A6E004788CF /* RSRecording.m */; };
+		EA96C9E911677B9100BBB94A /* hdhomerun_device_selector.c in Sources */ = {isa = PBXBuildFile; fileRef = EA96C9E211677B9100BBB94A /* hdhomerun_device_selector.c */; };
+		EA96C9EA11677B9100BBB94A /* hdhomerun_device_selector.h in Headers */ = {isa = PBXBuildFile; fileRef = EA96C9E311677B9100BBB94A /* hdhomerun_device_selector.h */; };
+		EA96C9EB11677B9100BBB94A /* hdhomerun_os_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = EA96C9E411677B9100BBB94A /* hdhomerun_os_posix.c */; };
+		EA96C9EC11677B9100BBB94A /* hdhomerun_os_posix.h in Headers */ = {isa = PBXBuildFile; fileRef = EA96C9E511677B9100BBB94A /* hdhomerun_os_posix.h */; };
+		EA96C9ED11677B9100BBB94A /* hdhomerun_sock_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = EA96C9E611677B9100BBB94A /* hdhomerun_sock_posix.c */; };
+		EA96C9EE11677B9100BBB94A /* hdhomerun_sock.h in Headers */ = {isa = PBXBuildFile; fileRef = EA96C9E711677B9100BBB94A /* hdhomerun_sock.h */; };
+		EA96C9EF11677B9100BBB94A /* hdhomerun_types.h in Headers */ = {isa = PBXBuildFile; fileRef = EA96C9E811677B9100BBB94A /* hdhomerun_types.h */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */; };
 		EABE726C0DCFF2EC0013310F /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE726B0DCFF2EC0013310F /* ProgramSearchViewController.m */; };
@@ -274,6 +286,20 @@
 		EA2387320D5E5E4900343704 /* RSFirstRunContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSFirstRunContentView.m; path = UIApp/views/RSFirstRunContentView.m; sourceTree = "<group>"; };
 		EA23A4FD115BD7D0004F67B9 /* recsched_DataModel 8.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 8.xcdatamodel"; sourceTree = "<group>"; };
 		EA23A508115BD97A004F67B9 /* recsched_7_8.xcmappingmodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcmappingmodel; name = recsched_7_8.xcmappingmodel; path = mappingModels/recsched_7_8.xcmappingmodel; sourceTree = "<group>"; };
+		EA23A83411642AD4004F67B9 /* mock_channel_scan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mock_channel_scan.h; path = test/mock_channel_scan.h; sourceTree = "<group>"; };
+		EA23A83511642AD4004F67B9 /* mock_channel_scan.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = mock_channel_scan.m; path = test/mock_channel_scan.m; sourceTree = "<group>"; };
+		EA23A8EC11660A4A004F67B9 /* ASIFormDataRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASIFormDataRequest.h; path = "opensource/asi-http-request/Classes/ASIFormDataRequest.h"; sourceTree = "<group>"; };
+		EA23A8ED11660A4A004F67B9 /* ASIFormDataRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASIFormDataRequest.m; path = "opensource/asi-http-request/Classes/ASIFormDataRequest.m"; sourceTree = "<group>"; };
+		EA23A8EE11660A4A004F67B9 /* ASIHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASIHTTPRequest.h; path = "opensource/asi-http-request/Classes/ASIHTTPRequest.h"; sourceTree = "<group>"; };
+		EA23A8EF11660A4A004F67B9 /* ASIHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASIHTTPRequest.m; path = "opensource/asi-http-request/Classes/ASIHTTPRequest.m"; sourceTree = "<group>"; };
+		EA23A8F011660A4A004F67B9 /* ASIHTTPRequestConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASIHTTPRequestConfig.h; path = "opensource/asi-http-request/Classes/ASIHTTPRequestConfig.h"; sourceTree = "<group>"; };
+		EA23A8F111660A4A004F67B9 /* ASIInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASIInputStream.h; path = "opensource/asi-http-request/Classes/ASIInputStream.h"; sourceTree = "<group>"; };
+		EA23A8F211660A4A004F67B9 /* ASIInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASIInputStream.m; path = "opensource/asi-http-request/Classes/ASIInputStream.m"; sourceTree = "<group>"; };
+		EA23A8F311660A4A004F67B9 /* ASINetworkQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASINetworkQueue.h; path = "opensource/asi-http-request/Classes/ASINetworkQueue.h"; sourceTree = "<group>"; };
+		EA23A8F411660A4A004F67B9 /* ASINetworkQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASINetworkQueue.m; path = "opensource/asi-http-request/Classes/ASINetworkQueue.m"; sourceTree = "<group>"; };
+		EA23A8F511660A4A004F67B9 /* ASINSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ASINSStringAdditions.h; path = "opensource/asi-http-request/Classes/ASINSStringAdditions.h"; sourceTree = "<group>"; };
+		EA23A8F611660A4A004F67B9 /* ASINSStringAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ASINSStringAdditions.m; path = "opensource/asi-http-request/Classes/ASINSStringAdditions.m"; sourceTree = "<group>"; };
+		EA23A90711660A9E004F67B9 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		EA29391C0C0CB2740053E2B8 /* HexNumberFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HexNumberFormatter.h; path = UIApp/HexNumberFormatter.h; sourceTree = "<group>"; };
 		EA29391D0C0CB2740053E2B8 /* HexNumberFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HexNumberFormatter.m; path = UIApp/HexNumberFormatter.m; sourceTree = "<group>"; };
 		EA293ACD0C0D95F00053E2B8 /* PolishedBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolishedBackgroundView.h; path = UIApp/views/PolishedBackgroundView.h; sourceTree = "<group>"; };
@@ -378,6 +404,13 @@
 		EA93F7E90C9C4728004788CF /* recsched_DataModel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 3.xcdatamodel"; sourceTree = "<group>"; };
 		EA93F8170C9C4A6E004788CF /* RSRecording.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSRecording.h; path = common/RSRecording.h; sourceTree = "<group>"; };
 		EA93F8180C9C4A6E004788CF /* RSRecording.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSRecording.m; path = common/RSRecording.m; sourceTree = "<group>"; };
+		EA96C9E211677B9100BBB94A /* hdhomerun_device_selector.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hdhomerun_device_selector.c; path = ../libhdhomerun/hdhomerun_device_selector.c; sourceTree = SOURCE_ROOT; };
+		EA96C9E311677B9100BBB94A /* hdhomerun_device_selector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hdhomerun_device_selector.h; path = ../libhdhomerun/hdhomerun_device_selector.h; sourceTree = SOURCE_ROOT; };
+		EA96C9E411677B9100BBB94A /* hdhomerun_os_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hdhomerun_os_posix.c; path = ../libhdhomerun/hdhomerun_os_posix.c; sourceTree = SOURCE_ROOT; };
+		EA96C9E511677B9100BBB94A /* hdhomerun_os_posix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hdhomerun_os_posix.h; path = ../libhdhomerun/hdhomerun_os_posix.h; sourceTree = SOURCE_ROOT; };
+		EA96C9E611677B9100BBB94A /* hdhomerun_sock_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hdhomerun_sock_posix.c; path = ../libhdhomerun/hdhomerun_sock_posix.c; sourceTree = SOURCE_ROOT; };
+		EA96C9E711677B9100BBB94A /* hdhomerun_sock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hdhomerun_sock.h; path = ../libhdhomerun/hdhomerun_sock.h; sourceTree = SOURCE_ROOT; };
+		EA96C9E811677B9100BBB94A /* hdhomerun_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hdhomerun_types.h; path = ../libhdhomerun/hdhomerun_types.h; sourceTree = SOURCE_ROOT; };
 		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSOutlineView.h; path = UIApp/views/RSOutlineView.h; sourceTree = "<group>"; };
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
 		EAB16BF20CF51502001313CA /* RSProgramSearchTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSProgramSearchTableHeaderView.h; path = UIApp/views/RSProgramSearchTableHeaderView.h; sourceTree = SOURCE_ROOT; };
@@ -503,6 +536,7 @@
 				EA289D250C720FF900D2EE7B /* libhdhomerun.a in Frameworks */,
 				EA7002880CC4288500DA9542 /* ScriptingBridge.framework in Frameworks */,
 				EAEC17A20E0589260082544E /* SystemConfiguration.framework in Frameworks */,
+				EA23A90A11660AAD004F67B9 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -567,6 +601,7 @@
 		29B97314FDCFA39411CA2CEA /* recsched */ = {
 			isa = PBXGroup;
 			children = (
+				EA23A83311642AAF004F67B9 /* test */,
 				EABF0EAC0CDE7DAC00DFFA0F /* common */,
 				EA0F2ED20CD3D824003E6954 /* InstallBkgdServer */,
 				EA2EE0280C07D1EA0002420F /* libhdhomerun */,
@@ -609,6 +644,7 @@
 				EA20ADB90C2330AC00A9BDBD /* Security.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+				EA23A90711660A9E004F67B9 /* libz.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -631,6 +667,33 @@
 				EA0F2ED30CD3D860003E6954 /* main.m */,
 			);
 			name = InstallBkgdServer;
+			sourceTree = "<group>";
+		};
+		EA23A83311642AAF004F67B9 /* test */ = {
+			isa = PBXGroup;
+			children = (
+				EA23A83411642AD4004F67B9 /* mock_channel_scan.h */,
+				EA23A83511642AD4004F67B9 /* mock_channel_scan.m */,
+			);
+			name = test;
+			sourceTree = "<group>";
+		};
+		EA23A8E6116609F7004F67B9 /* ASIHTTPRequest */ = {
+			isa = PBXGroup;
+			children = (
+				EA23A8EC11660A4A004F67B9 /* ASIFormDataRequest.h */,
+				EA23A8ED11660A4A004F67B9 /* ASIFormDataRequest.m */,
+				EA23A8EE11660A4A004F67B9 /* ASIHTTPRequest.h */,
+				EA23A8EF11660A4A004F67B9 /* ASIHTTPRequest.m */,
+				EA23A8F011660A4A004F67B9 /* ASIHTTPRequestConfig.h */,
+				EA23A8F111660A4A004F67B9 /* ASIInputStream.h */,
+				EA23A8F211660A4A004F67B9 /* ASIInputStream.m */,
+				EA23A8F311660A4A004F67B9 /* ASINetworkQueue.h */,
+				EA23A8F411660A4A004F67B9 /* ASINetworkQueue.m */,
+				EA23A8F511660A4A004F67B9 /* ASINSStringAdditions.h */,
+				EA23A8F611660A4A004F67B9 /* ASINSStringAdditions.m */,
+			);
+			name = ASIHTTPRequest;
 			sourceTree = "<group>";
 		};
 		EA2939860C0CC89E0053E2B8 /* Images */ = {
@@ -662,6 +725,13 @@
 		EA2EE0280C07D1EA0002420F /* libhdhomerun */ = {
 			isa = PBXGroup;
 			children = (
+				EA96C9E211677B9100BBB94A /* hdhomerun_device_selector.c */,
+				EA96C9E311677B9100BBB94A /* hdhomerun_device_selector.h */,
+				EA96C9E411677B9100BBB94A /* hdhomerun_os_posix.c */,
+				EA96C9E511677B9100BBB94A /* hdhomerun_os_posix.h */,
+				EA96C9E611677B9100BBB94A /* hdhomerun_sock_posix.c */,
+				EA96C9E711677B9100BBB94A /* hdhomerun_sock.h */,
+				EA96C9E811677B9100BBB94A /* hdhomerun_types.h */,
 				EA85BE710E13F81000264446 /* hdhomerun_channels.c */,
 				EA85BE720E13F81000264446 /* hdhomerun_channels.h */,
 				EA85BE730E13F81000264446 /* hdhomerun_dhcp.c */,
@@ -782,6 +852,7 @@
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
 			isa = PBXGroup;
 			children = (
+				EA23A8E6116609F7004F67B9 /* ASIHTTPRequest */,
 				EAD024270CE246F1002B7C37 /* UserPresets.plist */,
 				EA7002860CC4285D00DA9542 /* iTunes_ScriptingBridge.h */,
 				EA20AF000C25CCA200A9BDBD /* RecordingThread.h */,
@@ -868,6 +939,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA96C9EA11677B9100BBB94A /* hdhomerun_device_selector.h in Headers */,
+				EA96C9EC11677B9100BBB94A /* hdhomerun_os_posix.h in Headers */,
+				EA96C9EE11677B9100BBB94A /* hdhomerun_sock.h in Headers */,
+				EA96C9EF11677B9100BBB94A /* hdhomerun_types.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1143,7 +1218,9 @@
 				EA2EE0450C07D2400002420F /* hdhomerun_device.c in Sources */,
 				EA2EE0460C07D2410002420F /* hdhomerun_debug.c in Sources */,
 				EA85BE750E13F81500264446 /* hdhomerun_channels.c in Sources */,
-				EA85BE760E13F81700264446 /* hdhomerun_dhcp.c in Sources */,
+				EA96C9E911677B9100BBB94A /* hdhomerun_device_selector.c in Sources */,
+				EA96C9EB11677B9100BBB94A /* hdhomerun_os_posix.c in Sources */,
+				EA96C9ED11677B9100BBB94A /* hdhomerun_sock_posix.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1187,6 +1264,11 @@
 				EABE7C4B0DE8321C0013310F /* recsched6To7Migration.m in Sources */,
 				EAEC183E0E0E8E1F0082544E /* RSError.m in Sources */,
 				EA23A50A115BD97A004F67B9 /* recsched_7_8.xcmappingmodel in Sources */,
+				EA23A8F711660A4A004F67B9 /* ASIFormDataRequest.m in Sources */,
+				EA23A8F811660A4A004F67B9 /* ASIHTTPRequest.m in Sources */,
+				EA23A8F911660A4A004F67B9 /* ASIInputStream.m in Sources */,
+				EA23A8FA11660A4A004F67B9 /* ASINetworkQueue.m in Sources */,
+				EA23A8FB11660A4A004F67B9 /* ASINSStringAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1467,6 +1549,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
+				GCC_PREPROCESSOR_DEFINITIONS = "BUILDING_BKGD_APP=1";
 				HEADER_SEARCH_PATHS = ../HandBrake/libhb;
 				INFOPLIST_FILE = "BkgdServer/recsched_bkgd-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
