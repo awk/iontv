@@ -1,7 +1,7 @@
 /*
  * hdhomerun_channelscan.c
  *
- * Copyright © 2007 Silicondust Engineering Ltd. <www.silicondust.com>.
+ * Copyright Â© 2007-2010 Silicondust USA Inc. <www.silicondust.com>.
  *
  * This library is free software; you can redistribute it and/or 
  * modify it under the terms of the GNU Lesser General Public
@@ -15,241 +15,336 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * As a special exception to the GNU Lesser General Public License,
+ * you may link, statically or dynamically, an application with a
+ * publicly distributed version of the Library to produce an
+ * executable file containing portions of the Library, and
+ * distribute that executable file under terms of your choice,
+ * without any of the additional requirements listed in clause 4 of
+ * the GNU Lesser General Public License.
+ * 
+ * By "a publicly distributed version of the Library", we mean
+ * either the unmodified Library as distributed by Silicondust, or a
+ * modified version of the Library that is distributed under the
+ * conditions defined in the GNU Lesser General Public License.
  */
 
-#include "hdhomerun_os.h"
-#include "hdhomerun_pkt.h"
-#include "hdhomerun_debug.h"
-#include "hdhomerun_control.h"
-#include "hdhomerun_device.h"
-#include "hdhomerun_channels.h"
-#include "hdhomerun_channelscan.h"
+#include "hdhomerun.h"
 
-static int channelscan_execute_find_lock_internal(struct hdhomerun_device_t *hd, uint32_t frequency, struct hdhomerun_tuner_status_t *status)
+struct hdhomerun_channelscan_t {
+	struct hdhomerun_device_t *hd;
+	uint32_t scanned_channels;
+	struct hdhomerun_channel_list_t *channel_list;	
+	struct hdhomerun_channel_entry_t *next_channel;
+};
+
+struct hdhomerun_channelscan_t *channelscan_create(struct hdhomerun_device_t *hd, const char *channelmap)
 {
-	char channel_str[64];
+	struct hdhomerun_channelscan_t *scan = (struct hdhomerun_channelscan_t *)calloc(1, sizeof(struct hdhomerun_channelscan_t));
+	if (!scan) {
+		return NULL;
+	}
 
-	/* Set auto channel. */
+	scan->hd = hd;
+
+	scan->channel_list = hdhomerun_channel_list_create(channelmap);
+	if (!scan->channel_list) {
+		free(scan);
+		return NULL;
+	}
+
+	scan->next_channel = hdhomerun_channel_list_last(scan->channel_list);
+	return scan;
+}
+
+void channelscan_destroy(struct hdhomerun_channelscan_t *scan)
+{
+	free(scan);
+}
+
+static int channelscan_find_lock(struct hdhomerun_channelscan_t *scan, uint32_t frequency, struct hdhomerun_channelscan_result_t *result)
+{
+	/* Set channel. */
+	char channel_str[64];
 	sprintf(channel_str, "auto:%ld", (unsigned long)frequency);
-	int ret = hdhomerun_device_set_tuner_channel(hd, channel_str);
+
+	int ret = hdhomerun_device_set_tuner_channel(scan->hd, channel_str);
 	if (ret <= 0) {
 		return ret;
 	}
 
 	/* Wait for lock. */
-	ret = hdhomerun_device_wait_for_lock(hd, status);
+	ret = hdhomerun_device_wait_for_lock(scan->hd, &result->status);
 	if (ret <= 0) {
 		return ret;
 	}
-	if (status->lock_supported || status->lock_unsupported) {
+	if (!result->status.lock_supported) {
 		return 1;
 	}
 
-	return 1;
-}
-
-static int channelscan_execute_find_lock(struct hdhomerun_device_t *hd, uint32_t frequency, struct hdhomerun_tuner_status_t *status)
-{
-	int ret = channelscan_execute_find_lock_internal(hd, frequency, status);
-	if (ret <= 0) {
-		return ret;
-	}
-
-	if (!status->lock_supported) {
-		return 1;
-	}
-
-	int i;
-	for (i = 0; i < 5 * 4; i++) {
-		usleep(250000);
-
-		ret = hdhomerun_device_get_tuner_status(hd, status);
+	/* Wait for symbol quality = 100%. */
+	uint64_t timeout = getcurrenttime() + 5000;
+	while (1) {
+		ret = hdhomerun_device_get_tuner_status(scan->hd, NULL, &result->status);
 		if (ret <= 0) {
 			return ret;
 		}
 
-		if (status->symbol_error_quality == 100) {
-			break;
+		if (result->status.symbol_error_quality == 100) {
+			return 1;
 		}
-	}
 
-	return 1;
+		if (getcurrenttime() >= timeout) {
+			return 1;
+		}
+
+		msleep_approx(250);
+	}
 }
 
-static int channelscan_execute_find_programs(struct hdhomerun_device_t *hd, char **pstreaminfo)
+static void channelscan_extract_name(struct hdhomerun_channelscan_program_t *program, const char *line)
 {
-	*pstreaminfo = NULL;
+	/* Find start of name. */
+	const char *start = strchr(line, ' ');
+	if (!start) {
+		return;
+	}
+	start++;
+
+	start = strchr(start, ' ');
+	if (!start) {
+		return;
+	}
+	start++;
+
+	/* Find end of name. */
+	const char *end = strstr(start, " (");
+	if (!end) {
+		end = strchr(line, 0);
+	}
+
+	if (end <= start) {
+		return;
+	}
+
+	/* Extract name. */
+	size_t length = (size_t)(end - start);
+	if (length > sizeof(program->name) - 1) {
+		length = sizeof(program->name) - 1;
+	}
+
+	strncpy(program->name, start, length);
+	program->name[length] = 0;
+}
+
+static int channelscan_detect_programs(struct hdhomerun_channelscan_t *scan, struct hdhomerun_channelscan_result_t *result, bool_t *pchanged, bool_t *pincomplete)
+{
+	*pchanged = FALSE;
+	*pincomplete = FALSE;
 
 	char *streaminfo;
-	int ret = hdhomerun_device_get_tuner_streaminfo(hd, &streaminfo);
+	int ret = hdhomerun_device_get_tuner_streaminfo(scan->hd, &streaminfo);
 	if (ret <= 0) {
 		return ret;
 	}
 
-	char *last_streaminfo = strdup(streaminfo);
-	if (!last_streaminfo) {
-		return -1;
-	}
+	char *next_line = streaminfo;
+	int program_count = 0;
 
-	int same = 0;
-	int i;
-	for (i = 0; i < 5 * 4; i++) {
-		usleep(250000);
+	while (1) {
+		char *line = next_line;
 
-		ret = hdhomerun_device_get_tuner_streaminfo(hd, &streaminfo);
-		if (ret <= 0) {
-			free(last_streaminfo);
-			return ret;
+		next_line = strchr(line, '\n');
+		if (!next_line) {
+			break;
 		}
+		*next_line++ = 0;
 
-		if (strcmp(streaminfo, last_streaminfo) != 0) {
-			free(last_streaminfo);
-			last_streaminfo = strdup(streaminfo);
-			if (!last_streaminfo) {
-				return -1;
-			}
-			same = 0;
+		unsigned int transport_stream_id;
+		if (sscanf(line, "tsid=0x%x", &transport_stream_id) == 1) {
+			result->transport_stream_id = transport_stream_id;
+			result->transport_stream_id_detected = TRUE;
 			continue;
 		}
 
-		same++;
-		if (same >= 8) {
-			break;
+		if (program_count >= HDHOMERUN_CHANNELSCAN_MAX_PROGRAM_COUNT) {
+			continue;
 		}
+
+		struct hdhomerun_channelscan_program_t program;
+		memset(&program, 0, sizeof(program));
+
+		strncpy(program.program_str, line, sizeof(program.program_str));
+		program.program_str[sizeof(program.program_str) - 1] = 0;
+
+		unsigned int program_number;
+		unsigned int virtual_major, virtual_minor;
+		if (sscanf(line, "%u: %u.%u", &program_number, &virtual_major, &virtual_minor) != 3) {
+			if (sscanf(line, "%u: %u", &program_number, &virtual_major) != 2) {
+				continue;
+			}
+			virtual_minor = 0;
+		}
+
+		program.program_number = program_number;
+		program.virtual_major = virtual_major;
+		program.virtual_minor = virtual_minor;
+
+		channelscan_extract_name(&program, line);
+
+		if (strstr(line, "(control)")) {
+			program.type = HDHOMERUN_CHANNELSCAN_PROGRAM_CONTROL;
+		} else if (strstr(line, "(encrypted)")) {
+			program.type = HDHOMERUN_CHANNELSCAN_PROGRAM_ENCRYPTED;
+		} else if (strstr(line, "(no data)")) {
+			program.type = HDHOMERUN_CHANNELSCAN_PROGRAM_NODATA;
+			*pincomplete = TRUE;
+		} else {
+			program.type = HDHOMERUN_CHANNELSCAN_PROGRAM_NORMAL;
+			if ((program.virtual_major == 0) || (program.name[0] == 0)) {
+				*pincomplete = TRUE;
+			}
+		}
+
+		if (memcmp(&result->programs[program_count], &program, sizeof(program)) != 0) {
+			memcpy(&result->programs[program_count], &program, sizeof(program));
+			*pchanged = TRUE;
+		}
+
+		program_count++;
 	}
 
-	*pstreaminfo = last_streaminfo;
+	if (program_count == 0) {
+		*pincomplete = TRUE;
+	}
+	if (result->program_count != program_count) {
+		result->program_count = program_count;
+		*pchanged = TRUE;
+	}
+
 	return 1;
 }
 
-static int channelscan_execute_callback(channelscan_callback_t callback, va_list callback_ap, const char *type, const char *str)
+int channelscan_advance(struct hdhomerun_channelscan_t *scan, struct hdhomerun_channelscan_result_t *result)
 {
-	if (!callback) {
-		return 1;
+	memset(result, 0, sizeof(struct hdhomerun_channelscan_result_t));
+
+	struct hdhomerun_channel_entry_t *entry = scan->next_channel;
+	if (!entry) {
+		return 0;
 	}
-	
-	va_list ap;
-	va_copy(ap, callback_ap);
-	int ret = callback(ap, type, str);
-	va_end(ap);
-
-	return ret;
-}
-
-static int channelscan_execute_internal(struct hdhomerun_device_t *hd, uint32_t channel_map, struct hdhomerun_channel_entry_t **pentry, channelscan_callback_t callback, va_list callback_ap)
-{
-	struct hdhomerun_channel_entry_t *entry = *pentry;
-	uint32_t frequency = hdhomerun_channel_entry_frequency(entry);
-	char buffer[256];
-	int ret;
 
 	/* Combine channels with same frequency. */
-	char *ptr = buffer;
-	sprintf(ptr, "%ld (", (unsigned long)frequency);
-	ptr = strchr(ptr, 0);
+	result->frequency = hdhomerun_channel_entry_frequency(entry);
+	strncpy(result->channel_str, hdhomerun_channel_entry_name(entry), sizeof(result->channel_str) - 1);
+	result->channel_str[sizeof(result->channel_str) - 1] = 0;
+
 	while (1) {
-		const char *name = hdhomerun_channel_entry_name(entry);
-		strcpy(ptr, name);
-		ptr = strchr(ptr, 0);
-
-		entry = hdhomerun_channel_list_next(channel_map, entry);
+		entry = hdhomerun_channel_list_prev(scan->channel_list, entry);
 		if (!entry) {
-			break;
-		}
-		if (hdhomerun_channel_entry_frequency(entry) != frequency) {
+			scan->next_channel = NULL;
 			break;
 		}
 
-		sprintf(ptr, ", ");
-		ptr = strchr(ptr, 0);
-	}
-	sprintf(ptr, ")");
-	*pentry = entry;
+		if (hdhomerun_channel_entry_frequency(entry) != result->frequency) {
+			scan->next_channel = entry;
+			break;
+		}
 
-	ret = channelscan_execute_callback(callback, callback_ap, "SCANNING", buffer);
-	if (ret <= 0) {
-		return ret;
+		char *ptr = strchr(result->channel_str, 0);
+		sprintf(ptr, ", %s", hdhomerun_channel_entry_name(entry));
 	}
+
+	return 1;
+}
+
+int channelscan_detect(struct hdhomerun_channelscan_t *scan, struct hdhomerun_channelscan_result_t *result)
+{
+	scan->scanned_channels++;
 
 	/* Find lock. */
-	struct hdhomerun_tuner_status_t status;
-	ret = channelscan_execute_find_lock(hd, frequency, &status);
+	int ret = channelscan_find_lock(scan, result->frequency, result);
 	if (ret <= 0) {
 		return ret;
 	}
-
-	ptr = buffer;
-	sprintf(ptr, "%s (ss=%u snq=%u seq=%u)", status.lock_str, status.signal_strength, status.signal_to_noise_quality, status.symbol_error_quality);
-
-	ret = channelscan_execute_callback(callback, callback_ap, "LOCK", buffer);
-	if (ret <= 0) {
-		return ret;
-	}
-
-	if (!status.lock_supported) {
+	if (!result->status.lock_supported) {
 		return 1;
 	}
 
 	/* Detect programs. */
-	char *streaminfo = NULL;
-	ret = channelscan_execute_find_programs(hd, &streaminfo);
-	if (ret <= 0) {
-		return ret;
+	result->program_count = 0;
+
+	uint64_t timeout;
+	if (strstr(hdhomerun_device_get_model_str(scan->hd), "atsc")) {
+		timeout = getcurrenttime() + 4000;
+	} else {
+		timeout = getcurrenttime() + 10000;
 	}
 
-	ptr = streaminfo;
+	uint64_t complete_time = getcurrenttime() + 1000;
+
 	while (1) {
-		char *end = strchr(ptr, '\n');
-		if (!end) {
-			break;
-		}
-
-		*end++ = 0;
-
-		ret = channelscan_execute_callback(callback, callback_ap, "PROGRAM", ptr);
+		bool_t changed, incomplete;
+		ret = channelscan_detect_programs(scan, result, &changed, &incomplete);
 		if (ret <= 0) {
-			free(streaminfo);
 			return ret;
 		}
 
-		ptr = end;
+		if (changed) {
+			complete_time = getcurrenttime() + 1000;
+		}
+
+		if (!incomplete && (getcurrenttime() >= complete_time)) {
+			break;
+		}
+
+		if (getcurrenttime() >= timeout) {
+			break;
+		}
+
+		msleep_approx(250);
 	}
 
-	free(streaminfo);
+	/* Lock => skip overlapping channels. */
+	uint32_t max_next_frequency = result->frequency - 5500000;
+	while (1) {
+		if (!scan->next_channel) {
+			break;
+		}
 
-	/* Complete. */
+		if (hdhomerun_channel_entry_frequency(scan->next_channel) <= max_next_frequency) {
+			break;
+		}
+
+		scan->next_channel = hdhomerun_channel_list_prev(scan->channel_list, scan->next_channel);
+	}
+
+	/* Success. */
 	return 1;
 }
 
-int channelscan_execute_single(struct hdhomerun_device_t *hd, uint32_t channel_map, struct hdhomerun_channel_entry_t **pentry, channelscan_callback_t callback, ...)
+uint8_t channelscan_get_progress(struct hdhomerun_channelscan_t *scan)
 {
-	if (!*pentry) {
-		*pentry = hdhomerun_channel_list_first(channel_map);
+	struct hdhomerun_channel_entry_t *entry = scan->next_channel;
+	if (!entry) {
+		return 100;
 	}
 
-	va_list callback_ap;
-	va_start(callback_ap, callback);
+	uint32_t channels_remaining = 1;
+	uint32_t frequency = hdhomerun_channel_entry_frequency(entry);
 
-	int result = channelscan_execute_internal(hd, channel_map, pentry, callback, callback_ap);
-
-	va_end(callback_ap);
-	return result;
-}
-
-int channelscan_execute_all(struct hdhomerun_device_t *hd, uint32_t channel_map, channelscan_callback_t callback, ...)
-{
-	va_list callback_ap;
-	va_start(callback_ap, callback);
-
-	int result = 0;
-	struct hdhomerun_channel_entry_t *entry = hdhomerun_channel_list_first(channel_map);
-	while (entry) {
-		result = channelscan_execute_internal(hd, channel_map, &entry, callback, callback_ap);
-		if (result <= 0) {
+	while (1) {
+		entry = hdhomerun_channel_list_prev(scan->channel_list, entry);
+		if (!entry) {
 			break;
+		}
+
+		if (hdhomerun_channel_entry_frequency(entry) != frequency) {
+			channels_remaining++;
+			frequency = hdhomerun_channel_entry_frequency(entry);
 		}
 	}
 
-	va_end(callback_ap);
-	return result;
+	return scan->scanned_channels * 100 / (scan->scanned_channels + channels_remaining);
 }
