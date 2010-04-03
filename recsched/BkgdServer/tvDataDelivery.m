@@ -51,7 +51,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   // XML data we just write it to a file and parse it seperately later. The WebServices parser is confused anyway
   // by a lot of the XML in this file and tries to interpret things as SOAP returned variables.
   char *tmpXMLFilePath = tempnam(NULL,"recsched.");
-  NSString *xmlFilePath = [[NSString alloc] initWithCString:tmpXMLFilePath];
+  NSString *xmlFilePath = [[[NSString alloc] initWithCString:tmpXMLFilePath] autorelease];
   free(tmpXMLFilePath);
 
   // Find the <xtvd ..> portion of the input XML - that's all we need to write out
@@ -95,8 +95,6 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   } else {
     returnedDict = [[NSDictionary alloc] init];
   }
-
-  [xmlFilePath release];
   return returnedDict;
 }
 
@@ -343,6 +341,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
     [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelector:@selector(handleDownloadData:) withObject:parserCallData];
   }
   [parserCallData release];
+  [downloadResult release];
   [pool release];
 }
 
