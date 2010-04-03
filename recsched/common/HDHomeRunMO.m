@@ -17,8 +17,6 @@
 
 #import "HDHomeRunMO.h"
 #import "HDHomeRunTuner.h"
-#import "hdhomerun_os.h"
-#import "hdhomerun_device.h"
 #import "Z2ITLineup.h"
 
 const int kDefaultPortNumber = 1234;
@@ -124,7 +122,7 @@ const int kLatestFirmwareVersion = 20080427;
   uint32_t deviceID = [[self deviceID] intValue];
   if ((deviceID != 0) && (mHDHomeRunDevice == nil)) {
     uint32_t version;
-    mHDHomeRunDevice = hdhomerun_device_create(deviceID, 0, 0);
+    mHDHomeRunDevice = hdhomerun_device_create(deviceID, 0, 0, NULL);
 
     int versionCheck = hdhomerun_device_get_version(mHDHomeRunDevice, NULL, &version);
     if (versionCheck > 0) {
@@ -135,12 +133,6 @@ const int kLatestFirmwareVersion = 20080427;
     } else {
       // Device offline - exit
       return;
-    }
-
-    int firmwareCheck =  hdhomerun_device_firmware_version_check(mHDHomeRunDevice, 0);
-    if (firmwareCheck == 0) {
-      // Check succeeded but the firmware is out of date for our purposes, upgrade it
-      [self upgradeFirmware];
     }
   }
 }
