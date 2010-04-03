@@ -16,9 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 #import <Cocoa/Cocoa.h>
-#import "hdhomerun_os.h"
-#import "hdhomerun_debug.h"       // Fixes warning from undefined type in device header
-#import "hdhomerun_device.h"
+#import "hdhomerun.h"
 
 @class HDHomeRun;
 @class HDHomeRunChannel;
@@ -32,7 +30,6 @@
   struct hdhomerun_device_t *mHDHomeRunDevice;
   id<RSActivityDisplay> mCurrentProgressDisplay;
   size_t mCurrentActivityToken;
-  HDHomeRunChannel *mCurrentHDHomeRunChannel;
 }
 
 + (NSArray *)allTunersInManagedObjectContext:(NSManagedObjectContext *)inMOC;

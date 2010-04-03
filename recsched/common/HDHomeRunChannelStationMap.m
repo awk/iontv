@@ -6,10 +6,13 @@
 //  Copyright 2008 __MyCompanyName__. All rights reserved.
 //
 
+#import "ASIHTTPRequest.h"
 #import "HDHomeRunChannelStationMap.h"
 #import "HDHomeRunTuner.h"
 #import "RecSchedProtocol.h"
 #import "recsched_bkgd_AppDelegate.h"
+#import "Z2ITLineup.h"
+#import "Z2ITStation.h"
 
 @interface LineUpResponseParser : NSObject <NSXMLParserDelegate> {
   NSMutableString *currentStringValue;
@@ -21,6 +24,9 @@
   NSString *guideName;
   NSString *guideNumber;
   
+  NSManagedObjectContext *managedObjectContext;
+  Z2ITLineup *lineup;
+  
   BOOL foundLineUpResponse;
   BOOL foundCommand;
 }
@@ -28,6 +34,9 @@
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict;
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string;
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName;
+
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) Z2ITLineup *lineup;
 
 @end
 
@@ -82,23 +91,99 @@
 #endif
 }
 
+- (NSData *)createChannelMapExportXMLDataWithDeviceID:(int)deviceID {
+  // Start by adding all the channels on this tuner to an array
+  NSSet *channelsSet = [self channels];
+  //[self mutableSetValueForKey:@"lineup.channelStationMap.channels"];
+  
+  NSXMLElement *root = (NSXMLElement *)[NSXMLNode elementWithName:@"LineupUIRequest"];
+  NSXMLDocument *xmlDoc = [[NSXMLDocument alloc] initWithRootElement:root];
+  [xmlDoc setVersion:@"1.0"];
+  [xmlDoc setCharacterEncoding:@"UTF-8"];
+  [xmlDoc setStandalone:YES];
+  
+  // The first part of the document should look like:
+  // <Vendor>iontv-app.com</Vendor>
+  // <Application>iOnTV v1.0 (Mac OS X)</Application>
+  // <Command>IdentifyPrograms2</Command>
+  // <UserID>ION:1</UserID>
+  // <DeviceID>0x10100b88</DeviceID>
+  // <Location>US:01890</Location>
+  
+  NSXMLElement *anElement = nil;
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"Vendor"];
+  [anElement setStringValue:@"iontv-app.com"];
+  [root addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"Application"];
+  [anElement setStringValue:@"iOnTV v1.0 (Mac OS X)"];
+  [root addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"Command"];
+  [anElement setStringValue:@"IdentifyPrograms2"];
+  [root addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"UserID"];
+  [anElement setStringValue:@"ION:1"];
+  [root addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"DeviceID"];
+  [anElement setStringValue:[NSString stringWithFormat:@"0x%x", deviceID]];
+  [root addChild:anElement];
+  [anElement release];
+  
+  anElement = [[NSXMLElement alloc] initWithName:@"Location"];
+  [anElement setStringValue:[NSString stringWithFormat:@"US:%@", self.lineup.postalCode]];
+  [root addChild:anElement];
+  [anElement release];
+  
+  // Ask each HDHomeRunChannel in the set to add their info (in dictionary form) to the array
+  [channelsSet makeObjectsPerformSelector:@selector(addChannelInfoTo:) withObject:root];
+  
+  NSData *xmlData;
+  xmlData = [xmlDoc XMLDataWithOptions:NSXMLDocumentTidyXML];
+  [xmlDoc release];
+  
+  return xmlData;
+}
+
 - (void)importLineupResponse:(NSData*)xmlData {
   NSXMLParser *parser = [[NSXMLParser alloc] initWithData:xmlData];
   LineUpResponseParser *parserDelegate = [[LineUpResponseParser alloc] init];
+  parserDelegate.managedObjectContext = [self managedObjectContext];
+  parserDelegate.lineup = self.lineup;
   [parser setDelegate:parserDelegate];
   [parser parse];
   [parserDelegate release];
   [parser release];
-  
-  NSError *error = nil;
-  if (![[[NSApp delegate] managedObjectContext] save:&error]) {
-    NSLog(@"importLineupResponse - saving context reported error %@, info = %@", error, [error userInfo]);
+}
+
+- (void)updateMapUsingSDLineupServerWithDeviceID:(int)deviceID {
+#if BUILDING_BKGD_APP
+  NSData *xmlData = [self createChannelMapExportXMLDataWithDeviceID:deviceID];
+  NSURL *url = [NSURL URLWithString:@"https://www.silicondust.com/hdhomerun/lineup_dvr.fcgi?Cmd=IdentifyPrograms2"];
+  ASIHTTPRequest *request = [ASIHTTPRequest requestWithURL:url];
+  [request appendPostData:xmlData];
+  [request startSynchronous];
+  NSError *error = [request error];
+  if (!error) {
+    NSData *responseData = [request responseData];
+    [self importLineupResponse:responseData];
   }
+#endif // BUILDING_BKGD_APP
 }
 
 @end
 
 @implementation LineUpResponseParser
+
+@synthesize managedObjectContext;
+@synthesize lineup;
 
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName attributes:(NSDictionary *)attributeDict{
   if ([elementName isEqualToString:@"LineupUIResponse"]) {
@@ -137,47 +222,31 @@
     } else if ([elementName isEqualToString:@"GuideNumber"]) {
       guideNumber = [[NSString alloc] initWithString:currentStringValue];
     } else if ([elementName isEqualToString:@"Program"]) {
-      NSManagedObjectContext *moc = [[NSApp delegate] managedObjectContext];
-      NSEntityDescription *HDHRStationEntityDescription = [NSEntityDescription entityForName:@"HDHomeRunStation" inManagedObjectContext:moc];
-      NSFetchRequest *request = [[NSFetchRequest alloc] init];
-      [request setEntity:HDHRStationEntityDescription];
-      
-      NSPredicate *hdhrStationPredicate = [NSPredicate predicateWithFormat:
-        @"(programNumber== %@) AND (channel.tuningType = %@) AND (channel.frequency == %@) AND (channel.transportStreamID == %@)",
-        programNumber, modulation, frequency, transportStreamID];
-      [request setPredicate:hdhrStationPredicate];
-      
-      NSError *error = nil;
-      NSArray *hdhrStationArray = [moc executeFetchRequest:request error:&error];
-      [request release];
-      
-      NSEntityDescription *guideStationEntityDescription = [NSEntityDescription entityForName:@"Station" inManagedObjectContext:moc];
-      request = [[NSFetchRequest alloc] init];
-      [request setEntity:guideStationEntityDescription];
-      
-      NSPredicate *guideStationPredicate = [NSPredicate predicateWithFormat:
-                                              @"(callSign == %@)",
-                                              guideName];
-      [request setPredicate:guideStationPredicate];
-      
-      NSArray *guideStationArray = [moc executeFetchRequest:request error:&error];
-      [request release];
       HDHomeRunStation *theHDHRStation = nil;
-      Z2ITStation *theGuideStation = nil;
-      if ([hdhrStationArray count] > 1) {
-        NSLog(@"matched multiple HDHR stations = %@\n", hdhrStationArray);
+      Z2ITStation *theGuideStation = [Z2ITStation fetchStationWithCallSign:guideName inLineup:self.lineup inManagedObjectContext:self.managedObjectContext];
+
+      for (HDHomeRunChannel *aHDHRChannel in self.lineup.channelStationMap.channels) {
+        for (HDHomeRunStation *aHDHRStation in aHDHRChannel.stations) {
+          if (([aHDHRStation.programNumber intValue] == [programNumber intValue]) &&
+              ([aHDHRChannel.frequency intValue] == [frequency intValue]) &&
+              ([aHDHRChannel.transportStreamID intValue] == [transportStreamID intValue])) {
+            theHDHRStation = aHDHRStation;
+            break;
+          }
+        }
+        if (theHDHRStation != nil) {
+          break;
+        }
       }
-      if ([hdhrStationArray count] > 0) {
-        theHDHRStation = [hdhrStationArray objectAtIndex:0];
+      
+      if (!theHDHRStation) {
+        NSLog(@"Could not find HDHR station program num %@, channel.frequency %@ channel.TSID %@\n", programNumber, frequency, transportStreamID);
       }
-      if ([guideStationArray count] > 1) {
-        NSLog(@"matched multiple Guide stations = %@\n", guideStationArray);
-      }
-      if ([guideStationArray count] > 0) {
-        theGuideStation = [guideStationArray objectAtIndex:0];
-      } else {
+      
+      if (!theGuideStation) {
         NSLog(@"Could not find %@ in the guide data !\n", guideName);
       }
+      
       if (theHDHRStation && theGuideStation) {
         [theHDHRStation setZ2itStation:theGuideStation];
       }
