@@ -589,16 +589,14 @@ static Preferences *sSharedInstance = nil;
   NSError *error = nil;
 
   NSFetchRequest *aFetchRequest = [mHDHomeRunTunersArrayController defaultFetchRequest];
-  [aFetchRequest setRelationshipKeyPathsForPrefetching:[NSArray arrayWithObject:@"channels"]];
+  [aFetchRequest setRelationshipKeyPathsForPrefetching:[NSArray arrayWithObject:@"lineup.channelStationMap.channels"]];
   NSArray *array = [[[NSApp delegate] managedObjectContext] executeFetchRequest:aFetchRequest error:&error];
   for (HDHomeRunTuner *aTuner in array) {
-    [[[NSApp delegate] managedObjectContext] refreshObject:aTuner mergeChanges:YES];
+    NSLog(@"before refresh tuner = %@\n, channelStationMap = %@\n", aTuner, aTuner.lineup.channelStationMap);
+    [[[NSApp delegate] managedObjectContext] refreshObject:aTuner.lineup mergeChanges:YES];
+    [[[NSApp delegate] managedObjectContext] refreshObject:aTuner.lineup.channelStationMap mergeChanges:YES];
   }
 
-  if ([[mHDHomeRunTunersArrayController selectedObjects] count] > 0) {
-//          [self selectedTunerDidChange:[[mHDHomeRunTunersArrayController selectedObjects] objectAtIndex:0]];
-    NSLog(@"channelScanCOmpletedNotification - changed lineup/channelStationMap ?");
-  }
   mChannelScanInProgress = NO;
   [mScanChannelsButton setEnabled:YES];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSChannelScanCompleteNotification object:RSBackgroundApplication];
