@@ -89,6 +89,8 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSCleanupCompleteNotification object:RSBackgroundApplication];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:RSBackgroundApplication];
+
+  [mLastScheduleFetchEndDate release];
   [super dealloc];
 }
 
