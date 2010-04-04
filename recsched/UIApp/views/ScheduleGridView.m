@@ -314,7 +314,7 @@ const float kScheduleDetailsPopUpTime = 3.0;
   [self updateForNewStartTime];
 }
 
-- (void)setStartStationIndex:(unsigned)inIndex {
+- (void)setStartStationIndex:(NSUInteger)inIndex {
   mStartStationIndex = inIndex;
   [self updateStationsInViewArray];
   [self updateForNewStartTime];

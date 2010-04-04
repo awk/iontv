@@ -32,7 +32,7 @@
   NSMutableArray *mStationsInViewArray;
   NSArray *mSortedStationsArray;
   Z2ITLineup *mCurrentLineup;
-  unsigned mStartStationIndex;
+  NSUInteger mStartStationIndex;
   CFAbsoluteTime mStartTime;
   float mVisibleTimeSpan;
   NSCell *mSelectedCell;
@@ -43,7 +43,7 @@
 }
 
 - (void)setSortedStationsArray:(NSArray *)inArray forLineup:(Z2ITLineup *)inLineup;
-- (void)setStartStationIndex:(unsigned)inIndex;
+- (void)setStartStationIndex:(NSUInteger)inIndex;
 - (void)setStartTime:(CFAbsoluteTime)inStartTime;
 - (void)setVisibleTimeSpan:(float)inTimeSpan;
 - (void)setSelectedSchedule:(Z2ITSchedule *)inSchedule;
@@ -53,5 +53,5 @@
 @property (setter=setVisibleTimeSpan:) float mVisibleTimeSpan;
 @property (retain,getter=selectedSchedule) Z2ITSchedule *mSelectedSchedule;
 @property (setter=setStartTime:) CFAbsoluteTime mStartTime;
-@property (setter=setStartStationIndex:) unsigned mStartStationIndex;
+@property (setter=setStartStationIndex:) NSUInteger mStartStationIndex;
 @end

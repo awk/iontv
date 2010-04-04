@@ -25,9 +25,9 @@
 
 #import "AKColorExtensions.h"
 
-void AdjustColorLightness(float *red, float *green, float *blue, float inLuma)
+void AdjustColorLightness(CGFloat *red, CGFloat *green, CGFloat *blue, CGFloat inLuma)
 {
-  float luma = inLuma;
+  CGFloat luma = inLuma;
 
   if (luma < -1) {
     luma = -1;

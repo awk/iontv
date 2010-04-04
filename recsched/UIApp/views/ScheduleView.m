@@ -223,7 +223,7 @@
 }
 
 - (void)scrollToStation:(Z2ITStation *)inStation {
-  int stationIndex = [mSortedStationsArray indexOfObject:inStation];
+  NSUInteger stationIndex = [mSortedStationsArray indexOfObject:inStation];
   if (stationIndex != NSNotFound) {
     // It might not be in the current array - since we may need to change lineups (somewhere else)
     int currStartIndex = ([mStationsScroller floatValue] * (float)([mSortedStationsArray count] - [mStationColumnView numberStationsDisplayed]) + 0.5);
@@ -240,7 +240,7 @@
 #pragma mark Station list updating methods
 
 // Compare two stations according to their overall lineup channel numbers (major and minor)
-int sortStationsWithLineup(id thisStation, id otherStation, void *context)
+NSInteger sortStationsWithLineup(id thisStation, id otherStation, void *context)
 {
   Z2ITLineup *currentLineup = (Z2ITLineup*)context;
 
