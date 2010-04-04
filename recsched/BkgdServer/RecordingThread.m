@@ -28,7 +28,7 @@
 #import "RSRecording.h"
 #import "PreferenceKeys.h"
 
-#define RECORDING_DISABLED 1
+#define RECORDING_DISABLED 0
 
 @implementation RecordingThreadController
 
@@ -173,7 +173,7 @@
   while (!mFinishRecording) {
     usleep(64000);
 
-    NSData *videoData = [anHDHRStation receiveVideoData];
+    NSData *videoData = [anHDHRStation copyVideoData];
     if (videoData) {
       @try {
         [transportStreamFileHandle writeData:videoData];

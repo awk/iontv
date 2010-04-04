@@ -45,16 +45,6 @@
 //- (void) importChannelMapFrom:(NSURL *)inURL;
 //- (void) copyChannelsAndStationsFrom:(HDHomeRunTuner*)sourceTuner;
 
-#if 0
-- (void)startStreaming;
-- (void)setFilterForProgramNumber:(NSNumber *)inProgramNumber;
-- (void)tuneToChannel:(HDHomeRunChannel *)inChannel;
-- (NSData *)receiveVideoData;
-
-- (void)releaseHDHRDevice;
-- (void)createHDHRDevice;
-#endif
-
 @end
 
 // coalesce these into one @interface HDHomeRunTuner (CoreDataGeneratedAccessors) section
