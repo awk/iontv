@@ -284,7 +284,7 @@ NSString *kPersistentStoreCoordinatorKey = @"persistentStoreCoordinator";
 }
 
 // Compare two programs for their program ID
-int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, void *context)
+NSInteger compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, void *context)
 {
   NSString *programIDStringThisXMLProgramNode = [[thisXMLProgramNode attributeForName:@"id"] stringValue];
   NSString *programIDStringOtherXMLProgramNode = [[otherXMLProgramNode attributeForName:@"id"] stringValue];
@@ -356,7 +356,7 @@ int compareProgramsByIDAttribute(id thisXMLProgramNode, id otherXMLProgramNode, 
   }
 }
 
-int compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNode, void *context)
+NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLProgramNode, void *context)
 {
   NSString *programIDStringThisXMLCrewNode = [[thisXMLProgramNode attributeForName:@"program"] stringValue];
   NSString *programIDStringOtherXMLCrewNode = [[otherXMLProgramNode attributeForName:@"program"] stringValue];
