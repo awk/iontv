@@ -181,7 +181,7 @@
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
   // Register to be notified when an update through sparkle completes - we use this to restart the background
   // server which may also have just been updated.
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sparkleWillRestart:) name:SUUpdaterWillRestartNotification object:nil];
+//  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sparkleWillRestart:) name:SUUpdaterWillRestartNotification object:nil];
 
   if ([self storeNeedsMigrating]) {
     [self showMigrationSheet];
