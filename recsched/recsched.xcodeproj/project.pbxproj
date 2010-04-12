@@ -80,7 +80,6 @@
 		EA4F2D020D73A80A005BC950 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4F2D010D73A80A005BC950 /* NSStringAdditions.m */; };
 		EA4F2D030D73A80A005BC950 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4F2D010D73A80A005BC950 /* NSStringAdditions.m */; };
 		EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAEA60B6D75CE00CCD5D5 /* Preferences.m */; };
-		EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC20B6FB49400CCD5D5 /* FixedNSControl.m */; };
 		EA5FAFCA0B6FB50D00CCD5D5 /* DiscreteDurationSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFC90B6FB50D00CCD5D5 /* DiscreteDurationSlider.m */; };
 		EA5FAFD80B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = EA5FAFD70B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m */; };
 		EA5FB6D80B7028B000CCD5D5 /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = EA5FB6D70B7028B000CCD5D5 /* UserDefaults.plist */; };
@@ -125,6 +124,9 @@
 		EA96C9ED11677B9100BBB94A /* hdhomerun_sock_posix.c in Sources */ = {isa = PBXBuildFile; fileRef = EA96C9E611677B9100BBB94A /* hdhomerun_sock_posix.c */; };
 		EA96C9EE11677B9100BBB94A /* hdhomerun_sock.h in Headers */ = {isa = PBXBuildFile; fileRef = EA96C9E711677B9100BBB94A /* hdhomerun_sock.h */; };
 		EA96C9EF11677B9100BBB94A /* hdhomerun_types.h in Headers */ = {isa = PBXBuildFile; fileRef = EA96C9E811677B9100BBB94A /* hdhomerun_types.h */; };
+		EA96CC9D1169050300BBB94A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA96CC87116904EA00BBB94A /* AudioToolbox.framework */; };
+		EA96CD121169077500BBB94A /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EA96CD101169076E00BBB94A /* libbz2.dylib */; };
+		EA96CD131169077900BBB94A /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = EA96CD111169076E00BBB94A /* libiconv.dylib */; };
 		EA977F5D0C8992CF0043B79E /* RSOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA977F5C0C8992CF0043B79E /* RSOutlineView.m */; };
 		EAB16BF40CF51502001313CA /* RSProgramSearchTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = EAB16BF30CF51502001313CA /* RSProgramSearchTableHeaderView.m */; };
 		EABE726C0DCFF2EC0013310F /* ProgramSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EABE726B0DCFF2EC0013310F /* ProgramSearchViewController.m */; };
@@ -141,7 +143,6 @@
 		EAC3529C0DCD355E00963287 /* RSRecordingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC3529B0DCD355E00963287 /* RSRecordingAdditions.m */; };
 		EAC352E80DCD381400963287 /* RSSeasonPassAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */; };
 		EAC8F7A10DCA99E100A289CD /* RSMigrationSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */; };
-		EAD023D80CE20F47002B7C37 /* libhb.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = EAD023D70CE20F42002B7C37 /* libhb.dylib */; };
 		EAD024280CE246FF002B7C37 /* UserPresets.plist in Resources */ = {isa = PBXBuildFile; fileRef = EAD024270CE246F1002B7C37 /* UserPresets.plist */; };
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
 		EAE3FB290C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */; };
@@ -232,7 +233,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 6;
 			files = (
-				EAD023D80CE20F47002B7C37 /* libhb.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -411,6 +411,9 @@
 		EA96C9E611677B9100BBB94A /* hdhomerun_sock_posix.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = hdhomerun_sock_posix.c; path = ../libhdhomerun/hdhomerun_sock_posix.c; sourceTree = SOURCE_ROOT; };
 		EA96C9E711677B9100BBB94A /* hdhomerun_sock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hdhomerun_sock.h; path = ../libhdhomerun/hdhomerun_sock.h; sourceTree = SOURCE_ROOT; };
 		EA96C9E811677B9100BBB94A /* hdhomerun_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hdhomerun_types.h; path = ../libhdhomerun/hdhomerun_types.h; sourceTree = SOURCE_ROOT; };
+		EA96CC87116904EA00BBB94A /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		EA96CD101169076E00BBB94A /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = usr/lib/libbz2.dylib; sourceTree = SDKROOT; };
+		EA96CD111169076E00BBB94A /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		EA977F5B0C8992CF0043B79E /* RSOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSOutlineView.h; path = UIApp/views/RSOutlineView.h; sourceTree = "<group>"; };
 		EA977F5C0C8992CF0043B79E /* RSOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSOutlineView.m; path = UIApp/views/RSOutlineView.m; sourceTree = "<group>"; };
 		EAB16BF20CF51502001313CA /* RSProgramSearchTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSProgramSearchTableHeaderView.h; path = UIApp/views/RSProgramSearchTableHeaderView.h; sourceTree = SOURCE_ROOT; };
@@ -441,7 +444,6 @@
 		EAC352E70DCD381400963287 /* RSSeasonPassAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSSeasonPassAdditions.m; path = UIApp/RSSeasonPassAdditions.m; sourceTree = "<group>"; };
 		EAC8F79F0DCA99E100A289CD /* RSMigrationSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSMigrationSheetController.h; path = UIApp/RSMigrationSheetController.h; sourceTree = "<group>"; };
 		EAC8F7A00DCA99E100A289CD /* RSMigrationSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSMigrationSheetController.m; path = UIApp/RSMigrationSheetController.m; sourceTree = "<group>"; };
-		EAD023D70CE20F42002B7C37 /* libhb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libhb.dylib; path = ../HandBrake/libhb/libhb.dylib; sourceTree = SOURCE_ROOT; };
 		EAD024270CE246F1002B7C37 /* UserPresets.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = UserPresets.plist; path = BkgdServer/UserPresets.plist; sourceTree = "<group>"; };
 		EADCD96F0C3EC4CF0005A5B4 /* AKSourceTableClasses.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AKSourceTableClasses.h; path = UIApp/views/AKSourceTableClasses.h; sourceTree = "<group>"; };
 		EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AKSourceTableClasses.m; path = UIApp/views/AKSourceTableClasses.m; sourceTree = "<group>"; };
@@ -537,6 +539,9 @@
 				EA7002880CC4288500DA9542 /* ScriptingBridge.framework in Frameworks */,
 				EAEC17A20E0589260082544E /* SystemConfiguration.framework in Frameworks */,
 				EA23A90A11660AAD004F67B9 /* libz.dylib in Frameworks */,
+				EA96CC9D1169050300BBB94A /* AudioToolbox.framework in Frameworks */,
+				EA96CD121169077500BBB94A /* libbz2.dylib in Frameworks */,
+				EA96CD131169077900BBB94A /* libiconv.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -638,13 +643,15 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				EAD023D70CE20F42002B7C37 /* libhb.dylib */,
 				EA7002870CC4288500DA9542 /* ScriptingBridge.framework */,
 				EA20AE2D0C23612800A9BDBD /* SyncServices.framework */,
 				EA20ADB90C2330AC00A9BDBD /* Security.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 				EA23A90711660A9E004F67B9 /* libz.dylib */,
+				EA96CC87116904EA00BBB94A /* AudioToolbox.framework */,
+				EA96CD101169076E00BBB94A /* libbz2.dylib */,
+				EA96CD111169076E00BBB94A /* libiconv.dylib */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1146,7 +1153,6 @@
 				EAF8956C0B69023D00373CEF /* ScheduleStationColumnView.m in Sources */,
 				EAF89D8E0B6A8CFD00373CEF /* ScheduleView.m in Sources */,
 				EA5FAEA70B6D75CE00CCD5D5 /* Preferences.m in Sources */,
-				EA5FAFC30B6FB49500CCD5D5 /* FixedNSControl.m in Sources */,
 				EA5FAFCA0B6FB50D00CCD5D5 /* DiscreteDurationSlider.m in Sources */,
 				EA5FAFD80B6FB58900CCD5D5 /* DiscreteDurationSliderCell.m in Sources */,
 				EA5FBEAF0B724DB400CCD5D5 /* ScheduleGridView.m in Sources */,
@@ -1376,6 +1382,8 @@
 		26FC0A850875C7B200E6366F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
 				COPY_PHASE_STRIP = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1516,6 +1524,8 @@
 		EA2EE04B0C07D26E0002420F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -1542,6 +1552,8 @@
 		EAEC092F0C272E1600C40D5A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_64_BIT_PRE_XCODE_3_1 = x86_64;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)/iOnTV.app/Contents/Support";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1564,6 +1576,26 @@
 					"-framework",
 					AppKit,
 					"-lhb",
+					"-lavcodec",
+					"-lmp4v2",
+					"-ldvdnavmini",
+					"-lmpeg2",
+					"-lvorbis",
+					"-ldvdread",
+					"-ldca",
+					"-logg",
+					"-la52",
+					"-lavutil",
+					"-lavformat",
+					"-lx264",
+					"-lsamplerate",
+					"-lmp3lame",
+					"-lfaad",
+					"-lfaac",
+					"-lmkv",
+					"-ltheora",
+					"-lvorbisenc",
+					"-lswscale",
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = recsched_bkgd;
@@ -1586,6 +1618,8 @@
 					build/Release,
 					../HandBrake/libhb,
 					../HandBrake/contrib/lib,
+					"\"$(SRCROOT)/../HandBrake/libhb\"",
+					"\"$(SRCROOT)/../HandBrake/contrib/lib\"",
 				);
 				OTHER_LDFLAGS = (
 					"-framework",

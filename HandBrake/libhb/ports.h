@@ -1,7 +1,7 @@
 /* $Id: ports.h,v 1.7 2005/10/15 18:05:03 titer Exp $
 
    This file is part of the HandBrake source code.
-   Homepage: <http://handbrake.m0k.org/>.
+   Homepage: <http://handbrake.fr/>.
    It may be used under the terms of the GNU General Public License. */
 
 #ifndef HB_PORTS_H
@@ -17,6 +17,11 @@ int      hb_get_cpu_count();
 #ifdef __LIBHB__
 
 /* Everything from now is only used internally and hidden to the UI */
+
+/************************************************************************
+ * DVD utils
+ ***********************************************************************/
+int hb_dvd_region(char *device, int *region_mask);
 
 /************************************************************************
  * Files utils
@@ -43,6 +48,9 @@ typedef struct hb_thread_s hb_thread_t;
 #elif defined( SYS_CYGWIN )
 #  define HB_LOW_PRIORITY    0
 #  define HB_NORMAL_PRIORITY 1
+#elif defined( SYS_MINGW )
+#  define HB_LOW_PRIORITY    0
+#  define HB_NORMAL_PRIORITY 0
 #endif
 
 hb_thread_t * hb_thread_init( char * name, void (* function)(void *),

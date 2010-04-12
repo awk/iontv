@@ -124,7 +124,7 @@ static Preferences *sSharedInstance = nil;
 + (Preferences *)sharedInstance {
   @synchronized(self) {
     if (sSharedInstance == nil) {
-      sSharedInstance = [[Preferences alloc] init];
+      sSharedInstance = [[self alloc] init];
     }
   }
   return sSharedInstance;
@@ -149,7 +149,7 @@ static Preferences *sSharedInstance = nil;
   return self;
 }
 
-- (unsigned)retainCount {
+- (NSUInteger)retainCount {
   return UINT_MAX;  // denotes an object that cannot be released
 }
 
@@ -194,12 +194,10 @@ static Preferences *sSharedInstance = nil;
 }
 
 - (id)init {
-    if (sSharedInstance) {
-      // We just have one instance of the Preferences class, return that one instead
-      [self release];
-    } else if (self = [super init]) {
+  Class myClass = [self class];
+  @synchronized(myClass) {
+    if (self = [super init]) {
       [Preferences setupDefaults];
-      sSharedInstance = self;
       [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self forKeyPath:@"values.scheduleDownloadDuration" options:NSKeyValueObservingOptionNew context:nil];
       [[NSUserDefaultsController sharedUserDefaultsController] setAppliesImmediately:NO];
 
@@ -208,10 +206,24 @@ static Preferences *sSharedInstance = nil;
       NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : NSTemporaryDirectory();
       NSString *presetsPath = [basePath stringByAppendingPathComponent:@"HandBrake/UserPresets.plist"];
 
-      handbrakePresetsArrayController = [[NSArrayController alloc] initWithContent:[NSArray arrayWithContentsOfFile:presetsPath]];
+      NSArray *allPresetsArray = [NSArray arrayWithContentsOfFile:presetsPath];
+      NSMutableArray *presetsArray = [NSMutableArray arrayWithCapacity:[allPresetsArray count]];
+      for (NSDictionary *aPresetItem in allPresetsArray) {
+        if ([[aPresetItem valueForKey:@"PresetName"] isEqualToString:@"Apple"]) {
+          // Add all the presets which are sub-items of the Apple group
+          for (NSDictionary *anApplePreset in [aPresetItem valueForKey:@"ChildrenArray"]) {
+            [presetsArray addObject:anApplePreset];
+          }
+        } else if ([[aPresetItem valueForKey:@"ChildenArray"] count] == 0) {
+          // This is a leaf item - a custom/user preset - add it too.
+          [presetsArray addObject:aPresetItem];
+        }
+      }
+      handbrakePresetsArrayController = [[NSArrayController alloc] initWithContent:presetsArray];
       [handbrakePresetsArrayController setObjectClass:[NSMutableDictionary class]];
     }
-    return sSharedInstance;
+  }
+  return self;
 }
 
 - (void)dealloc {

@@ -25,37 +25,19 @@
 #import "RecSchedServer.h"
 #import "RSTranscodeController.h"
 
-static int FormatSettings[4][10] = {
-  { HB_MUX_MP4 | HB_VCODEC_FFMPEG | HB_ACODEC_FAAC,
-    HB_MUX_MP4 | HB_VCODEC_X264   | HB_ACODEC_FAAC,
-    0, 0 },
-  { HB_MUX_MKV | HB_VCODEC_FFMPEG | HB_ACODEC_FAAC,
-    HB_MUX_MKV | HB_VCODEC_FFMPEG | HB_ACODEC_AC3,
-    HB_MUX_MKV | HB_VCODEC_FFMPEG | HB_ACODEC_LAME,
-    HB_MUX_MKV | HB_VCODEC_FFMPEG | HB_ACODEC_VORBIS,
-    HB_MUX_MKV | HB_VCODEC_X264   | HB_ACODEC_FAAC,
-    HB_MUX_MKV | HB_VCODEC_X264   | HB_ACODEC_AC3,
-    HB_MUX_MKV | HB_VCODEC_X264   | HB_ACODEC_LAME,
-    HB_MUX_MKV | HB_VCODEC_X264   | HB_ACODEC_VORBIS,
-    0, 0 },
-  { HB_MUX_AVI | HB_VCODEC_FFMPEG | HB_ACODEC_LAME,
-    HB_MUX_AVI | HB_VCODEC_FFMPEG | HB_ACODEC_AC3,
-    HB_MUX_AVI | HB_VCODEC_X264   | HB_ACODEC_LAME,
-    HB_MUX_AVI | HB_VCODEC_X264   | HB_ACODEC_AC3 },
-  { HB_MUX_OGM | HB_VCODEC_FFMPEG | HB_ACODEC_VORBIS,
-    HB_MUX_OGM | HB_VCODEC_FFMPEG | HB_ACODEC_LAME,
-    0, 0 }
-};
-
 @interface RSTranscodingImp(Private)
-- (int)audioSampleRateIndexForString:(NSString *)aString;
-- (int)formatIndexForString:(NSString *)aString;
-- (int)codecIndexForString:(NSString *)aString;
-- (int)videoEncoderIndexForString:(NSString *)aString;
-- (int)videoFrameRateIndexForString:(NSString *)aString;
-- (int)subtitleIndexForString:(NSString *)aString;
-- (int)audioBitRateTagForString:(NSString *)aString;
+- (int)acodecForString:(NSString *)codec;
+- (NSString *) audioCodecStringForPreset:(NSDictionary *)aPreset;
+- (NSString *) audioSampleRateForPreset:(NSDictionary *)aPreset;
+- (NSString *) audioBitrateForPreset:(NSDictionary *)aPreset;
+- (NSString *) drcForPreset:(NSDictionary *)aPreset;
+- (NSString *) audioMixdownForPreset:(NSDictionary *)aPreset;
+
 @end
+
+static int is_sample_rate_valid(int rate);
+
+const int kDefaultAudioBitRate = 160;
 
 @implementation RSTranscodingImp
 
@@ -75,6 +57,9 @@ static int FormatSettings[4][10] = {
 
     // We need to know if an activity UI becomes available.
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(uiActivityNotification:) name:RSNotificationUIActivityAvailable object:nil];
+    
+    mDefaultAcodec = HB_ACODEC_FAAC;
+    mAudios = hb_list_init();
   }
   return self;
 }
@@ -90,214 +75,572 @@ static int FormatSettings[4][10] = {
   mHandbrakeTitle = aTitle;
 }
 
-- (void)setupPictureDimensionsForJob:(hb_job_t *)aJob withPreset:(NSDictionary *)aPreset {
-  if ([[aPreset objectForKey:@"UsesPictureSettings"]  intValue] == 2 || [[aPreset objectForKey:@"UsesMaxPictureSettings"]  intValue] == 1) {
-    aJob->keep_ratio = [[aPreset objectForKey:@"PictureKeepRatio"]  intValue];
-    if (aJob->keep_ratio == 1) {
-      hb_fix_aspect( aJob, HB_KEEP_WIDTH );
-      if( aJob->height > mHandbrakeTitle->height ) {
-        aJob->height = mHandbrakeTitle->height;
-        hb_fix_aspect( aJob, HB_KEEP_HEIGHT );
+- (void)setupPictureDimensionsWithPreset:(NSDictionary *)aPreset {
+  if ([[aPreset objectForKey:@"UsesPictureSettings"]  intValue] == 2 ||
+      [[aPreset objectForKey:@"UsesMaxPictureSettings"]  intValue] == 1) {
+    /* Use Max Picture settings for whatever the dvd is.*/
+    mHandbrakeJob->width = mHandbrakeTitle->width;
+    mHandbrakeJob->height = mHandbrakeTitle->height;
+    mHandbrakeJob->keep_ratio = [[aPreset objectForKey:@"PictureKeepRatio"]  intValue];
+    if (mHandbrakeJob->keep_ratio == 1) {
+      hb_fix_aspect(mHandbrakeJob, HB_KEEP_WIDTH);
+      if (mHandbrakeJob->height > mHandbrakeTitle->height) {
+        mHandbrakeJob->height = mHandbrakeTitle->height;
+        hb_fix_aspect(mHandbrakeJob, HB_KEEP_HEIGHT);
       }
     }
-    aJob->pixel_ratio = [[aPreset objectForKey:@"PicturePAR"]  intValue];
+    mHandbrakeJob->anamorphic.mode = [[aPreset objectForKey:@"PicturePAR"]  intValue];
   } else {
-    // Apply picture settings that were in effect at the time the preset was saved
-    aJob->width = [[aPreset objectForKey:@"PictureWidth"]  intValue];
-    aJob->height = [[aPreset objectForKey:@"PictureHeight"]  intValue];
-    aJob->keep_ratio = [[aPreset objectForKey:@"PictureKeepRatio"]  intValue];
-    if (aJob->keep_ratio == 1) {
-      hb_fix_aspect( aJob, HB_KEEP_WIDTH );
-      if( aJob->height > mHandbrakeTitle->height ) {
-        aJob->height = mHandbrakeTitle->height;
-        hb_fix_aspect( aJob, HB_KEEP_HEIGHT );
+    /* If not 0 or 2 we assume objectForKey:@"UsesPictureSettings is 1 which is "Use picture sizing from when the preset was set" */
+    /* we check to make sure the presets width/height does not exceed the sources width/height */
+    if (mHandbrakeTitle->width < [[aPreset objectForKey:@"PictureWidth"]  intValue]
+        || mHandbrakeTitle->height < [[aPreset objectForKey:@"PictureHeight"]  intValue]) {
+      /* if so, then we use the sources height and width to avoid scaling up */
+      mHandbrakeJob->width = mHandbrakeTitle->width;
+      mHandbrakeJob->height = mHandbrakeTitle->height;
+    } else {
+      // source width/height is >= the preset height/width
+      /* we can go ahead and use the presets values for height and width */
+      mHandbrakeJob->width = [[aPreset objectForKey:@"PictureWidth"]  intValue];
+      mHandbrakeJob->height = [[aPreset objectForKey:@"PictureHeight"]  intValue];
+    }
+    mHandbrakeJob->keep_ratio = [[aPreset objectForKey:@"PictureKeepRatio"]  intValue];
+    if (mHandbrakeJob->keep_ratio == 1) {
+      hb_fix_aspect(mHandbrakeJob, HB_KEEP_WIDTH );
+      if (mHandbrakeJob->height > mHandbrakeTitle->height) {
+        mHandbrakeJob->height = mHandbrakeTitle->height;
+        hb_fix_aspect(mHandbrakeJob, HB_KEEP_HEIGHT);
       }
     }
-    aJob->pixel_ratio = [[aPreset objectForKey:@"PicturePAR"]  intValue];
+    mHandbrakeJob->anamorphic.mode = [[aPreset objectForKey:@"PicturePAR"]  intValue];
+  }
+}
+
+- (void)setupVideoCodecsWithPreset:(NSDictionary *)aPreset {
+  // AWK - Fix Me, read the values from the preset
+  float vquality = 20.0;
+  int vcodec = HB_VCODEC_X264;
+  int vbitrate = 0;
+  int vrate = 0;
+  int cfr = 0;
+  
+  vquality = [[aPreset objectForKey:@"VideoQualitySlider"] floatValue];
+  vbitrate = [[aPreset objectForKey:@"VideoAvgBitrate"] intValue];
+  
+  if (vquality >= 0.0 && ((vquality <= 1.0) || (vcodec == HB_VCODEC_X264) || (vcodec == HB_VCODEC_FFMPEG))) {
+    mHandbrakeJob->vquality = vquality;
+    mHandbrakeJob->vbitrate = 0;
+  } else if (vbitrate) {
+    mHandbrakeJob->vquality = -1.0;
+    mHandbrakeJob->vbitrate = vbitrate;
+  }
+  
+  if (vcodec) {
+    mHandbrakeJob->vcodec = vcodec;
+  }
+  
+  if (vrate) {
+    mHandbrakeJob->cfr = cfr;
+    mHandbrakeJob->vrate = 27000000;
+    mHandbrakeJob->vrate_base = vrate;
+  } else if (cfr) {
+    // cfr or pfr flag with no rate specified implies
+    // use the title rate.
+    mHandbrakeJob->cfr = cfr;
+    mHandbrakeJob->vrate = mHandbrakeTitle->rate;
+    mHandbrakeJob->vrate_base = mHandbrakeTitle->rate_base;
+  }
+}
+
+- (void)findAudioTracks:(NSString*) trackSelection {
+  char *atracks = strdup([trackSelection UTF8String]);
+  
+  if (atracks) {
+    char * token = strtok(atracks, ",");
+    if (token == NULL) {
+      token = optarg;
+    }
+    int track_start, track_end;
+    while( token != NULL ) {
+      hb_audio_config_t * audio = NULL;
+      audio = calloc(1, sizeof(*audio));
+      hb_audio_config_init(audio);
+      if (strlen(token) >= 3) {
+        if (sscanf(token, "%d-%d", &track_start, &track_end) == 2) {
+          int i;
+          for (i = track_start - 1; i < track_end; i++) {
+            if (i != track_start - 1) {
+              audio = calloc(1, sizeof(*audio));
+              hb_audio_config_init(audio);
+            }
+            audio->in.track = i;
+            audio->out.track = mNumAudioTracks++;
+            hb_list_add(mAudios, audio);
+          }
+        } else if (!strcasecmp(token, "none")) {
+          audio->in.track = audio->out.track = -1;
+          audio->out.codec = 0;
+          hb_list_add(mAudios, audio);
+          break;
+        } else {
+          fprintf(stderr, "ERROR: Unable to parse audio input \"%s\", skipping.",
+                  token);
+          free(audio);
+        }
+      } else {
+        audio->in.track = atoi(token) - 1;
+        audio->out.track = mNumAudioTracks++;
+        hb_list_add(mAudios, audio);
+      }
+      token = strtok(NULL, ",");
+    }
+  }
+  
+  free(atracks);
+}
+
+- (void)setupAudioTracks {
+  hb_audio_config_t *audio = NULL;
+  
+  if (hb_list_count(mAudios) == 0 &&
+      hb_list_count(mHandbrakeJob->title->list_audio) > 0) {        
+    /* Create a new audio track with default settings */
+    audio = calloc(1, sizeof(*audio));
+    hb_audio_config_init(audio);
+    /* Add it to our audios */
+    hb_list_add(mAudios, audio);
+  }
+  
+  int tmp_num_audio_tracks = mNumAudioTracks = hb_list_count(mAudios);
+  int i;
+  for (i = 0; i < tmp_num_audio_tracks; i++) {
+    audio = hb_list_item(mAudios, 0);
+    if ((audio == NULL) || (audio->in.track == -1) ||
+        (audio->out.track == -1) || (audio->out.codec == 0)) {
+      mNumAudioTracks--;
+    } else {
+      if (hb_audio_add( mHandbrakeJob, audio) == 0) {
+        fprintf(stderr, "ERROR: Invalid audio input track '%u', exiting.\n", 
+                audio->in.track + 1 );
+        mNumAudioTracks--;
+        return;  
+      }
+    }
+    hb_list_rem(mAudios, audio);
+    if (audio != NULL) {
+      if (audio->out.name) {
+        free( audio->out.name);
+      }
+    }
+    free( audio );
+  }
+}
+
+- (void)setupAudioWithCodecs:(NSString *)codecString {
+  int i = 0;
+  char *acodecs = strdup([codecString UTF8String]);
+  int acodec;
+  
+  if (acodecs) {
+    char * token = strtok(acodecs, ",");
+    if (token == NULL) {
+      token = acodecs;
+    }
+    while (token != NULL) {
+      if ((acodec = [self acodecForString:[NSString stringWithUTF8String:token]]) == -1) {
+        fprintf(stderr, "Invalid codec %s, using default for container.\n", token);
+        acodec = mDefaultAcodec;
+      }
+      if (i < mNumAudioTracks) {
+        hb_audio_config_t * audio = NULL;
+        audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+        audio->out.codec = acodec;
+      } else {
+        hb_audio_config_t * last_audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i - 1);
+        hb_audio_config_t audio;
+        
+        if (last_audio) {
+          fprintf(stderr, "More audio codecs than audio tracks, copying track %i and using encoder %s\n",
+                  i, token);
+          hb_audio_config_init(&audio);
+          audio.in.track = last_audio->in.track;
+          audio.out.track = mNumAudioTracks++;
+          audio.out.codec = acodec;
+          hb_audio_add(mHandbrakeJob, &audio);
+        } else {
+          fprintf(stderr, "Audio codecs and no valid audio tracks, skipping codec %s\n", token);
+        }
+      }
+      token = strtok(NULL, ",");
+      i++;
+    }
+  }
+  if (i < mNumAudioTracks) {
+    /* We have fewer inputs than audio tracks, use the default codec for
+     * this container for the remaining tracks. Unless we only have one input
+     * then use that codec instead.
+     */
+    if (i != 1) {
+      acodec = mDefaultAcodec;
+    }
+    for ( ; i < mNumAudioTracks; i++) {
+      hb_audio_config_t * audio = NULL;
+      audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      audio->out.codec = acodec;
+    }
+  }
+  free(acodecs);
+}
+
+- (void)setupAudioSampleRate:(NSString *) audioRatesString {
+  char *arates = strdup([audioRatesString UTF8String]);
+  int i = 0;
+  int arate;
+  hb_audio_config_t *audio = NULL;
+    
+  if (arates) {
+    char * token = strtok(arates, ",");
+    if (token == NULL) {
+      token = arates;
+    }
+    while (token != NULL) {
+      arate = atoi(token);
+      audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      int j;
+      
+      for (j=0;j < hb_audio_rates_count;j++) {
+        if (!strcmp(token, hb_audio_rates[j].string)) {
+          arate = hb_audio_rates[j].rate;
+          break;
+        }
+      }
+      
+      if (audio != NULL) {
+        if (!is_sample_rate_valid(arate)) {
+          fprintf(stderr, "Invalid sample rate %d, using input rate %d\n", arate, audio->in.samplerate);
+          arate = audio->in.samplerate;
+        }
+        
+        audio->out.samplerate = arate;
+        if ((++i) >= mNumAudioTracks) {
+          break;  /* We have more inputs than audio tracks, oops */
+        }
+      } else {
+        fprintf(stderr, "Ignoring sample rate %d, no audio tracks\n", arate);
+      }
+      token = strtok(NULL, ",");
+    }
+  }
+  if (i < mNumAudioTracks) {
+    /* We have fewer inputs than audio tracks, use default sample rate.
+     * Unless we only have one input, then use that for all tracks.
+     */
+    if (i != 1) {
+      arate = audio->in.samplerate;
+    }
+    for ( ;i < mNumAudioTracks;i++) {
+      audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      audio->out.samplerate = arate;
+    }
+  }
+  free(arates);
+}
+
+- (void)setupAudioBitrate:(NSString *) audioBitratesString {
+  char *abitrates = strdup([audioBitratesString UTF8String]);
+  int i = 0;
+  int abitrate;
+  
+  if (abitrates) {
+    char * token = strtok(abitrates, ",");
+    if (token == NULL) {
+      token = abitrates;
+    }
+    while (token != NULL) {
+      abitrate = atoi(token);
+      hb_audio_config_t *audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      
+      if (audio != NULL) {
+        audio->out.bitrate = abitrate;
+        if ((++i) >= mNumAudioTracks) {
+          break;  /* We have more inputs than audio tracks, oops */
+        }
+      } else {
+        fprintf(stderr, "Ignoring bitrate %d, no audio tracks\n", abitrate);
+      }
+      token = strtok(NULL, ",");
+    }
+  }
+  if (i < mNumAudioTracks) {
+    /* We have fewer inputs than audio tracks, use the default bitrate
+     * for the remaining tracks. Unless we only have one input, then use
+     * that for all tracks.
+     */
+    if (i != 1) {
+      abitrate = kDefaultAudioBitRate;
+    }
+    for (; i < mNumAudioTracks; i++) {
+      hb_audio_config_t *audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      audio->out.bitrate = abitrate;
+    }
+  }
+  free(abitrates);
+}
+
+- (void)setupAudioDRC:(NSString *)DRCString {
+  int i = 0;
+  char *dynamic_range_compression = strdup([DRCString UTF8String]);
+  float d_r_c;
+  
+  if (dynamic_range_compression) {
+    char * token = strtok(dynamic_range_compression, ",");
+    if (token == NULL) {
+      token = dynamic_range_compression;
+    }
+    while (token != NULL) {
+      d_r_c = atof(token);
+      hb_audio_config_t *audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      if (audio != NULL) {
+        audio->out.dynamic_range_compression = d_r_c;
+        if ((++i) >= mNumAudioTracks) {
+          break;  /* We have more inputs than audio tracks, oops */
+        }
+      } else {
+        fprintf(stderr, "Ignoring drc, no audio tracks\n");
+      }
+      token = strtok(NULL, ",");
+    }
+  }
+  if (i < mNumAudioTracks) {
+    /* We have fewer inputs than audio tracks, use no DRC for the remaining
+     * tracks. Unless we only have one input, then use the same DRC for all
+     * tracks.
+     */
+    if (i != 1) {
+      d_r_c = 0;
+    }
+    for (; i < mNumAudioTracks; i++) {
+      hb_audio_config_t *audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      audio->out.dynamic_range_compression = d_r_c;
+    }
+  }
+  free(dynamic_range_compression);
+}
+
+- (void)setupAudioMixdown:(NSString *)mixdownString {
+  int i = 0;
+  char *mixdowns = strdup([mixdownString UTF8String]);
+  int mixdown;
+  
+  if (mixdowns) {
+    char * token = strtok(mixdowns, ",");
+    if (token == NULL) {
+      token = mixdowns;
+    }
+    while (token != NULL) {
+      mixdown = hb_mixdown_get_mixdown_from_short_name(token);
+      hb_audio_config_t *audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      if (audio != NULL) {
+        audio->out.mixdown = mixdown;
+        if ((++i) >= mNumAudioTracks) {
+          break;  /* We have more inputs than audio tracks, oops */
+        }
+      } else {
+        fprintf(stderr, "Ignoring mixdown, no audio tracks\n");
+      }
+      token = strtok(NULL, ",");
+    }
+  }
+  if (i < mNumAudioTracks) {
+    /* We have fewer inputs than audio tracks, use DPLII for the rest. Unless
+     * we only have one input, then use that.
+     */
+    if (i != 1) {
+      mixdown = HB_AMIXDOWN_DOLBYPLII;
+    }
+    for (; i < mNumAudioTracks; i++) {
+      hb_audio_config_t *audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
+      audio->out.mixdown = mixdown;
+    }
+  }
+  free(mixdowns);
+}
+
+- (void) setupFiltersWithPreset:(NSDictionary *)aPreset {
+  mHandbrakeJob->filters = hb_list_init();
+  
+  if ([[aPreset objectForKey:@"UsesPictureFilters"]  intValue] > 0) {
+    if ([[aPreset objectForKey:@"PictureDetelecine"] intValue] == 1) {
+      hb_filter_detelecine.settings = (char *) [[aPreset objectForKey:@"PictureDetelecineCustom"] UTF8String];
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
+    } else if ([[aPreset objectForKey:@"PictureDetelecine"] intValue] == 2) {
+      hb_filter_detelecine.settings = NULL;
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
+    }
+
+    if ([[aPreset objectForKey:@"PictureDecomb"] intValue] == 1) {
+      hb_filter_decomb.settings = (char *) [[aPreset objectForKey:@"PictureDecombCustom"] UTF8String];
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_decomb );
+    } else if ([[aPreset objectForKey:@"PictureDecomb"] intValue] == 2) {
+      hb_filter_decomb.settings = NULL;
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_decomb );
+    }
+    
+    if ([[aPreset objectForKey:@"PictureDeinterlace"] intValue] == 1) {
+      hb_filter_detelecine.settings = (char *) [[aPreset objectForKey:@"PictureDeinterlaceCustom"] UTF8String];
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
+    } else if ([[aPreset objectForKey:@"PictureDeinterlace"] intValue] == 2) {
+      hb_filter_detelecine.settings = "-1";
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
+    } else if ([[aPreset objectForKey:@"PictureDeinterlace"] intValue] == 3) {
+      hb_filter_detelecine.settings = "2";
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
+    } else if ([[aPreset objectForKey:@"PictureDeinterlace"] intValue] == 4) {
+      hb_filter_detelecine.settings = "0";
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
+    }
+
+    /*
+     * Even if Deinterlace hasn't been specified we default to using the 'slow'
+     * method. We know we're recording TV programs - they're going to be interlaced!
+     */
+    if (NULL == hb_filter_detelecine.settings) {
+      hb_filter_detelecine.settings = "2";
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
+    }
+ 
+    if ([[aPreset objectForKey:@"PictureDeblock"] intValue] == 1) {
+      /* if its a one, then its the old on/off deblock, set on to 5*/
+      asprintf(&hb_filter_deblock.settings, "%d", 5);
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_deblock );
+    } else {
+      /* use the settings intValue */
+      asprintf(&hb_filter_deblock.settings, "%d", [[aPreset objectForKey:@"PictureDeblock"] intValue]);
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_deblock );
+    }
+    
+    if ([[aPreset objectForKey:@"PictureDenoise"] intValue] == 1) {
+      hb_filter_denoise.settings = (char *) [[aPreset objectForKey:@"PictureDenoiseCustom"] UTF8String];
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_denoise );
+    } else if ([[aPreset objectForKey:@"PictureDenoise"] intValue] == 2) {
+      hb_filter_denoise.settings = "2:1:2:3"; 
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
+    } else if ([[aPreset objectForKey:@"PictureDenoise"] intValue] == 3) {
+      hb_filter_denoise.settings = "3:2:2:3"; 
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_denoise );
+    } else if ([[aPreset objectForKey:@"PictureDenoise"] intValue] == 4) {
+      hb_filter_denoise.settings = "7:7:5:5"; 
+      hb_list_add( mHandbrakeJob->filters, &hb_filter_denoise );
+    }
   }
 }
 
 - (void)setupJobWithPreset:(NSDictionary *)aPreset {
   mHandbrakeJob = mHandbrakeTitle->job;
 
-  [self setupPictureDimensionsForJob:mHandbrakeJob withPreset:aPreset];
+  [self setupPictureDimensionsWithPreset:aPreset];
 
   /* Chapter selection  - transport streams have no chapters, just use 1 & 1 here */
   mHandbrakeJob->chapter_start = 1;
   mHandbrakeJob->chapter_end   = 1;
+  
+  mHandbrakeJob->deinterlace = 0;
+  mHandbrakeJob->grayscale = 0;
+  
+  [self setupFiltersWithPreset:aPreset];
+  [self setupVideoCodecsWithPreset:aPreset];
 
-  /* Format and codecs */
+  /* Audio Settings */
+  [self findAudioTracks:@"1,1"];
+  [self setupAudioTracks];
+  [self setupAudioWithCodecs:[self audioCodecStringForPreset:aPreset]];
+  [self setupAudioSampleRate:[self audioSampleRateForPreset:aPreset]];
+  [self setupAudioBitrate:[self audioBitrateForPreset:aPreset]];
+  [self setupAudioDRC:[self drcForPreset:aPreset]];
+  [self setupAudioMixdown:[self audioMixdownForPreset:aPreset]];
+  
+  if ([[aPreset objectForKey:@"Mp4LargeFile"] intValue] == 1) {
+    mHandbrakeJob->largeFileSize = 1;
+  } else {
+    mHandbrakeJob->largeFileSize = 0;
+  }
+  
+  if ([[aPreset objectForKey:@"Mp4HttpOptimize"] intValue] == 1) {
+    mHandbrakeJob->mp4_optimize = 1;
+  } else {
+    mHandbrakeJob->mp4_optimize = 0;
+  }
 
-  // We need to convert the presets text label into an index (that matches the popup menu in Handbrake !)
-  int format = [self formatIndexForString:[aPreset valueForKey:@"FileFormat"]];
-  int codecs = [self codecIndexForString:[aPreset valueForKey:@"FileCodecs"]];//1; //[fDstCodecsPopUp indexOfSelectedItem];
-  mHandbrakeJob->mux    = FormatSettings[format][codecs] & HB_MUX_MASK;
-  mHandbrakeJob->vcodec = FormatSettings[format][codecs] & HB_VCODEC_MASK;
-  mHandbrakeJob->acodec = FormatSettings[format][codecs] & HB_ACODEC_MASK;
-  /* If mpeg-4, then set mpeg-4 specific options like chapters and > 4gb file sizes */
-  if (format == 0) {
-    /* We set the largeFileSize (64 bit formatting) variable here to allow for > 4gb files based on the format being
-       mpeg4 and the checkbox being checked
-       *Note: this will break compatibility with some target devices like iPod, etc.!!!!
-     */
-    if (0) {
-      //([[NSUserDefaults standardUserDefaults] boolForKey:@"AllowLargeFiles"] > 0 && [fDstMpgLargeFileCheck state] == NSOnState) {
-      mHandbrakeJob->largeFileSize = 1;
+  if ([[aPreset objectForKey:@"Mp4iPodCompatible"] intValue] == 1) {
+    mHandbrakeJob->ipod_atom = 1;
+  } else {
+    mHandbrakeJob->ipod_atom = 0;
+  }
+  
+  if ([aPreset objectForKey:@"x264Option"]) {
+      mHandbrakeJob->x264opts = strdup([[aPreset objectForKey:@"x264Option"] UTF8String]);
+  } else {
+    /* avoids a bus error crash when options aren't specified */
+    mHandbrakeJob->x264opts =  NULL;
+  }
+}
+
+- (void)setupTwoPassEncoding {
+  char *x264opts2 = NULL;
+  /*
+   * If subtitle_scan is enabled then only turn it on
+   * for the first pass and then off again for the
+   * second.
+   */
+  mHandbrakeJob->pass = 1;
+  
+  mHandbrakeJob->indepth_scan = 0;
+  
+  if (mHandbrakeJob->x264opts) {
+    x264opts2 = strdup(mHandbrakeJob->x264opts);
+  }
+  
+  /*
+   * If turbo options have been selected then append them
+   * to the x264opts now (size includes one ':' and the '\0')
+   */
+   // AWK Fix Me - Read Turbo Opts from the preset ?
+  if (0 /*turbo_opts_enabled*/) {
+    static char * turbo_opts = "ref=1:subme=2:me=dia:analyse=none:trellis=0:no-fast-pskip=0:8x8dct=0:weightb=0";
+
+    int size = (mHandbrakeJob->x264opts ? strlen(mHandbrakeJob->x264opts) : 0) + strlen(turbo_opts) + 2;
+    char *tmp_x264opts;
+    
+    tmp_x264opts = malloc(size * sizeof(char));
+    if (mHandbrakeJob->x264opts) {
+      snprintf(tmp_x264opts, size, "%s:%s", mHandbrakeJob->x264opts, turbo_opts );
+      free(mHandbrakeJob->x264opts);
     } else {
-      mHandbrakeJob->largeFileSize = 0;
-    }
-  }
-  if ((format == 0) || (format == 3)) {
-    /* We set the chapter marker extraction here based on the format being
-       mpeg4 or mkv and the checkbox being checked
-     */
-    if ([[aPreset valueForKey:@"ChapterMarkers"] intValue] == 1) {
-      mHandbrakeJob->chapter_markers = 1;
-    } else {
-      mHandbrakeJob->chapter_markers = 0;
-    }
-  }
-  int videoEncoderIndex = [self videoEncoderIndexForString:[aPreset valueForKey:@"VideoEncoder"]];
-  int videoQualityType = [[aPreset objectForKey:@"VideoQualityType"] intValue];
-  if ((mHandbrakeJob->vcodec & HB_VCODEC_FFMPEG ) && (videoEncoderIndex > 0 )) {
-    mHandbrakeJob->vcodec = HB_VCODEC_XVID;
-  }
-
-  if (mHandbrakeJob->vcodec & HB_VCODEC_X264) {
-    if (videoEncoderIndex > 0) {
-      /* Just use new Baseline Level 3.0
-      Lets Deprecate Baseline Level 1.3h264_level*/
-      mHandbrakeJob->h264_level = 30;
-      mHandbrakeJob->mux = HB_MUX_IPOD;
-      /* move sanity check for iPod Encoding here */
-      mHandbrakeJob->pixel_ratio = 0 ;
-    }
-
-#if 0   // AWK - FIXME
-    /* Set this flag to switch from Constant Quantizer(default) to Constant Rate Factor Thanks jbrjake
-    Currently only used with Constant Quality setting*/
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"DefaultCrf"] > 0 && [vidQuality == 2) {
-          mHandbrakeJob->crf = 1;
-    }
-#endif
-
-    /* Below Sends x264 options to the core library if x264 is selected*/
-    /* Lets use this as per Nyx, Thanks Nyx!*/
-    mHandbrakeJob->x264opts = (char *)calloc(1024, 1); /* Fixme, this just leaks */
-    /* Turbo first pass if two pass and Turbo First pass is selected */
-
-    if ([[aPreset objectForKey:@"VideoTwoPass"] intValue] == 1 && [[aPreset objectForKey:@"VideoTurboTwoPass"] intValue] == 1) {
-      /* pass the "Turbo" string to be appended to the existing x264 opts string into a variable for the first pass */
-      NSString *firstPassOptStringTurbo = @":ref=1:subme=1:me=dia:analyse=none:trellis=0:no-fast-pskip=0:8x8dct=0";
-      /* append the "Turbo" string variable to the existing opts string.
-         Note: the "Turbo" string must be appended, not prepended to work properly
+      /*
+       * No x264opts to modify, but apply the turbo options
+       * anyway as they may be modifying defaults
        */
-      NSString *firstPassOptStringCombined = [[aPreset valueForKey:@"x264Option"] stringByAppendingString:firstPassOptStringTurbo];
-      strcpy(mHandbrakeJob->x264opts, [firstPassOptStringCombined UTF8String]);
-    } else {
-      strcpy(mHandbrakeJob->x264opts, [[aPreset valueForKey:@"x264Option"] UTF8String]);
+      snprintf(tmp_x264opts, size, "%s", turbo_opts);
     }
-
-    mHandbrakeJob->h264_13 = videoEncoderIndex;
+    fprintf(stderr, "Modified x264 options for pass 1 to append turbo options: %s\n",
+            tmp_x264opts);
+    
+    mHandbrakeJob->x264opts = tmp_x264opts;
   }
-
-  /* Video settings */
-  int defaultVidRateIndex = [self videoFrameRateIndexForString:[aPreset valueForKey:@"VideoFramerate"]];
-  if  (defaultVidRateIndex > 0 ) {
-    mHandbrakeJob->vrate      = 27000000;
-    mHandbrakeJob->vrate_base = hb_video_rates[defaultVidRateIndex-1].rate;
-  } else {
-    mHandbrakeJob->vrate      = mHandbrakeTitle->rate;
-    mHandbrakeJob->vrate_base = mHandbrakeTitle->rate_base;
-  }
-
-  switch( videoQualityType ) {
-    case 0:
-      /* Target size.
-         Bitrate should already have been calculated and displayed
-         in fVidBitrateField, so let's just use it */
-    case 1:
-      mHandbrakeJob->vquality = -1.0;
-      mHandbrakeJob->vbitrate = [[aPreset valueForKey:@"VideoAvgBitrate"] intValue];
-      break;
-    case 2:
-      mHandbrakeJob->vquality = [[aPreset valueForKey:@"VideoQualitySlider"] floatValue];
-      mHandbrakeJob->vbitrate = 0;
-      break;
-  }
-
-  mHandbrakeJob->grayscale = [[aPreset objectForKey:@"VideoGrayScale"] intValue];
-
-  /* Subtitle settings */
-  mHandbrakeJob->subtitle = [self subtitleIndexForString:[aPreset valueForKey:@"Subtitles"]] - 2;
-
-  /* Audio tracks and mixdowns */
-  /* check for the condition where track 2 has an audio selected, but track 1 does not */
-  /* we will use track 2 as track 1 in this scenario */
-
-  // AWK FIXME
-  int defaultAudio1Language = 1;    // second (first audio track) item in popup selected
-  int defaultAudio2Language = 0;    // first item (no audio) in popup selected
-  if (defaultAudio1Language > 0) {
-    mHandbrakeJob->audios[0] = defaultAudio1Language - 1;
-    mHandbrakeJob->audios[1] = defaultAudio2Language - 1; /* will be -1 if "none" is selected */
-    mHandbrakeJob->audios[2] = -1;
-    mHandbrakeJob->audio_mixdowns[0] = hb_audio_mixdowns[1].amixdown ; //[[fAudTrack1MixPopUp selectedItem] tag];
-    mHandbrakeJob->audio_mixdowns[1] = 0; //[[fAudTrack2MixPopUp selectedItem] tag];
-  } else if (defaultAudio2Language > 0) {
-    mHandbrakeJob->audios[0] = defaultAudio1Language - 1;
-    mHandbrakeJob->audio_mixdowns[0] = 0; //[[fAudTrack2MixPopUp selectedItem] tag];
-    mHandbrakeJob->audios[1] = -1;
-  } else {
-    mHandbrakeJob->audios[0] = -1;
-  }
-
-  /* Audio settings */
-  mHandbrakeJob->arate = hb_audio_rates[[self audioSampleRateIndexForString:[aPreset valueForKey:@"AudioSampleRate"]]].rate;
-  mHandbrakeJob->abitrate = [self audioBitRateTagForString:[aPreset valueForKey:@"AudioBitRate"]];
-
-  mHandbrakeJob->filters = hb_list_init();
-
-  /* Detelecine */
-  if ([[aPreset objectForKey:@"PictureDetelecine"] intValue] > 0) {
-    hb_list_add( mHandbrakeJob->filters, &hb_filter_detelecine );
-  }
-
-  /* Deinterlace */
-  int defaultDeinterlace = [[aPreset objectForKey:@"PictureDeinterlace"] intValue];
-  if (defaultDeinterlace == 1) {
-    /* Run old deinterlacer by default */
-    hb_filter_deinterlace.settings = "-1";
-    hb_list_add( mHandbrakeJob->filters, &hb_filter_deinterlace );
-  } else if (defaultDeinterlace == 2) {
-    /* Yadif mode 0 (1-pass with spatial deinterlacing.) */
-    hb_filter_deinterlace.settings = "0";
-    hb_list_add( mHandbrakeJob->filters, &hb_filter_deinterlace );
-  } else if (defaultDeinterlace == 3) {
-    /* Yadif (1-pass w/o spatial deinterlacing) and Mcdeint */
-    hb_filter_deinterlace.settings = "2:-1:1";
-    hb_list_add( mHandbrakeJob->filters, &hb_filter_deinterlace );
-  } else if (defaultDeinterlace == 4) {
-    /* Yadif (2-pass w/ spatial deinterlacing) and Mcdeint*/
-    hb_filter_deinterlace.settings = "1:-1:1";
-    hb_list_add( mHandbrakeJob->filters, &hb_filter_deinterlace );
-  }
-
-  /* Denoise */
-  int defaultDenoise = [[aPreset objectForKey:@"PictureDenoise"] intValue];
-  if (defaultDenoise == 1) {
-    // Weak in popup
-    hb_filter_denoise.settings = "2:1:2:3";
-    hb_list_add( mHandbrakeJob->filters, &hb_filter_denoise );
-  } else if (defaultDenoise == 2) {
-    // Medium in popup
-    hb_filter_denoise.settings = "3:2:2:3";
-    hb_list_add( mHandbrakeJob->filters, &hb_filter_denoise );
-  } else if (defaultDenoise == 3) {
-    // Strong in popup
-    hb_filter_denoise.settings = "7:7:5:5";
-    hb_list_add( mHandbrakeJob->filters, &hb_filter_denoise );
-  }
+  hb_add( mHandbrakeHandle, mHandbrakeJob );
+  
+  mHandbrakeJob->pass = 2;
+  /*
+   * On the second pass we turn off subtitle scan so that we
+   * can actually encode using any subtitles that were auto
+   * selected in the first pass (using the whacky select-subtitle
+   * attribute of the job).
+   */
+  mHandbrakeJob->indepth_scan = 0;
+  
+  mHandbrakeJob->x264opts = x264opts2;
+  
+  hb_add(mHandbrakeHandle, mHandbrakeJob);
 }
 
 - (void)beginTranscodeWithHandle:(hb_handle_t *)handbrakeHandle toDestinationPath:(NSString *)destinationPath usingPreset:(NSDictionary *)aPreset {
@@ -308,76 +651,11 @@ static int FormatSettings[4][10] = {
   /* Destination file */
   mHandbrakeJob->file = [destinationPath UTF8String];
 
-  if (0) {
-    // No subtitles ( [fSubForcedCheck state] == NSOnState )
-    mHandbrakeJob->subtitle_force = 1;
-  } else {
-    mHandbrakeJob->subtitle_force = 0;
-  }
-  /*
-   * subtitle of -1 is a scan
-   */
-  if( mHandbrakeJob->subtitle == -1 ) {
-    char *x264opts_tmp;
-
-    /*
-     * When subtitle scan is enabled do a fast pre-scan job
-     * which will determine which subtitles to enable, if any.
-     */
-    mHandbrakeJob->pass = -1;
-    x264opts_tmp = mHandbrakeJob->x264opts;
-    mHandbrakeJob->subtitle = -1;
-
-    mHandbrakeJob->x264opts = NULL;
-
-    mHandbrakeJob->indepth_scan = 1;
-
-    mHandbrakeJob->select_subtitle = (hb_subtitle_t**)malloc(sizeof(hb_subtitle_t*));
-    *(mHandbrakeJob->select_subtitle) = NULL;
-
-    /*
-     * Add the pre-scan job
-     */
-    mHandbrakeJob->sequence_id++; // for job grouping
-    hb_add( mHandbrakeHandle, mHandbrakeJob );
-
-    mHandbrakeJob->x264opts = x264opts_tmp;
-  } else {
-    mHandbrakeJob->select_subtitle = NULL;
-  }
-  /* No subtitle were selected, so reset the subtitle to -1 (which before
-   * this point meant we were scanning
-   */
-  if( mHandbrakeJob->subtitle == -2 ) {
-      mHandbrakeJob->subtitle = -1;
-  }
-
   if ([[aPreset objectForKey:@"VideoTwoPass"] intValue] > 0) {
-    hb_subtitle_t **subtitle_tmp = mHandbrakeJob->select_subtitle;
-    mHandbrakeJob->indepth_scan = 0;
-
-    /*
-     * Do not autoselect subtitles on the first pass of a two pass
-     */
-    mHandbrakeJob->select_subtitle = NULL;
-
-    mHandbrakeJob->pass = 1;
-    mHandbrakeJob->sequence_id++; // for job grouping
-    hb_add( mHandbrakeHandle, mHandbrakeJob );
-
-    mHandbrakeJob->pass = 2;
-    mHandbrakeJob->sequence_id++; // for job grouping
-
-    mHandbrakeJob->x264opts = (char *)calloc(1024, 1); /* Fixme, this just leaks */
-    strcpy(mHandbrakeJob->x264opts, [[aPreset valueForKey:@"x264Option"] UTF8String]);
-
-    mHandbrakeJob->select_subtitle = subtitle_tmp;
-
-    hb_add( mHandbrakeHandle, mHandbrakeJob );
+    [self setupTwoPassEncoding];
   } else {
     mHandbrakeJob->indepth_scan = 0;
     mHandbrakeJob->pass = 0;
-    mHandbrakeJob->sequence_id++; // for job grouping
     hb_add( mHandbrakeHandle, mHandbrakeJob );
   }
 
@@ -511,78 +789,134 @@ static int FormatSettings[4][10] = {
   }
 }
 
-- (int)formatIndexForString:(NSString*)aString {
-  if ([aString compare:@"MP4 file"] == NSOrderedSame) {
-    return 0;
-  } else if ([aString compare:@"MKV file"] == NSOrderedSame) {
-    return 1;
-  } else if ([aString compare:@"AVI file"] == NSOrderedSame) {
-    return 2;
-  } else if ([aString compare:@"OGM file"] == NSOrderedSame) {
-    return 3;
+ - (int)acodecForString:(NSString *)codec {
+  if ([codec isEqualToString:@"ac3"]) {
+    return HB_ACODEC_AC3;
+  } else if ([codec isEqualToString:@"dts"] || [codec isEqualToString:@"dca"]) {
+    return HB_ACODEC_DCA;
+  } else if ([codec isEqualToString:@"lame"]) {
+    return HB_ACODEC_LAME;
+  } else if ([codec isEqualToString:@"faac"]) {
+    return HB_ACODEC_FAAC;
+  } else if ([codec isEqualToString:@"vorbis"]) {
+    return HB_ACODEC_VORBIS;
+  } else if ([codec isEqualToString:@"ca_aac"]) {
+    return HB_ACODEC_CA_AAC;
   } else {
     return -1;
   }
 }
-
-- (int)codecIndexForString:(NSString *)aString {
-  if ([aString compare:@"MPEG-4 Video / AAC Audio"] == NSOrderedSame) {
-    return 0;
-  } else if ([aString compare:@"AVC/H.264 Video / AAC Audio"] == NSOrderedSame) {
-    return 1;
-  } else {
-    return -1;
+              
+static int is_sample_rate_valid(int rate)
+{
+  int i;
+  for( i = 0; i < hb_audio_rates_count; i++ )
+  {
+    if (rate == hb_audio_rates[i].rate)
+      return 1;
   }
+  return 0;
 }
 
-- (int)videoEncoderIndexForString:(NSString *)aString {
-  if ([aString compare:@"x264 (h.264 Main)"] == NSOrderedSame) {
-    return 0;
-  } else if ([aString compare:@"x264 (h.264 iPod)"] == NSOrderedSame) {
-    return 1;
-  } else {
-    return -1;
+
+- (NSString *) audioCodecStringForPreset:(NSDictionary *)aPreset
+{
+  NSMutableString *codecString = nil;
+  
+  NSArray *audioList = [aPreset valueForKey:@"AudioList"];
+  for (NSDictionary *audioDetails in audioList) {
+    if ([[audioDetails objectForKey:@"AudioEncoder"] isEqualToString:@"AAC (faac)"]) {
+      if (codecString) {
+        [codecString appendString:@",faac"];
+      } else {
+        codecString = [NSMutableString stringWithString:@"faac"];
+      }
+    } else if ([[audioDetails objectForKey:@"AudioEncoder"] isEqualToString:@"AC3 Passthru"]) {
+      if (codecString) {
+        [codecString appendString:@",ac3"];
+      } else {
+        codecString = [NSMutableString stringWithString:@"ac3"];
+      }
+    }
   }
+  
+  return codecString;
 }
 
-- (int)videoFrameRateIndexForString:(NSString *)aString {
-  if ([aString compare:@"Same as source"] == NSOrderedSame) {
-    return 0;
-  } else if ([aString compare:@"5"] == NSOrderedSame) {
-    return 1;
-  } else if ([aString compare:@"10"] == NSOrderedSame) {
-    return 2;
-  } else if ([aString compare:@"12"] == NSOrderedSame) {
-    return 3;
-  } else if ([aString compare:@"15"] == NSOrderedSame) {
-    return 4;
-  } else if ([aString compare:@"23.976 (NTSC Film)"] == NSOrderedSame) {
-    return 5;
-  } else if ([aString compare:@"24"] == NSOrderedSame) {
-    return 6;
-  } else if ([aString compare:@"25 (PAL Film/Video)"] == NSOrderedSame) {
-    return 7;
-  } else if ([aString compare:@"29.97 (NTSC Video)"] == NSOrderedSame) {
-    return 8;
-  } else {
-    return -1;
+- (NSString *) audioSampleRateForPreset:(NSDictionary *)aPreset
+{
+  NSMutableString *sampleRateString = nil;
+  
+  NSArray *audioList = [aPreset valueForKey:@"AudioList"];
+  for (NSDictionary *audioDetails in audioList) {
+    if ([audioDetails objectForKey:@"AudioSamplerate"]){
+      if (sampleRateString) {
+        [sampleRateString appendFormat:@",%@", [audioDetails objectForKey:@"AudioSamplerate"]];
+      } else {
+        sampleRateString = [NSMutableString stringWithFormat:@"%@", [audioDetails objectForKey:@"AudioSamplerate"]];
+      }
+    }
   }
+  
+  return sampleRateString;
 }
-
-- (int)subtitleIndexForString:(NSString *)aString {
-  if ([aString compare:@"None"] == NSOrderedSame) {
-    return 0;
-  } else if ([aString compare:@"Autoselect"] == NSOrderedSame) {
-    return 1;
-  } else {
-    return -1;
+   
+- (NSString *) audioBitrateForPreset:(NSDictionary *)aPreset
+{
+  NSMutableString *bitRateString = nil;
+  
+  NSArray *audioList = [aPreset valueForKey:@"AudioList"];
+  for (NSDictionary *audioDetails in audioList) {
+    if ([audioDetails objectForKey:@"AudioBitrate"]){
+      if (bitRateString) {
+        [bitRateString appendFormat:@",%@", [audioDetails objectForKey:@"AudioBitrate"]];
+      } else {
+        bitRateString = [NSMutableString stringWithFormat:@"%@", [audioDetails objectForKey:@"AudioBitrate"]];
+      }
+    }
   }
+  
+  return bitRateString;
 }
 
-- (int)audioBitRateTagForString:(NSString *)aString {
-  // Although handbrake uses a tag to encode the audio bitrate (ie 128 for 128Kbps) we can
-  // just do a straight conversion on the string value - it should be fine.
-  return [aString intValue];
+- (NSString *) drcForPreset:(NSDictionary *)aPreset
+{
+  NSMutableString *drcString = nil;
+  
+  NSArray *audioList = [aPreset valueForKey:@"AudioList"];
+  for (NSDictionary *audioDetails in audioList) {
+    if ([audioDetails objectForKey:@"AudioTrackDRCSlider"]){
+      if (drcString) {
+        [drcString appendFormat:@",%.1f", [[audioDetails objectForKey:@"AudioTrackDRCSlider"] floatValue]];
+      } else {
+        drcString = [NSMutableString stringWithFormat:@"%.1f", [[audioDetails objectForKey:@"AudioTrackDRCSlider"] floatValue]];
+      }
+    }
+  }
+  
+  return drcString;
 }
 
+- (NSString *) audioMixdownForPreset:(NSDictionary *)aPreset
+{
+  NSMutableString *mixdownString = nil;
+  
+  NSArray *audioList = [aPreset valueForKey:@"AudioList"];
+  for (NSDictionary *audioDetails in audioList) {
+    if ([[audioDetails objectForKey:@"AudioMixdown"] isEqualToString:@"Dolby Pro Logic II"]) {
+      if (mixdownString) {
+        [mixdownString appendString:@",dpl2"];
+      } else {
+        mixdownString = [NSMutableString stringWithString:@"dpl2"];
+      }
+    } else  if ([[audioDetails objectForKey:@"AudioMixdown"] isEqualToString:@"AC3 Passthru"]) {
+      if (mixdownString) {
+        [mixdownString appendString:@",auto"];
+      } else {
+        mixdownString = [NSMutableString stringWithString:@"auto"];
+      }
+    }
+  }
+  return mixdownString;
+}
 @end

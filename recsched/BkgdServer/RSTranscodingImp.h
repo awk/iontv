@@ -33,6 +33,10 @@
   id mUIActivity;
   size_t mActivityToken;
   float mLastProgressValue;
+  
+  int mDefaultAcodec;
+  int mNumAudioTracks;
+  hb_list_t *mAudios;
 }
 
 - (id)initWithTranscoding:(RSTranscoding *)mTranscoding;

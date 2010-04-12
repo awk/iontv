@@ -45,7 +45,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
       // preferably) before we can continue on with creating the real transcode job ?
       if ([[NSFileManager defaultManager] fileExistsAtPath:mCurrentTranscoding.schedule.recording.mediaFile]) {
         NSLog(@"updateForNewTranscodings - have candidate for transcoding = %@", mCurrentTranscoding.schedule.program.title);
-        hb_scan(mHandbrakeHandle, [[NSFileManager defaultManager] fileSystemRepresentationWithPath:mCurrentTranscoding.schedule.recording.mediaFile], 0);
+        hb_scan(mHandbrakeHandle, [[NSFileManager defaultManager] fileSystemRepresentationWithPath:mCurrentTranscoding.schedule.recording.mediaFile], 0, 1, 1);
 
         // Set a timer running to watch the progress of the scan
         [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(scanProgressTimerCallback:) userInfo:nil repeats:YES];
@@ -169,6 +169,15 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
       NSString *plistPresetName = [aPreset valueForKey:@"PresetName"];
       if ([plistPresetName compare:presetName] == NSOrderedSame) {
         chosenPreset = aPreset;
+      } else if ([plistPresetName isEqualToString:@"Apple"]) {
+        for (NSDictionary *applePreset in [aPreset valueForKey:@"ChildrenArray"]) {
+          NSString *plistPresetName = [applePreset valueForKey:@"PresetName"];
+          if ([plistPresetName compare:presetName] == NSOrderedSame) {
+            chosenPreset = applePreset;
+          }
+        }
+      }
+      if (chosenPreset != nil) {
         break;    // Got a match
       }
     }
@@ -284,6 +293,10 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
   }
   [mCurrentTranscoding release];
   mCurrentTranscoding = nil;
+  
+  // Save any updated status
+  [[NSApp delegate] saveAction:self];
+
   // Check to see if there's another candidate to transcode
   [self updateForNewTranscodings:[mTranscodingsArrayController arrangedObjects]];
 }
@@ -323,7 +336,8 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
         RSTranscoding *aTranscoding = [NSEntityDescription insertNewObjectForEntityForName:@"Transcoding" inManagedObjectContext:[[NSApp delegate] managedObjectContext]];
         [aTranscoding setSchedule:aRecording.schedule];
         [aTranscoding setStatus:[NSNumber numberWithInt:RSRecordingNotYetStartedStatus]];
-      } else if ([aRecording.schedule.transcoding.status intValue] == RSRecordingInProgressStatus) {
+      } else if (([aRecording.schedule.transcoding.status intValue] == RSRecordingInProgressStatus) ||
+                 ([aRecording.schedule.transcoding.status intValue] == RSRecordingNotYetStartedStatus)) {
         // This is a prior transcoding that failed to complete when we exited the server last time,
         // restart it now
         aRecording.schedule.transcoding.status = [NSNumber numberWithInt:RSRecordingNotYetStartedStatus];
