@@ -25,7 +25,6 @@ NSString *RSDeviceScanCompleteNotification = @"RSDeviceScanCompleteNotification"
 NSString *RSChannelScanCompleteNotification = @"RSChannelScanCompleteNotification";
 NSString *RSLineupRetrievalCompleteNotification = @"RSLineupRetrievalCompleteNotification";
 NSString *RSScheduleUpdateCompleteNotification = @"RSScheduleUpdateCompleteNotification";
-NSString *RSCleanupCompleteNotification = @"RSCleanupCompleteNotification";
 NSString *RSDownloadErrorNotification = @"RSDownloadErrorNotification";
 
 NSString *RSRecordingAddedNotification = @"RSRecordingAddedNotification";

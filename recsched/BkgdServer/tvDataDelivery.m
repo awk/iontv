@@ -36,12 +36,6 @@
 // URL for SOAP services used to retrieve the listings
 // @"http://webservices.schedulesdirect.tmsdatadirect.com/schedulesdirect/tvlistings/xtvdService
 
-NSString *kTVDataDeliveryFetchFutureScheduleKey = @"fetchFutureSchedule";
-NSString *kTVDataDeliveryLineupsOnlyKey = @"lineupsOnly";
-NSString *kTVDataDeliveryStartDateKey = @"startDateStr";
-NSString *kTVDataDeliveryEndDateKey = @"endDateStr";
-NSString *kTVDataDeliveryReportProgressToKey = @"reportProgressTo";
-NSString *kTVDataDeliveryDataRecipientKey = @"dataRecipient";
 
 @implementation tvDataDelivery
 
@@ -50,9 +44,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
   // Create a temp file path - rather than allowing the default WebServices parser to try and handle the returned
   // XML data we just write it to a file and parse it seperately later. The WebServices parser is confused anyway
   // by a lot of the XML in this file and tries to interpret things as SOAP returned variables.
-  char *tmpXMLFilePath = tempnam(NULL,"recsched.");
-  NSString *xmlFilePath = [[[NSString alloc] initWithCString:tmpXMLFilePath] autorelease];
-  free(tmpXMLFilePath);
+  NSString *xmlFilePath = (NSString *) info;
 
   // Find the <xtvd ..> portion of the input XML - that's all we need to write out
   CFDataRef dataRef = CFXMLTreeCreateXMLData(kCFAllocatorDefault, deserializeRoot);
@@ -111,6 +103,7 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
     CFRelease(fAuthorizedRef);
     fAuthorizedRef = nil;
   }
+  [fXMLFilePath release];
   [super dealloc];
 }
 
@@ -173,7 +166,10 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
       fResult = NULL;
 
       CFStringRef wsGeneratedAuthMode = CFSTR("NS-WSSYNCAUTH");
-      WSMethodInvocationAddDeserializationOverride(fAuthorizedRef,CFSTR("urn:TMSWebServices"),CFSTR("xtvd"),deserializationCallback,NULL);
+      WSClientContext clientContext;
+      memset(&clientContext, 0, sizeof clientContext);
+      clientContext.info = fXMLFilePath;
+      WSMethodInvocationAddDeserializationOverride(fAuthorizedRef,CFSTR("urn:TMSWebServices"),CFSTR("xtvd"),deserializationCallback, &clientContext);
       WSMethodInvocationScheduleWithRunLoop(fAuthorizedRef, [[NSRunLoop currentRunLoop] getCFRunLoop], wsGeneratedAuthMode);
 
       while (fResult == NULL) {
@@ -206,6 +202,12 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
     }
   }
   return fResult;
+}
+
+- (void) setXMLFilePath:(NSString *)xmlFilePath {
+  NSString *oldPath = fXMLFilePath;
+  fXMLFilePath = [xmlFilePath retain];
+  [oldPath release];
 }
 
 @end; /* tvDataDelivery */
@@ -282,10 +284,13 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 }
 
 
-+ (id)download:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_endTime {
++ (id)download:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_startTime
+    in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_endTime
+   xmlFilePath:(NSString *)xmlFilePath {
   id result = NULL;
   download* _invocation = [[download alloc] init];
   [_invocation setParameters: in_startTime in_endTime:in_endTime];
+  [_invocation setXMLFilePath:xmlFilePath];
   result = [[_invocation resultValue] retain];
   [_invocation release];
   return result;
@@ -293,59 +298,56 @@ static CFTypeRef deserializationCallback(WSMethodInvocationRef invocation, CFXML
 
 @end;
 
+@implementation xtvdDownloadOperation
 
-@implementation xtvdDownloadThread
+- (id)initWithXMLFilePath:(NSString*)xmlFilePath
+                startDate:(NSDate *)startDate
+                  endDate:(NSDate *)endDate
+         progressReporter:(NSObject<RSActivityDisplay> *)progressReporter {
+  if (self = [super init]) {
+    mXMLFilePath = [xmlFilePath retain];
+    mStartDate = [startDate retain];
+    mEndDate = [endDate retain];
+    mProgressReporter = [progressReporter retain];
+  }
+  return self;
+}
 
-- (void)performDownload:(id)downloadInfo {
+- (void)dealloc {
+  [mXMLFilePath release];
+  [mStartDate release];
+  [mEndDate release];
+  [mProgressReporter release];
+  [super dealloc];
+}
+
+- (void)main {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   size_t activityToken;
-
-  NSDictionary *xtvdDownloadData = (NSDictionary*)downloadInfo;
-
-  id reportProgressTo = [xtvdDownloadData valueForKey:kTVDataDeliveryReportProgressToKey];
-  BOOL reportProgress = [reportProgressTo conformsToProtocol:@protocol(RSActivityDisplay)];
-
-  if (reportProgress) {
-    activityToken = [reportProgressTo createActivity];
-    activityToken = [reportProgressTo setActivity:activityToken infoString:@"Downloading Schedule Data"];
-    activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:YES];
-  }
-
-  NSDictionary *downloadResult = [xtvdWebService download:[xtvdDownloadData valueForKey:kTVDataDeliveryStartDateKey] in_endTime:[xtvdDownloadData valueForKey:kTVDataDeliveryEndDateKey]];
-
+  
+  activityToken = [mProgressReporter createActivity];
+  activityToken = [mProgressReporter setActivity:activityToken infoString:@"Downloading Schedule Data"];
+  activityToken = [mProgressReporter setActivity:activityToken progressIndeterminate:YES];
+  
+  NSDictionary *downloadResult = [xtvdWebService download:mStartDate in_endTime:mEndDate xmlFilePath:mXMLFilePath];
+  
   if ((downloadResult == nil) || ([downloadResult valueForKey:@"xtvd"] == nil)) {
     // Error during the download - notify the other side and return
     [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSDownloadErrorNotification object:RSBackgroundApplication userInfo:downloadResult];
-    if (reportProgress) {
-      activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
-      [reportProgressTo endActivity:activityToken];
-    }
+    activityToken = [mProgressReporter setActivity:activityToken progressIndeterminate:NO];
+    [mProgressReporter endActivity:activityToken];
     [pool release];
     return;
   }
 
-  NSMutableDictionary *parserCallData = [[NSMutableDictionary alloc] initWithDictionary:downloadResult];
-  if ([xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] != nil) {
-    [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryLineupsOnlyKey] forKey:kTVDataDeliveryLineupsOnlyKey];
-  }
-  if ([xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil) {
-    [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
-    [parserCallData setValue:[xtvdDownloadData valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
-  }
+  activityToken = [mProgressReporter setActivity:activityToken progressIndeterminate:NO];
+  [mProgressReporter endActivity:activityToken];
 
-  if (reportProgress) {
-    activityToken = [reportProgressTo setActivity:activityToken progressIndeterminate:NO];
-    [reportProgressTo endActivity:activityToken];
-  }
-  if ([[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] respondsToSelector:@selector(handleDownloadData:)]) {
-    [[xtvdDownloadData valueForKey:kTVDataDeliveryDataRecipientKey] performSelector:@selector(handleDownloadData:) withObject:parserCallData];
-  }
-  [parserCallData release];
   [downloadResult release];
   [pool release];
 }
 
-@end;
+@end
 
 /*-
  * End of WSDL document at tvDataDelivery.wsdl

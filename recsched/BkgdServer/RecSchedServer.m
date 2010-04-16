@@ -53,11 +53,18 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
 @end
 
 @interface RecSchedServer(Private)
-- (RSRecording *)addRecordingOfSchedule:(Z2ITSchedule *)schedule addConflictsTo:(NSMutableArray *)conflicts;
+- (RSRecording *)addRecordingOfSchedule:(Z2ITSchedule *)schedule
+                         addConflictsTo:(NSMutableArray *)conflicts;
 - (void)cancelRecording:(RSRecording *)aRecording;
-- (BOOL)scheduleFutureRecordingsForSeasonPass:(RSSeasonPass *)aSeasonPass addNewRecordingsTo:(NSMutableArray *)recordings error:(NSError **)error;
+- (BOOL)scheduleFutureRecordingsForSeasonPass:(RSSeasonPass *)aSeasonPass
+                           addNewRecordingsTo:(NSMutableArray *)recordings
+                                        error:(NSError **)error;
 - (void)createRecordingsForAllSeasonPasses;
 - (SCNetworkReachabilityRef)getSDServerReachableRef;
+- (void) downloadParseAndCleanupSchedulesWithStartDate:(NSDate *)startDate
+                                               endDate:(NSDate *)endDate
+                                           lineupsOnly:(BOOL)lineupsOnly
+                                   fetchFutureSchedule:(BOOL)fetchFutureSchedule;
 @end
 
 @implementation RecSchedServer
@@ -75,9 +82,9 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
 
     // Watch for schedule and lineup download/parsing complete notifications
     [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(scheduleUpdateCompleteNotification:) name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];
-    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(lineupRetrievalCompleteNotification:) name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
-    [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(cleanupCompleteNotification:) name:RSCleanupCompleteNotification object:RSBackgroundApplication];
     [[NSDistributedNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadErrorNotification:) name:RSDownloadErrorNotification object:RSBackgroundApplication];
+    
+    mXTVDQueue = [[NSOperationQueue alloc] init];
   }
   return self;
 }
@@ -86,11 +93,10 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
   [mUIActivityProxy release];
 
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication];
-  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication];
-  [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSCleanupCompleteNotification object:RSBackgroundApplication];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver:self name:RSDownloadErrorNotification object:RSBackgroundApplication];
 
   [mLastScheduleFetchEndDate release];
+  [mXTVDQueue release];
   [super dealloc];
 }
 
@@ -159,53 +165,7 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
   return mUIActivityProxy;
 }
 
-- (void)performCleanup:(id)info {
-  // Clear all old items from the store
-  NSDate *cleanupDate = [NSDate dateWithTimeIntervalSinceNow:-(12 * 60 * 60)];		// 12 hours prior to now
-  NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:cleanupDate, kCleanupDateKey,
-                                        self, @"reportProgressTo",
-                                        [[NSApp  delegate] persistentStoreCoordinator], kPersistentStoreCoordinatorKey,
-                                        nil];
-
-  if ([info valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil) {
-    [callData setValue:[info valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
-  }
-  if ([info valueForKey:kTVDataDeliveryEndDateKey] != nil) {
-    [callData setValue:[info valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
-  }
-
-  xtvdCleanupThread *aCleanupThread = [[xtvdCleanupThread alloc] init];
-  [NSThread detachNewThreadSelector:@selector(performCleanup:) toTarget:aCleanupThread withObject:callData];
-  [aCleanupThread release];
-  [callData release];
-}
-
 #pragma mark - Internal Methods
-
-- (void)fetchScheduleWithDuration:(int)inHours {
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-
-  // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
-  // SchedulesDirect expects
-  CFGregorianDate startDate = CFAbsoluteTimeGetGregorianDate(currentTime,NULL);
-
-  // Retrieve 'n' hours of data
-  CFGregorianUnits retrieveRange;
-  memset(&retrieveRange, 0, sizeof(retrieveRange));
-  retrieveRange.hours = inHours;
-
-  CFAbsoluteTime endTime = CFAbsoluteTimeAddGregorianUnits(currentTime, NULL, retrieveRange);
-  CFGregorianDate endDate = CFAbsoluteTimeGetGregorianDate(endTime,NULL);
-
-  NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
-  NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
-
-  xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, kTVDataDeliveryStartDateKey, endDateStr, kTVDataDeliveryEndDateKey, self, kTVDataDeliveryDataRecipientKey, self, kTVDataDeliveryReportProgressToKey, nil];
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
-  [aDownloadThread release];
-  [callData release];
-}
 
 - (void)recordingComplete:(NSManagedObjectID *)aRecordingObjectID {
   RSRecording *recordingJustFinished = (RSRecording*)[[[NSApp delegate] managedObjectContext] objectRegisteredForID:aRecordingObjectID];
@@ -244,7 +204,12 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
   [NSTimer scheduledTimerWithTimeInterval:(kDefaultUpdateScheduleFetchDurationInHours - 1) * 60 * 60 target:self selector:@selector(updateScheduleTimer:) userInfo:nil repeats:NO];
 
   if (updateScheduleNow) {
-    [self fetchScheduleWithDuration:kDefaultUpdateScheduleFetchDurationInHours];
+    NSDate *startDate = [NSDate date];
+    NSDate *endDate = [startDate dateByAddingTimeInterval:kDefaultUpdateScheduleFetchDurationInHours * 60 * 60];
+    [self downloadParseAndCleanupSchedulesWithStartDate:startDate
+                                                endDate:endDate
+                                            lineupsOnly:NO
+                                    fetchFutureSchedule:NO];
   }
 }
 
@@ -326,14 +291,10 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
 
     NSLog(@"Fetching future schedule data for %@ to %@", startDateStr, endDateStr);
 
-    NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, kTVDataDeliveryStartDateKey, endDateStr, kTVDataDeliveryEndDateKey,
-                                                                          self, kTVDataDeliveryDataRecipientKey, self, kTVDataDeliveryReportProgressToKey,
-                                                                          [NSNumber numberWithBool:YES], kTVDataDeliveryFetchFutureScheduleKey, nil];
-    // We 'transfer' ownership of this dictionary to this new thread - they'll release the memory for us.
-    xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
-    [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
-    [aDownloadThread release];
-    [callData release];
+    [self downloadParseAndCleanupSchedulesWithStartDate:mLastScheduleFetchEndDate
+                                                endDate:endDate
+                                            lineupsOnly:NO
+                                    fetchFutureSchedule:YES];
     return YES;
   }
 
@@ -352,47 +313,7 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
   [self fetchFutureSchedule:nil];
 }
 
-
-#pragma mark Callback Methods
-
-- (void)handleDownloadData:(id)inDownloadResult {
-  NSDictionary *downloadResult = (NSDictionary*)inDownloadResult;
-  NSDictionary *messages = [downloadResult valueForKey:@"messages"];
-  NSDictionary *xtvd = [downloadResult valueForKey:@"xtvd"];
-  NSLog(@"getScheduleAction downloadResult message = %@", [messages valueForKey:@"message"]);
-
-  if (xtvd != nil) {
-    id notificationProxy = [self uiActivity];
-    if (notificationProxy == nil) {
-      notificationProxy = self;
-    }
-    NSMutableDictionary *callData = [[NSMutableDictionary alloc] initWithObjectsAndKeys:[xtvd valueForKey:@"xmlFilePath"], @"xmlFilePath",
-        notificationProxy, @"reportProgressTo",
-        [[NSApp  delegate] persistentStoreCoordinator], kPersistentStoreCoordinatorKey,
-        nil];
-
-    if ([downloadResult valueForKey:kTVDataDeliveryLineupsOnlyKey] != nil) {
-      [callData setValue:[downloadResult valueForKey:kTVDataDeliveryLineupsOnlyKey] forKey:kTVDataDeliveryLineupsOnlyKey];
-    }
-    if ([downloadResult valueForKey:kTVDataDeliveryFetchFutureScheduleKey] != nil) {
-      [callData setValue:[downloadResult valueForKey:kTVDataDeliveryFetchFutureScheduleKey] forKey:kTVDataDeliveryFetchFutureScheduleKey];
-      [callData setValue:[downloadResult valueForKey:kTVDataDeliveryEndDateKey] forKey:kTVDataDeliveryEndDateKey];
-    }
-
-    // Start our local parsing
-    xtvdParseThread *aParseThread = [[xtvdParseThread alloc] init];
-
-    [NSThread detachNewThreadSelector:@selector(performParse:) toTarget:aParseThread withObject:callData];
-    [aParseThread release];
-    [callData release];
-  }
-}
-
 #pragma mark Notifications
-
-- (void)lineupRetrievalCompleteNotification:(NSNotification *)aNotification {
-  [self performCleanup:[aNotification userInfo]];
-}
 
 - (void)scheduleUpdateCompleteNotification:(NSNotification *)aNotification {
   // Update the 'scheduleUpdated' file
@@ -401,17 +322,6 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
   [[NSFileManager defaultManager] createFileAtPath:scheduleUpdatedPath contents:nil attributes:nil];
 
   [self createRecordingsForAllSeasonPasses];
-
-  // Cleanup any stale data in the database
-  [self performCleanup:[aNotification userInfo]];
-}
-
-- (void)cleanupCompleteNotification:(NSNotification *)aNotification {
-  NSLog(@"cleanupComplete");
-  if ([[[aNotification userInfo] valueForKey:kTVDataDeliveryFetchFutureScheduleKey] boolValue] == YES) {
-    mLastScheduleFetchEndDate = [[NSCalendarDate alloc] initWithString:[[aNotification userInfo] valueForKey:kTVDataDeliveryEndDateKey] calendarFormat:@"%Y-%m-%dT%H:%M:%SZ"];
-    [self performSelectorOnMainThread:@selector(fetchFutureSchedule:) withObject:nil waitUntilDone:NO];
-  }
 }
 
 - (void)downloadErrorNotification:(NSNotification *)aNotification {
@@ -626,31 +536,12 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
 }
 
 - (oneway void)updateLineups {
-  CFAbsoluteTime currentTime = CFAbsoluteTimeGetCurrent();
-
-  // Converting the current time to a Gregorian Date with no timezone gives us a GMT time that
-  // SchedulesDirect expects
-  CFGregorianDate startDate = CFAbsoluteTimeGetGregorianDate(currentTime,NULL);
-
-  // Retrieve 'n' hours of data
-  CFGregorianUnits retrieveRange;
-  memset(&retrieveRange, 0, sizeof(retrieveRange));
-
-  retrieveRange.minutes = 0;
-
-  CFAbsoluteTime endTime = CFAbsoluteTimeAddGregorianUnits(currentTime, NULL, retrieveRange);
-  CFGregorianDate endDate = CFAbsoluteTimeGetGregorianDate(endTime,NULL);
-
-  NSString *startDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", startDate.year, startDate.month, startDate.day, startDate.hour];
-  NSString *endDateStr = [NSString stringWithFormat:@"%d-%d-%dT%d:0:0Z", endDate.year, endDate.month, endDate.day, endDate.hour];
-
-  NSDictionary *callData = [[NSDictionary alloc] initWithObjectsAndKeys:startDateStr, kTVDataDeliveryStartDateKey, endDateStr, kTVDataDeliveryEndDateKey, [NSNumber numberWithBool:YES], kTVDataDeliveryLineupsOnlyKey,
-      self, kTVDataDeliveryDataRecipientKey,
-      self, kTVDataDeliveryReportProgressToKey, nil];
-  xtvdDownloadThread *aDownloadThread = [[xtvdDownloadThread alloc] init];
-  [NSThread detachNewThreadSelector:@selector(performDownload:) toTarget:aDownloadThread withObject:callData];
-  [aDownloadThread release];
-  [callData release];
+  NSDate *startDate = [NSDate date];
+  NSDate *endDate = [NSDate date];
+  [self downloadParseAndCleanupSchedulesWithStartDate:startDate
+                                              endDate:endDate
+                                          lineupsOnly:YES
+                                  fetchFutureSchedule:NO];
 }
 
 - (void)scanForHDHomeRunDevices:(id)sender {
@@ -933,6 +824,48 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
 
 - (SCNetworkReachabilityRef) getSDServerReachableRef {
   return mSDServerReachableRef;
+}
+
+- (void) downloadParseAndCleanupSchedulesWithStartDate:(NSDate *)startDate
+                                               endDate:(NSDate *)endDate
+                                           lineupsOnly:(BOOL)lineupsOnly
+                                   fetchFutureSchedule:(BOOL)fetchFutureSchedule {
+  char *tmpPath = tempnam(NULL, "recsched.");
+  NSString *xmlFilePath = [NSString stringWithUTF8String:tmpPath];
+  free(tmpPath);
+  NSOperation *downloadOperation = [[xtvdDownloadOperation alloc] initWithXMLFilePath:xmlFilePath
+                                                                            startDate:startDate
+                                                                              endDate:endDate
+                                                                     progressReporter:self];
+  NSOperation *parseOperation = [[xtvdParseOperation alloc] initWithFilePath:xmlFilePath
+                                                            progressReporter:self
+                                                                 lineupsOnly:lineupsOnly];
+  [parseOperation setCompletionBlock:^{
+    dispatch_async(dispatch_get_main_queue(),^{
+      if (lineupsOnly) {
+        [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSLineupRetrievalCompleteNotification object:RSBackgroundApplication userInfo:nil];
+      } else {
+        [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSScheduleUpdateCompleteNotification object:RSBackgroundApplication userInfo:nil];
+      }
+    });
+  }];
+  [parseOperation addDependency:downloadOperation];
+  
+  // Clear all old items from the store
+  NSDate *cleanupDate = [NSDate dateWithTimeIntervalSinceNow:-(12 * 60 * 60)];		// 12 hours prior to now
+  NSOperation *cleanupOperation = [[xtvdCleanupOperation alloc] initWithCleanupDate:cleanupDate
+                                                                   progressReporter:self];
+  [cleanupOperation setCompletionBlock:^{
+    mLastScheduleFetchEndDate = [endDate retain];
+    if (fetchFutureSchedule) {
+      [self performSelectorOnMainThread:@selector(fetchFutureSchedule:) withObject:nil waitUntilDone:NO];
+    }
+  }];
+  [cleanupOperation addDependency:parseOperation];
+  
+  [mXTVDQueue addOperation:downloadOperation];
+  [mXTVDQueue addOperation:parseOperation];
+  [mXTVDQueue addOperation:cleanupOperation];
 }
 
 @end

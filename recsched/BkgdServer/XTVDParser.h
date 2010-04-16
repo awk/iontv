@@ -19,8 +19,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-extern NSString *kCleanupDateKey;
-extern NSString *kPersistentStoreCoordinatorKey;
+@protocol RSActivityDisplay;
 
 @interface XTVDParser : NSObject {
   id mReportProgressTo;
@@ -34,18 +33,28 @@ extern NSString *kPersistentStoreCoordinatorKey;
 
 @end
 
-@interface xtvdParseThread : NSObject {
-  NSManagedObjectContext *mManagedObjectContext;
+
+@interface xtvdCleanupOperation : NSOperation
+{
+  NSObject<RSActivityDisplay> *mProgressReporter;
+  NSDate *mCleanupDate;
 }
 
-- (void)performParse:(id)parseInfo;
+- (id) initWithCleanupDate:(NSDate *)cleanupDate
+          progressReporter:(NSObject<RSActivityDisplay> *)progressReporter;
 
-@end;
+@end
 
-@interface xtvdCleanupThread : NSObject {
+@interface xtvdParseOperation : NSOperation
+{
+  NSObject<RSActivityDisplay> *_progressReporter;
+  BOOL _lineupsOnly;
+  NSString *_xmlFilePath;
 }
 
-- (void)performCleanup:(id)cleanupInfo;
-
-@end;
+- (id) initWithFilePath:(NSString *)filePath
+       progressReporter:(NSObject<RSActivityDisplay> *)progressReporter
+            lineupsOnly:(BOOL)lineupsOnly;
+  
+@end
 

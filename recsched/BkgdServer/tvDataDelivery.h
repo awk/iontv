@@ -34,15 +34,9 @@
 
 extern NSString *kWebServicesSDPath;
 
-extern NSString *kTVDataDeliveryFetchFutureScheduleKey;
-extern NSString *kTVDataDeliveryLineupsOnlyKey;
-extern NSString *kTVDataDeliveryStartDateKey;
-extern NSString *kTVDataDeliveryEndDateKey;
-extern NSString *kTVDataDeliveryReportProgressToKey;
-extern NSString *kTVDataDeliveryDataRecipientKey;
-
 @interface tvDataDelivery : WSGeneratedObj {
   WSMethodInvocationRef fAuthorizedRef;
+  NSString *fXMLFilePath;
 }
 
 // We just override some SOAP processing messages to perform authentication
@@ -89,15 +83,29 @@ extern NSString *kTVDataDeliveryDataRecipientKey;
 @interface xtvdWebService : NSObject
 
 + (id)acknowledge;
-+ (id)download:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_startTime in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_endTime;
++ (id)download:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_startTime
+    in_endTime:(CFTypeRef /* Complex type urn:TMSWebServices|dateTime */)in_endTime
+   xmlFilePath:(NSString *)xmlFilePath;
 
 @end;
 
-@interface xtvdDownloadThread : NSObject
+@protocol RSActivityDisplay;
 
-- (void)performDownload:(id)downloadInfo;
+@interface xtvdDownloadOperation : NSOperation
+{
+  NSString *mXMLFilePath;
+  NSObject<RSActivityDisplay> *mProgressReporter;
+  NSDate *mStartDate;
+  NSDate *mEndDate;
+  BOOL mFetchFutureSchedule;
+}
 
-@end;
+- (id) initWithXMLFilePath:(NSString *)xmlFilePath
+                 startDate:(NSDate *)startDate
+                   endDate:(NSDate *)endDate
+          progressReporter:(NSObject<RSActivityDisplay> *)progressReporter;
+
+@end
 
 #endif /* __tvDataDelivery__ */
 /*-

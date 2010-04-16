@@ -45,12 +45,13 @@ extern const int kDefaultFutureScheduleFetchDurationInHours;
 
   NSTimer *mFetchFutureScheduleTimer;
   SCNetworkReachabilityRef mSDServerReachableRef;
+  
+  NSOperationQueue *mXTVDQueue;
 }
 
 - (bool) shouldExit;
 - (BOOL) fetchFutureSchedule:(id)info;
 - (RSActivityProxy*) uiActivity;
-- (void) performCleanup:(id)info;
 
 @property BOOL mExitServer;
 //@property (retain,getter=uiActivity) id mUIActivity;
