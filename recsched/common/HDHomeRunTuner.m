@@ -330,18 +330,6 @@ const int kCallSignStringLength = 10;
   }
 }
 
-/**
-    Notification sent out when the threads own managedObjectContext has been.  This method
-    ensures updates from the thread (which has its own managed object
-    context) are merged into the application managed object content, so the
-    user always sees the most current information.
-*/
-
-- (void)threadContextDidSave:(NSNotification *)notification {
-  RSCommonAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
-  [appDelegate performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
-}
-
 #pragma Initialization
 
 - (void)createHDHRDevice {
@@ -606,6 +594,18 @@ const int kCallSignStringLength = 10;
   [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:RSBackgroundApplication userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:1], @"scanResult", nil] deliverImmediately:NO];
   
   mCurrentProgressDisplay = nil;
+}
+
+/**
+ Notification sent out when the threads own managedObjectContext has been.  This method
+ ensures updates from the thread (which has its own managed object
+ context) are merged into the application managed object content, so the
+ user always sees the most current information.
+ */
+
+- (void)threadContextDidSave:(NSNotification *)notification {
+  RSCommonAppDelegate *appDelegate = [[NSApplication sharedApplication] delegate];
+  [appDelegate performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
 }
 
 - (void) main {
