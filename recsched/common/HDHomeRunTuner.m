@@ -34,11 +34,21 @@
 
 const int kCallSignStringLength = 10;
 
-@interface HDHomeRunTunerChannelScanThread : NSObject
+@interface ScanOperation : NSOperation
+{
+  NSManagedObjectID *mTunerObjectID;
+  HDHomeRunTuner *mTuner;
+  NSManagedObjectContext *mManagedObjectContext;
+  NSObject<RSActivityDisplay> *mCurrentProgressDisplay;
+}
 
-+ (void) performScan:(NSManagedObjectID*)aTunerObjectID;
+@property (nonatomic, retain, setter=setManagedObjectContext, getter=managedObjectContext) NSManagedObjectContext *mManagedObjectContext;
+@property (nonatomic, retain, setter=setTuner, getter=tuner) HDHomeRunTuner *mTuner;
 
-@end;
+- (id) initWithTunerObjectID:(NSManagedObjectID *)aTunerObjectID
+            progressReporter:(NSObject<RSActivityDisplay> *)progressReporter;
+
+@end
 
 // coalesce these into one @interface HDHomeRunTuner (CoreDataGeneratedPrimitiveAccessors) section
 @interface HDHomeRunTuner (CoreDataGeneratedPrimitiveAccessors)
@@ -53,6 +63,7 @@ const int kCallSignStringLength = 10;
 @interface HDHomeRunTuner (Private)
 - (void) createHDHRDevice;
 - (void) releaseHDHRDevice;
+- (struct hdhomerun_device_t *) getHDHRDevice;
 @end
 
 @implementation HDHomeRunTuner
@@ -119,8 +130,9 @@ const int kCallSignStringLength = 10;
 #pragma mark - Actions
 
 - (void)scanActionReportingProgressTo:(id)progressDisplay {
-  mCurrentProgressDisplay = progressDisplay;
-  [NSThread detachNewThreadSelector:@selector(performScan:) toTarget:[HDHomeRunTunerChannelScanThread class] withObject:[self objectID]];
+  NSOperation *scanOperation = [[ScanOperation alloc] initWithTunerObjectID:[self objectID]
+                                                           progressReporter:progressDisplay];
+  [mOperationQueue addOperation:scanOperation];
 }
 
 - (void)startStreaming {
@@ -305,6 +317,10 @@ const int kCallSignStringLength = 10;
 }
 #endif
 
+- (struct hdhomerun_device_t *) getHDHRDevice {
+  return mHDHomeRunDevice;
+}
+
 #pragma mark - Notifications
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -326,7 +342,71 @@ const int kCallSignStringLength = 10;
   [appDelegate performSelectorOnMainThread:@selector(updateForSavedContext:) withObject:notification waitUntilDone:YES];
 }
 
-#pragma mark - Thread Functions
+#pragma Initialization
+
+- (void)createHDHRDevice {
+  uint32_t deviceID = [[[self device] deviceID] intValue];
+  if ((deviceID != 0) && (mHDHomeRunDevice == nil))   {
+    mHDHomeRunDevice = hdhomerun_device_create(deviceID, 0, [[self index] intValue], NULL);
+  }
+  mOperationQueue = [[NSOperationQueue alloc] init];
+  [mOperationQueue setMaxConcurrentOperationCount:1];
+}
+
+- (void)awakeFromFetch {
+  [super awakeFromFetch];
+  [self createHDHRDevice];
+
+  // Register to be told when the device name changes
+  if ([self device]) {
+    [[self device] addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
+  }
+}
+
+- (void)awakeFromInsert {
+  [super awakeFromInsert];
+  [self createHDHRDevice];
+}
+
+#pragma Uninitialization
+
+- (void)releaseHDHRDevice {
+  if (mHDHomeRunDevice) {
+    hdhomerun_device_destroy(mHDHomeRunDevice);
+  }
+  mHDHomeRunDevice = nil;
+
+  [mOperationQueue release];
+  mOperationQueue = nil;
+}
+
+- (void)willTurnIntoFault {
+  [self releaseHDHRDevice];
+  if ([self device]) {
+    [[self device] removeObserver:self forKeyPath:@"name"];
+  }
+}
+
+@end
+
+@implementation ScanOperation
+
+@synthesize mManagedObjectContext, mTuner;
+
+- (id) initWithTunerObjectID:(NSManagedObjectID *)aTunerObjectID
+            progressReporter:(NSObject<RSActivityDisplay> *)progressReporter {
+  if (self = [super init]) {
+    mTunerObjectID = [aTunerObjectID retain];
+    mCurrentProgressDisplay = [progressReporter retain];
+  }
+  return self;
+}
+
+- (void) dealloc {
+  [mTunerObjectID release];
+  [mCurrentProgressDisplay release];
+  [super dealloc];
+}
 
 - (HDHomeRunChannel *) newChannelFromScanResult:(struct hdhomerun_channelscan_result_t *)scanResult {
   // Parse the channel type and number details from the data string
@@ -357,7 +437,7 @@ const int kCallSignStringLength = 10;
   frequencyNumber = [NSNumber numberWithInt:scanResult->frequency];
   
   // Create a HDHomeRunChannel to match
-  HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:channelType andNumber:channelNumber inManagedObjectContext:[self managedObjectContext]];
+  HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:channelType andNumber:channelNumber inManagedObjectContext:self.managedObjectContext];
   [aChannel setFrequency:frequencyNumber];
   
   return aChannel;
@@ -373,16 +453,16 @@ const int kCallSignStringLength = 10;
   //    13668: 0.0
   // if there's no encoded FCC Channel details or callsign. We need to break up the details add build an HDHomeRunStation object
   if (([programString rangeOfString:@"(encrypted)"].location == NSNotFound)
-       && ([programString rangeOfString:@"(no data)"].location == NSNotFound)
-       && ([programString rangeOfString:@"internet"].location == NSNotFound)
-       && ([programString rangeOfString:@"none"].location == NSNotFound)) {
-
-    HDHomeRunStation *aStation = [HDHomeRunStation createStationWithProgramNumber:[NSNumber numberWithInt:program->program_number] forChannel:hdhrChannel inManagedObjectContext:[self managedObjectContext]];
+      && ([programString rangeOfString:@"(no data)"].location == NSNotFound)
+      && ([programString rangeOfString:@"internet"].location == NSNotFound)
+      && ([programString rangeOfString:@"none"].location == NSNotFound)) {
+    
+    HDHomeRunStation *aStation = [HDHomeRunStation createStationWithProgramNumber:[NSNumber numberWithInt:program->program_number] forChannel:hdhrChannel inManagedObjectContext:self.managedObjectContext];
     
     if (program->name && (program->name[0] != '\0')) {
       [aStation setCallSign:[NSString stringWithUTF8String:program->name]];
-      Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[[self managedObjectContext] objectWithID:[self.lineup objectID]];
-      Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:[NSString stringWithUTF8String:program->name] inLineup:lineupInThreadMOC inManagedObjectContext:[self managedObjectContext]];
+      Z2ITLineup *lineupInThreadMOC =  (Z2ITLineup*)[self.managedObjectContext objectWithID:[self.tuner.lineup objectID]];
+      Z2ITStation *aZ2ITStation = [Z2ITStation fetchStationWithCallSign:[NSString stringWithUTF8String:program->name] inLineup:lineupInThreadMOC inManagedObjectContext:self.managedObjectContext];
       if (aZ2ITStation) {
         [aStation setZ2itStation:aZ2ITStation];
       }
@@ -390,33 +470,32 @@ const int kCallSignStringLength = 10;
   }
 }
 
-// Typically called from a seperate thread to carry out the scanning - the caller must make sure that the instance is
-// in a valid MOC for this thread.
 - (void) performScan {
   HDHomeRunChannel *currentHDHomeRunChannel = nil;
-
+  size_t activityToken;
+  
   // Delete the old channel station map
-  if (self.lineup.channelStationMap != nil) {
-    [[self managedObjectContext] deleteObject:self.lineup.channelStationMap];
+  if (self.tuner.lineup.channelStationMap != nil) {
+    [self.managedObjectContext deleteObject:self.tuner.lineup.channelStationMap];
   }
-
+  
   // Create a new empty channel station map
-  HDHomeRunChannelStationMap *anHDHomeRunChannelStationMap = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunChannelStationMap" inManagedObjectContext:[self managedObjectContext]];
-  [anHDHomeRunChannelStationMap setLineup:self.lineup];
+  HDHomeRunChannelStationMap *anHDHomeRunChannelStationMap = [NSEntityDescription insertNewObjectForEntityForName:@"HDHomeRunChannelStationMap" inManagedObjectContext:self.managedObjectContext];
+  [anHDHomeRunChannelStationMap setLineup:self.tuner.lineup];
   [anHDHomeRunChannelStationMap setLastUpdateDate:[NSDate date]];
-
-  mCurrentActivityToken = 0;
+  
+  activityToken = 0;
   if (mCurrentProgressDisplay) {
-    mCurrentActivityToken = [mCurrentProgressDisplay createActivity];
-    mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken progressMaxValue:390.0f];    // There are a maximum of 390 channels to scan per tuner !
+    activityToken = [mCurrentProgressDisplay createActivity];
+    activityToken = [mCurrentProgressDisplay setActivity:activityToken progressMaxValue:390.0f];    // There are a maximum of 390 channels to scan per tuner !
   }
-
+  
 #if USE_MOCK_CHANNEL_SCAN
   @try {
     @synchronized(self) {
       NSLog(@"HDHomeRunTuner - scanAction for %@", [self longName]);
       
-      scanResult = mock_channelscan_execute_all(mHDHomeRunDevice, 0, cmd_scan_callback, self, [self managedObjectContext]);
+      scanResult = mock_channelscan_execute_all([self.tuner getHDHRDevice], 0, cmd_scan_callback, self, self.managedObjectContext);
     }
   }
   @catch (NSException *anException) {
@@ -424,18 +503,18 @@ const int kCallSignStringLength = 10;
   }
 #else
   char *channelMap;
-  if (hdhomerun_device_get_tuner_channelmap(mHDHomeRunDevice, &channelMap) < 0) {
+  if (hdhomerun_device_get_tuner_channelmap([self.tuner getHDHRDevice], &channelMap) < 0) {
 		NSLog(@"performScan failed to query channelmap from device\n");
     return;
   }
-
+  
 	const char *channelmap_scan_group = hdhomerun_channelmap_get_channelmap_scan_group(channelMap);
 	if (!channelmap_scan_group) {
 		NSLog(@"performScan unknown channelmap '%s'\n", channelMap);
 		return;
 	}
   
-	if (hdhomerun_device_channelscan_init(mHDHomeRunDevice, channelmap_scan_group) <= 0) {
+	if (hdhomerun_device_channelscan_init([self.tuner getHDHRDevice], channelmap_scan_group) <= 0) {
 		NSLog(@"performScan failed to initialize channel scan\n");
 		return;
 	}
@@ -444,27 +523,27 @@ const int kCallSignStringLength = 10;
   int ret;
 	while (continueScan) {
 		struct hdhomerun_channelscan_result_t result;
-		ret = hdhomerun_device_channelscan_advance(mHDHomeRunDevice, &result);
+		ret = hdhomerun_device_channelscan_advance([self.tuner getHDHRDevice], &result);
 		if (ret <= 0) {
 			break;
 		}
     
 		NSLog(@"  SCANNING: %lu (%s)\n", (unsigned long)result.frequency, result.channel_str);
     
-    mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken infoString:[NSString stringWithFormat:@"Scanning on Device %@ Tuner:%d %s", self.device.name, [self.index intValue]+1, result.channel_str]];
-    mCurrentActivityToken = [mCurrentProgressDisplay setActivity:mCurrentActivityToken incrementBy:1.0];
+    activityToken = [mCurrentProgressDisplay setActivity:activityToken infoString:[NSString stringWithFormat:@"Scanning on Device %@ Tuner:%d %s", self.tuner.device.name, [self.tuner.index intValue]+1, result.channel_str]];
+    activityToken = [mCurrentProgressDisplay setActivity:activityToken incrementBy:1.0];
     
     currentHDHomeRunChannel = [self newChannelFromScanResult:&result];
     
-		ret = hdhomerun_device_channelscan_detect(mHDHomeRunDevice, &result);
+		ret = hdhomerun_device_channelscan_detect([self.tuner getHDHRDevice], &result);
 		if (ret <= 0) {
 			break;
 		}
     
 		NSLog(@"  LOCK: %s (ss=%u snq=%u seq=%u)\n",
-            result.status.lock_str, result.status.signal_strength,
-            result.status.signal_to_noise_quality, result.status.symbol_error_quality);
-
+          result.status.lock_str, result.status.signal_strength,
+          result.status.signal_to_noise_quality, result.status.symbol_error_quality);
+    
     [currentHDHomeRunChannel setTuningType:[NSString stringWithUTF8String:result.status.lock_str]];
     
 		if (result.transport_stream_id_detected) {
@@ -479,14 +558,14 @@ const int kCallSignStringLength = 10;
       [self addHDHRStationFromProgramResults:program toHDHRChannel:currentHDHomeRunChannel];
 		}
     if ([[currentHDHomeRunChannel stations] count] > 0) {
-      [self.lineup.channelStationMap addChannelsObject:currentHDHomeRunChannel]; 
+      [self.tuner.lineup.channelStationMap addChannelsObject:currentHDHomeRunChannel]; 
     } else {
       // No stations we can use on this channel - delete it.
-      [[self managedObjectContext] deleteObject:currentHDHomeRunChannel];
+      [self.managedObjectContext deleteObject:currentHDHomeRunChannel];
     }
-
+    
     BOOL shouldCancel = NO;
-    mCurrentActivityToken = [mCurrentProgressDisplay shouldCancelActivity:mCurrentActivityToken cancel:&shouldCancel];
+    activityToken = [mCurrentProgressDisplay shouldCancelActivity:activityToken cancel:&shouldCancel];
     if (shouldCancel) {
       NSLog(@"Abort Channel Scan");
       continueScan = 0;
@@ -494,94 +573,49 @@ const int kCallSignStringLength = 10;
   }
 #endif
   
-  if (mCurrentActivityToken) {
-    [mCurrentProgressDisplay endActivity:mCurrentActivityToken];
+  if (activityToken) {
+    [mCurrentProgressDisplay endActivity:activityToken];
   }
-
+  
   if (0 == continueScan) {
     // Scan was aborted, don't do anything more - just return.
     return;
   }
-
+  
   // Post the scan results to the SiliconDust lineup Server, retrieve the results
   // and update our ChannelStationMap.
-  [self.lineup.channelStationMap updateMapUsingSDLineupServerWithDeviceID:[self.device.deviceID intValue]];
+  [self.tuner.lineup.channelStationMap updateMapUsingSDLineupServerWithDeviceID:[self.tuner.device.deviceID intValue]];
   
   // when we save, we want to update the same object in the UI's MOC.
   // So listen for the did save notification from the retrieval/parsing thread MOC
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(threadContextDidSave:)
                                                name:NSManagedObjectContextDidSaveNotification
-                                             object:[self managedObjectContext]];
-
+                                             object:self.managedObjectContext];
+  
   NSError *error = nil;
-
+  
   // This save should overwrite whats in the store
-  [[self managedObjectContext] setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
-  if (![[self managedObjectContext] save:&error]) {
+  [self.managedObjectContext setMergePolicy:NSMergeByPropertyObjectTrumpMergePolicy];
+  if (![self.managedObjectContext save:&error]) {
     NSLog(@"Channel scan - save returned an error %@", error);
   }
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:[self managedObjectContext]];
-
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:self.managedObjectContext];
+  
   NSLog(@"HDHomeRunTuner - performScan complete - sending notification");
   [[NSDistributedNotificationCenter defaultCenter] postNotificationName:RSChannelScanCompleteNotification object:RSBackgroundApplication userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:1], @"scanResult", nil] deliverImmediately:NO];
-
+  
   mCurrentProgressDisplay = nil;
 }
 
-#pragma Initialization
-
-- (void)createHDHRDevice {
-  uint32_t deviceID = [[[self device] deviceID] intValue];
-  if ((deviceID != 0) && (mHDHomeRunDevice == nil))   {
-    mHDHomeRunDevice = hdhomerun_device_create(deviceID, 0, [[self index] intValue], NULL);
-  }
-}
-
-- (void)awakeFromFetch {
-  [super awakeFromFetch];
-  [self createHDHRDevice];
-
-  // Register to be told when the device name changes
-  if ([self device]) {
-    [[self device] addObserver:self forKeyPath:@"name" options:NSKeyValueObservingOptionNew context:nil];
-  }
-}
-
-- (void)awakeFromInsert {
-  [super awakeFromInsert];
-  [self createHDHRDevice];
-}
-
-#pragma Uninitialization
-
-- (void)releaseHDHRDevice {
-  if (mHDHomeRunDevice) {
-    hdhomerun_device_destroy(mHDHomeRunDevice);
-  }
-  mHDHomeRunDevice = nil;
-}
-
-- (void)willTurnIntoFault {
-  [self releaseHDHRDevice];
-  if ([self device]) {
-    [[self device] removeObserver:self forKeyPath:@"name"];
-  }
-}
-
-@end
-
-@implementation HDHomeRunTunerChannelScanThread
-
-+ (void)performScan:(NSManagedObjectID *)aTunerObjectID {
+- (void) main {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
-  NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-  [managedObjectContext setPersistentStoreCoordinator: psc];
-  HDHomeRunTuner *aTuner = (HDHomeRunTuner *) [managedObjectContext objectWithID:aTunerObjectID];
-
-  [aTuner performScan];
-  [managedObjectContext release];
+  self.managedObjectContext = [[NSManagedObjectContext alloc] init];
+  [self.managedObjectContext setPersistentStoreCoordinator:psc];
+  self.tuner = (HDHomeRunTuner *) [self.managedObjectContext objectWithID:mTunerObjectID];
+  
+  [self performScan];
   [pool release];
 }
 
