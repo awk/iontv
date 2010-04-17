@@ -30,6 +30,8 @@
 
 @implementation XTVDParser
 
+@synthesize mOperation;
+
 - (void)dealloc {
   [mReportProgressTo release];
   [mManagedObjectContext release];
@@ -71,6 +73,9 @@
   xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl
                                                 options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA)
                                                   error:&err];
+  if (self.operation.isCancelled) {
+    return;
+  }
   if (xmlDoc == nil) {
       xmlDoc = [[NSXMLDocument alloc] initWithContentsOfURL:furl
                                                     options:NSXMLDocumentTidyXML
@@ -85,6 +90,10 @@
 
   if (err) {
     [self handleError:err];
+  }
+
+  if (self.operation.isCancelled) {
+    return;
   }
 
   // Now that we have a document we can traverse it to create the CoreData objects
@@ -210,7 +219,7 @@
         NSArray *lineupChildNodes = [childElement children];
         mActivityToken = [mReportProgressTo setActivity:mActivityToken progressMaxValue:[lineupChildNodes count]];
         for (NSXMLElement *lineupMap in lineupChildNodes) {
-          NSAutoreleasePool *subPool = [[NSAutoreleasePool alloc] init];
+          NSAutoreleasePool *lineupMapSubPool = [[NSAutoreleasePool alloc] init];
           NSNumber *stationIDNumber = nil;
           NSString *channelString = nil;
           NSNumber *channelMinorNumber = nil;
@@ -269,7 +278,7 @@
 //            NSLog(@"updateLineups - Failed to find station with ID %@", stationIDNumber);
           }
 
-        [subPool release];
+        [lineupMapSubPool release];
       }
 
       [aLineup release];
@@ -571,6 +580,10 @@ NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLPro
   }
   [subPool release];
 
+  if (self.operation.isCancelled) {
+    return;
+  }
+  
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//programs" error:&err];
   if (([nodes count] > 0 ) && !inLineupsOnly) {
@@ -579,6 +592,10 @@ NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLPro
     [self updatePrograms:thePrograms];
   }
   [subPool release];
+
+  if (self.operation.isCancelled) {
+    return;
+  }
 
 #if 0
   subPool = [[NSAutoreleasePool alloc] init];
@@ -590,6 +607,9 @@ NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLPro
         [self updateProductionCrew:theProductionCrew];
   }
   [subPool release];
+  if (operation.isCancelled) {
+    return;
+  }
 #endif
 
   subPool = [[NSAutoreleasePool alloc] init];
@@ -601,6 +621,10 @@ NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLPro
   }
   [subPool release];
 
+  if (self.operation.isCancelled) {
+    return;
+  }
+  
   subPool = [[NSAutoreleasePool alloc] init];
   nodes = [inXMLDocument nodesForXPath:@"//schedules" error:&err];
   if (([nodes count] > 0 ) && !inLineupsOnly) {
@@ -758,6 +782,7 @@ NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLPro
   [anXTVDParser setManagedObjectContext:parseMOC];
   
   [anXTVDParser setReportProgressTo:_progressReporter];
+  anXTVDParser.operation = self;
   
   // when the lineup retrieval and MOC saves, we want to update the same object in the UI's MOC.
   // So listen for the did save notification from the retrieval/parsing thread MOC

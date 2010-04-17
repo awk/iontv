@@ -25,7 +25,10 @@
   id mReportProgressTo;
   NSManagedObjectContext *mManagedObjectContext;
   size_t mActivityToken;
+  NSOperation *mOperation;
 }
+
+@property (nonatomic, retain, setter=setOperation, getter=operation) NSOperation * mOperation;
 
 - (void)traverseXMLDocument:(NSXMLDocument *)inXMLDocument lineupsOnly:(BOOL)inLineupsOnly;
 - (void)parseXMLFile:(NSString *)filePath lineupsOnly:(BOOL)inLineupsOnly;
