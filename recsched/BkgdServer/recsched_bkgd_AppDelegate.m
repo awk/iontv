@@ -21,7 +21,6 @@
 #import "RecSchedServer.h"
 #import "RSNotifications.h"
 #import "RSRecording.h"
-#import "RecordingThread.h"
 
 #import "PreferenceKeys.h"    // For the key values in the shared preferences
 

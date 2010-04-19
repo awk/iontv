@@ -31,7 +31,7 @@
 #import "RSRecording.h"
 #import "RSSeasonPass.h"
 #import "XTVDParser.h"
-#import "RecordingThread.h"
+#import "RSRecordingOperation.h"
 #import "HDHomeRunTuner.h"
 #import "RSTranscodeController.h"
 #import "RSNotifications.h"
@@ -65,6 +65,7 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
                                                endDate:(NSDate *)endDate
                                            lineupsOnly:(BOOL)lineupsOnly
                                    fetchFutureSchedule:(BOOL)fetchFutureSchedule;
+- (void)recordingComplete:(NSManagedObjectID *)aRecordingObjectID;
 @end
 
 @implementation RecSchedServer
@@ -115,15 +116,24 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
     // Each queue also needs a timer for when the next recording needs to be started
     RSRecordingQueue *aQueue = [[RSRecordingQueue alloc] initWithTuner:aTuner];
     [mRecordingQueues insertObject:aQueue atIndex:0];
-    [aQueue release];
 
     // Now run through all the recordings and assign them to the right queues according to their associated HDHRstation
     for (RSRecording *aRecording in aTuner.recordings) {
       if (([aRecording.status intValue] == RSRecordingNotYetStartedStatus) && ([aRecording.schedule.endTime compare:[NSDate date]] == NSOrderedDescending)) {
-        aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
+        aRecording.recordingOperation = [[RSRecordingOperation alloc]initWithRecordingObjectID:[aRecording objectID] recordingServer:self];
+        [aRecording.recordingOperation setCompletionBlock:^{
+          dispatch_async(dispatch_get_main_queue(), ^{
+            // Notify everyone that this recording has finished - since we're in a seperate thread, and notifications are
+            // delivered in the thread context which triggers them we'll send a message to the server object on the main thread
+            // to send further notifications
+            NSLog(@"RecordingOperation  - calling recordingComplete on main thread, recording Program Title = %@", aRecording.schedule.program.title);
+            [self recordingComplete:[aRecording objectID]];
+          });
+        }];
         [aQueue addRecording:aRecording];
       }
     }
+    [aQueue release];
   }
 }
 
@@ -163,14 +173,6 @@ static void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetwo
 
 - (RSActivityProxy *)uiActivity {
   return mUIActivityProxy;
-}
-
-#pragma mark - Internal Methods
-
-- (void)recordingComplete:(NSManagedObjectID *)aRecordingObjectID {
-  RSRecording *recordingJustFinished = (RSRecording*)[[[NSApp delegate] managedObjectContext] objectRegisteredForID:aRecordingObjectID];
-  [recordingJustFinished.recordingQueue recordingComplete:recordingJustFinished];
-  [mTranscodeController updateForCompletedRecordings:[NSArray arrayWithObject:recordingJustFinished]];
 }
 
 #pragma mark Schedule Update Methods
@@ -746,7 +748,16 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
     }
 
     if (aRecording) {
-      aRecording.recordingThreadController = [[RecordingThreadController alloc]initWithRecording:aRecording recordingServer:self];
+      aRecording.recordingOperation = [[RSRecordingOperation alloc]initWithRecordingObjectID:[aRecording objectID] recordingServer:self];
+      [aRecording.recordingOperation setCompletionBlock:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+          // Notify everyone that this recording has finished - since we're in a seperate thread, and notifications are
+          // delivered in the thread context which triggers them we'll send a message to the server object on the main thread
+          // to send further notifications
+          NSLog(@"RecordingOperation  - calling recordingComplete on main thread, recording Program Title = %@", aRecording.schedule.program.title);
+          [self recordingComplete:[aRecording objectID]];
+        });
+      }];
       return aRecording;
     } else {
       // No recording created - probably because of overlaps - we should construct an appropriate error object to return.
@@ -763,7 +774,7 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
   NSLog(@"cancelRecording:");
   NSLog(@"  My Program title = %@, My Schedule start time = %@ channel = %@", aRecording.schedule.program.title, aRecording.schedule.time, aRecording.schedule.station.callSign);
   // We need to cancel/delete the recording thread controller - we can do this by setting the recordings thread controller property to nil
-  aRecording.recordingThreadController = nil;
+  aRecording.recordingOperation = nil;
 
   // Remove the recording from the queue
   [aRecording.recordingQueue removeRecording:aRecording];
@@ -866,6 +877,12 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
   [mXTVDQueue addOperation:downloadOperation];
   [mXTVDQueue addOperation:parseOperation];
   [mXTVDQueue addOperation:cleanupOperation];
+}
+
+- (void)recordingComplete:(NSManagedObjectID *)aRecordingObjectID {
+  RSRecording *recordingJustFinished = (RSRecording*)[[[NSApp delegate] managedObjectContext] objectRegisteredForID:aRecordingObjectID];
+  [recordingJustFinished.recordingQueue recordingComplete:recordingJustFinished];
+  [mTranscodeController updateForCompletedRecordings:[NSArray arrayWithObject:recordingJustFinished]];
 }
 
 @end
@@ -1166,6 +1183,15 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
   [queue addObject:aRecording];
   aRecording.recordingQueue = self;
 
+  // Save the MOC before adding the recording to a queue, adding it to the queue will cause it to be scheduled, 
+  // possibly immediately. If the MOC isn't saved then when the recording thread starts up the references for this
+  // recording won't be in place in the the MOC for the other thread and the recording will fail.
+  NSError *error = nil;
+  if (![[[NSApp delegate] managedObjectContext] save:&error]) {
+    NSLog(@"addRecording: - error occured during save %@", error);
+    return NO;
+  } 
+  
   NSSortDescriptor *sortDescriptor = [[[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:YES] autorelease];
   [queue sortUsingDescriptors:[NSArray arrayWithObject:sortDescriptor]];
 
@@ -1221,7 +1247,7 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
   NSLog(@"RSRecordingQueue - time to start a recording of %@ on %@, %@", recordingToStart.schedule.program.title, self.tuner.longName, recordingToStart.schedule.station.callSign);
   nextRecordingStartTimer = nil;
 
-  [recordingToStart.recordingThreadController startRecordingTimerFired:aTimer];
+  [recordingToStart.tuner.operationQueue addOperation:recordingToStart.recordingOperation];
 }
 
 - (void)recordingComplete:(RSRecording *)recordingJustFinished {

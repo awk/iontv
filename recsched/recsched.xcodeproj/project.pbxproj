@@ -157,7 +157,7 @@
 		EAEC09D50C275B6E00C40D5A /* Z2ITProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8863A0B61598700373CEF /* Z2ITProgram.m */; };
 		EAEC09D70C275BB500C40D5A /* WSGeneratedObj.m in Sources */ = {isa = PBXBuildFile; fileRef = EA0674400B580B4D009B0E27 /* WSGeneratedObj.m */; };
 		EAEC09D80C275BC500C40D5A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA20ADB90C2330AC00A9BDBD /* Security.framework */; };
-		EAEC09DA0C275BE700C40D5A /* RecordingThread.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20AF010C25CCA200A9BDBD /* RecordingThread.m */; };
+		EAEC09DA0C275BE700C40D5A /* RSRecordingOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = EA20AF010C25CCA200A9BDBD /* RSRecordingOperation.m */; };
 		EAEC09DC0C275C2100C40D5A /* Z2ITStation.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8830F0B5DCE4800373CEF /* Z2ITStation.m */; };
 		EAEC0A250C283C6F00C40D5A /* XTVDParser.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF8826F0B5DC0BD00373CEF /* XTVDParser.m */; };
 		EAEC0A270C283C7F00C40D5A /* Z2ITLineup.m in Sources */ = {isa = PBXBuildFile; fileRef = EAF883DD0B5ECB5B00373CEF /* Z2ITLineup.m */; };
@@ -274,8 +274,8 @@
 		EA0F2ED30CD3D860003E6954 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = InstallBkgdServer/main.m; sourceTree = "<group>"; };
 		EA20ADB90C2330AC00A9BDBD /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = /System/Library/Frameworks/Security.framework; sourceTree = "<absolute>"; };
 		EA20AE2D0C23612800A9BDBD /* SyncServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SyncServices.framework; path = /System/Library/Frameworks/SyncServices.framework; sourceTree = "<absolute>"; };
-		EA20AF000C25CCA200A9BDBD /* RecordingThread.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = RecordingThread.h; path = BkgdServer/RecordingThread.h; sourceTree = "<group>"; };
-		EA20AF010C25CCA200A9BDBD /* RecordingThread.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = RecordingThread.m; path = BkgdServer/RecordingThread.m; sourceTree = "<group>"; };
+		EA20AF000C25CCA200A9BDBD /* RSRecordingOperation.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = RSRecordingOperation.h; path = BkgdServer/RSRecordingOperation.h; sourceTree = "<group>"; };
+		EA20AF010C25CCA200A9BDBD /* RSRecordingOperation.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = RSRecordingOperation.m; path = BkgdServer/RSRecordingOperation.m; sourceTree = "<group>"; };
 		EA2339EF0D6BDCC700451694 /* NSStringAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringAdditions.h; path = common/NSStringAdditions.h; sourceTree = "<group>"; };
 		EA2387190D5E5CF400343704 /* RSFirstRunWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSFirstRunWindowController.h; path = UIApp/controllers/RSFirstRunWindowController.h; sourceTree = "<group>"; };
 		EA23871A0D5E5CF400343704 /* RSFirstRunWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSFirstRunWindowController.m; path = UIApp/controllers/RSFirstRunWindowController.m; sourceTree = "<group>"; };
@@ -862,8 +862,8 @@
 				EA23A8E6116609F7004F67B9 /* ASIHTTPRequest */,
 				EAD024270CE246F1002B7C37 /* UserPresets.plist */,
 				EA7002860CC4285D00DA9542 /* iTunes_ScriptingBridge.h */,
-				EA20AF000C25CCA200A9BDBD /* RecordingThread.h */,
-				EA20AF010C25CCA200A9BDBD /* RecordingThread.m */,
+				EA20AF000C25CCA200A9BDBD /* RSRecordingOperation.h */,
+				EA20AF010C25CCA200A9BDBD /* RSRecordingOperation.m */,
 				EAE6553F0B9D0A7600CDB279 /* recsched_bkgd_prefix.pch */,
 				EAE655580B9D1A8300CDB279 /* RecSchedServer.h */,
 				EAE655590B9D1A8300CDB279 /* RecSchedServer.m */,
@@ -1241,7 +1241,7 @@
 				EAEC09D40C275B6400C40D5A /* tvDataDelivery.m in Sources */,
 				EAEC09D50C275B6E00C40D5A /* Z2ITProgram.m in Sources */,
 				EAEC09D70C275BB500C40D5A /* WSGeneratedObj.m in Sources */,
-				EAEC09DA0C275BE700C40D5A /* RecordingThread.m in Sources */,
+				EAEC09DA0C275BE700C40D5A /* RSRecordingOperation.m in Sources */,
 				EAEC09DC0C275C2100C40D5A /* Z2ITStation.m in Sources */,
 				EAEC0A250C283C6F00C40D5A /* XTVDParser.m in Sources */,
 				EAEC0A270C283C7F00C40D5A /* Z2ITLineup.m in Sources */,

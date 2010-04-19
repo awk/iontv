@@ -24,18 +24,16 @@
 @class HDHomeRunDevice;
 @class RecSchedServer;
 
-@interface RecordingThreadController : NSObject {
-  RSRecording *mRecording;
+@interface RSRecordingOperation : NSOperation {
+  NSManagedObjectID *mRecordingObjectID;
   bool mFinishRecording;
   HDHomeRunDevice *mHDHRDevice;
-  NSPersistentStoreCoordinator *mPersistentStoreCoordinator;
 
-  NSManagedObjectContext *mThreadManagedObjectContext;
+  NSManagedObjectContext *mManagedObjectContext;
   RSRecording *mThreadRecording;
   RecSchedServer *mRecSchedServer;
 }
 
-- (id)initWithRecording:(RSRecording *)inRecording recordingServer:(RecSchedServer *)inServer;
+- (id)initWithRecordingObjectID:(NSManagedObjectID *)inRecordingObjectID recordingServer:(RecSchedServer *)inServer;
 - (void)beginRecording;
-- (void)startRecordingTimerFired:(NSTimer *)inTimer;
 @end

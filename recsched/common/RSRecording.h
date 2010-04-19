@@ -18,7 +18,7 @@
 #import <Cocoa/Cocoa.h>
 
 @class Z2ITSchedule;
-@class RecordingThreadController;
+@class RSRecordingOperation;
 @class HDHomeRunTuner;
 @class RSRecordingQueue;
 @class RSRecordingOptions;
@@ -32,7 +32,7 @@ enum {
 };
 
 @interface RSRecording : NSManagedObject {
-  RecordingThreadController *recordingThreadController;
+  RSRecordingOperation *recordingOperation;
   RSRecordingQueue *recordingQueue;
 }
 
@@ -40,7 +40,7 @@ enum {
 @property (retain) NSNumber * status;
 @property (retain) Z2ITSchedule * schedule;
 @property (retain) HDHomeRunTuner * tuner;
-@property (retain) RecordingThreadController * recordingThreadController;
+@property (retain) RSRecordingOperation * recordingOperation;
 @property (retain) RSRecordingQueue *recordingQueue;
 @property (retain) RSRecordingOptions *recordingOptions;
 @property (retain) RSSeasonPass* seasonPass;

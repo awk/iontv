@@ -17,7 +17,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-#import "RecordingThread.h"
+#import "RSRecordingOperation.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITStation.h"
@@ -30,49 +30,38 @@
 
 #define RECORDING_DISABLED 0
 
-@implementation RecordingThreadController
+@implementation RSRecordingOperation
 
-- (void)initializeThreadData {
-  // We need to create a new the managedObjectContext for this thread, we can use the mSchedule (which was given to us
-  // in a seperate thread context to retrieve the store co-ordinator and then work from there.
-  if (mPersistentStoreCoordinator != nil) {
-    mThreadManagedObjectContext = [[NSManagedObjectContext alloc] init];
-    [mThreadManagedObjectContext setPersistentStoreCoordinator:mPersistentStoreCoordinator];
-
-    // We also need to create a thread local schedule object too.
-    mThreadRecording = (RSRecording*) [mThreadManagedObjectContext objectWithID:[mRecording objectID]];
-  }
-}
-
-+ (void)recordingThreadStarted:(id)aRecordingThreadController {
+- (void) main{
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-  RecordingThreadController *theController = (RecordingThreadController*)aRecordingThreadController;
-  [theController initializeThreadData];
-  [theController beginRecording];
+  // We need to create a new the managedObjectContext for this thread.
+  mManagedObjectContext = [[NSManagedObjectContext alloc] init];
+  [mManagedObjectContext setPersistentStoreCoordinator:[[NSApp delegate] persistentStoreCoordinator]];
+  
+  // We also need to create a thread local schedule object too.
+  mThreadRecording = (RSRecording*) [mManagedObjectContext objectWithID:mRecordingObjectID];
+
+  [self beginRecording];
 
   NSLog(@"recordingThread - EXIT");
   [pool release];
 }
 
-- (id)initWithRecording:(RSRecording *)inRecording recordingServer:(RecSchedServer *)inServer {
+- (id)initWithRecordingObjectID:(NSManagedObjectID *)inRecordingObjectID
+                recordingServer:(RecSchedServer *)inServer {
   self = [super init];
   if (self != nil) {
-    mRecording = [inRecording retain];
+    mRecordingObjectID = [inRecordingObjectID retain];
     mRecSchedServer = [inServer retain];
-    mPersistentStoreCoordinator = [[NSApp delegate] persistentStoreCoordinator];
   }
   return self;
 }
 
 - (void)dealloc {
-  [mRecording release];
+  [mRecordingObjectID release];
   [mRecSchedServer release];
   [super dealloc];
-}
-
-- (void)startRecordingTimerFired:(NSTimer *)inTimer {
-  [NSThread detachNewThreadSelector:@selector(recordingThreadStarted:) toTarget:[RecordingThreadController class] withObject:self];
 }
 
 - (NSString *)recordedProgramsFolder {
@@ -238,20 +227,14 @@
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(threadContextDidSave:)
                                                name:NSManagedObjectContextDidSaveNotification
-                                             object:mThreadManagedObjectContext];
+                                             object:mManagedObjectContext];
 
-  [mThreadManagedObjectContext processPendingChanges];
+  [mManagedObjectContext processPendingChanges];
   NSError *error = nil;
-  if (![mThreadManagedObjectContext save:&error]) {
+  if (![mManagedObjectContext save:&error]) {
     NSLog(@"Error saving after record completed - %@", error);
   }
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mThreadManagedObjectContext];
-
-  // Notify everyone that this recording has finished - since we're in a seperate thread, and notifications are
-  // delivered in the thread context which triggers them we'll send a message to the server object on the main thread
-  // to send further notifications
-  NSLog(@"RecordingThread  - sending recordingComplete message to server on main thread, recording Program Title = %@", mThreadRecording.schedule.program.title);
-  [mRecSchedServer performSelectorOnMainThread:@selector(recordingComplete:) withObject:[mThreadRecording objectID] waitUntilDone:YES];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:mManagedObjectContext];
 }
 #endif
 

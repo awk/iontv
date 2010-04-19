@@ -28,7 +28,7 @@
 @dynamic tuner;
 @dynamic recordingOptions;
 @dynamic seasonPass;
-@synthesize recordingThreadController;
+@synthesize recordingOperation;
 @synthesize recordingQueue;
 
 + (RSRecording *)insertRecordingOfSchedule:(Z2ITSchedule *)aSchedule {

@@ -25,7 +25,7 @@
 #import "Z2ITSchedule.h"
 #import "iTunes_ScriptingBridge.h"
 #import "PreferenceKeys.h"
-#import "RecordingThread.h"
+#import "RSRecordingOperation.h"
 #import "recsched_bkgd_AppDelegate.h"
 
 @implementation RSTranscodeController
