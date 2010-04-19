@@ -28,7 +28,7 @@
   NSOperation *mOperation;
 }
 
-@property (nonatomic, retain, setter=setOperation, getter=operation) NSOperation * mOperation;
+@property (nonatomic, retain) NSOperation *operation;
 
 - (void)traverseXMLDocument:(NSXMLDocument *)inXMLDocument lineupsOnly:(BOOL)inLineupsOnly;
 - (void)parseXMLFile:(NSString *)filePath lineupsOnly:(BOOL)inLineupsOnly;

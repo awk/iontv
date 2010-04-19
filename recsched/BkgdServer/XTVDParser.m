@@ -30,7 +30,7 @@
 
 @implementation XTVDParser
 
-@synthesize mOperation;
+@synthesize operation = mOperation;
 
 - (void)dealloc {
   [mReportProgressTo release];
@@ -74,6 +74,7 @@
                                                 options:(NSXMLNodePreserveWhitespace|NSXMLNodePreserveCDATA)
                                                   error:&err];
   if (self.operation.isCancelled) {
+    [xmlDoc release];
     return;
   }
   if (xmlDoc == nil) {
@@ -93,6 +94,7 @@
   }
 
   if (self.operation.isCancelled) {
+    [xmlDoc release];
     return;
   }
 
@@ -766,14 +768,16 @@ NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLPro
 - (void)main {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSError *error = nil;
-  
+  NSManagedObjectContext *parseMOC  = nil;
+  XTVDParser *anXTVDParser = nil;
   NSPersistentStoreCoordinator *psc = [[NSApp delegate] persistentStoreCoordinator];
+  
   if (psc == nil) {
     goto exit;
   }
   
-  XTVDParser *anXTVDParser = [[XTVDParser alloc] init];
-  NSManagedObjectContext *parseMOC = [[NSManagedObjectContext alloc] init];
+  anXTVDParser = [[XTVDParser alloc] init];
+  parseMOC = [[NSManagedObjectContext alloc] init];
   [parseMOC setPersistentStoreCoordinator:psc];  
   if (parseMOC == nil) {
     goto exit;
@@ -791,7 +795,6 @@ NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLPro
                                                name:NSManagedObjectContextDidSaveNotification object:parseMOC];
   
   [anXTVDParser parseXMLFile:_xmlFilePath lineupsOnly:_lineupsOnly];
-  [anXTVDParser release];
   
   [parseMOC processPendingChanges];
   
@@ -805,6 +808,7 @@ NSInteger compareXMLNodeByProgramAttribute(id thisXMLProgramNode, id otherXMLPro
   [[NSFileManager defaultManager] removeItemAtPath:_xmlFilePath error:&error];
   
 exit:
+  [anXTVDParser release];
   [parseMOC release];
   [pool drain];
 }
