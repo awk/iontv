@@ -33,6 +33,7 @@ int main(int argc, char *argv[])
   [NSApp run];
 //   return NSApplicationMain(argc,  (const char **) argv);
 
+  [appDelegate release];
   [pool release];
   return 0;
 }
