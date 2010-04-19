@@ -42,8 +42,8 @@ const int kCallSignStringLength = 10;
   NSObject<RSActivityDisplay> *mCurrentProgressDisplay;
 }
 
-@property (nonatomic, retain, setter=setManagedObjectContext, getter=managedObjectContext) NSManagedObjectContext *mManagedObjectContext;
-@property (nonatomic, retain, setter=setTuner, getter=tuner) HDHomeRunTuner *mTuner;
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) HDHomeRunTuner *tuner;
 
 - (id) initWithTunerObjectID:(NSManagedObjectID *)aTunerObjectID
             progressReporter:(NSObject<RSActivityDisplay> *)progressReporter;
@@ -135,6 +135,7 @@ const int kCallSignStringLength = 10;
   NSOperation *scanOperation = [[ScanOperation alloc] initWithTunerObjectID:[self objectID]
                                                            progressReporter:progressDisplay];
   [mOperationQueue addOperation:scanOperation];
+  [scanOperation release];
 }
 
 - (void)startStreaming {
@@ -381,7 +382,7 @@ const int kCallSignStringLength = 10;
 
 @implementation ScanOperation
 
-@synthesize mManagedObjectContext, mTuner;
+@synthesize managedObjectContext = mManagedObjectContext, tuner = mTuner;
 
 - (id) initWithTunerObjectID:(NSManagedObjectID *)aTunerObjectID
             progressReporter:(NSObject<RSActivityDisplay> *)progressReporter {
@@ -430,7 +431,7 @@ const int kCallSignStringLength = 10;
   HDHomeRunChannel *aChannel = [HDHomeRunChannel createChannelWithType:channelType andNumber:channelNumber inManagedObjectContext:self.managedObjectContext];
   [aChannel setFrequency:frequencyNumber];
   
-  return aChannel;
+  return [aChannel retain];
 }
 
 - (void) addHDHRStationFromProgramResults:(struct hdhomerun_channelscan_program_t *)program toHDHRChannel:(HDHomeRunChannel *)hdhrChannel {
@@ -461,7 +462,6 @@ const int kCallSignStringLength = 10;
 }
 
 - (void) performScan {
-  HDHomeRunChannel *currentHDHomeRunChannel = nil;
   size_t activityToken;
   
   // Delete the old channel station map
@@ -512,6 +512,7 @@ const int kCallSignStringLength = 10;
   int continueScan = 1;
   int ret;
 	while (continueScan) {
+    HDHomeRunChannel *currentHDHomeRunChannel = nil;
 		struct hdhomerun_channelscan_result_t result;
 		ret = hdhomerun_device_channelscan_advance([self.tuner getHDHRDevice], &result);
 		if (ret <= 0) {
@@ -527,6 +528,7 @@ const int kCallSignStringLength = 10;
     
 		ret = hdhomerun_device_channelscan_detect([self.tuner getHDHRDevice], &result);
 		if (ret <= 0) {
+      [currentHDHomeRunChannel release];
 			break;
 		}
     
@@ -560,6 +562,7 @@ const int kCallSignStringLength = 10;
       NSLog(@"Abort Channel Scan");
       continueScan = 0;
     }
+    [currentHDHomeRunChannel release];
   }
 #endif
   
