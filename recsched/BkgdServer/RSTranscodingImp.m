@@ -336,6 +336,7 @@ const int kDefaultAudioBitRate = 160;
      * Unless we only have one input, then use that for all tracks.
      */
     if (i != 1) {
+      audio = hb_list_audio_config_item(mHandbrakeJob->list_audio, i);
       arate = audio->in.samplerate;
     }
     for ( ;i < mNumAudioTracks;i++) {
