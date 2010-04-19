@@ -68,6 +68,8 @@ const int kCallSignStringLength = 10;
 
 @implementation HDHomeRunTuner
 
+@synthesize mOperationQueue;
+
 + (void)initialize {
 }
 

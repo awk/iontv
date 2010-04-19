@@ -37,6 +37,7 @@
 @property (retain) NSString * longName;
 @property (retain) NSSet* recordings;
 @property (retain) Z2ITLineup * lineup;
+@property (retain, nonatomic, readonly, getter=operationQueue) NSOperationQueue *mOperationQueue;
 
 - (void)scanActionReportingProgressTo:(id)progressDisplay;
 - (void)exportChannelMapTo:(NSURL *)inURL;
