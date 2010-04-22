@@ -64,6 +64,8 @@ extern NSString *RSSSchedulePBoardType;
 - (IBAction)recordSeasonPass:(id)sender;
 - (IBAction)watchStation:(id)sender;
 - (IBAction)createWishlist:(id)sender;
+- (IBAction)transcodeProgramInSourceList:(id)sender;
+- (IBAction)addProgramToiTunesFromSourceList:(id)sender;
 
 - (void)setGetScheduleButtonEnabled:(BOOL)enabled;
 

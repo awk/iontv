@@ -33,6 +33,7 @@
 #import "RSScheduleConflictController.h"
 #import "RSSeasonPass.h"
 #import "RSSeasonPassCalendarViewController.h"
+#import "RSTranscoding.h"
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
 #import "Z2ITStation.h"
@@ -204,6 +205,24 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 
   NSError *error = nil;
   [[[NSApp delegate] recServer] deleteSeasonPassWithObjectID:[aSeasonPass objectID] error:&error];
+}
+
+- (RSRecording *)recordingForClickedRowInSourceList {
+  NSInteger clickedRow = [mViewSelectionOutlineView clickedRow];
+  id item = nil;
+  NSDictionary *nodeData = nil;
+  RSRecording *aRecording = nil;
+
+  if (clickedRow != -1) {
+    // If we clicked on a selected row, then we want to consider all rows in the selection. Otherwise, we only consider the clicked on row.
+    item = [mViewSelectionOutlineView itemAtRow:clickedRow];
+    nodeData = [item representedObject];
+    NSManagedObjectID *objectID = [nodeData valueForKey:RSSourceListObjectIDKey];
+    if (objectID) {
+      aRecording = (RSRecording *) [[[NSApp delegate] managedObjectContext] objectWithID:objectID];
+    }
+  }
+  return aRecording;
 }
 
 #pragma mark Initialization/Startup
@@ -440,6 +459,14 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
   [mPredicatePanel orderOut:self];
 }
 
+- (IBAction)transcodeProgramInSourceList:(id)sender {
+  NSLog(@"transcodeProgramInSourceList - ENTER\n");
+}
+
+- (IBAction)addProgramToiTunesFromSourceList:(id)sender {
+  NSLog(@"addProgramToiTunesFromSourceList - ENTER\n");
+}
+
 #pragma mark Responder Methods
 
 - (void)flagsChanged:(NSEvent *)theEvent {
@@ -514,6 +541,25 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
     enableItem = YES;
   }
 
+  if ([anItem action] == @selector(transcodeProgramInSourceList:)) {
+    RSRecording *aRecording = [self recordingForClickedRowInSourceList];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:aRecording.mediaFile]) {
+      enableItem = YES;
+    } else {
+      enableItem = NO;
+    }
+  }
+  
+  if ([anItem action] == @selector(addProgramToiTunesFromSourceList:)) {
+    RSRecording *aRecording = [self recordingForClickedRowInSourceList];
+    RSTranscoding *aTranscoding = aRecording.schedule.transcoding;
+    if ([[NSFileManager defaultManager] fileExistsAtPath:aTranscoding.mediaFile]) {
+      enableItem = YES;
+    } else {
+      enableItem = NO;
+    }
+  }
+  
   return enableItem;
 }
 
