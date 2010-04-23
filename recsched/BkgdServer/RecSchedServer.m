@@ -537,6 +537,17 @@ void SDServerReachabilityChanged(SCNetworkReachabilityRef target, SCNetworkConne
   }
 }
 
+- (BOOL)addTranscodingToiTunes:(NSManagedObjectID *)transcodingObjectID error:(NSError **)error
+{
+  RSTranscoding *aTranscoding = nil;
+  aTranscoding = (RSTranscoding *) [[[NSApp delegate] managedObjectContext] objectWithID:transcodingObjectID];
+  if (aTranscoding) {
+    [mTranscodeController addToiTunes:aTranscoding];
+  }
+  *error = nil;
+  return YES;
+}
+
 - (oneway void)updateLineups {
   NSDate *startDate = [NSDate date];
   NSDate *endDate = [NSDate date];

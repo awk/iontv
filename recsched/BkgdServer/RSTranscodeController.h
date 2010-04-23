@@ -36,5 +36,6 @@ extern NSString *RSNotificationTranscodingFinished;
 }
 
 - (void)updateForCompletedRecordings:(NSArray *)inArray;
+- (void)addToiTunes:(RSTranscoding *)aTranscoding;
 
 @end

@@ -203,9 +203,9 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
     // Have a valid title create a transcoding job
     NSString *transcodingPath;
     if (mCurrentTranscoding.schedule.program.subTitle != nil) {
-      transcodingPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.mp4", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title, mCurrentTranscoding.schedule.program.subTitle];
+      transcodingPath = [NSString stringWithFormat:@"%@/%@ %@ - %@.m4v", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title, mCurrentTranscoding.schedule.program.subTitle];
     } else {
-      transcodingPath = [NSString stringWithFormat:@"%@/%@ %@.mp4", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title];
+      transcodingPath = [NSString stringWithFormat:@"%@/%@ %@.m4v", [self transcodedProgramsFolder], mCurrentTranscoding.schedule.program.programID, mCurrentTranscoding.schedule.program.title];
     }
 
     NSString *legalTranscodingPath;
@@ -240,7 +240,109 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
   [[NSApp delegate] saveAction:nil];
 }
 
-- (void)addToiTunes:(RSTranscoding *) aTranscoding {
++ (AliasHandle)newAliasHandleWithURL:(NSURL *)url
+{
+  AliasHandle alias;
+  FSRef fsRef;
+  
+  if (!CFURLGetFSRef((CFURLRef)url, &fsRef)) {
+    return nil;
+  }
+  
+  if (!FSNewAliasMinimal(&fsRef, &alias)) {
+    return alias;
+  }
+  return nil;
+}
+
+const OSType iTunesSignature = 'hook';
+
+- (id)addTrack:(NSURL *)fromLocation
+{
+  OSErr err;
+  AppleEvent getEvent, replyEvent;
+  AEDescList replyList;
+  NSMutableArray *trackList = nil;
+  
+  // iTunes won't add a video file with the .mp4 extension so change it to .m4v if needed
+  if ([[fromLocation pathExtension] isEqualToString:@"mp4"]) {
+    NSURL *locationWithoutExtension = [fromLocation URLByDeletingPathExtension];
+    fromLocation = [locationWithoutExtension URLByAppendingPathExtension:@"m4v"];
+  }
+  
+  AliasHandle alias = [RSTranscodeController newAliasHandleWithURL:fromLocation];
+  
+  AEBuildError buildError;
+  
+  err = AEBuildAppleEvent(iTunesSignature,        // class 
+                          'Add ',            // ID
+                          typeApplSignature,      // address type
+                          &iTunesSignature,       // address data
+                          sizeof(iTunesSignature),        // address length
+                          kAutoGenerateReturnID,  // return ID
+                          kAnyTransactionID,      //transaction ID
+                          &getEvent,      // result
+                          &buildError,    // error
+                          "'----':alis(@@)", // params format
+                          alias,  // ... (var args)
+                          nil);
+  
+  DisposeHandle((Handle)alias);
+  
+  if (err != noErr) {
+    NSLog(@"Error creating Apple Event: %d", err);
+    return nil;
+  }
+  
+  err = AESendMessage(&getEvent, &replyEvent, kAEWaitReply + kAENeverInteract, kAEDefaultTimeout);
+  if (err != noErr) {
+    NSLog(@"Error sending AppleEvent: %d", err);
+    goto cleanup_get_event;
+  }
+  
+  /* Read Results */
+  err = AEGetParamDesc(&replyEvent, keyDirectObject, typeWildCard /*typeAEList*/, &replyList);
+  if (err != noErr) {
+    NSLog(@"Error extracting from reply event: %d", err);
+    goto cleanup_reply_event;
+  }
+  
+  long items, i;
+  err = AECountItems(&replyList, &items);
+  if (err != noErr) {
+    NSLog(@"Unable to access Reply List: %d", err);
+    goto cleanup_reply_list;
+  }
+  
+  trackList = [NSMutableArray arrayWithCapacity:items];
+  for (i = 1; i < items + 1; i++) {
+    AEDesc trackDesc;
+    err = AEGetNthDesc(&replyList,
+                       i,
+                       typeWildCard,
+                       0,
+                       &trackDesc);
+    if (err != noErr) {
+      NSLog(@"Error rextracting from List: %d", err);
+      goto cleanup_reply_list;
+    }
+//    [trackList addObject:[[[ETTrack alloc] initWithDescriptor:&trackDesc] autorelease]];
+  }
+  
+cleanup_reply_list:
+  AEDisposeDesc(&replyList);
+cleanup_reply_event:
+  AEDisposeDesc(&replyEvent);
+cleanup_get_event:
+  AEDisposeDesc(&getEvent);
+  
+  return trackList;
+}
+
+- (void)addToiTunes:(RSTranscoding *)aTranscoding {
+  [self addTrack:[NSURL fileURLWithPath:aTranscoding.mediaFile]];
+  
+#if 0
   iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
   [iTunes setDelegate:self];
 
@@ -270,6 +372,7 @@ NSString *RSNotificationTranscodingFinished = @"RSNotificationTranscodingFinishe
     theTrack.name = aTranscoding.schedule.program.subTitle;
   }
   theTrack.objectDescription = aTranscoding.schedule.program.descriptionStr;
+#endif
 }
 
 - (id)eventDidFail:(const AppleEvent *)event withError:(NSError *)error {

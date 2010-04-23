@@ -36,6 +36,7 @@ extern NSString *kRecServerConnectionName;
 - (BOOL)cancelRecordingWithObjectID:(NSManagedObjectID *)recordingObjectID error:(NSError **)error;
 - (BOOL)addSeasonPassForProgramWithObjectID:(NSManagedObjectID *)programObjectID onStation:(NSManagedObjectID *)stationObjectID error:(NSError **)error;
 - (BOOL)deleteSeasonPassWithObjectID:(NSManagedObjectID *)seasonPassObjectID error:(NSError **)error;
+- (BOOL)addTranscodingToiTunes:(NSManagedObjectID *)transcodingObjectID error:(NSError **)error;
 
 - (void)reloadPreferences:(id)sender;
 

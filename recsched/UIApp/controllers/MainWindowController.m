@@ -464,7 +464,10 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
 }
 
 - (IBAction)addProgramToiTunesFromSourceList:(id)sender {
-  NSLog(@"addProgramToiTunesFromSourceList - ENTER\n");
+  RSRecording *aRecording = [self recordingForClickedRowInSourceList];
+  RSTranscoding *aTranscoding = aRecording.schedule.transcoding;
+  NSError *error = nil;
+  [[[NSApp delegate] recServer] addTranscodingToiTunes:[aTranscoding objectID] error:&error];
 }
 
 #pragma mark Responder Methods
