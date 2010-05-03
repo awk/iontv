@@ -75,6 +75,20 @@
 		EA490BB60CAEDB8100A1DE02 /* Activity_StopPressed.tif in Resources */ = {isa = PBXBuildFile; fileRef = EA490BB40CAEDB8100A1DE02 /* Activity_StopPressed.tif */; };
 		EA490BD90CAEE61E00A1DE02 /* RSActivityListView.m in Sources */ = {isa = PBXBuildFile; fileRef = EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */; };
 		EA490DBA0CAF376E00A1DE02 /* ActivityAggregateView.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA490DB80CAF376E00A1DE02 /* ActivityAggregateView.xib */; };
+		EA499952118F7D0700E614AC /* arrays.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA49993D118F7D0700E614AC /* arrays.cpp */; };
+		EA499954118F7D0700E614AC /* compress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA499942118F7D0700E614AC /* compress.cpp */; };
+		EA499955118F7D0700E614AC /* extracts.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA499944118F7D0700E614AC /* extracts.cpp */; };
+		EA499956118F7D0700E614AC /* iconv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA499945118F7D0700E614AC /* iconv.cpp */; };
+		EA499957118F7D0700E614AC /* id3v2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA499946118F7D0700E614AC /* id3v2.cpp */; };
+		EA499958118F7D0700E614AC /* metalist.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA49994A118F7D0700E614AC /* metalist.cpp */; };
+		EA499959118F7D0700E614AC /* nsfile.mm in Sources */ = {isa = PBXBuildFile; fileRef = EA49994B118F7D0700E614AC /* nsfile.mm */; };
+		EA49995A118F7D0700E614AC /* nsimage.mm in Sources */ = {isa = PBXBuildFile; fileRef = EA49994C118F7D0700E614AC /* nsimage.mm */; };
+		EA49995B118F7D0700E614AC /* parsley.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA49994D118F7D0700E614AC /* parsley.cpp */; };
+		EA49995C118F7D0700E614AC /* sha1.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA49994E118F7D0700E614AC /* sha1.cpp */; };
+		EA49995D118F7D0700E614AC /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA49994F118F7D0700E614AC /* util.cpp */; };
+		EA49995E118F7D0700E614AC /* uuid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA499951118F7D0700E614AC /* uuid.cpp */; };
+		EA4999AF118F7E9700E614AC /* CDtoc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EA499940118F7D0700E614AC /* CDtoc.cpp */; };
+		EA4999CA118F7EEA00E614AC /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EA4999C9118F7EEA00E614AC /* IOKit.framework */; };
 		EA4BA1180C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */; };
 		EA4BA1190C84A23600FBAF95 /* RSCommonAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */; };
 		EA4F2D020D73A80A005BC950 /* NSStringAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = EA4F2D010D73A80A005BC950 /* NSStringAdditions.m */; };
@@ -345,6 +359,29 @@
 		EA490BD70CAEE61E00A1DE02 /* RSActivityListView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSActivityListView.h; path = UIApp/views/RSActivityListView.h; sourceTree = "<group>"; };
 		EA490BD80CAEE61E00A1DE02 /* RSActivityListView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSActivityListView.m; path = UIApp/views/RSActivityListView.m; sourceTree = "<group>"; };
 		EA490DB90CAF376E00A1DE02 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/ActivityAggregateView.xib; sourceTree = "<group>"; };
+		EA49993C118F7D0700E614AC /* ap_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ap_types.h; path = opensource/atomicparsley/ap_types.h; sourceTree = "<group>"; };
+		EA49993D118F7D0700E614AC /* arrays.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = arrays.cpp; path = opensource/atomicparsley/arrays.cpp; sourceTree = "<group>"; };
+		EA49993E118F7D0700E614AC /* AtomDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AtomDefs.h; path = opensource/atomicparsley/AtomDefs.h; sourceTree = "<group>"; };
+		EA49993F118F7D0700E614AC /* AtomicParsley.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AtomicParsley.h; path = opensource/atomicparsley/AtomicParsley.h; sourceTree = "<group>"; };
+		EA499940118F7D0700E614AC /* CDtoc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CDtoc.cpp; path = opensource/atomicparsley/CDtoc.cpp; sourceTree = "<group>"; };
+		EA499941118F7D0700E614AC /* CDtoc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDtoc.h; path = opensource/atomicparsley/CDtoc.h; sourceTree = "<group>"; };
+		EA499942118F7D0700E614AC /* compress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = compress.cpp; path = opensource/atomicparsley/compress.cpp; sourceTree = "<group>"; };
+		EA499943118F7D0700E614AC /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = opensource/atomicparsley/config.h; sourceTree = "<group>"; };
+		EA499944118F7D0700E614AC /* extracts.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = extracts.cpp; path = opensource/atomicparsley/extracts.cpp; sourceTree = "<group>"; };
+		EA499945118F7D0700E614AC /* iconv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iconv.cpp; path = opensource/atomicparsley/iconv.cpp; sourceTree = "<group>"; };
+		EA499946118F7D0700E614AC /* id3v2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = id3v2.cpp; path = opensource/atomicparsley/id3v2.cpp; sourceTree = "<group>"; };
+		EA499947118F7D0700E614AC /* id3v2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3v2.h; path = opensource/atomicparsley/id3v2.h; sourceTree = "<group>"; };
+		EA499948118F7D0700E614AC /* id3v2defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3v2defs.h; path = opensource/atomicparsley/id3v2defs.h; sourceTree = "<group>"; };
+		EA499949118F7D0700E614AC /* id3v2types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3v2types.h; path = opensource/atomicparsley/id3v2types.h; sourceTree = "<group>"; };
+		EA49994A118F7D0700E614AC /* metalist.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metalist.cpp; path = opensource/atomicparsley/metalist.cpp; sourceTree = "<group>"; };
+		EA49994B118F7D0700E614AC /* nsfile.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = nsfile.mm; path = opensource/atomicparsley/nsfile.mm; sourceTree = "<group>"; };
+		EA49994C118F7D0700E614AC /* nsimage.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = nsimage.mm; path = opensource/atomicparsley/nsimage.mm; sourceTree = "<group>"; };
+		EA49994D118F7D0700E614AC /* parsley.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = parsley.cpp; path = opensource/atomicparsley/parsley.cpp; sourceTree = "<group>"; };
+		EA49994E118F7D0700E614AC /* sha1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sha1.cpp; path = opensource/atomicparsley/sha1.cpp; sourceTree = "<group>"; };
+		EA49994F118F7D0700E614AC /* util.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = opensource/atomicparsley/util.cpp; sourceTree = "<group>"; };
+		EA499950118F7D0700E614AC /* util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = util.h; path = opensource/atomicparsley/util.h; sourceTree = "<group>"; };
+		EA499951118F7D0700E614AC /* uuid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = uuid.cpp; path = opensource/atomicparsley/uuid.cpp; sourceTree = "<group>"; };
+		EA4999C9118F7EEA00E614AC /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		EA4B9FBB0C822AD300FBAF95 /* recsched_DataModel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "recsched_DataModel 2.xcdatamodel"; sourceTree = "<group>"; };
 		EA4BA1160C84A23500FBAF95 /* RSCommonAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSCommonAppDelegate.h; path = common/RSCommonAppDelegate.h; sourceTree = "<group>"; };
 		EA4BA1170C84A23600FBAF95 /* RSCommonAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RSCommonAppDelegate.m; path = common/RSCommonAppDelegate.m; sourceTree = "<group>"; };
@@ -542,6 +579,7 @@
 				EA96CC9D1169050300BBB94A /* AudioToolbox.framework in Frameworks */,
 				EA96CD121169077500BBB94A /* libbz2.dylib in Frameworks */,
 				EA96CD131169077900BBB94A /* libiconv.dylib in Frameworks */,
+				EA4999CA118F7EEA00E614AC /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -652,6 +690,7 @@
 				EA96CC87116904EA00BBB94A /* AudioToolbox.framework */,
 				EA96CD101169076E00BBB94A /* libbz2.dylib */,
 				EA96CD111169076E00BBB94A /* libiconv.dylib */,
+				EA4999C9118F7EEA00E614AC /* IOKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -764,6 +803,35 @@
 			name = libhdhomerun;
 			sourceTree = "<group>";
 		};
+		EA49993B118F7CD900E614AC /* AtomicParsley */ = {
+			isa = PBXGroup;
+			children = (
+				EA49993C118F7D0700E614AC /* ap_types.h */,
+				EA49993D118F7D0700E614AC /* arrays.cpp */,
+				EA49993E118F7D0700E614AC /* AtomDefs.h */,
+				EA49993F118F7D0700E614AC /* AtomicParsley.h */,
+				EA499940118F7D0700E614AC /* CDtoc.cpp */,
+				EA499941118F7D0700E614AC /* CDtoc.h */,
+				EA499942118F7D0700E614AC /* compress.cpp */,
+				EA499943118F7D0700E614AC /* config.h */,
+				EA499944118F7D0700E614AC /* extracts.cpp */,
+				EA499945118F7D0700E614AC /* iconv.cpp */,
+				EA499946118F7D0700E614AC /* id3v2.cpp */,
+				EA499947118F7D0700E614AC /* id3v2.h */,
+				EA499948118F7D0700E614AC /* id3v2defs.h */,
+				EA499949118F7D0700E614AC /* id3v2types.h */,
+				EA49994A118F7D0700E614AC /* metalist.cpp */,
+				EA49994B118F7D0700E614AC /* nsfile.mm */,
+				EA49994C118F7D0700E614AC /* nsimage.mm */,
+				EA49994D118F7D0700E614AC /* parsley.cpp */,
+				EA49994E118F7D0700E614AC /* sha1.cpp */,
+				EA49994F118F7D0700E614AC /* util.cpp */,
+				EA499950118F7D0700E614AC /* util.h */,
+				EA499951118F7D0700E614AC /* uuid.cpp */,
+			);
+			name = AtomicParsley;
+			sourceTree = "<group>";
+		};
 		EABF0EAC0CDE7DAC00DFFA0F /* common */ = {
 			isa = PBXGroup;
 			children = (
@@ -859,6 +927,7 @@
 		EAE655370B9D0A3100CDB279 /* Background App */ = {
 			isa = PBXGroup;
 			children = (
+				EA49993B118F7CD900E614AC /* AtomicParsley */,
 				EA23A8E6116609F7004F67B9 /* ASIHTTPRequest */,
 				EAD024270CE246F1002B7C37 /* UserPresets.plist */,
 				EA7002860CC4285D00DA9542 /* iTunes_ScriptingBridge.h */,
@@ -1275,6 +1344,19 @@
 				EA23A8F911660A4A004F67B9 /* ASIInputStream.m in Sources */,
 				EA23A8FA11660A4A004F67B9 /* ASINetworkQueue.m in Sources */,
 				EA23A8FB11660A4A004F67B9 /* ASINSStringAdditions.m in Sources */,
+				EA499952118F7D0700E614AC /* arrays.cpp in Sources */,
+				EA499954118F7D0700E614AC /* compress.cpp in Sources */,
+				EA499955118F7D0700E614AC /* extracts.cpp in Sources */,
+				EA499956118F7D0700E614AC /* iconv.cpp in Sources */,
+				EA499957118F7D0700E614AC /* id3v2.cpp in Sources */,
+				EA499958118F7D0700E614AC /* metalist.cpp in Sources */,
+				EA499959118F7D0700E614AC /* nsfile.mm in Sources */,
+				EA49995A118F7D0700E614AC /* nsimage.mm in Sources */,
+				EA49995B118F7D0700E614AC /* parsley.cpp in Sources */,
+				EA49995C118F7D0700E614AC /* sha1.cpp in Sources */,
+				EA49995D118F7D0700E614AC /* util.cpp in Sources */,
+				EA49995E118F7D0700E614AC /* uuid.cpp in Sources */,
+				EA4999AF118F7E9700E614AC /* CDtoc.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1560,8 +1642,11 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/AppKit.framework/Headers/AppKit.h";
-				GCC_PREPROCESSOR_DEFINITIONS = "BUILDING_BKGD_APP=1";
+				GCC_PREFIX_HEADER = BkgdServer/recsched_bkgd_prefix.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DARWIN_PLATFORM=1",
+					"BUILDING_BKGD_APP=1",
+				);
 				HEADER_SEARCH_PATHS = ../HandBrake/libhb;
 				INFOPLIST_FILE = "BkgdServer/recsched_bkgd-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";

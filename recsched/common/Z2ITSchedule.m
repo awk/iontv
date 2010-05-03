@@ -18,6 +18,8 @@
 #import "Z2ITSchedule.h"
 #import "Z2ITProgram.h"
 
+#import <AppKit/NSImage.h>
+
 @implementation Z2ITSchedule
 
 + (void)clearAllSchedulesInManagedObjectContext:(NSManagedObjectContext *)inMOC {
