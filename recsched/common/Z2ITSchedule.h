@@ -35,7 +35,6 @@
 @property (retain) NSString * dolby;
 @property (retain) NSDate * endTime;
 @property (retain) NSNumber * hdtv;
-@property (retain, getter=newProgram, setter=setNewProgram:) NSNumber * new;
 @property (retain) NSNumber * partNumber;
 @property (retain) NSString * recordedMediaPath;
 @property (retain) NSNumber * recordingStatus;
@@ -51,7 +50,8 @@
 
 - (NSString *)programDetailsStr;
 - (NSString *)tvRatingImageName;
-
+- (NSNumber *)newProgram;
+- (void)setNewProgram:(NSNumber *)newProg;
 @end
 
 // coalesce these into one @interface Z2ITSchedule (CoreDataGeneratedAccessors) section
