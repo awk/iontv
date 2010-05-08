@@ -89,7 +89,7 @@ NSString *RSSourceListDeleteMessageNameKey = @"deleteMessageName";
       [schedulesToBeRecorded makeObjectsPerformSelector:@selector(buildSourceListNodeAndAddTo:) withObject:sourceListNodes];
       [aSourceListNode setValue:sourceListNodes forKey:RSSourceListChildrenKey];
     } else if ([aSourceListNode valueForKey:RSSourceListTypeKey] == RSSourceListNodePastRecordingsType) {
-      NSMutableArray *pastRecordings = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] beforeDate:[NSDate date]]];
+      NSMutableArray *pastRecordings = [NSMutableArray arrayWithArray:[RSRecording fetchRecordingsInManagedObjectContext:[[NSApp delegate]managedObjectContext] beforeDate:[NSDate date] withRecordingOrTranscoding:YES]];
       NSMutableArray *sourceListNodes = [NSMutableArray arrayWithCapacity:[pastRecordings count]];
       [pastRecordings makeObjectsPerformSelector:@selector(buildSourceListNodeAndAddTo:) withObject:sourceListNodes];
       [aSourceListNode setValue:sourceListNodes forKey:RSSourceListChildrenKey];

@@ -60,12 +60,18 @@
   return array;
 }
 
-+ (NSArray *)fetchRecordingsInManagedObjectContext:(NSManagedObjectContext *)inMOC beforeDate:(NSDate *)aDate {
++ (NSArray *)fetchRecordingsInManagedObjectContext:(NSManagedObjectContext *)inMOC beforeDate:(NSDate *)aDate withRecordingOrTranscoding:(BOOL)withRecordingOrTranscoding {
   NSEntityDescription *entityDescription = [NSEntityDescription entityForName:@"Recording" inManagedObjectContext:inMOC];
   NSFetchRequest *request = [[[NSFetchRequest alloc] init] autorelease];
   [request setEntity:entityDescription];
 
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"schedule.time < %@", aDate];
+  NSPredicate *predicate = nil;
+  if (withRecordingOrTranscoding) {
+    predicate = [NSPredicate predicateWithFormat:@"(schedule.time < %@) AND "
+                 @"((mediaFile != nil) OR (schedule.transcoding.mediaFile != nil))", aDate];
+  } else {
+    predicate = [NSPredicate predicateWithFormat:@"schedule.time < %@", aDate];
+  }
   [request setPredicate:predicate];
 
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"schedule.time" ascending:NO];
