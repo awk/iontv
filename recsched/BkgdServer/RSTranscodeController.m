@@ -20,6 +20,7 @@
 #import "RSTranscodeController.h"
 #import "RSRecording.h"
 #import "RSTranscoding.h"
+#import "RSTranscodingAdditions.h"
 #import "RSTranscodingImp.h"
 #import "Z2ITProgram.h"
 #import "Z2ITSchedule.h"
@@ -267,7 +268,10 @@ const OSType iTunesSignature = 'hook';
   // iTunes won't add a video file with the .mp4 extension so change it to .m4v if needed
   if ([[fromLocation pathExtension] isEqualToString:@"mp4"]) {
     NSURL *locationWithoutExtension = [fromLocation URLByDeletingPathExtension];
-    fromLocation = [locationWithoutExtension URLByAppendingPathExtension:@"m4v"];
+    NSURL *newLocation = [locationWithoutExtension URLByAppendingPathExtension:@"m4v"];
+    NSError *error = nil;
+    [[NSFileManager defaultManager] moveItemAtURL:fromLocation toURL:newLocation error:&error];
+    fromLocation = newLocation;
   }
   
   AliasHandle alias = [RSTranscodeController newAliasHandleWithURL:fromLocation];
@@ -340,44 +344,8 @@ cleanup_get_event:
 }
 
 - (void)addToiTunes:(RSTranscoding *)aTranscoding {
+  [aTranscoding updateMetadata];
   [self addTrack:[NSURL fileURLWithPath:aTranscoding.mediaFile]];
-  
-#if 0
-  iTunesApplication *iTunes = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-  [iTunes setDelegate:self];
-
-  NSArray *filesArray = [NSArray arrayWithObject:[NSURL fileURLWithPath:aTranscoding.mediaFile]];
-  iTunesTrack *theTrack = [iTunes add:filesArray to:nil];
-  if (![aTranscoding.schedule.program isMovie]) {
-    // Additions to the iTunes library are movies by default
-    theTrack.videoKind = iTunesEVdKTVShow;
-  }
-  theTrack.show = aTranscoding.schedule.program.title;
-  theTrack.albumArtist = aTranscoding.schedule.program.title;
-  theTrack.artist = aTranscoding.schedule.program.title;
-  // In theory the Episode ID/syndicatedEpisodeNumber is usually a 3 digit number of the form 104, 307 etc. This can be parsed as
-  // Season 1 Episode 4, Season 3 Episode 7. In practice however the ScheduleDirect data doesn't seem to uniformly follow
-  // this scheme - so we'll take the syndicated episode number and if it's between 1 and 99999 use it to generate  the season
-  // and epsidoe number - if not we'll just skip that part
-  theTrack.episodeID = aTranscoding.schedule.program.syndicatedEpisodeNumber;
-  int episodeID = [theTrack.episodeID intValue];
-  if ((episodeID >= 100) && (episodeID < 99999)) {
-    theTrack.seasonNumber = episodeID / 100;
-    theTrack.episodeNumber = episodeID % 100;
-    theTrack.album = [NSString stringWithFormat:@"%@, Season %d", theTrack.artist, theTrack.seasonNumber];
-  }
-  NSCalendarDate *originalAirDate = [aTranscoding.schedule.program.originalAirDate dateWithCalendarFormat:nil timeZone:nil];
-  theTrack.year = [originalAirDate yearOfCommonEra];
-  if (aTranscoding.schedule.program.subTitle != nil) {
-    theTrack.name = aTranscoding.schedule.program.subTitle;
-  }
-  theTrack.objectDescription = aTranscoding.schedule.program.descriptionStr;
-#endif
-}
-
-- (id)eventDidFail:(const AppleEvent *)event withError:(NSError *)error {
-  NSLog(@"ScriptingBridge eventDidFail error = %@", error);
- return nil;
 }
 
 - (void)transcodingFinishedNotification:(NSNotification *)aNotification {
