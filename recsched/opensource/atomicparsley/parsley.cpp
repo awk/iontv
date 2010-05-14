@@ -15,7 +15,7 @@
     cannot, write to the Free Software Foundation, 59 Temple Place
     Suite 330, Boston, MA 02111-1307, USA.  Or www.fsf.org
 
-    Copyright ©2005-2007 puck_lock
+    Copyright ï¿½2005-2007 puck_lock
 
     ----------------------
     Code Contributions by:
@@ -879,7 +879,9 @@ void APar_AtomizeFileInfo(uint64_t Astart, uint64_t Alength,
 	thisAtom->ancillary_data = 0;
 	
 	//set the next atom number of the PREVIOUS atom (we didn't know there would be one until now); this is our default normal mode
-	parsedAtoms[atom_number-1].NextAtomNumber = atom_number;
+  if (atom_number > 0) {
+    parsedAtoms[atom_number-1].NextAtomNumber = atom_number;
+  }
 	thisAtom->NextAtomNumber=0; //this could be the end... (we just can't quite say until we find another atom)
 		
 	if (strncmp(Astring, "mdat", 4) == 0) {
@@ -2158,7 +2160,7 @@ APar_MetaData_atomGenre_Set
 	atomPayload - the desired string value of the genre
 
     genre is special in that it gets carried on 2 atoms. A standard genre (as listed in ID3v1GenreList) is represented as a number on a 'gnre' atom
-		any value other than those, and the genre is placed as a string onto a '©gen' atom. Only one or the other can be present. So if atomPayload is a
+		any value other than those, and the genre is placed as a string onto a '\xa9gen' atom. Only one or the other can be present. So if atomPayload is a
 		non-NULL value, first try and match the genre into the ID3v1GenreList standard genres. Try to remove the other type of genre atom, then find or
 		create the new genre atom and put the data manually onto the atom.
 ----------------------*/
@@ -2166,8 +2168,8 @@ void APar_MetaData_atomGenre_Set(const char* atomPayload) {
 	if (metadata_style == ITUNES_STYLE) {
 		const char* standard_genre_atom = "moov.udta.meta.ilst.gnre";
 		const char* std_genre_data_atom = "moov.udta.meta.ilst.gnre.data";
-		const char* custom_genre_atom = "moov.udta.meta.ilst.©gen";
-		const char* cstm_genre_data_atom = "moov.udta.meta.ilst.©gen.data";
+		const char* custom_genre_atom = "moov.udta.meta.ilst.\xa9gen";
+		const char* cstm_genre_data_atom = "moov.udta.meta.ilst.\xa9gen.data";
 		
 		if ( strlen(atomPayload) == 0) {
 			APar_RemoveAtom(std_genre_data_atom, VERSIONED_ATOM, 0); //find the atom; don't create if it's "" to remove
@@ -2181,13 +2183,13 @@ void APar_MetaData_atomGenre_Set(const char* atomPayload) {
 			modified_atoms = true;
 			
 			if (genre_number != 0) {
-				//first find if a custom genre atom ("©gen") exists; erase the custom-string genre atom in favor of the standard genre atom
+				//first find if a custom genre atom ("ï¿½gen") exists; erase the custom-string genre atom in favor of the standard genre atom
 				
 				AtomicInfo* verboten_genre_atom = APar_FindAtom(custom_genre_atom, false, SIMPLE_ATOM, 0);
 				
 				if (verboten_genre_atom != NULL) {
 					if (strlen(verboten_genre_atom->AtomicName) > 0) {
-						if (strncmp(verboten_genre_atom->AtomicName, "©gen", 4) == 0) {
+						if (strncmp(verboten_genre_atom->AtomicName, "\xa9gen", 4) == 0) {
 							APar_RemoveAtom(cstm_genre_data_atom, VERSIONED_ATOM, 0);
 						}
 					}
