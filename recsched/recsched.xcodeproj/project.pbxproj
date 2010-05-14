@@ -161,6 +161,7 @@
 		EADCD9710C3EC4CF0005A5B4 /* AKSourceTableClasses.m in Sources */ = {isa = PBXBuildFile; fileRef = EADCD9700C3EC4CF0005A5B4 /* AKSourceTableClasses.m */; };
 		EAE3FB290C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */; };
 		EAE3FB2A0C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = EAE3FB280C727D80005E9CA8 /* recsched_DataModel.xcdatamodeld */; };
+		EAE9EA8E1191A0750023BC4A /* RSTranscodingAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = EAE9EA8D1191A0750023BC4A /* RSTranscodingAdditions.mm */; };
 		EAEC09370C272E8800C40D5A /* recsched_bkgd_main.m in Sources */ = {isa = PBXBuildFile; fileRef = EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */; };
 		EAEC09580C27422800C40D5A /* recsched_bkgd_AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EAEC09570C27422800C40D5A /* recsched_bkgd_AppDelegate.m */; };
 		EAEC09630C27452600C40D5A /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 77C82804067257F0000B614F /* CoreData.framework */; };
@@ -488,6 +489,8 @@
 		EAE655580B9D1A8300CDB279 /* RecSchedServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RecSchedServer.h; path = BkgdServer/RecSchedServer.h; sourceTree = "<group>"; };
 		EAE655590B9D1A8300CDB279 /* RecSchedServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RecSchedServer.m; path = BkgdServer/RecSchedServer.m; sourceTree = "<group>"; };
 		EAE655730B9E691000CDB279 /* RecSchedProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RecSchedProtocol.h; path = common/RecSchedProtocol.h; sourceTree = "<group>"; };
+		EAE9EA8D1191A0750023BC4A /* RSTranscodingAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RSTranscodingAdditions.mm; path = BkgdServer/RSTranscodingAdditions.mm; sourceTree = "<group>"; };
+		EAE9EA8F1191A0940023BC4A /* RSTranscodingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RSTranscodingAdditions.h; path = BkgdServer/RSTranscodingAdditions.h; sourceTree = "<group>"; };
 		EAEC092D0C272E1300C40D5A /* recsched_bkgd.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = recsched_bkgd.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EAEC09360C272E8800C40D5A /* recsched_bkgd_main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = recsched_bkgd_main.m; path = BkgdServer/recsched_bkgd_main.m; sourceTree = "<group>"; };
 		EAEC09560C27422800C40D5A /* recsched_bkgd_AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = recsched_bkgd_AppDelegate.h; path = BkgdServer/recsched_bkgd_AppDelegate.h; sourceTree = "<group>"; };
@@ -955,6 +958,8 @@
 				EA6338D90D03527B006F3F64 /* RSRecording4To5MigrationPolicy.m */,
 				EABE7C490DE8321C0013310F /* recsched6To7Migration.h */,
 				EABE7C4A0DE8321C0013310F /* recsched6To7Migration.m */,
+				EAE9EA8D1191A0750023BC4A /* RSTranscodingAdditions.mm */,
+				EAE9EA8F1191A0940023BC4A /* RSTranscodingAdditions.h */,
 			);
 			name = "Background App";
 			sourceTree = "<group>";
@@ -1357,6 +1362,7 @@
 				EA49995D118F7D0700E614AC /* util.cpp in Sources */,
 				EA49995E118F7D0700E614AC /* uuid.cpp in Sources */,
 				EA4999AF118F7E9700E614AC /* CDtoc.cpp in Sources */,
+				EAE9EA8E1191A0750023BC4A /* RSTranscodingAdditions.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
