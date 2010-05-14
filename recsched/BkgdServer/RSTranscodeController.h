@@ -26,7 +26,7 @@ extern NSString *RSNotificationTranscodingFinished;
 
 @class RSTranscoding;
 
-@interface RSTranscodeController : NSObject <SBApplicationDelegate> {
+@interface RSTranscodeController : NSObject {
   hb_handle_t    *mHandbrakeHandle;   // Connection to the Handbrake libraries
 
   NSArrayController *mRecordingsArrayController;
